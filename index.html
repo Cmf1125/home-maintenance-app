@@ -71,4 +71,368 @@
                     </div>
                 </div>
 
-                <!-
+                <!-- Custom Categories -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Maintenance Categories</label>
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="new-category" placeholder="Add category" class="flex-1 p-2 border rounded">
+                        <button onclick="addCategory()" class="px-4 py-2 primary-bg text-white rounded hover:opacity-90">Add</button>
+                    </div>
+                    <div id="categories-list" class="space-y-2">
+                        <!-- Categories will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Insurance Info -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Insurance Information</label>
+                    <div class="space-y-3">
+                        <input type="text" id="insurance-provider" placeholder="Insurance Provider" 
+                               class="w-full p-2 border rounded" onchange="updateInsurance()">
+                        <input type="text" id="policy-number" placeholder="Policy Number" 
+                               class="w-full p-2 border rounded" onchange="updateInsurance()">
+                        <input type="number" id="annual-premium" placeholder="Annual Premium" 
+                               class="w-full p-2 border rounded" onchange="updateInsurance()">
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <button onclick="saveSettings()" class="w-full primary-bg text-white py-3 rounded-lg font-medium hover:opacity-90">
+                    💾 Save All Changes
+                </button>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="bg-white shadow-lg border-b border-gray-100">
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <h1 id="main-title" class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    Home Maintenance Tracker
+                </h1>
+                <p class="text-gray-600 mt-1">Keep your home well-maintained and document everything</p>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="flex space-x-1 bg-white rounded-xl p-2 shadow-lg">
+                <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn accent-bg text-white px-6 py-3 rounded-lg font-medium">
+                    📅 Dashboard
+                </button>
+                <button onclick="showTab('tasks')" id="tab-tasks" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                    ✅ All Tasks
+                </button>
+                <button onclick="showTab('insurance')" id="tab-insurance" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                    🛡️ Insurance
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-4 pb-8">
+            <!-- Dashboard Tab -->
+            <div id="dashboard-content" class="tab-content">
+                <!-- Welcome Card -->
+                <div class="gradient-bg text-white rounded-2xl p-8 shadow-2xl mb-8">
+                    <h2 class="text-2xl font-bold mb-4">🎉 Welcome to Your Home Maintenance Tracker!</h2>
+                    <p class="text-blue-100 mb-6">Get started by adding your home maintenance tasks. Try the design panel (🎨) to customize your experience!</p>
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="openTaskModal()" class="px-6 py-3 bg-white primary-text rounded-lg hover:bg-blue-50 transition-colors font-medium">
+                            ➕ Add Your First Task
+                        </button>
+                        <button onclick="toggleDesignPanel()" class="px-6 py-3 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-colors font-medium border border-white border-opacity-30">
+                            🎨 Open Design Panel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center gap-4">
+                            <div class="p-3 bg-red-100 rounded-xl">⚠️</div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Overdue Tasks</p>
+                                <p id="overdue-count" class="text-3xl font-bold text-gray-900">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center gap-4">
+                            <div class="p-3 bg-orange-100 rounded-xl">⏰</div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Due This Month</p>
+                                <p id="upcoming-count" class="text-3xl font-bold text-gray-900">1</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center gap-4">
+                            <div class="p-3 bg-green-100 rounded-xl">💰</div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Annual Budget</p>
+                                <p id="annual-budget" class="text-3xl font-bold text-gray-900">$100</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Tasks -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                        <h2 class="text-2xl font-bold text-gray-900">Upcoming Tasks</h2>
+                        <button onclick="openTaskModal()" class="flex items-center gap-2 px-6 py-3 accent-bg text-white rounded-lg hover:opacity-90">
+                            ➕ Add Task
+                        </button>
+                    </div>
+                    <div id="tasks-list" class="p-6">
+                        <div class="p-6 border border-orange-200 bg-orange-50 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Change HVAC Filter</h3>
+                                    <p class="text-gray-600">HVAC • Every 3 months</p>
+                                    <p class="text-gray-500 text-sm">16x25x1 MERV 8 filter from Home Depot</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">Due Soon</span>
+                                    <button onclick="completeTask()" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Complete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks Tab -->
+            <div id="tasks-content" class="tab-content hidden">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                        <h2 class="text-2xl font-bold text-gray-900">All Maintenance Tasks</h2>
+                        <button onclick="openTaskModal()" class="px-6 py-3 accent-bg text-white rounded-lg hover:opacity-90">
+                            ➕ Add Task
+                        </button>
+                    </div>
+                    <div class="p-8 text-center">
+                        <div class="text-4xl mb-4">📝</div>
+                        <p class="text-xl font-medium text-gray-600 mb-2">Your tasks will appear here</p>
+                        <p class="text-gray-500">Add your first maintenance task to get started!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insurance Tab -->
+            <div id="insurance-content" class="tab-content hidden">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-100">
+                        <h2 class="text-2xl font-bold text-gray-900">Insurance Policy Overview</h2>
+                        <p id="insurance-info" class="text-gray-600">Your Insurance Company • Policy #Enter Policy Number</p>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="text-center p-6 bg-blue-50 rounded-xl">
+                            <h3 class="font-semibold text-blue-900 mb-2">Annual Premium</h3>
+                            <p id="premium-display" class="text-3xl font-bold text-blue-600">$1,200</p>
+                            <p class="text-sm text-blue-700">Renews: 2026-06-28</p>
+                        </div>
+                        <div class="text-center p-6 bg-green-50 rounded-xl">
+                            <h3 class="font-semibold text-green-900 mb-2">Current Discounts</h3>
+                            <p class="text-3xl font-bold text-green-600">-$22</p>
+                            <p class="text-sm text-green-700">1 active discount</p>
+                        </div>
+                        <div class="text-center p-6 bg-orange-50 rounded-xl">
+                            <h3 class="font-semibold text-orange-900 mb-2">Potential Savings</h3>
+                            <p class="text-3xl font-bold text-orange-600">$150</p>
+                            <p class="text-sm text-orange-700">Complete maintenance tasks</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simple Modal for Adding Tasks -->
+        <div id="task-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+            <div class="bg-white rounded-xl max-w-md w-full mx-4 p-6">
+                <h3 class="text-xl font-bold mb-4">Add New Task</h3>
+                <input type="text" id="task-title" placeholder="Task title" class="w-full p-3 border rounded-lg mb-3">
+                <select id="task-category" class="w-full p-3 border rounded-lg mb-4">
+                    <option value="HVAC">HVAC</option>
+                    <option value="Plumbing">Plumbing</option>
+                    <option value="Electrical">Electrical</option>
+                    <option value="Exterior">Exterior</option>
+                    <option value="General">General</option>
+                </select>
+                <div class="flex gap-3">
+                    <button onclick="closeTaskModal()" class="flex-1 px-4 py-2 bg-gray-200 rounded-lg">Cancel</button>
+                    <button onclick="addTask()" class="flex-1 px-4 py-2 accent-bg text-white rounded-lg">Add Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // App state
+        let appSettings = {
+            appName: 'Home Maintenance Tracker',
+            colorTheme: 'blue',
+            categories: ['HVAC', 'Plumbing', 'Electrical', 'Exterior', 'General'],
+            insurance: {
+                provider: 'Your Insurance Company',
+                policyNumber: 'Enter Policy Number',
+                premium: 1200
+            }
+        };
+
+        // Load saved settings
+        function loadSettings() {
+            const saved = localStorage.getItem('homeMaintenanceSettings');
+            if (saved) {
+                appSettings = { ...appSettings, ...JSON.parse(saved) };
+                applySettings();
+            }
+        }
+
+        // Apply settings to the UI
+        function applySettings() {
+            document.getElementById('app-name').value = appSettings.appName;
+            document.getElementById('main-title').textContent = appSettings.appName;
+            document.getElementById('insurance-provider').value = appSettings.insurance.provider;
+            document.getElementById('policy-number').value = appSettings.insurance.policyNumber;
+            document.getElementById('annual-premium').value = appSettings.insurance.premium;
+            updateInsuranceDisplay();
+            updateCategoriesList();
+            setColorTheme(appSettings.colorTheme);
+        }
+
+        // Save settings
+        function saveSettings() {
+            localStorage.setItem('homeMaintenanceSettings', JSON.stringify(appSettings));
+            alert('✅ Settings saved successfully!');
+        }
+
+        // Design panel functions
+        function toggleDesignPanel() {
+            const panel = document.getElementById('design-panel');
+            panel.classList.toggle('translate-x-full');
+        }
+
+        function updateAppName() {
+            const newName = document.getElementById('app-name').value;
+            appSettings.appName = newName;
+            document.getElementById('main-title').textContent = newName;
+        }
+
+        function setColorTheme(theme) {
+            appSettings.colorTheme = theme;
+            
+            const colors = {
+                blue: { primary: '#4f46e5', secondary: '#7c3aed', accent: '#3b82f6' },
+                purple: { primary: '#7c3aed', secondary: '#a855f7', accent: '#8b5cf6' },
+                green: { primary: '#059669', secondary: '#10b981', accent: '#06b6d4' },
+                red: { primary: '#dc2626', secondary: '#ef4444', accent: '#f59e0b' }
+            };
+            
+            const themeColors = colors[theme];
+            document.documentElement.style.setProperty('--primary-color', themeColors.primary);
+            document.documentElement.style.setProperty('--secondary-color', themeColors.secondary);
+            document.documentElement.style.setProperty('--accent-color', themeColors.accent);
+            
+            // Update theme selection UI
+            document.querySelectorAll('.color-theme').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'border-purple-500', 'border-green-500', 'border-red-500');
+                btn.classList.add('border-transparent');
+            });
+            document.querySelector(`[onclick="setColorTheme('${theme}')"]`).classList.add(`border-${theme}-500`);
+        }
+
+        function addCategory() {
+            const input = document.getElementById('new-category');
+            const newCategory = input.value.trim();
+            if (newCategory && !appSettings.categories.includes(newCategory)) {
+                appSettings.categories.push(newCategory);
+                input.value = '';
+                updateCategoriesList();
+                updateTaskCategorySelect();
+            }
+        }
+
+        function removeCategory(category) {
+            appSettings.categories = appSettings.categories.filter(c => c !== category);
+            updateCategoriesList();
+            updateTaskCategorySelect();
+        }
+
+        function updateCategoriesList() {
+            const container = document.getElementById('categories-list');
+            container.innerHTML = appSettings.categories.map(category => `
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <span class="text-sm">${category}</span>
+                    <button onclick="removeCategory('${category}')" class="text-red-500 hover:text-red-700 text-sm">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function updateTaskCategorySelect() {
+            const select = document.getElementById('task-category');
+            select.innerHTML = appSettings.categories.map(cat => 
+                `<option value="${cat}">${cat}</option>`
+            ).join('');
+        }
+
+        function updateInsurance() {
+            appSettings.insurance.provider = document.getElementById('insurance-provider').value;
+            appSettings.insurance.policyNumber = document.getElementById('policy-number').value;
+            appSettings.insurance.premium = document.getElementById('annual-premium').value;
+            updateInsuranceDisplay();
+        }
+
+        function updateInsuranceDisplay() {
+            document.getElementById('insurance-info').textContent = 
+                `${appSettings.insurance.provider} • Policy #${appSettings.insurance.policyNumber}`;
+            document.getElementById('premium-display').textContent = 
+                `$${appSettings.insurance.premium.toLocaleString()}`;
+        }
+
+        // Tab functionality
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = 'tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium';
+            });
+            
+            document.getElementById(tabName + '-content').classList.remove('hidden');
+            document.getElementById('tab-' + tabName).className = 'tab-btn accent-bg text-white px-6 py-3 rounded-lg font-medium';
+        }
+
+        // Modal functions
+        function openTaskModal() {
+            document.getElementById('task-modal').classList.remove('hidden');
+        }
+
+        function closeTaskModal() {
+            document.getElementById('task-modal').classList.add('hidden');
+            document.getElementById('task-title').value = '';
+        }
+
+        function addTask() {
+            const title = document.getElementById('task-title').value;
+            const category = document.getElementById('task-category').value;
+            if (title) {
+                alert(`Task "${title}" (${category}) added! Full functionality coming in next update.`);
+                closeTaskModal();
+            }
+        }
+
+        function completeTask() {
+            alert('Task completed! 🎉');
+        }
+
+        // Initialize
+        loadSettings();
+        showTab('dashboard');
+    </script>
+</body>
+</html>
