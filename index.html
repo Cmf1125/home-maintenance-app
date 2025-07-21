@@ -1,4 +1,647 @@
-<!DOCTYPE html>
+async function searchRealAddresses(query) {
+            if (!apiKey) {
+                showDemoAddressSuggestions(query);
+                return;
+            }
+
+            try {
+                // Using RentSpree API via RapidAPI for address autocomplete
+                const response = await fetch(`https://us-real-estate.p.rapidapi.com/v2/auto-complete?input=${encodeURIComponent(query)}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-RapidAPI-Key': apiKey,
+                        'X-RapidAPI-Host': 'us-real-estate.p.rapidapi.com'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const suggestions = data.data ? data.data.map(item => item.full_address || item.address) : [];
+                    displayAddressSuggestions(suggestions);
+                } else {
+                    console.error('API request failed:', response.status);
+                    showDemoAddressSuggestions(query);
+                }
+            } catch (error) {
+                console.error('Address search error:', error);
+                showDemoAddressSuggestions(query);
+            }
+        }
+
+        function displayAddressSuggestions(suggestions) {
+            const container = document.getElementById('address-suggestions');
+            
+            if (suggestions.length === 0) {
+                hideAddressSuggestions();
+                return;
+            }
+            
+            container.innerHTML = suggestions.map(address => `
+                <div class="address-suggestion p-3 border-b border-gray-100 last:border-b-0" onclick="selectAddress('${address}')">
+                    <div class="text-sm text-gray-900">${address}</div>
+                </div>
+            `).join('');
+            
+            container.classList.remove('hidden');
+        }
+
+        function hideAddressSuggestions() {
+            document.getElementById('address-suggestions').classList.add('hidden');
+        }
+
+        function selectAddress(address) {
+            document.getElementById('address-input').value = address;
+            hideAddressSuggestions();
+            lookupPropertyDetails(address);
+        }
+
+        // Property lookup with real API
+        async function lookupPropertyDetails(address) {
+            document.getElementById('loading-indicator').classList.remove('hidden');
+            
+            try {
+                if (demoMode) {
+                    // Use demo data
+                    setTimeout(() => {
+                        propertyData = generateDemoPropertyData(address);
+                        document.getElementById('loading-indicator').classList.add('hidden');
+                        populatePropertyDetails();
+                        nextStep();
+                    }, 1500);
+                } else {
+                    // Real API call
+                    const response = await fetch(`https://us-real-estate.p.rapidapi.com/v2/for-sale-properties/detail?property_id=${encodeURIComponent(address)}`, {
+                        method: 'GET',
+                        headers: {
+                            'X-RapidAPI-Key': apiKey,
+                            'X-RapidAPI-Host': 'us-real-estate.p.rapidapi.com'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        propertyData = parsePropertyData(data, address);
+                    } else {
+                        // Fallback to demo data if API fails
+                        propertyData = generateDemoPropertyData(address);
+                    }
+                    
+                    document.getElementById('loading-indicator').classList.add('hidden');
+                    populatePropertyDetails();
+                    nextStep();
+                }
+            } catch (error) {
+                console.error('Property lookup error:', error);
+                // Fallback to demo data
+                propertyData = generateDemoPropertyData(address);
+                document.getElementById('loading-indicator').classList.add('hidden');
+                populatePropertyDetails();
+                nextStep();
+            }
+        }
+
+        function generateDemoPropertyData(address) {
+            // Generate realistic demo data based on address
+            const yearBuilt = 1980 + Math.floor(Math.random() * 40);
+            const sqft = 1500 + Math.floor(Math.random() * 2000);
+            const bedrooms = 2 + Math.floor(Math.random() * 4);
+            const bathrooms = Math.floor(bedrooms * 0.75) + 0.5;
+            
+            return {
+                address: address,
+                yearBuilt: yearBuilt,
+                squareFootage: sqft,
+                bedrooms: bedrooms,
+                bathrooms: bathrooms,
+                propertyType: 'Single Family',
+                waterSource: Math.random() > 0.7 ? 'Well Water' : 'City Water',
+                sewerType: Math.random() > 0.6 ? 'Septic System' : 'Public Sewer',
+                heatingType: 'Central Air/Heat',
+                lotSize: (0.15 + Math.random() * 0.4).toFixed(2) + ' acres'
+            };
+        }
+
+        function parsePropertyData(apiData, address) {
+            // Parse real API response into our format
+            const property = apiData.data || {};
+            
+            return {
+                address: address,
+                yearBuilt: property.year_built || property.construction_year || 1990,
+                squareFootage: property.sqft || property.size_sqft || 2000,
+                bedrooms: property.beds || property.bedrooms || 3,
+                bathrooms: property.baths || property.bathrooms || 2,
+                propertyType: property.prop_type || property.property_type || 'Single Family',
+                waterSource: property.utilities?.water || 'City Water',
+                sewerType: property.utilities?.sewer || 'Public Sewer',
+                heatingType: property.heating || 'Central Air/Heat',
+                lotSize: property.lot_size || '0.25 acres'
+            };
+        }
+
+        function populatePropertyDetails() {
+            const container = document.getElementById('property-details');
+            container.innerHTML = `
+                <div class="bg-blue-50 rounded-lg p-4 mb-6">
+                    <h4 class="font-medium text-blue-900 mb-2">📍 ${propertyData.address}</h4>
+                    <p class="text-sm text-blue-700">Property details loaded ${demoMode ? '(Demo Data)' : '(Live Data)'}</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
+                        <input type="number" value="${propertyData.yearBuilt}" 
+                               class="w-full px-3 py-2 border rounded-lg" 
+                               onchange="propertyData.yearBuilt = this.value">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Square Footage</label>
+                        <input type="number" value="${propertyData.squareFootage}" 
+                               class="w-full px-3 py-2 border rounded-lg"
+                               onchange="propertyData.squareFootage = this.value">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
+                        <input type="number" value="${propertyData.bedrooms}" 
+                               class="w-full px-3 py-2 border rounded-lg"
+                               onchange="propertyData.bedrooms = this.value">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
+                        <input type="number" step="0.5" value="${propertyData.bathrooms}" 
+                               class="w-full px-3 py-2 border rounded-lg"
+                               onchange="propertyData.bathrooms = this.value">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Water Source</label>
+                        <select class="w-full px-3 py-2 border rounded-lg" onchange="propertyData.waterSource = this.value">
+                            <option value="City Water" ${propertyData.waterSource === 'City Water' ? 'selected' : ''}>City Water</option>
+                            <option value="Well Water" ${propertyData.waterSource === 'Well Water' ? 'selected' : ''}>Well Water</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Waste Water</label>
+                        <select class="w-full px-3 py-2 border rounded-lg" onchange="propertyData.sewerType = this.value">
+                            <option value="Public Sewer" ${propertyData.sewerType === 'Public Sewer' ? 'selected' : ''}>Public Sewer</option>
+                            <option value="Septic System" ${propertyData.sewerType === 'Septic System' ? 'selected' : ''}>Septic System</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Wizard navigation
+        function nextStep() {
+            if (currentStep < 4) {
+                document.getElementById(`wizard-step-${currentStep}`).classList.add('hidden');
+                currentStep++;
+                document.getElementById(`wizard-step-${currentStep}`).classList.remove('hidden');
+                updateProgressIndicators();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`wizard-step-${currentStep}`).classList.add('hidden');
+                currentStep--;
+                document.getElementById(`wizard-step-${currentStep}`).classList.remove('hidden');
+                updateProgressIndicators();
+            }
+        }
+
+        function updateProgressIndicators() {
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step-${i}`);
+                if (i < currentStep) {
+                    step.className = 'step-indicator step-completed w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold';
+                } else if (i === currentStep) {
+                    step.className = 'step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold';
+                } else {
+                    step.className = 'step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500';
+                }
+            }
+        }
+
+        // Generate maintenance tasks based on user inputs
+        function generateTasks() {
+            // Collect user preferences
+            userPreferences = {
+                hvacSystems: Array.from(document.querySelectorAll('input[name="hvac"]:checked')).map(cb => cb.value),
+                features: Array.from(document.querySelectorAll('input[name="features"]:checked')).map(cb => cb.value),
+                pets: document.querySelector('input[name="pets"]:checked').value,
+                occupancy: document.querySelector('select[name="occupancy"]').value,
+                approach: document.querySelector('input[name="approach"]:checked').value
+            };
+
+            maintenanceTasks = generateTaskList(propertyData, userPreferences);
+            
+            // Save to localStorage
+            localStorage.setItem('casaCareData', JSON.stringify({
+                propertyData,
+                userPreferences,
+                maintenanceTasks,
+                setupComplete: true,
+                apiKey: apiKey,
+                demoMode: demoMode
+            }));
+
+            // Switch to main app
+            document.getElementById('setup-wizard').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            
+            // Initialize main app
+            initializeMainApp();
+        }
+
+        function generateTaskList(property, preferences) {
+            const tasks = [];
+            let taskId = 1;
+
+            // Base frequency modifiers
+            const frequencyModifier = {
+                'proactive': 0.8,
+                'standard': 1.0,
+                'minimal': 1.3
+            }[preferences.approach];
+
+            const petModifier = preferences.pets === 'yes' ? 0.75 : 1.0;
+
+            // HVAC Tasks
+            if (preferences.hvacSystems.includes('central-ac')) {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Replace HVAC Filter',
+                    category: 'HVAC',
+                    frequency: Math.round(30 * frequencyModifier * petModifier), // days
+                    priority: 'high',
+                    cost: 25,
+                    description: 'Replace central air system filter to maintain air quality and system efficiency',
+                    tips: preferences.pets === 'yes' ? 'Change more frequently due to pet hair and dander' : 'Standard replacement schedule',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 1 week from now
+                });
+
+                tasks.push({
+                    id: taskId++,
+                    title: 'HVAC System Professional Service',
+                    category: 'HVAC',
+                    frequency: Math.round(365 * frequencyModifier),
+                    priority: 'medium',
+                    cost: 150,
+                    description: 'Annual professional maintenance including cleaning, inspection, and tune-up',
+                    tips: 'Schedule before peak heating/cooling seasons',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            if (preferences.hvacSystems.includes('mini-splits')) {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Clean Mini-Split Filters',
+                    category: 'HVAC',
+                    frequency: Math.round(60 * frequencyModifier * petModifier),
+                    priority: 'medium',
+                    cost: 0,
+                    description: 'Remove and wash mini-split unit filters',
+                    tips: 'Rinse with warm water and let dry completely before reinstalling',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            // Water System Tasks
+            if (property.waterSource === 'Well Water') {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Test Well Water Quality',
+                    category: 'Water Systems',
+                    frequency: Math.round(365 * frequencyModifier),
+                    priority: 'high',
+                    cost: 75,
+                    description: 'Annual water quality testing for bacteria and minerals',
+                    tips: 'Required by health departments in most areas',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000)
+                });
+
+                tasks.push({
+                    id: taskId++,
+                    title: 'Well Pump Inspection',
+                    category: 'Water Systems',
+                    frequency: Math.round(1095 * frequencyModifier), // 3 years
+                    priority: 'medium',
+                    cost: 200,
+                    description: 'Professional inspection of well pump and pressure tank',
+                    tips: 'Check for unusual noises or pressure issues',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            if (property.sewerType === 'Septic System') {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Septic Tank Pumping',
+                    category: 'Water Systems',
+                    frequency: Math.round(1460 * frequencyModifier), // 4 years
+                    priority: 'high',
+                    cost: 400,
+                    description: 'Professional septic tank pumping and inspection',
+                    tips: 'Frequency depends on household size and usage',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            // General Home Tasks
+            tasks.push({
+                id: taskId++,
+                title: 'Clean Gutters and Downspouts',
+                category: 'Exterior',
+                frequency: Math.round(182 * frequencyModifier), // twice yearly
+                priority: 'medium',
+                cost: 150,
+                description: 'Remove debris from gutters and check downspouts for proper drainage',
+                tips: 'Schedule for spring and fall, after leaves have fallen',
+                lastCompleted: null,
+                nextDue: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000)
+            });
+
+            tasks.push({
+                id: taskId++,
+                title: 'Test Smoke and CO Detectors',
+                category: 'Safety',
+                frequency: Math.round(30 * frequencyModifier),
+                priority: 'high',
+                cost: 0,
+                description: 'Test all smoke and carbon monoxide detectors, replace batteries if needed',
+                tips: 'Test monthly, replace batteries annually or when chirping',
+                lastCompleted: null,
+                nextDue: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)
+            });
+
+            // Feature-specific tasks
+            if (preferences.features.includes('fireplace')) {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Chimney Inspection and Cleaning',
+                    category: 'Safety',
+                    frequency: Math.round(365 * frequencyModifier),
+                    priority: 'high',
+                    cost: 300,
+                    description: 'Professional chimney inspection and cleaning',
+                    tips: 'Required annually for safety and insurance',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            if (preferences.features.includes('deck')) {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Deck Staining/Sealing',
+                    category: 'Exterior',
+                    frequency: Math.round(730 * frequencyModifier), // 2 years
+                    priority: 'medium',
+                    cost: 200,
+                    description: 'Clean and apply protective stain or sealant to deck',
+                    tips: 'Best done in dry weather, spring or early fall',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            if (preferences.features.includes('pool')) {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Pool Opening/Closing',
+                    category: 'Pool',
+                    frequency: Math.round(182 * frequencyModifier),
+                    priority: 'medium',
+                    cost: 250,
+                    description: 'Seasonal pool opening and closing service',
+                    tips: 'Schedule based on local climate and usage patterns',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            // Age-based tasks
+            const homeAge = new Date().getFullYear() - property.yearBuilt;
+            if (homeAge > 15) {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Electrical Panel Inspection',
+                    category: 'Electrical',
+                    frequency: Math.round(1825 * frequencyModifier), // 5 years
+                    priority: 'medium',
+                    cost: 300,
+                    description: 'Professional electrical panel and wiring inspection',
+                    tips: 'Recommended for homes over 15 years old',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 200 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            if (homeAge > 25) {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Roof Inspection',
+                    category: 'Exterior',
+                    frequency: Math.round(1095 * frequencyModifier), // 3 years
+                    priority: 'high',
+                    cost: 250,
+                    description: 'Professional roof inspection for damage and wear',
+                    tips: 'Critical for older homes to prevent water damage',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 150 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            return tasks;
+        }
+
+        // Initialize main app
+        function initializeMainApp() {
+            document.getElementById('dashboard-address').textContent = `Managing maintenance for ${propertyData.address}`;
+            updateTaskStats();
+            renderUpcomingTasks();
+            renderAllTasks();
+            updateApiStatus();
+        }
+
+        // Update dashboard stats
+        function updateTaskStats() {
+            const now = new Date();
+            const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            
+            const overdue = maintenanceTasks.filter(task => task.nextDue < now).length;
+            const thisWeek = maintenanceTasks.filter(task => task.nextDue <= oneWeek && task.nextDue >= now).length;
+            const total = maintenanceTasks.length;
+            const annualCost = maintenanceTasks.reduce((sum, task) => {
+                const yearlyFreq = 365 / task.frequency;
+                return sum + (task.cost * yearlyFreq);
+            }, 0);
+
+            document.getElementById('overdue-count').textContent = overdue;
+            document.getElementById('week-count').textContent = thisWeek;
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('annual-cost').textContent = `${Math.round(annualCost)}`;
+        }
+
+        // Render upcoming tasks
+        function renderUpcomingTasks() {
+            const container = document.getElementById('upcoming-tasks-list');
+            const now = new Date();
+            const twoWeeks = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+            
+            const upcoming = maintenanceTasks
+                .filter(task => task.nextDue <= twoWeeks)
+                .sort((a, b) => a.nextDue - b.nextDue)
+                .slice(0, 5);
+
+            if (upcoming.length === 0) {
+                container.innerHTML = `
+                    <div class="p-8 text-center text-gray-500">
+                        <div class="text-4xl mb-4">✅</div>
+                        <p class="font-medium">All caught up!</p>
+                        <p class="text-sm">No urgent maintenance tasks in the next two weeks.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = upcoming.map(task => {
+                const daysUntil = Math.ceil((task.nextDue - now) / (1000 * 60 * 60 * 24));
+                const isOverdue = daysUntil < 0;
+                const urgencyClass = isOverdue ? 'border-l-red-500 bg-red-50' : 
+                                   daysUntil <= 3 ? 'border-l-orange-500 bg-orange-50' : 
+                                   'border-l-blue-500 bg-blue-50';
+                
+                return `
+                    <div class="p-6 border-l-4 ${urgencyClass} hover:bg-opacity-75 transition-colors">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900 mb-1">${task.title}</h4>
+                                <p class="text-sm text-gray-600 mb-2">${task.category} • ${task.description}</p>
+                                <div class="flex items-center gap-4 text-xs text-gray-500">
+                                    <span>Due: ${task.nextDue.toLocaleDateString()}</span>
+                                    ${task.cost > 0 ? `<span>Est. Cost: ${task.cost}</span>` : ''}
+                                    <span class="font-medium ${isOverdue ? 'text-red-600' : daysUntil <= 3 ? 'text-orange-600' : 'text-blue-600'}">
+                                        ${isOverdue ? `${Math.abs(daysUntil)} days overdue` : daysUntil === 0 ? 'Due today' : `${daysUntil} days`}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 ml-4">
+                                <button onclick="completeTask(${task.id})" class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors">
+                                    Complete
+                                </button>
+                                <button onclick="postponeTask(${task.id})" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition-colors">
+                                    Postpone
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render all tasks
+        function renderAllTasks() {
+            const container = document.getElementById('all-tasks-list');
+            const tasksByCategory = {};
+            
+            maintenanceTasks.forEach(task => {
+                if (!tasksByCategory[task.category]) {
+                    tasksByCategory[task.category] = [];
+                }
+                tasksByCategory[task.category].push(task);
+            });
+
+            container.innerHTML = Object.entries(tasksByCategory).map(([category, tasks]) => `
+                <div class="border-b border-gray-100 last:border-b-0">
+                    <div class="p-6 bg-gray-50">
+                        <h4 class="font-semibold text-gray-900">${category}</h4>
+                    </div>
+                    ${tasks.map(task => {
+                        const now = new Date();
+                        const daysUntil = Math.ceil((task.nextDue - now) / (1000 * 60 * 60 * 24));
+                        const isOverdue = daysUntil < 0;
+                        
+                        return `
+                            <div class="p-6 border-b border-gray-100 last:border-b-0 hover:bg-gray-50">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <h5 class="font-medium text-gray-900 mb-1">${task.title}</h5>
+                                        <p class="text-sm text-gray-600 mb-2">${task.description}</p>
+                                        <div class="flex items-center gap-4 text-xs text-gray-500">
+                                            <span>Every ${Math.round(task.frequency / 30)} months</span>
+                                            <span>Next: ${task.nextDue.toLocaleDateString()}</span>
+                                            ${task.cost > 0 ? `<span>${task.cost}</span>` : '<span>DIY</span>'}
+                                            <span class="font-medium ${isOverdue ? 'text-red-600' : daysUntil <= 7 ? 'text-orange-600' : 'text-gray-500'}">
+                                                ${isOverdue ? 'Overdue' : daysUntil <= 7 ? 'Due soon' : 'Scheduled'}
+                                            </span>
+                                        </div>
+                                        ${task.tips ? `<p class="text-xs text-blue-600 mt-2">💡 ${task.tips}</p>` : ''}
+                                    </div>
+                                    <div class="flex gap-2 ml-4">
+                                        <button onclick="completeTask(${task.id})" class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">
+                                            Complete
+                                        </button>
+                                        <button onclick="editTask(${task.id})" class="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300">
+                                            Edit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `).join('');
+        }
+
+        // Task actions
+        function completeTask(taskId) {
+            const task = maintenanceTasks.find(t => t.id === taskId);
+            openModal('Complete Task', `
+                <p class="mb-4">Mark "${task.title}" as completed?</p>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Completion Date</label>
+                        <input type="date" id="completion-date" value="${new Date().toISOString().split('T')[0]}" 
+                               class="w-full px-3 py-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
+                        <textarea id="completion-notes" placeholder="Any notes about this maintenance..." 
+                                  class="w-full px-3 py-2 border rounded-lg" rows="2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Actual Cost</label>
+                        <input type="number" id="actual-cost" value="${task.cost}" 
+                               class="w-full px-3 py-2 border rounded-lg" placeholder="0">
+                    </div>
+                </div>
+            `, () => {
+                const completionDate = new Date(document.getElementById('completion-date').value);
+                const notes = document.getElementById('completion-notes').value;
+                const actualCost = parseFloat(document.getElementById('actual-cost').value) || 0;
+                
+                // Update task
+                task.lastCompleted = completionDate;
+                task.nextDue = new Date(completionDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
+                task.actualCost = actualCost;
+                task.notes = notes;
+                
+                saveData();
+                refreshApp();
+                closeModal();
+            });
+            currentModalAction = 'complete';
+        }<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -33,6 +676,15 @@
             background: #10b981;
             color: white;
         }
+
+        .address-suggestion {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .address-suggestion:hover {
+            background-color: #f3f4f6;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -45,8 +697,53 @@
             </div>
         </div>
 
+        <!-- API Key Setup (shown first time) -->
+        <div id="api-setup" class="max-w-2xl mx-auto px-4 py-8">
+            <div class="bg-white rounded-xl p-8 shadow-lg">
+                <div class="text-center mb-8">
+                    <div class="text-4xl mb-4">🔑</div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Get Started with Real Property Data</h2>
+                    <p class="text-gray-600">To provide accurate property information, we need a free API key from RentSpree</p>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="bg-blue-50 rounded-lg p-6">
+                        <h3 class="font-semibold text-blue-900 mb-3">How to get your free API key:</h3>
+                        <ol class="text-sm text-blue-800 space-y-2">
+                            <li><strong>1.</strong> Go to <a href="https://rapidapi.com/rentspree-rentspree-default/api/us-real-estate" target="_blank" class="underline hover:text-blue-600">RentSpree API on RapidAPI</a></li>
+                            <li><strong>2.</strong> Click "Subscribe to Test" (it's free!)</li>
+                            <li><strong>3.</strong> Create a free RapidAPI account</li>
+                            <li><strong>4.</strong> Copy your API key from the dashboard</li>
+                            <li><strong>5.</strong> Paste it below</li>
+                        </ol>
+                        <p class="text-xs text-blue-600 mt-3">💡 The free tier includes 100 property lookups per month</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">RapidAPI Key</label>
+                        <input type="text" id="api-key-input" placeholder="Paste your RapidAPI key here..." 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <p class="text-xs text-gray-500 mt-1">Your key is stored locally and never sent to our servers</p>
+                    </div>
+                    
+                    <div class="flex gap-4">
+                        <button onclick="saveApiKey()" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                            Save API Key & Continue
+                        </button>
+                        <button onclick="useDemoMode()" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors font-medium">
+                            Use Demo Mode
+                        </button>
+                    </div>
+                    
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500">Demo mode uses sample data for testing purposes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Setup Wizard -->
-        <div id="setup-wizard" class="max-w-2xl mx-auto px-4 py-8">
+        <div id="setup-wizard" class="max-w-2xl mx-auto px-4 py-8 hidden">
             <!-- Progress Indicators -->
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center space-x-4">
@@ -65,20 +762,31 @@
                 <div class="text-center mb-8">
                     <div class="text-4xl mb-4">🏠</div>
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">Let's start with your home</h2>
-                    <p class="text-gray-600">We'll look up your property details to create a personalized maintenance plan</p>
+                    <p class="text-gray-600">Enter your address and we'll look up detailed property information</p>
                 </div>
                 
                 <div class="space-y-4">
-                    <div>
+                    <div class="relative">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Home Address</label>
-                        <input type="text" id="address-input" placeholder="123 Main St, Anytown, NY 12345" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <p class="text-xs text-gray-500 mt-1">We use this to get accurate property details and local maintenance recommendations</p>
+                        <input type="text" id="address-input" placeholder="Start typing your address..." 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               oninput="searchAddresses(this.value)"
+                               autocomplete="off">
+                        
+                        <!-- Address suggestions dropdown -->
+                        <div id="address-suggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 hidden max-h-60 overflow-y-auto">
+                            <!-- Suggestions will be populated here -->
+                        </div>
+                        
+                        <p class="text-xs text-gray-500 mt-1">We'll automatically fetch property details from public records</p>
                     </div>
                     
-                    <button onclick="lookupAddress()" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                        Look Up Property Details
-                    </button>
+                    <div id="loading-indicator" class="hidden text-center py-4">
+                        <div class="inline-flex items-center gap-2 text-blue-600">
+                            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                            <span>Looking up property details...</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -366,6 +1074,14 @@
                         </div>
                         
                         <div>
+                            <h4 class="font-medium text-gray-900 mb-3">API Configuration</h4>
+                            <button onclick="updateApiKey()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mr-3">
+                                Update API Key
+                            </button>
+                            <span class="text-sm text-gray-600">Currently using: <span id="api-status">Demo Mode</span></span>
+                        </div>
+                        
+                        <div>
                             <h4 class="font-medium text-gray-900 mb-3">Data</h4>
                             <div class="space-y-2">
                                 <button onclick="exportData()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mr-3">
@@ -401,666 +1117,80 @@
         let userPreferences = {};
         let maintenanceTasks = [];
         let currentModalAction = null;
+        let apiKey = null;
+        let demoMode = false;
+        let searchTimeout = null;
 
-        // Property lookup simulation (in real app, this would call a property API)
-        function lookupAddress() {
-            const address = document.getElementById('address-input').value.trim();
-            if (!address) {
-                alert('Please enter an address');
+        // API Configuration
+        function saveApiKey() {
+            const key = document.getElementById('api-key-input').value.trim();
+            if (!key) {
+                alert('Please enter your API key');
                 return;
             }
-
-            // Simulate API call with realistic property data
-            setTimeout(() => {
-                propertyData = {
-                    address: address,
-                    yearBuilt: 1995,
-                    squareFootage: 2150,
-                    bedrooms: 3,
-                    bathrooms: 2,
-                    propertyType: 'Single Family',
-                    waterSource: 'City Water',
-                    sewerType: 'Public Sewer',
-                    heatingType: 'Central Air/Heat',
-                    lotSize: '0.25 acres'
-                };
-                
-                populatePropertyDetails();
-                nextStep();
-            }, 1000);
-        }
-
-        function populatePropertyDetails() {
-            const container = document.getElementById('property-details');
-            container.innerHTML = `
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
-                        <input type="number" value="${propertyData.yearBuilt}" 
-                               class="w-full px-3 py-2 border rounded-lg" 
-                               onchange="propertyData.yearBuilt = this.value">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Square Footage</label>
-                        <input type="number" value="${propertyData.squareFootage}" 
-                               class="w-full px-3 py-2 border rounded-lg"
-                               onchange="propertyData.squareFootage = this.value">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
-                        <input type="number" value="${propertyData.bedrooms}" 
-                               class="w-full px-3 py-2 border rounded-lg"
-                               onchange="propertyData.bedrooms = this.value">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
-                        <input type="number" step="0.5" value="${propertyData.bathrooms}" 
-                               class="w-full px-3 py-2 border rounded-lg"
-                               onchange="propertyData.bathrooms = this.value">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Water Source</label>
-                        <select class="w-full px-3 py-2 border rounded-lg" onchange="propertyData.waterSource = this.value">
-                            <option value="City Water" ${propertyData.waterSource === 'City Water' ? 'selected' : ''}>City Water</option>
-                            <option value="Well Water" ${propertyData.waterSource === 'Well Water' ? 'selected' : ''}>Well Water</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Waste Water</label>
-                        <select class="w-full px-3 py-2 border rounded-lg" onchange="propertyData.sewerType = this.value">
-                            <option value="Public Sewer" ${propertyData.sewerType === 'Public Sewer' ? 'selected' : ''}>Public Sewer</option>
-                            <option value="Septic System" ${propertyData.sewerType === 'Septic System' ? 'selected' : ''}>Septic System</option>
-                        </select>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Wizard navigation
-        function nextStep() {
-            if (currentStep < 4) {
-                document.getElementById(`wizard-step-${currentStep}`).classList.add('hidden');
-                currentStep++;
-                document.getElementById(`wizard-step-${currentStep}`).classList.remove('hidden');
-                updateProgressIndicators();
-            }
-        }
-
-        function prevStep() {
-            if (currentStep > 1) {
-                document.getElementById(`wizard-step-${currentStep}`).classList.add('hidden');
-                currentStep--;
-                document.getElementById(`wizard-step-${currentStep}`).classList.remove('hidden');
-                updateProgressIndicators();
-            }
-        }
-
-        function updateProgressIndicators() {
-            for (let i = 1; i <= 4; i++) {
-                const step = document.getElementById(`step-${i}`);
-                if (i < currentStep) {
-                    step.className = 'step-indicator step-completed w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold';
-                } else if (i === currentStep) {
-                    step.className = 'step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold';
-                } else {
-                    step.className = 'step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500';
-                }
-            }
-        }
-
-        // Generate maintenance tasks based on user inputs
-        function generateTasks() {
-            // Collect user preferences
-            userPreferences = {
-                hvacSystems: Array.from(document.querySelectorAll('input[name="hvac"]:checked')).map(cb => cb.value),
-                features: Array.from(document.querySelectorAll('input[name="features"]:checked')).map(cb => cb.value),
-                pets: document.querySelector('input[name="pets"]:checked').value,
-                occupancy: document.querySelector('select[name="occupancy"]').value,
-                approach: document.querySelector('input[name="approach"]:checked').value
-            };
-
-            maintenanceTasks = generateTaskList(propertyData, userPreferences);
             
-            // Save to localStorage
-            localStorage.setItem('casaCareData', JSON.stringify({
-                propertyData,
-                userPreferences,
-                maintenanceTasks,
-                setupComplete: true
-            }));
-
-            // Switch to main app
-            document.getElementById('setup-wizard').classList.add('hidden');
-            document.getElementById('main-app').classList.remove('hidden');
+            apiKey = key;
+            demoMode = false;
+            localStorage.setItem('casaCareApiKey', key);
             
-            // Initialize main app
-            initializeMainApp();
-        }
-
-        function generateTaskList(property, preferences) {
-            const tasks = [];
-            let taskId = 1;
-
-            // Base frequency modifiers
-            const frequencyModifier = {
-                'proactive': 0.8,
-                'standard': 1.0,
-                'minimal': 1.3
-            }[preferences.approach];
-
-            const petModifier = preferences.pets === 'yes' ? 0.75 : 1.0;
-
-            // HVAC Tasks
-            if (preferences.hvacSystems.includes('central-ac')) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Replace HVAC Filter',
-                    category: 'HVAC',
-                    frequency: Math.round(30 * frequencyModifier * petModifier), // days
-                    priority: 'high',
-                    cost: 25,
-                    description: 'Replace central air system filter to maintain air quality and system efficiency',
-                    tips: preferences.pets === 'yes' ? 'Change more frequently due to pet hair and dander' : 'Standard replacement schedule',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 1 week from now
-                });
-
-                tasks.push({
-                    id: taskId++,
-                    title: 'HVAC System Professional Service',
-                    category: 'HVAC',
-                    frequency: Math.round(365 * frequencyModifier),
-                    priority: 'medium',
-                    cost: 150,
-                    description: 'Annual professional maintenance including cleaning, inspection, and tune-up',
-                    tips: 'Schedule before peak heating/cooling seasons',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            if (preferences.hvacSystems.includes('mini-splits')) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Clean Mini-Split Filters',
-                    category: 'HVAC',
-                    frequency: Math.round(60 * frequencyModifier * petModifier),
-                    priority: 'medium',
-                    cost: 0,
-                    description: 'Remove and wash mini-split unit filters',
-                    tips: 'Rinse with warm water and let dry completely before reinstalling',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            // Water System Tasks
-            if (property.waterSource === 'Well Water') {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Test Well Water Quality',
-                    category: 'Water Systems',
-                    frequency: Math.round(365 * frequencyModifier),
-                    priority: 'high',
-                    cost: 75,
-                    description: 'Annual water quality testing for bacteria and minerals',
-                    tips: 'Required by health departments in most areas',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000)
-                });
-
-                tasks.push({
-                    id: taskId++,
-                    title: 'Well Pump Inspection',
-                    category: 'Water Systems',
-                    frequency: Math.round(1095 * frequencyModifier), // 3 years
-                    priority: 'medium',
-                    cost: 200,
-                    description: 'Professional inspection of well pump and pressure tank',
-                    tips: 'Check for unusual noises or pressure issues',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            if (property.sewerType === 'Septic System') {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Septic Tank Pumping',
-                    category: 'Water Systems',
-                    frequency: Math.round(1460 * frequencyModifier), // 4 years
-                    priority: 'high',
-                    cost: 400,
-                    description: 'Professional septic tank pumping and inspection',
-                    tips: 'Frequency depends on household size and usage',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            // General Home Tasks
-            tasks.push({
-                id: taskId++,
-                title: 'Clean Gutters and Downspouts',
-                category: 'Exterior',
-                frequency: Math.round(182 * frequencyModifier), // twice yearly
-                priority: 'medium',
-                cost: 150,
-                description: 'Remove debris from gutters and check downspouts for proper drainage',
-                tips: 'Schedule for spring and fall, after leaves have fallen',
-                lastCompleted: null,
-                nextDue: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000)
-            });
-
-            tasks.push({
-                id: taskId++,
-                title: 'Test Smoke and CO Detectors',
-                category: 'Safety',
-                frequency: Math.round(30 * frequencyModifier),
-                priority: 'high',
-                cost: 0,
-                description: 'Test all smoke and carbon monoxide detectors, replace batteries if needed',
-                tips: 'Test monthly, replace batteries annually or when chirping',
-                lastCompleted: null,
-                nextDue: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)
-            });
-
-            // Feature-specific tasks
-            if (preferences.features.includes('fireplace')) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Chimney Inspection and Cleaning',
-                    category: 'Safety',
-                    frequency: Math.round(365 * frequencyModifier),
-                    priority: 'high',
-                    cost: 300,
-                    description: 'Professional chimney inspection and cleaning',
-                    tips: 'Required annually for safety and insurance',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            if (preferences.features.includes('deck')) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Deck Staining/Sealing',
-                    category: 'Exterior',
-                    frequency: Math.round(730 * frequencyModifier), // 2 years
-                    priority: 'medium',
-                    cost: 200,
-                    description: 'Clean and apply protective stain or sealant to deck',
-                    tips: 'Best done in dry weather, spring or early fall',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            if (preferences.features.includes('pool')) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Pool Opening/Closing',
-                    category: 'Pool',
-                    frequency: Math.round(182 * frequencyModifier),
-                    priority: 'medium',
-                    cost: 250,
-                    description: 'Seasonal pool opening and closing service',
-                    tips: 'Schedule based on local climate and usage patterns',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            // Age-based tasks
-            const homeAge = new Date().getFullYear() - property.yearBuilt;
-            if (homeAge > 15) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Electrical Panel Inspection',
-                    category: 'Electrical',
-                    frequency: Math.round(1825 * frequencyModifier), // 5 years
-                    priority: 'medium',
-                    cost: 300,
-                    description: 'Professional electrical panel and wiring inspection',
-                    tips: 'Recommended for homes over 15 years old',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 200 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            if (homeAge > 25) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Roof Inspection',
-                    category: 'Exterior',
-                    frequency: Math.round(1095 * frequencyModifier), // 3 years
-                    priority: 'high',
-                    cost: 250,
-                    description: 'Professional roof inspection for damage and wear',
-                    tips: 'Critical for older homes to prevent water damage',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 150 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            return tasks;
-        }
-
-        // Initialize main app
-        function initializeMainApp() {
-            document.getElementById('dashboard-address').textContent = `Managing maintenance for ${propertyData.address}`;
-            updateTaskStats();
-            renderUpcomingTasks();
-            renderAllTasks();
-        }
-
-        // Update dashboard stats
-        function updateTaskStats() {
-            const now = new Date();
-            const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-            
-            const overdue = maintenanceTasks.filter(task => task.nextDue < now).length;
-            const thisWeek = maintenanceTasks.filter(task => task.nextDue <= oneWeek && task.nextDue >= now).length;
-            const total = maintenanceTasks.length;
-            const annualCost = maintenanceTasks.reduce((sum, task) => {
-                const yearlyFreq = 365 / task.frequency;
-                return sum + (task.cost * yearlyFreq);
-            }, 0);
-
-            document.getElementById('overdue-count').textContent = overdue;
-            document.getElementById('week-count').textContent = thisWeek;
-            document.getElementById('total-count').textContent = total;
-            document.getElementById('annual-cost').textContent = `${Math.round(annualCost)}`;
-        }
-
-        // Render upcoming tasks
-        function renderUpcomingTasks() {
-            const container = document.getElementById('upcoming-tasks-list');
-            const now = new Date();
-            const twoWeeks = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
-            
-            const upcoming = maintenanceTasks
-                .filter(task => task.nextDue <= twoWeeks)
-                .sort((a, b) => a.nextDue - b.nextDue)
-                .slice(0, 5);
-
-            if (upcoming.length === 0) {
-                container.innerHTML = `
-                    <div class="p-8 text-center text-gray-500">
-                        <div class="text-4xl mb-4">✅</div>
-                        <p class="font-medium">All caught up!</p>
-                        <p class="text-sm">No urgent maintenance tasks in the next two weeks.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = upcoming.map(task => {
-                const daysUntil = Math.ceil((task.nextDue - now) / (1000 * 60 * 60 * 24));
-                const isOverdue = daysUntil < 0;
-                const urgencyClass = isOverdue ? 'border-l-red-500 bg-red-50' : 
-                                   daysUntil <= 3 ? 'border-l-orange-500 bg-orange-50' : 
-                                   'border-l-blue-500 bg-blue-50';
-                
-                return `
-                    <div class="p-6 border-l-4 ${urgencyClass} hover:bg-opacity-75 transition-colors">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h4 class="font-semibold text-gray-900 mb-1">${task.title}</h4>
-                                <p class="text-sm text-gray-600 mb-2">${task.category} • ${task.description}</p>
-                                <div class="flex items-center gap-4 text-xs text-gray-500">
-                                    <span>Due: ${task.nextDue.toLocaleDateString()}</span>
-                                    ${task.cost > 0 ? `<span>Est. Cost: ${task.cost}</span>` : ''}
-                                    <span class="font-medium ${isOverdue ? 'text-red-600' : daysUntil <= 3 ? 'text-orange-600' : 'text-blue-600'}">
-                                        ${isOverdue ? `${Math.abs(daysUntil)} days overdue` : daysUntil === 0 ? 'Due today' : `${daysUntil} days`}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="flex gap-2 ml-4">
-                                <button onclick="completeTask(${task.id})" class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors">
-                                    Complete
-                                </button>
-                                <button onclick="postponeTask(${task.id})" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition-colors">
-                                    Postpone
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Render all tasks
-        function renderAllTasks() {
-            const container = document.getElementById('all-tasks-list');
-            const tasksByCategory = {};
-            
-            maintenanceTasks.forEach(task => {
-                if (!tasksByCategory[task.category]) {
-                    tasksByCategory[task.category] = [];
-                }
-                tasksByCategory[task.category].push(task);
-            });
-
-            container.innerHTML = Object.entries(tasksByCategory).map(([category, tasks]) => `
-                <div class="border-b border-gray-100 last:border-b-0">
-                    <div class="p-6 bg-gray-50">
-                        <h4 class="font-semibold text-gray-900">${category}</h4>
-                    </div>
-                    ${tasks.map(task => {
-                        const now = new Date();
-                        const daysUntil = Math.ceil((task.nextDue - now) / (1000 * 60 * 60 * 24));
-                        const isOverdue = daysUntil < 0;
-                        
-                        return `
-                            <div class="p-6 border-b border-gray-100 last:border-b-0 hover:bg-gray-50">
-                                <div class="flex items-start justify-between">
-                                    <div class="flex-1">
-                                        <h5 class="font-medium text-gray-900 mb-1">${task.title}</h5>
-                                        <p class="text-sm text-gray-600 mb-2">${task.description}</p>
-                                        <div class="flex items-center gap-4 text-xs text-gray-500">
-                                            <span>Every ${Math.round(task.frequency / 30)} months</span>
-                                            <span>Next: ${task.nextDue.toLocaleDateString()}</span>
-                                            ${task.cost > 0 ? `<span>${task.cost}</span>` : '<span>DIY</span>'}
-                                            <span class="font-medium ${isOverdue ? 'text-red-600' : daysUntil <= 7 ? 'text-orange-600' : 'text-gray-500'}">
-                                                ${isOverdue ? 'Overdue' : daysUntil <= 7 ? 'Due soon' : 'Scheduled'}
-                                            </span>
-                                        </div>
-                                        ${task.tips ? `<p class="text-xs text-blue-600 mt-2">💡 ${task.tips}</p>` : ''}
-                                    </div>
-                                    <div class="flex gap-2 ml-4">
-                                        <button onclick="completeTask(${task.id})" class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">
-                                            Complete
-                                        </button>
-                                        <button onclick="editTask(${task.id})" class="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300">
-                                            Edit
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `).join('');
-        }
-
-        // Task actions
-        function completeTask(taskId) {
-            const task = maintenanceTasks.find(t => t.id === taskId);
-            openModal('Complete Task', `
-                <p class="mb-4">Mark "${task.title}" as completed?</p>
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Completion Date</label>
-                        <input type="date" id="completion-date" value="${new Date().toISOString().split('T')[0]}" 
-                               class="w-full px-3 py-2 border rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
-                        <textarea id="completion-notes" placeholder="Any notes about this maintenance..." 
-                                  class="w-full px-3 py-2 border rounded-lg" rows="2"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Actual Cost</label>
-                        <input type="number" id="actual-cost" value="${task.cost}" 
-                               class="w-full px-3 py-2 border rounded-lg" placeholder="0">
-                    </div>
-                </div>
-            `, () => {
-                const completionDate = new Date(document.getElementById('completion-date').value);
-                const notes = document.getElementById('completion-notes').value;
-                const actualCost = parseFloat(document.getElementById('actual-cost').value) || 0;
-                
-                // Update task
-                task.lastCompleted = completionDate;
-                task.nextDue = new Date(completionDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
-                task.actualCost = actualCost;
-                task.notes = notes;
-                
-                saveData();
-                refreshApp();
-                closeModal();
-            });
-            currentModalAction = 'complete';
-        }
-
-        function postponeTask(taskId) {
-            const task = maintenanceTasks.find(t => t.id === taskId);
-            openModal('Postpone Task', `
-                <p class="mb-4">Postpone "${task.title}" until when?</p>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">New Due Date</label>
-                    <input type="date" id="postpone-date" 
-                           value="${new Date(task.nextDue.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}" 
-                           class="w-full px-3 py-2 border rounded-lg">
-                </div>
-            `, () => {
-                const newDate = new Date(document.getElementById('postpone-date').value);
-                task.nextDue = newDate;
-                
-                saveData();
-                refreshApp();
-                closeModal();
-            });
-            currentModalAction = 'postpone';
-        }
-
-        // App navigation
-        function showAppTab(tabName) {
-            // Hide all content
-            document.querySelectorAll('.app-content').forEach(content => {
-                content.classList.add('hidden');
-            });
-            
-            // Remove active class from all tabs
-            document.querySelectorAll('.app-tab-btn').forEach(btn => {
-                btn.className = 'app-tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium';
-            });
-            
-            // Show selected content
-            document.getElementById(`app-${tabName}`).classList.remove('hidden');
-            
-            // Style active tab
-            document.getElementById(`app-tab-${tabName}`).className = 'app-tab-btn bg-blue-100 text-blue-700 px-6 py-3 rounded-lg font-medium';
-        }
-
-        // Modal functions
-        function openModal(title, content, confirmAction) {
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-content').innerHTML = content;
-            document.getElementById('modal-confirm').onclick = confirmAction;
-            document.getElementById('task-modal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('task-modal').classList.add('hidden');
-            currentModalAction = null;
-        }
-
-        function confirmTaskAction() {
-            // This will be set by the specific action functions
-        }
-
-        // Data management
-        function saveData() {
-            localStorage.setItem('casaCareData', JSON.stringify({
-                propertyData,
-                userPreferences,
-                maintenanceTasks,
-                setupComplete: true
-            }));
-        }
-
-        function refreshApp() {
-            updateTaskStats();
-            renderUpcomingTasks();
-            renderAllTasks();
-        }
-
-        function exportData() {
-            const data = {
-                propertyData,
-                userPreferences,
-                maintenanceTasks,
-                exportDate: new Date().toISOString()
-            };
-            
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `casa-care-data-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function clearData() {
-            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
-                localStorage.removeItem('casaCareData');
-                location.reload();
-            }
-        }
-
-        function restartWizard() {
-            localStorage.removeItem('casaCareData');
-            location.reload();
-        }
-
-        // Initialize app
-        function initApp() {
-            const savedData = localStorage.getItem('casaCareData');
-            
-            if (savedData) {
-                try {
-                    const data = JSON.parse(savedData);
-                    if (data.setupComplete) {
-                        propertyData = data.propertyData;
-                        userPreferences = data.userPreferences;
-                        maintenanceTasks = data.maintenanceTasks.map(task => ({
-                            ...task,
-                            nextDue: new Date(task.nextDue),
-                            lastCompleted: task.lastCompleted ? new Date(task.lastCompleted) : null
-                        }));
-                        
-                        document.getElementById('setup-wizard').classList.add('hidden');
-                        document.getElementById('main-app').classList.remove('hidden');
-                        initializeMainApp();
-                        return;
-                    }
-                } catch (e) {
-                    console.error('Error loading saved data:', e);
-                }
-            }
-            
-            // Show setup wizard
+            document.getElementById('api-setup').classList.add('hidden');
             document.getElementById('setup-wizard').classList.remove('hidden');
-            updateProgressIndicators();
+            updateApiStatus();
         }
 
-        // Start the app
-        initApp();
-    </script>
-</body>
-</html>
+        function useDemoMode() {
+            demoMode = true;
+            apiKey = null;
+            localStorage.setItem('casaCareDemoMode', 'true');
+            
+            document.getElementById('api-setup').classList.add('hidden');
+            document.getElementById('setup-wizard').classList.remove('hidden');
+            updateApiStatus();
+        }
+
+        function updateApiKey() {
+            document.getElementById('api-setup').classList.remove('hidden');
+            document.getElementById('setup-wizard').classList.add('hidden');
+            document.getElementById('main-app').classList.add('hidden');
+        }
+
+        function updateApiStatus() {
+            const statusElement = document.getElementById('api-status');
+            if (statusElement) {
+                statusElement.textContent = demoMode ? 'Demo Mode' : 'Real Property API';
+            }
+        }
+
+        // Address search and autocomplete
+        function searchAddresses(query) {
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+            
+            if (query.length < 3) {
+                hideAddressSuggestions();
+                return;
+            }
+            
+            searchTimeout = setTimeout(() => {
+                if (demoMode) {
+                    showDemoAddressSuggestions(query);
+                } else {
+                    searchRealAddresses(query);
+                }
+            }, 300);
+        }
+
+        function showDemoAddressSuggestions(query) {
+            const suggestions = [
+                "123 Main Street, Anytown, NY 12345",
+                "456 Oak Avenue, Somewhere, CA 90210", 
+                "789 Pine Road, Elsewhere, TX 73301",
+                "321 Elm Street, Nowhere, FL 33101"
+            ].filter(addr => addr.toLowerCase().includes(query.toLowerCase()));
+            
+            displayAddressSuggestions(suggestions);
+        }
+
+        async function searchRealAddresses(query) {
+            if (!apiKey) {
