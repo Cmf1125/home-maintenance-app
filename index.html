@@ -3,177 +3,314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Maintenance Tracker</title>
+    <title>Casa Care - Smart Home Maintenance</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .gradient-bg { background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .gradient-bg { background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        .slide-up { animation: slideUp 0.3s ease-out; }
         
-        :root {
-            --primary-color: #4f46e5;
-            --secondary-color: #7c3aed;
-            --accent-color: #3b82f6;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
-        .primary-bg { background-color: var(--primary-color); }
-        .primary-text { color: var(--primary-color); }
-        .accent-bg { background-color: var(--accent-color); }
-        .accent-text { color: var(--accent-color); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .step-indicator {
+            transition: all 0.3s ease;
+        }
+        
+        .step-active {
+            background: linear-gradient(135deg, #0891b2, #06b6d4);
+            color: white;
+        }
+        
+        .step-completed {
+            background: #10b981;
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <div id="app">
-        <!-- Design Panel Toggle -->
-        <div class="fixed top-4 right-4 z-50">
-            <button onclick="toggleDesignPanel()" class="bg-purple-600 text-white p-3 rounded-full shadow-lg hover:bg-purple-700 transition-colors">
-                🎨
-            </button>
-        </div>
-
-        <!-- Design Panel -->
-        <div id="design-panel" class="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform translate-x-full transition-transform z-40 overflow-y-auto">
-            <div class="p-6 border-b bg-gray-50">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-bold">🎨 Design Panel</h3>
-                    <button onclick="toggleDesignPanel()" class="text-gray-500 hover:text-gray-700">✕</button>
-                </div>
-            </div>
-            
-            <div class="p-6 space-y-6">
-                <!-- App Name -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">App Name</label>
-                    <input type="text" id="app-name" value="Home Maintenance Tracker" 
-                           class="w-full p-3 border rounded-lg" onchange="updateAppName()">
-                </div>
-
-                <!-- Color Themes -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">Color Theme</label>
-                    <div class="grid grid-cols-2 gap-3">
-                       <button onclick="setColorTheme('ocean')" class="color-theme p-4 rounded-lg border-2 border-blue-500 bg-blue-50">
-                            <div class="w-full h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded mb-2"></div>
-                            <span class="text-sm font-medium">🌊 Ocean Blue</span>
-                        </button>
-                        <button onclick="setColorTheme('coral')" class="color-theme p-4 rounded-lg border-2 border-transparent bg-gray-50 hover:border-pink-400">
-                            <div class="w-full h-8 bg-gradient-to-r from-pink-400 to-rose-400 rounded mb-2"></div>
-                            <span class="text-sm font-medium">🌸 Coral Pink</span>
-                        </button>
-                        <button onclick="setColorTheme('sage')" class="color-theme p-4 rounded-lg border-2 border-transparent bg-gray-50 hover:border-green-400">
-                            <div class="w-full h-8 bg-gradient-to-r from-green-400 to-emerald-500 rounded mb-2"></div>
-                            <span class="text-sm font-medium">🌿 Sage Green</span>
-                        </button>
-                        <button onclick="setColorTheme('sunset')" class="color-theme p-4 rounded-lg border-2 border-transparent bg-gray-50 hover:border-orange-400">
-                            <div class="w-full h-8 bg-gradient-to-r from-orange-400 to-amber-500 rounded mb-2"></div>
-                            <span class="text-sm font-medium">🌅 Sunset Orange</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Custom Categories -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">Maintenance Categories</label>
-                    <div class="flex gap-2 mb-3">
-                        <input type="text" id="new-category" placeholder="Add category" class="flex-1 p-2 border rounded">
-                        <button onclick="addCategory()" class="px-4 py-2 primary-bg text-white rounded hover:opacity-90">Add</button>
-                    </div>
-                    <div id="categories-list" class="space-y-2">
-                        <!-- Categories will be populated here -->
-                    </div>
-                </div>
-
-                <!-- Insurance Info -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">Insurance Information</label>
-                    <div class="space-y-3">
-                        <input type="text" id="insurance-provider" placeholder="Insurance Provider" 
-                               class="w-full p-2 border rounded" onchange="updateInsurance()">
-                        <input type="text" id="policy-number" placeholder="Policy Number" 
-                               class="w-full p-2 border rounded" onchange="updateInsurance()">
-                        <input type="number" id="annual-premium" placeholder="Annual Premium" 
-                               class="w-full p-2 border rounded" onchange="updateInsurance()">
-                    </div>
-                </div>
-
-                <!-- Save Button -->
-                <button onclick="saveSettings()" class="w-full primary-bg text-white py-3 rounded-lg font-medium hover:opacity-90">
-                    💾 Save All Changes
-                </button>
-            </div>
-        </div>
-
         <!-- Header -->
-        <div class="bg-white shadow-lg border-b border-gray-100">
-            <div class="max-w-7xl mx-auto px-4 py-6">
-                <h1 id="main-title" class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    Home Maintenance Tracker
-                </h1>
-                <p class="text-gray-600 mt-1">Keep your home well-maintained and document everything</p>
+        <div class="bg-white shadow-sm border-b">
+            <div class="max-w-4xl mx-auto px-4 py-4">
+                <h1 class="text-2xl font-bold text-gray-900">Casa Care</h1>
+                <p class="text-gray-600">Smart home maintenance, personalized for your property</p>
             </div>
         </div>
 
-        <!-- Navigation -->
-        <div class="max-w-7xl mx-auto px-4 py-6">
-            <div class="flex space-x-1 bg-white rounded-xl p-2 shadow-lg">
-                <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn accent-bg text-white px-6 py-3 rounded-lg font-medium">
-                    📅 Dashboard
-                </button>
-                <button onclick="showTab('tasks')" id="tab-tasks" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
-                    ✅ All Tasks
-                </button>
-                <button onclick="showTab('insurance')" id="tab-insurance" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
-                    🛡️ Insurance
-                </button>
+        <!-- Setup Wizard -->
+        <div id="setup-wizard" class="max-w-2xl mx-auto px-4 py-8">
+            <!-- Progress Indicators -->
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-4">
+                    <div id="step-1" class="step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                    <div class="w-12 h-1 bg-gray-200" id="progress-1"></div>
+                    <div id="step-2" class="step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500">2</div>
+                    <div class="w-12 h-1 bg-gray-200" id="progress-2"></div>
+                    <div id="step-3" class="step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500">3</div>
+                    <div class="w-12 h-1 bg-gray-200" id="progress-3"></div>
+                    <div id="step-4" class="step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500">4</div>
+                </div>
             </div>
-        </div>
 
-        <!-- Main Content -->
-        <div class="max-w-7xl mx-auto px-4 pb-8">
-            <!-- Dashboard Tab -->
-            <div id="dashboard-content" class="tab-content">
-                <!-- Welcome Card -->
-                <div class="gradient-bg text-white rounded-2xl p-8 shadow-2xl mb-8">
-                    <h2 class="text-2xl font-bold mb-4">🎉 Welcome to Your Home Maintenance Tracker!</h2>
-                    <p class="text-blue-100 mb-6">Get started by adding your home maintenance tasks. Try the design panel (🎨) to customize your experience!</p>
-                    <div class="flex flex-wrap gap-4">
-                        <button onclick="openTaskModal()" class="px-6 py-3 bg-white primary-text rounded-lg hover:bg-blue-50 transition-colors font-medium">
-                            ➕ Add Your First Task
-                        </button>
-                        <button onclick="toggleDesignPanel()" class="px-6 py-3 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-colors font-medium border border-white border-opacity-30">
-                            🎨 Open Design Panel
-                        </button>
+            <!-- Step 1: Address Input -->
+            <div id="wizard-step-1" class="wizard-step bg-white rounded-xl p-8 shadow-lg slide-up">
+                <div class="text-center mb-8">
+                    <div class="text-4xl mb-4">🏠</div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Let's start with your home</h2>
+                    <p class="text-gray-600">We'll look up your property details to create a personalized maintenance plan</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Home Address</label>
+                        <input type="text" id="address-input" placeholder="123 Main St, Anytown, NY 12345" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <p class="text-xs text-gray-500 mt-1">We use this to get accurate property details and local maintenance recommendations</p>
+                    </div>
+                    
+                    <button onclick="lookupAddress()" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        Look Up Property Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Confirm Property Details -->
+            <div id="wizard-step-2" class="wizard-step bg-white rounded-xl p-8 shadow-lg slide-up hidden">
+                <div class="text-center mb-8">
+                    <div class="text-4xl mb-4">🔍</div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Confirm your property details</h2>
+                    <p class="text-gray-600">Please verify and update any incorrect information</p>
+                </div>
+                
+                <div id="property-details" class="space-y-6">
+                    <!-- Property details will be populated here -->
+                </div>
+                
+                <div class="flex gap-4 mt-8">
+                    <button onclick="prevStep()" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">
+                        Back
+                    </button>
+                    <button onclick="nextStep()" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
+                        Looks Good
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Systems & Features -->
+            <div id="wizard-step-3" class="wizard-step bg-white rounded-xl p-8 shadow-lg slide-up hidden">
+                <div class="text-center mb-8">
+                    <div class="text-4xl mb-4">⚙️</div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Tell us about your home systems</h2>
+                    <p class="text-gray-600">This helps us suggest the right maintenance tasks</p>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- HVAC Systems -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Heating & Cooling (select all that apply)</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="hvac" value="central-ac" class="rounded">
+                                <span class="text-sm">Central A/C</span>
+                            </label>
+                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="hvac" value="mini-splits" class="rounded">
+                                <span class="text-sm">Mini-Splits</span>
+                            </label>
+                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="hvac" value="window-units" class="rounded">
+                                <span class="text-sm">Window Units</span>
+                            </label>
+                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="hvac" value="heat-pump" class="rounded">
+                                <span class="text-sm">Heat Pump</span>
+                            </label>
+                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="hvac" value="baseboard" class="rounded">
+                                <span class="text-sm">Baseboard Heat</span>
+                            </label>
+                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="hvac" value="radiators" class="rounded">
+                                <span class="text-sm">Radiators</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Home Features -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Home Features (select all that apply)</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="features" value="fireplace" class="rounded">
+                                <span class="text-sm">Fireplace</span>
+                            </label>
+                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="features" value="pool" class="rounded">
+                                <span class="text-sm">Pool/Spa</span>
+                            </label>
+                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="features" value="deck" class="rounded">
+                                <span class="text-sm">Deck/Patio</span>
+                            </label>
+                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="features" value="garage" class="rounded">
+                                <span class="text-sm">Garage</span>
+                            </label>
+                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="features" value="basement" class="rounded">
+                                <span class="text-sm">Basement</span>
+                            </label>
+                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" name="features" value="security" class="rounded">
+                                <span class="text-sm">Security System</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
+                
+                <div class="flex gap-4 mt-8">
+                    <button onclick="prevStep()" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">
+                        Back
+                    </button>
+                    <button onclick="nextStep()" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
+                        Continue
+                    </button>
+                </div>
+            </div>
 
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white rounded-2xl p-6 shadow-lg">
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-red-100 rounded-xl">⚠️</div>
+            <!-- Step 4: Lifestyle & Preferences -->
+            <div id="wizard-step-4" class="wizard-step bg-white rounded-xl p-8 shadow-lg slide-up hidden">
+                <div class="text-center mb-8">
+                    <div class="text-4xl mb-4">🏡</div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Final questions</h2>
+                    <p class="text-gray-600">This helps us customize maintenance frequencies</p>
+                </div>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Do you have pets?</label>
+                        <div class="flex gap-4">
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="pets" value="yes" class="text-blue-600">
+                                <span>Yes</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="pets" value="no" class="text-blue-600" checked>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">How many people live in your home?</label>
+                        <select name="occupancy" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="1-2">1-2 people</option>
+                            <option value="3-4" selected>3-4 people</option>
+                            <option value="5+">5+ people</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Maintenance approach preference</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="approach" value="proactive" class="text-blue-600" checked>
+                                <span class="text-sm">Proactive - I want to stay ahead of issues</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="approach" value="standard" class="text-blue-600">
+                                <span class="text-sm">Standard - Follow typical schedules</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="radio" name="approach" value="minimal" class="text-blue-600">
+                                <span class="text-sm">Minimal - Only essential maintenance</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-4 mt-8">
+                    <button onclick="prevStep()" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">
+                        Back
+                    </button>
+                    <button onclick="generateTasks()" class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                        🚀 Create My Maintenance Plan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App (hidden initially) -->
+        <div id="main-app" class="hidden">
+            <!-- Navigation -->
+            <div class="max-w-6xl mx-auto px-4 py-6">
+                <div class="flex space-x-1 bg-white rounded-xl p-2 shadow-lg">
+                    <button onclick="showAppTab('dashboard')" id="app-tab-dashboard" class="app-tab-btn bg-blue-100 text-blue-700 px-6 py-3 rounded-lg font-medium">
+                        📅 Dashboard
+                    </button>
+                    <button onclick="showAppTab('tasks')" id="app-tab-tasks" class="app-tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                        ✅ All Tasks
+                    </button>
+                    <button onclick="showAppTab('calendar')" id="app-tab-calendar" class="app-tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                        📆 Calendar
+                    </button>
+                    <button onclick="showAppTab('settings')" id="app-tab-settings" class="app-tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                        ⚙️ Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div id="app-dashboard" class="app-content max-w-6xl mx-auto px-4 pb-8">
+                <!-- Welcome Back -->
+                <div class="gradient-bg text-white rounded-2xl p-8 shadow-2xl mb-8">
+                    <h2 class="text-2xl font-bold mb-2">Welcome back! 👋</h2>
+                    <p class="text-blue-100" id="dashboard-address">Managing maintenance for your home</p>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-red-100 rounded-lg">⚠️</div>
                             <div>
-                                <p class="text-sm font-medium text-gray-600">Overdue Tasks</p>
-                                <p id="overdue-count" class="text-3xl font-bold text-gray-900">0</p>
+                                <p class="text-sm text-gray-600">Overdue</p>
+                                <p id="overdue-count" class="text-2xl font-bold text-gray-900">0</p>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="bg-white rounded-2xl p-6 shadow-lg">
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-orange-100 rounded-xl">⏰</div>
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-orange-100 rounded-lg">📅</div>
                             <div>
-                                <p class="text-sm font-medium text-gray-600">Due This Month</p>
-                                <p id="upcoming-count" class="text-3xl font-bold text-gray-900">1</p>
+                                <p class="text-sm text-gray-600">This Week</p>
+                                <p id="week-count" class="text-2xl font-bold text-gray-900">0</p>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="bg-white rounded-2xl p-6 shadow-lg">
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-green-100 rounded-xl">💰</div>
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-blue-100 rounded-lg">📋</div>
                             <div>
-                                <p class="text-sm font-medium text-gray-600">Annual Budget</p>
-                                <p id="annual-budget" class="text-3xl font-bold text-gray-900">$100</p>
+                                <p class="text-sm text-gray-600">Total Tasks</p>
+                                <p id="total-count" class="text-2xl font-bold text-gray-900">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-green-100 rounded-lg">💰</div>
+                            <div>
+                                <p class="text-sm text-gray-600">Est. Annual</p>
+                                <p id="annual-cost" class="text-2xl font-bold text-gray-900">$0</p>
                             </div>
                         </div>
                     </div>
@@ -181,258 +318,749 @@
 
                 <!-- Upcoming Tasks -->
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
-                        <h2 class="text-2xl font-bold text-gray-900">Upcoming Tasks</h2>
-                        <button onclick="openTaskModal()" class="flex items-center gap-2 px-6 py-3 accent-bg text-white rounded-lg hover:opacity-90">
-                            ➕ Add Task
-                        </button>
+                    <div class="p-6 border-b border-gray-100">
+                        <h3 class="text-xl font-bold text-gray-900">Upcoming Tasks</h3>
                     </div>
-                    <div id="tasks-list" class="p-6">
-                        <div class="p-6 border border-orange-200 bg-orange-50 rounded-lg">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Change HVAC Filter</h3>
-                                    <p class="text-gray-600">HVAC • Every 3 months</p>
-                                    <p class="text-gray-500 text-sm">16x25x1 MERV 8 filter from Home Depot</p>
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <span class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">Due Soon</span>
-                                    <button onclick="completeTask()" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Complete</button>
-                                </div>
-                            </div>
-                        </div>
+                    <div id="upcoming-tasks-list">
+                        <!-- Tasks will be populated here -->
                     </div>
                 </div>
             </div>
 
             <!-- Tasks Tab -->
-            <div id="tasks-content" class="tab-content hidden">
+            <div id="app-tasks" class="app-content hidden max-w-6xl mx-auto px-4 pb-8">
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
                     <div class="p-6 border-b border-gray-100 flex items-center justify-between">
-                        <h2 class="text-2xl font-bold text-gray-900">All Maintenance Tasks</h2>
-                        <button onclick="openTaskModal()" class="px-6 py-3 accent-bg text-white rounded-lg hover:opacity-90">
-                            ➕ Add Task
+                        <h3 class="text-xl font-bold text-gray-900">All Maintenance Tasks</h3>
+                        <button onclick="addCustomTask()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            ➕ Add Custom Task
                         </button>
                     </div>
-                    <div class="p-8 text-center">
-                        <div class="text-4xl mb-4">📝</div>
-                        <p class="text-xl font-medium text-gray-600 mb-2">Your tasks will appear here</p>
-                        <p class="text-gray-500">Add your first maintenance task to get started!</p>
+                    <div id="all-tasks-list">
+                        <!-- All tasks will be populated here -->
                     </div>
                 </div>
             </div>
 
-            <!-- Insurance Tab -->
-            <div id="insurance-content" class="tab-content hidden">
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="p-6 border-b border-gray-100">
-                        <h2 class="text-2xl font-bold text-gray-900">Insurance Policy Overview</h2>
-                        <p id="insurance-info" class="text-gray-600">Your Insurance Company • Policy #Enter Policy Number</p>
+            <!-- Calendar Tab -->
+            <div id="app-calendar" class="app-content hidden max-w-6xl mx-auto px-4 pb-8">
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Maintenance Calendar</h3>
+                    <div id="calendar-view">
+                        <p class="text-gray-600">Calendar view coming soon! For now, check the Dashboard for upcoming tasks.</p>
                     </div>
-                    <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="text-center p-6 bg-blue-50 rounded-xl">
-                            <h3 class="font-semibold text-blue-900 mb-2">Annual Premium</h3>
-                            <p id="premium-display" class="text-3xl font-bold text-blue-600">$1,200</p>
-                            <p class="text-sm text-blue-700">Renews: 2026-06-28</p>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="app-settings" class="app-content hidden max-w-6xl mx-auto px-4 pb-8">
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">Settings</h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-medium text-gray-900 mb-3">Property Information</h4>
+                            <button onclick="restartWizard()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                Update Property Details
+                            </button>
                         </div>
-                        <div class="text-center p-6 bg-green-50 rounded-xl">
-                            <h3 class="font-semibold text-green-900 mb-2">Current Discounts</h3>
-                            <p class="text-3xl font-bold text-green-600">-$22</p>
-                            <p class="text-sm text-green-700">1 active discount</p>
-                        </div>
-                        <div class="text-center p-6 bg-orange-50 rounded-xl">
-                            <h3 class="font-semibold text-orange-900 mb-2">Potential Savings</h3>
-                            <p class="text-3xl font-bold text-orange-600">$150</p>
-                            <p class="text-sm text-orange-700">Complete maintenance tasks</p>
+                        
+                        <div>
+                            <h4 class="font-medium text-gray-900 mb-3">Data</h4>
+                            <div class="space-y-2">
+                                <button onclick="exportData()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mr-3">
+                                    📄 Export Data
+                                </button>
+                                <button onclick="clearData()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                                    🗑️ Clear All Data
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Simple Modal for Adding Tasks -->
+        <!-- Task Modal -->
         <div id="task-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
             <div class="bg-white rounded-xl max-w-md w-full mx-4 p-6">
-                <h3 class="text-xl font-bold mb-4">Add New Task</h3>
-                <input type="text" id="task-title" placeholder="Task title" class="w-full p-3 border rounded-lg mb-3">
-                <select id="task-category" class="w-full p-3 border rounded-lg mb-4">
-                    <option value="HVAC">HVAC</option>
-                    <option value="Plumbing">Plumbing</option>
-                    <option value="Electrical">Electrical</option>
-                    <option value="Exterior">Exterior</option>
-                    <option value="General">General</option>
-                </select>
-                <div class="flex gap-3">
-                    <button onclick="closeTaskModal()" class="flex-1 px-4 py-2 bg-gray-200 rounded-lg">Cancel</button>
-                    <button onclick="addTask()" class="flex-1 px-4 py-2 accent-bg text-white rounded-lg">Add Task</button>
+                <h3 class="text-xl font-bold mb-4" id="modal-title">Complete Task</h3>
+                <div id="modal-content"></div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg">Cancel</button>
+                    <button onclick="confirmTaskAction()" id="modal-confirm" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Confirm</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // App state
-        let appSettings = {
-            appName: 'Home Maintenance Tracker',
-            colorTheme: 'blue',
-            categories: ['HVAC', 'Plumbing', 'Electrical', 'Exterior', 'General'],
-            insurance: {
-                provider: 'Your Insurance Company',
-                policyNumber: 'Enter Policy Number',
-                premium: 1200
+        // App State
+        let currentStep = 1;
+        let propertyData = {};
+        let userPreferences = {};
+        let maintenanceTasks = [];
+        let currentModalAction = null;
+
+        // Property lookup simulation (in real app, this would call a property API)
+        function lookupAddress() {
+            const address = document.getElementById('address-input').value.trim();
+            if (!address) {
+                alert('Please enter an address');
+                return;
             }
-        };
 
-        // Load saved settings
-        function loadSettings() {
-            const saved = localStorage.getItem('homeMaintenanceSettings');
-            if (saved) {
-                appSettings = { ...appSettings, ...JSON.parse(saved) };
-                applySettings();
+            // Simulate API call with realistic property data
+            setTimeout(() => {
+                propertyData = {
+                    address: address,
+                    yearBuilt: 1995,
+                    squareFootage: 2150,
+                    bedrooms: 3,
+                    bathrooms: 2,
+                    propertyType: 'Single Family',
+                    waterSource: 'City Water',
+                    sewerType: 'Public Sewer',
+                    heatingType: 'Central Air/Heat',
+                    lotSize: '0.25 acres'
+                };
+                
+                populatePropertyDetails();
+                nextStep();
+            }, 1000);
+        }
+
+        function populatePropertyDetails() {
+            const container = document.getElementById('property-details');
+            container.innerHTML = `
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
+                        <input type="number" value="${propertyData.yearBuilt}" 
+                               class="w-full px-3 py-2 border rounded-lg" 
+                               onchange="propertyData.yearBuilt = this.value">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Square Footage</label>
+                        <input type="number" value="${propertyData.squareFootage}" 
+                               class="w-full px-3 py-2 border rounded-lg"
+                               onchange="propertyData.squareFootage = this.value">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
+                        <input type="number" value="${propertyData.bedrooms}" 
+                               class="w-full px-3 py-2 border rounded-lg"
+                               onchange="propertyData.bedrooms = this.value">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
+                        <input type="number" step="0.5" value="${propertyData.bathrooms}" 
+                               class="w-full px-3 py-2 border rounded-lg"
+                               onchange="propertyData.bathrooms = this.value">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Water Source</label>
+                        <select class="w-full px-3 py-2 border rounded-lg" onchange="propertyData.waterSource = this.value">
+                            <option value="City Water" ${propertyData.waterSource === 'City Water' ? 'selected' : ''}>City Water</option>
+                            <option value="Well Water" ${propertyData.waterSource === 'Well Water' ? 'selected' : ''}>Well Water</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Waste Water</label>
+                        <select class="w-full px-3 py-2 border rounded-lg" onchange="propertyData.sewerType = this.value">
+                            <option value="Public Sewer" ${propertyData.sewerType === 'Public Sewer' ? 'selected' : ''}>Public Sewer</option>
+                            <option value="Septic System" ${propertyData.sewerType === 'Septic System' ? 'selected' : ''}>Septic System</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Wizard navigation
+        function nextStep() {
+            if (currentStep < 4) {
+                document.getElementById(`wizard-step-${currentStep}`).classList.add('hidden');
+                currentStep++;
+                document.getElementById(`wizard-step-${currentStep}`).classList.remove('hidden');
+                updateProgressIndicators();
             }
         }
 
-        // Apply settings to the UI
-        function applySettings() {
-            document.getElementById('app-name').value = appSettings.appName;
-            document.getElementById('main-title').textContent = appSettings.appName;
-            document.getElementById('insurance-provider').value = appSettings.insurance.provider;
-            document.getElementById('policy-number').value = appSettings.insurance.policyNumber;
-            document.getElementById('annual-premium').value = appSettings.insurance.premium;
-            updateInsuranceDisplay();
-            updateCategoriesList();
-            setColorTheme(appSettings.colorTheme);
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`wizard-step-${currentStep}`).classList.add('hidden');
+                currentStep--;
+                document.getElementById(`wizard-step-${currentStep}`).classList.remove('hidden');
+                updateProgressIndicators();
+            }
         }
 
-        // Save settings
-        function saveSettings() {
-            localStorage.setItem('homeMaintenanceSettings', JSON.stringify(appSettings));
-            alert('✅ Settings saved successfully!');
+        function updateProgressIndicators() {
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step-${i}`);
+                if (i < currentStep) {
+                    step.className = 'step-indicator step-completed w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold';
+                } else if (i === currentStep) {
+                    step.className = 'step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold';
+                } else {
+                    step.className = 'step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500';
+                }
+            }
         }
 
-        // Design panel functions
-        function toggleDesignPanel() {
-            const panel = document.getElementById('design-panel');
-            panel.classList.toggle('translate-x-full');
-        }
-
-        function updateAppName() {
-            const newName = document.getElementById('app-name').value;
-            appSettings.appName = newName;
-            document.getElementById('main-title').textContent = newName;
-        }
-
-        function setColorTheme(theme) {
-            appSettings.colorTheme = theme;
-            
-           const colors = {
-                ocean: { primary: '#0891b2', secondary: '#06b6d4', accent: '#3b82f6' },
-                coral: { primary: '#f472b6', secondary: '#fb7185', accent: '#ec4899' },
-                sage: { primary: '#10b981', secondary: '#34d399', accent: '#059669' },
-                sunset: { primary: '#f59e0b', secondary: '#fbbf24', accent: '#d97706' }
+        // Generate maintenance tasks based on user inputs
+        function generateTasks() {
+            // Collect user preferences
+            userPreferences = {
+                hvacSystems: Array.from(document.querySelectorAll('input[name="hvac"]:checked')).map(cb => cb.value),
+                features: Array.from(document.querySelectorAll('input[name="features"]:checked')).map(cb => cb.value),
+                pets: document.querySelector('input[name="pets"]:checked').value,
+                occupancy: document.querySelector('select[name="occupancy"]').value,
+                approach: document.querySelector('input[name="approach"]:checked').value
             };
+
+            maintenanceTasks = generateTaskList(propertyData, userPreferences);
             
-            const themeColors = colors[theme];
-            document.documentElement.style.setProperty('--primary-color', themeColors.primary);
-            document.documentElement.style.setProperty('--secondary-color', themeColors.secondary);
-            document.documentElement.style.setProperty('--accent-color', themeColors.accent);
+            // Save to localStorage
+            localStorage.setItem('casaCareData', JSON.stringify({
+                propertyData,
+                userPreferences,
+                maintenanceTasks,
+                setupComplete: true
+            }));
+
+            // Switch to main app
+            document.getElementById('setup-wizard').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
             
-            // Update theme selection UI
-           document.querySelectorAll('.color-theme').forEach(btn => {
-                btn.classList.remove('border-blue-500', 'border-pink-400', 'border-green-400', 'border-orange-400');
-                btn.classList.add('border-transparent');
-            });
-            document.querySelector(`[onclick="setColorTheme('${theme}')"]`).classList.add(`border-${theme}-500`);
+            // Initialize main app
+            initializeMainApp();
         }
 
-        function addCategory() {
-            const input = document.getElementById('new-category');
-            const newCategory = input.value.trim();
-            if (newCategory && !appSettings.categories.includes(newCategory)) {
-                appSettings.categories.push(newCategory);
-                input.value = '';
-                updateCategoriesList();
-                updateTaskCategorySelect();
+        function generateTaskList(property, preferences) {
+            const tasks = [];
+            let taskId = 1;
+
+            // Base frequency modifiers
+            const frequencyModifier = {
+                'proactive': 0.8,
+                'standard': 1.0,
+                'minimal': 1.3
+            }[preferences.approach];
+
+            const petModifier = preferences.pets === 'yes' ? 0.75 : 1.0;
+
+            // HVAC Tasks
+            if (preferences.hvacSystems.includes('central-ac')) {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Replace HVAC Filter',
+                    category: 'HVAC',
+                    frequency: Math.round(30 * frequencyModifier * petModifier), // days
+                    priority: 'high',
+                    cost: 25,
+                    description: 'Replace central air system filter to maintain air quality and system efficiency',
+                    tips: preferences.pets === 'yes' ? 'Change more frequently due to pet hair and dander' : 'Standard replacement schedule',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 1 week from now
+                });
+
+                tasks.push({
+                    id: taskId++,
+                    title: 'HVAC System Professional Service',
+                    category: 'HVAC',
+                    frequency: Math.round(365 * frequencyModifier),
+                    priority: 'medium',
+                    cost: 150,
+                    description: 'Annual professional maintenance including cleaning, inspection, and tune-up',
+                    tips: 'Schedule before peak heating/cooling seasons',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                });
             }
+
+            if (preferences.hvacSystems.includes('mini-splits')) {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Clean Mini-Split Filters',
+                    category: 'HVAC',
+                    frequency: Math.round(60 * frequencyModifier * petModifier),
+                    priority: 'medium',
+                    cost: 0,
+                    description: 'Remove and wash mini-split unit filters',
+                    tips: 'Rinse with warm water and let dry completely before reinstalling',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            // Water System Tasks
+            if (property.waterSource === 'Well Water') {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Test Well Water Quality',
+                    category: 'Water Systems',
+                    frequency: Math.round(365 * frequencyModifier),
+                    priority: 'high',
+                    cost: 75,
+                    description: 'Annual water quality testing for bacteria and minerals',
+                    tips: 'Required by health departments in most areas',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000)
+                });
+
+                tasks.push({
+                    id: taskId++,
+                    title: 'Well Pump Inspection',
+                    category: 'Water Systems',
+                    frequency: Math.round(1095 * frequencyModifier), // 3 years
+                    priority: 'medium',
+                    cost: 200,
+                    description: 'Professional inspection of well pump and pressure tank',
+                    tips: 'Check for unusual noises or pressure issues',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            if (property.sewerType === 'Septic System') {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Septic Tank Pumping',
+                    category: 'Water Systems',
+                    frequency: Math.round(1460 * frequencyModifier), // 4 years
+                    priority: 'high',
+                    cost: 400,
+                    description: 'Professional septic tank pumping and inspection',
+                    tips: 'Frequency depends on household size and usage',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            // General Home Tasks
+            tasks.push({
+                id: taskId++,
+                title: 'Clean Gutters and Downspouts',
+                category: 'Exterior',
+                frequency: Math.round(182 * frequencyModifier), // twice yearly
+                priority: 'medium',
+                cost: 150,
+                description: 'Remove debris from gutters and check downspouts for proper drainage',
+                tips: 'Schedule for spring and fall, after leaves have fallen',
+                lastCompleted: null,
+                nextDue: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000)
+            });
+
+            tasks.push({
+                id: taskId++,
+                title: 'Test Smoke and CO Detectors',
+                category: 'Safety',
+                frequency: Math.round(30 * frequencyModifier),
+                priority: 'high',
+                cost: 0,
+                description: 'Test all smoke and carbon monoxide detectors, replace batteries if needed',
+                tips: 'Test monthly, replace batteries annually or when chirping',
+                lastCompleted: null,
+                nextDue: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)
+            });
+
+            // Feature-specific tasks
+            if (preferences.features.includes('fireplace')) {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Chimney Inspection and Cleaning',
+                    category: 'Safety',
+                    frequency: Math.round(365 * frequencyModifier),
+                    priority: 'high',
+                    cost: 300,
+                    description: 'Professional chimney inspection and cleaning',
+                    tips: 'Required annually for safety and insurance',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            if (preferences.features.includes('deck')) {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Deck Staining/Sealing',
+                    category: 'Exterior',
+                    frequency: Math.round(730 * frequencyModifier), // 2 years
+                    priority: 'medium',
+                    cost: 200,
+                    description: 'Clean and apply protective stain or sealant to deck',
+                    tips: 'Best done in dry weather, spring or early fall',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            if (preferences.features.includes('pool')) {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Pool Opening/Closing',
+                    category: 'Pool',
+                    frequency: Math.round(182 * frequencyModifier),
+                    priority: 'medium',
+                    cost: 250,
+                    description: 'Seasonal pool opening and closing service',
+                    tips: 'Schedule based on local climate and usage patterns',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            // Age-based tasks
+            const homeAge = new Date().getFullYear() - property.yearBuilt;
+            if (homeAge > 15) {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Electrical Panel Inspection',
+                    category: 'Electrical',
+                    frequency: Math.round(1825 * frequencyModifier), // 5 years
+                    priority: 'medium',
+                    cost: 300,
+                    description: 'Professional electrical panel and wiring inspection',
+                    tips: 'Recommended for homes over 15 years old',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 200 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            if (homeAge > 25) {
+                tasks.push({
+                    id: taskId++,
+                    title: 'Roof Inspection',
+                    category: 'Exterior',
+                    frequency: Math.round(1095 * frequencyModifier), // 3 years
+                    priority: 'high',
+                    cost: 250,
+                    description: 'Professional roof inspection for damage and wear',
+                    tips: 'Critical for older homes to prevent water damage',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 150 * 24 * 60 * 60 * 1000)
+                });
+            }
+
+            return tasks;
         }
 
-        function removeCategory(category) {
-            appSettings.categories = appSettings.categories.filter(c => c !== category);
-            updateCategoriesList();
-            updateTaskCategorySelect();
+        // Initialize main app
+        function initializeMainApp() {
+            document.getElementById('dashboard-address').textContent = `Managing maintenance for ${propertyData.address}`;
+            updateTaskStats();
+            renderUpcomingTasks();
+            renderAllTasks();
         }
 
-        function updateCategoriesList() {
-            const container = document.getElementById('categories-list');
-            container.innerHTML = appSettings.categories.map(category => `
-                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <span class="text-sm">${category}</span>
-                    <button onclick="removeCategory('${category}')" class="text-red-500 hover:text-red-700 text-sm">✕</button>
+        // Update dashboard stats
+        function updateTaskStats() {
+            const now = new Date();
+            const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            
+            const overdue = maintenanceTasks.filter(task => task.nextDue < now).length;
+            const thisWeek = maintenanceTasks.filter(task => task.nextDue <= oneWeek && task.nextDue >= now).length;
+            const total = maintenanceTasks.length;
+            const annualCost = maintenanceTasks.reduce((sum, task) => {
+                const yearlyFreq = 365 / task.frequency;
+                return sum + (task.cost * yearlyFreq);
+            }, 0);
+
+            document.getElementById('overdue-count').textContent = overdue;
+            document.getElementById('week-count').textContent = thisWeek;
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('annual-cost').textContent = `${Math.round(annualCost)}`;
+        }
+
+        // Render upcoming tasks
+        function renderUpcomingTasks() {
+            const container = document.getElementById('upcoming-tasks-list');
+            const now = new Date();
+            const twoWeeks = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+            
+            const upcoming = maintenanceTasks
+                .filter(task => task.nextDue <= twoWeeks)
+                .sort((a, b) => a.nextDue - b.nextDue)
+                .slice(0, 5);
+
+            if (upcoming.length === 0) {
+                container.innerHTML = `
+                    <div class="p-8 text-center text-gray-500">
+                        <div class="text-4xl mb-4">✅</div>
+                        <p class="font-medium">All caught up!</p>
+                        <p class="text-sm">No urgent maintenance tasks in the next two weeks.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = upcoming.map(task => {
+                const daysUntil = Math.ceil((task.nextDue - now) / (1000 * 60 * 60 * 24));
+                const isOverdue = daysUntil < 0;
+                const urgencyClass = isOverdue ? 'border-l-red-500 bg-red-50' : 
+                                   daysUntil <= 3 ? 'border-l-orange-500 bg-orange-50' : 
+                                   'border-l-blue-500 bg-blue-50';
+                
+                return `
+                    <div class="p-6 border-l-4 ${urgencyClass} hover:bg-opacity-75 transition-colors">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900 mb-1">${task.title}</h4>
+                                <p class="text-sm text-gray-600 mb-2">${task.category} • ${task.description}</p>
+                                <div class="flex items-center gap-4 text-xs text-gray-500">
+                                    <span>Due: ${task.nextDue.toLocaleDateString()}</span>
+                                    ${task.cost > 0 ? `<span>Est. Cost: ${task.cost}</span>` : ''}
+                                    <span class="font-medium ${isOverdue ? 'text-red-600' : daysUntil <= 3 ? 'text-orange-600' : 'text-blue-600'}">
+                                        ${isOverdue ? `${Math.abs(daysUntil)} days overdue` : daysUntil === 0 ? 'Due today' : `${daysUntil} days`}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 ml-4">
+                                <button onclick="completeTask(${task.id})" class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors">
+                                    Complete
+                                </button>
+                                <button onclick="postponeTask(${task.id})" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition-colors">
+                                    Postpone
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render all tasks
+        function renderAllTasks() {
+            const container = document.getElementById('all-tasks-list');
+            const tasksByCategory = {};
+            
+            maintenanceTasks.forEach(task => {
+                if (!tasksByCategory[task.category]) {
+                    tasksByCategory[task.category] = [];
+                }
+                tasksByCategory[task.category].push(task);
+            });
+
+            container.innerHTML = Object.entries(tasksByCategory).map(([category, tasks]) => `
+                <div class="border-b border-gray-100 last:border-b-0">
+                    <div class="p-6 bg-gray-50">
+                        <h4 class="font-semibold text-gray-900">${category}</h4>
+                    </div>
+                    ${tasks.map(task => {
+                        const now = new Date();
+                        const daysUntil = Math.ceil((task.nextDue - now) / (1000 * 60 * 60 * 24));
+                        const isOverdue = daysUntil < 0;
+                        
+                        return `
+                            <div class="p-6 border-b border-gray-100 last:border-b-0 hover:bg-gray-50">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <h5 class="font-medium text-gray-900 mb-1">${task.title}</h5>
+                                        <p class="text-sm text-gray-600 mb-2">${task.description}</p>
+                                        <div class="flex items-center gap-4 text-xs text-gray-500">
+                                            <span>Every ${Math.round(task.frequency / 30)} months</span>
+                                            <span>Next: ${task.nextDue.toLocaleDateString()}</span>
+                                            ${task.cost > 0 ? `<span>${task.cost}</span>` : '<span>DIY</span>'}
+                                            <span class="font-medium ${isOverdue ? 'text-red-600' : daysUntil <= 7 ? 'text-orange-600' : 'text-gray-500'}">
+                                                ${isOverdue ? 'Overdue' : daysUntil <= 7 ? 'Due soon' : 'Scheduled'}
+                                            </span>
+                                        </div>
+                                        ${task.tips ? `<p class="text-xs text-blue-600 mt-2">💡 ${task.tips}</p>` : ''}
+                                    </div>
+                                    <div class="flex gap-2 ml-4">
+                                        <button onclick="completeTask(${task.id})" class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">
+                                            Complete
+                                        </button>
+                                        <button onclick="editTask(${task.id})" class="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300">
+                                            Edit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
             `).join('');
         }
 
-        function updateTaskCategorySelect() {
-            const select = document.getElementById('task-category');
-            select.innerHTML = appSettings.categories.map(cat => 
-                `<option value="${cat}">${cat}</option>`
-            ).join('');
+        // Task actions
+        function completeTask(taskId) {
+            const task = maintenanceTasks.find(t => t.id === taskId);
+            openModal('Complete Task', `
+                <p class="mb-4">Mark "${task.title}" as completed?</p>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Completion Date</label>
+                        <input type="date" id="completion-date" value="${new Date().toISOString().split('T')[0]}" 
+                               class="w-full px-3 py-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
+                        <textarea id="completion-notes" placeholder="Any notes about this maintenance..." 
+                                  class="w-full px-3 py-2 border rounded-lg" rows="2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Actual Cost</label>
+                        <input type="number" id="actual-cost" value="${task.cost}" 
+                               class="w-full px-3 py-2 border rounded-lg" placeholder="0">
+                    </div>
+                </div>
+            `, () => {
+                const completionDate = new Date(document.getElementById('completion-date').value);
+                const notes = document.getElementById('completion-notes').value;
+                const actualCost = parseFloat(document.getElementById('actual-cost').value) || 0;
+                
+                // Update task
+                task.lastCompleted = completionDate;
+                task.nextDue = new Date(completionDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
+                task.actualCost = actualCost;
+                task.notes = notes;
+                
+                saveData();
+                refreshApp();
+                closeModal();
+            });
+            currentModalAction = 'complete';
         }
 
-        function updateInsurance() {
-            appSettings.insurance.provider = document.getElementById('insurance-provider').value;
-            appSettings.insurance.policyNumber = document.getElementById('policy-number').value;
-            appSettings.insurance.premium = document.getElementById('annual-premium').value;
-            updateInsuranceDisplay();
+        function postponeTask(taskId) {
+            const task = maintenanceTasks.find(t => t.id === taskId);
+            openModal('Postpone Task', `
+                <p class="mb-4">Postpone "${task.title}" until when?</p>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">New Due Date</label>
+                    <input type="date" id="postpone-date" 
+                           value="${new Date(task.nextDue.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}" 
+                           class="w-full px-3 py-2 border rounded-lg">
+                </div>
+            `, () => {
+                const newDate = new Date(document.getElementById('postpone-date').value);
+                task.nextDue = newDate;
+                
+                saveData();
+                refreshApp();
+                closeModal();
+            });
+            currentModalAction = 'postpone';
         }
 
-        function updateInsuranceDisplay() {
-            document.getElementById('insurance-info').textContent = 
-                `${appSettings.insurance.provider} • Policy #${appSettings.insurance.policyNumber}`;
-            document.getElementById('premium-display').textContent = 
-                `$${appSettings.insurance.premium.toLocaleString()}`;
-        }
-
-        // Tab functionality
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(content => {
+        // App navigation
+        function showAppTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.app-content').forEach(content => {
                 content.classList.add('hidden');
             });
             
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = 'tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium';
+            // Remove active class from all tabs
+            document.querySelectorAll('.app-tab-btn').forEach(btn => {
+                btn.className = 'app-tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium';
             });
             
-            document.getElementById(tabName + '-content').classList.remove('hidden');
-            document.getElementById('tab-' + tabName).className = 'tab-btn accent-bg text-white px-6 py-3 rounded-lg font-medium';
+            // Show selected content
+            document.getElementById(`app-${tabName}`).classList.remove('hidden');
+            
+            // Style active tab
+            document.getElementById(`app-tab-${tabName}`).className = 'app-tab-btn bg-blue-100 text-blue-700 px-6 py-3 rounded-lg font-medium';
         }
 
         // Modal functions
-        function openTaskModal() {
+        function openModal(title, content, confirmAction) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-content').innerHTML = content;
+            document.getElementById('modal-confirm').onclick = confirmAction;
             document.getElementById('task-modal').classList.remove('hidden');
         }
 
-        function closeTaskModal() {
+        function closeModal() {
             document.getElementById('task-modal').classList.add('hidden');
-            document.getElementById('task-title').value = '';
+            currentModalAction = null;
         }
 
-        function addTask() {
-            const title = document.getElementById('task-title').value;
-            const category = document.getElementById('task-category').value;
-            if (title) {
-                alert(`Task "${title}" (${category}) added! Full functionality coming in next update.`);
-                closeTaskModal();
+        function confirmTaskAction() {
+            // This will be set by the specific action functions
+        }
+
+        // Data management
+        function saveData() {
+            localStorage.setItem('casaCareData', JSON.stringify({
+                propertyData,
+                userPreferences,
+                maintenanceTasks,
+                setupComplete: true
+            }));
+        }
+
+        function refreshApp() {
+            updateTaskStats();
+            renderUpcomingTasks();
+            renderAllTasks();
+        }
+
+        function exportData() {
+            const data = {
+                propertyData,
+                userPreferences,
+                maintenanceTasks,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `casa-care-data-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function clearData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                localStorage.removeItem('casaCareData');
+                location.reload();
             }
         }
 
-        function completeTask() {
-            alert('Task completed! 🎉');
+        function restartWizard() {
+            localStorage.removeItem('casaCareData');
+            location.reload();
         }
 
-        // Initialize
-        loadSettings();
-        showTab('dashboard');
+        // Initialize app
+        function initApp() {
+            const savedData = localStorage.getItem('casaCareData');
+            
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    if (data.setupComplete) {
+                        propertyData = data.propertyData;
+                        userPreferences = data.userPreferences;
+                        maintenanceTasks = data.maintenanceTasks.map(task => ({
+                            ...task,
+                            nextDue: new Date(task.nextDue),
+                            lastCompleted: task.lastCompleted ? new Date(task.lastCompleted) : null
+                        }));
+                        
+                        document.getElementById('setup-wizard').classList.add('hidden');
+                        document.getElementById('main-app').classList.remove('hidden');
+                        initializeMainApp();
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Error loading saved data:', e);
+                }
+            }
+            
+            // Show setup wizard
+            document.getElementById('setup-wizard').classList.remove('hidden');
+            updateProgressIndicators();
+        }
+
+        // Start the app
+        initApp();
     </script>
 </body>
 </html>
