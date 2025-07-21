@@ -1,655 +1,4 @@
-async function searchRealAddresses(query) {
-            if (!apiKey) {
-                showDemoAddressSuggestions(query);
-                return;
-            }
-
-            try {
-                // Using Google Places API for address autocomplete
-                const response = await fetch(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&types=address&key=${apiKey}`, {
-                    method: 'GET'
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const suggestions = data.predictions ? data.predictions.map(item => item.description) : [];
-                    displayAddressSuggestions(suggestions);
-                } else {
-                    console.error('Google Places API request failed:', response.status);
-                    showDemoAddressSuggestions(query);
-                }
-            } catch (error) {
-                console.error('Address search error:', error);
-                // Note: Google Places API requires CORS setup for browser use
-                // For production, you'd need a backend proxy or use the JavaScript SDK
-                showDemoAddressSuggestions(query);
-            }
-        }
-
-        function displayAddressSuggestions(suggestions) {
-            const container = document.getElementById('address-suggestions');
-            
-            if (suggestions.length === 0) {
-                hideAddressSuggestions();
-                return;
-            }
-            
-            container.innerHTML = suggestions.map(address => `
-                <div class="address-suggestion p-3 border-b border-gray-100 last:border-b-0" onclick="selectAddress('${address}')">
-                    <div class="text-sm text-gray-900">${address}</div>
-                </div>
-            `).join('');
-            
-            container.classList.remove('hidden');
-        }
-
-        function hideAddressSuggestions() {
-            document.getElementById('address-suggestions').classList.add('hidden');
-        }
-
-        function selectAddress(address) {
-            document.getElementById('address-input').value = address;
-            hideAddressSuggestions();
-            lookupPropertyDetails(address);
-        }
-
-        // Property lookup with real API
-        async function lookupPropertyDetails(address) {
-            document.getElementById('loading-indicator').classList.remove('hidden');
-            
-            try {
-                if (demoMode) {
-                    // Use demo data
-                    setTimeout(() => {
-                        propertyData = generateSmartPropertyData(address);
-                        document.getElementById('loading-indicator').classList.add('hidden');
-                        populatePropertyDetails();
-                        nextStep();
-                    }, 1500);
-                } else {
-                    // Real API call - using a simulated property lookup
-                    // Note: In production, you'd use Google Places Details API + Property APIs
-                    setTimeout(() => {
-                        propertyData = generateSmartPropertyData(address);
-                        document.getElementById('loading-indicator').classList.add('hidden');
-                        populatePropertyDetails();
-                        nextStep();
-                    }, 1500);
-                }
-            } catch (error) {
-                console.error('Property lookup error:', error);
-                // Fallback to demo data
-                                        propertyData = generateSmartPropertyData(address);
-                document.getElementById('loading-indicator').classList.add('hidden');
-                populatePropertyDetails();
-                nextStep();
-            }
-        }
-
-        function generateSmartPropertyData(address) {
-            // Generate more realistic property data based on address patterns
-            const state = address.match(/\b([A-Z]{2})\b/)?.[1] || 'NY';
-            const zipCode = address.match(/\b(\d{5})\b/)?.[1] || '12345';
-            
-            // Smarter data generation based on location patterns
-            let yearBuilt, sqft, waterSource, sewerType;
-            
-            // Regional building patterns
-            if (['CA', 'FL', 'TX', 'AZ'].includes(state)) {
-                yearBuilt = 1985 + Math.floor(Math.random() * 35); // Newer construction
-                sqft = 1800 + Math.floor(Math.random() * 1500);
-                waterSource = 'City Water';
-                sewerType = 'Public Sewer';
-            } else if (['VT', 'NH', 'ME', 'MT'].includes(state)) {
-                yearBuilt = 1960 + Math.floor(Math.random() * 45); // Older homes
-                sqft = 1400 + Math.floor(Math.random() * 1200);
-                waterSource = Math.random() > 0.4 ? 'Well Water' : 'City Water';
-                sewerType = Math.random() > 0.3 ? 'Septic System' : 'Public Sewer';
-            } else {
-                yearBuilt = 1975 + Math.floor(Math.random() * 40);
-                sqft = 1600 + Math.floor(Math.random() * 1400);
-                waterSource = Math.random() > 0.7 ? 'Well Water' : 'City Water';
-                sewerType = Math.random() > 0.6 ? 'Septic System' : 'Public Sewer';
-            }
-            
-            const bedrooms = 2 + Math.floor(Math.random() * 4);
-            const bathrooms = Math.max(1, Math.floor(bedrooms * 0.75)) + (Math.random() > 0.5 ? 0.5 : 0);
-            
-            return {
-                address: address,
-                yearBuilt: yearBuilt,
-                squareFootage: sqft,
-                bedrooms: bedrooms,
-                bathrooms: bathrooms,
-                propertyType: 'Single Family',
-                waterSource: waterSource,
-                sewerType: sewerType,
-                heatingType: yearBuilt > 1990 ? 'Central Air/Heat' : 'Mixed Systems',
-                lotSize: (0.15 + Math.random() * 0.4).toFixed(2) + ' acres'
-            };
-        }
-
-        function parsePropertyData(apiData, address) {
-            // Parse real API response into our format
-            const property = apiData.data || {};
-            
-            return {
-                address: address,
-                yearBuilt: property.year_built || property.construction_year || 1990,
-                squareFootage: property.sqft || property.size_sqft || 2000,
-                bedrooms: property.beds || property.bedrooms || 3,
-                bathrooms: property.baths || property.bathrooms || 2,
-                propertyType: property.prop_type || property.property_type || 'Single Family',
-                waterSource: property.utilities?.water || 'City Water',
-                sewerType: property.utilities?.sewer || 'Public Sewer',
-                heatingType: property.heating || 'Central Air/Heat',
-                lotSize: property.lot_size || '0.25 acres'
-            };
-        }
-
-        function populatePropertyDetails() {
-            const container = document.getElementById('property-details');
-            container.innerHTML = `
-                <div class="bg-blue-50 rounded-lg p-4 mb-6">
-                    <h4 class="font-medium text-blue-900 mb-2">📍 ${propertyData.address}</h4>
-                    <p class="text-sm text-blue-700">Property details loaded ${demoMode ? '(Demo Data)' : '(Live Data)'}</p>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
-                        <input type="number" value="${propertyData.yearBuilt}" 
-                               class="w-full px-3 py-2 border rounded-lg" 
-                               onchange="propertyData.yearBuilt = this.value">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Square Footage</label>
-                        <input type="number" value="${propertyData.squareFootage}" 
-                               class="w-full px-3 py-2 border rounded-lg"
-                               onchange="propertyData.squareFootage = this.value">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
-                        <input type="number" value="${propertyData.bedrooms}" 
-                               class="w-full px-3 py-2 border rounded-lg"
-                               onchange="propertyData.bedrooms = this.value">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
-                        <input type="number" step="0.5" value="${propertyData.bathrooms}" 
-                               class="w-full px-3 py-2 border rounded-lg"
-                               onchange="propertyData.bathrooms = this.value">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Water Source</label>
-                        <select class="w-full px-3 py-2 border rounded-lg" onchange="propertyData.waterSource = this.value">
-                            <option value="City Water" ${propertyData.waterSource === 'City Water' ? 'selected' : ''}>City Water</option>
-                            <option value="Well Water" ${propertyData.waterSource === 'Well Water' ? 'selected' : ''}>Well Water</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Waste Water</label>
-                        <select class="w-full px-3 py-2 border rounded-lg" onchange="propertyData.sewerType = this.value">
-                            <option value="Public Sewer" ${propertyData.sewerType === 'Public Sewer' ? 'selected' : ''}>Public Sewer</option>
-                            <option value="Septic System" ${propertyData.sewerType === 'Septic System' ? 'selected' : ''}>Septic System</option>
-                        </select>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Wizard navigation
-        function nextStep() {
-            if (currentStep < 4) {
-                document.getElementById(`wizard-step-${currentStep}`).classList.add('hidden');
-                currentStep++;
-                document.getElementById(`wizard-step-${currentStep}`).classList.remove('hidden');
-                updateProgressIndicators();
-            }
-        }
-
-        function prevStep() {
-            if (currentStep > 1) {
-                document.getElementById(`wizard-step-${currentStep}`).classList.add('hidden');
-                currentStep--;
-                document.getElementById(`wizard-step-${currentStep}`).classList.remove('hidden');
-                updateProgressIndicators();
-            }
-        }
-
-        function updateProgressIndicators() {
-            for (let i = 1; i <= 4; i++) {
-                const step = document.getElementById(`step-${i}`);
-                if (i < currentStep) {
-                    step.className = 'step-indicator step-completed w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold';
-                } else if (i === currentStep) {
-                    step.className = 'step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold';
-                } else {
-                    step.className = 'step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500';
-                }
-            }
-        }
-
-        // Generate maintenance tasks based on user inputs
-        function generateTasks() {
-            // Collect user preferences
-            userPreferences = {
-                hvacSystems: Array.from(document.querySelectorAll('input[name="hvac"]:checked')).map(cb => cb.value),
-                features: Array.from(document.querySelectorAll('input[name="features"]:checked')).map(cb => cb.value),
-                pets: document.querySelector('input[name="pets"]:checked').value,
-                occupancy: document.querySelector('select[name="occupancy"]').value,
-                approach: document.querySelector('input[name="approach"]:checked').value
-            };
-
-            maintenanceTasks = generateTaskList(propertyData, userPreferences);
-            
-            // Save to localStorage
-            localStorage.setItem('casaCareData', JSON.stringify({
-                propertyData,
-                userPreferences,
-                maintenanceTasks,
-                setupComplete: true,
-                apiKey: apiKey,
-                demoMode: demoMode
-            }));
-
-            // Switch to main app
-            document.getElementById('setup-wizard').classList.add('hidden');
-            document.getElementById('main-app').classList.remove('hidden');
-            
-            // Initialize main app
-            initializeMainApp();
-        }
-
-        function generateTaskList(property, preferences) {
-            const tasks = [];
-            let taskId = 1;
-
-            // Base frequency modifiers
-            const frequencyModifier = {
-                'proactive': 0.8,
-                'standard': 1.0,
-                'minimal': 1.3
-            }[preferences.approach];
-
-            const petModifier = preferences.pets === 'yes' ? 0.75 : 1.0;
-
-            // HVAC Tasks
-            if (preferences.hvacSystems.includes('central-ac')) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Replace HVAC Filter',
-                    category: 'HVAC',
-                    frequency: Math.round(30 * frequencyModifier * petModifier), // days
-                    priority: 'high',
-                    cost: 25,
-                    description: 'Replace central air system filter to maintain air quality and system efficiency',
-                    tips: preferences.pets === 'yes' ? 'Change more frequently due to pet hair and dander' : 'Standard replacement schedule',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 1 week from now
-                });
-
-                tasks.push({
-                    id: taskId++,
-                    title: 'HVAC System Professional Service',
-                    category: 'HVAC',
-                    frequency: Math.round(365 * frequencyModifier),
-                    priority: 'medium',
-                    cost: 150,
-                    description: 'Annual professional maintenance including cleaning, inspection, and tune-up',
-                    tips: 'Schedule before peak heating/cooling seasons',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            if (preferences.hvacSystems.includes('mini-splits')) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Clean Mini-Split Filters',
-                    category: 'HVAC',
-                    frequency: Math.round(60 * frequencyModifier * petModifier),
-                    priority: 'medium',
-                    cost: 0,
-                    description: 'Remove and wash mini-split unit filters',
-                    tips: 'Rinse with warm water and let dry completely before reinstalling',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            // Water System Tasks
-            if (property.waterSource === 'Well Water') {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Test Well Water Quality',
-                    category: 'Water Systems',
-                    frequency: Math.round(365 * frequencyModifier),
-                    priority: 'high',
-                    cost: 75,
-                    description: 'Annual water quality testing for bacteria and minerals',
-                    tips: 'Required by health departments in most areas',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000)
-                });
-
-                tasks.push({
-                    id: taskId++,
-                    title: 'Well Pump Inspection',
-                    category: 'Water Systems',
-                    frequency: Math.round(1095 * frequencyModifier), // 3 years
-                    priority: 'medium',
-                    cost: 200,
-                    description: 'Professional inspection of well pump and pressure tank',
-                    tips: 'Check for unusual noises or pressure issues',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            if (property.sewerType === 'Septic System') {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Septic Tank Pumping',
-                    category: 'Water Systems',
-                    frequency: Math.round(1460 * frequencyModifier), // 4 years
-                    priority: 'high',
-                    cost: 400,
-                    description: 'Professional septic tank pumping and inspection',
-                    tips: 'Frequency depends on household size and usage',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            // General Home Tasks
-            tasks.push({
-                id: taskId++,
-                title: 'Clean Gutters and Downspouts',
-                category: 'Exterior',
-                frequency: Math.round(182 * frequencyModifier), // twice yearly
-                priority: 'medium',
-                cost: 150,
-                description: 'Remove debris from gutters and check downspouts for proper drainage',
-                tips: 'Schedule for spring and fall, after leaves have fallen',
-                lastCompleted: null,
-                nextDue: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000)
-            });
-
-            tasks.push({
-                id: taskId++,
-                title: 'Test Smoke and CO Detectors',
-                category: 'Safety',
-                frequency: Math.round(30 * frequencyModifier),
-                priority: 'high',
-                cost: 0,
-                description: 'Test all smoke and carbon monoxide detectors, replace batteries if needed',
-                tips: 'Test monthly, replace batteries annually or when chirping',
-                lastCompleted: null,
-                nextDue: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)
-            });
-
-            // Feature-specific tasks
-            if (preferences.features.includes('fireplace')) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Chimney Inspection and Cleaning',
-                    category: 'Safety',
-                    frequency: Math.round(365 * frequencyModifier),
-                    priority: 'high',
-                    cost: 300,
-                    description: 'Professional chimney inspection and cleaning',
-                    tips: 'Required annually for safety and insurance',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            if (preferences.features.includes('deck')) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Deck Staining/Sealing',
-                    category: 'Exterior',
-                    frequency: Math.round(730 * frequencyModifier), // 2 years
-                    priority: 'medium',
-                    cost: 200,
-                    description: 'Clean and apply protective stain or sealant to deck',
-                    tips: 'Best done in dry weather, spring or early fall',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            if (preferences.features.includes('pool')) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Pool Opening/Closing',
-                    category: 'Pool',
-                    frequency: Math.round(182 * frequencyModifier),
-                    priority: 'medium',
-                    cost: 250,
-                    description: 'Seasonal pool opening and closing service',
-                    tips: 'Schedule based on local climate and usage patterns',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            // Age-based tasks
-            const homeAge = new Date().getFullYear() - property.yearBuilt;
-            if (homeAge > 15) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Electrical Panel Inspection',
-                    category: 'Electrical',
-                    frequency: Math.round(1825 * frequencyModifier), // 5 years
-                    priority: 'medium',
-                    cost: 300,
-                    description: 'Professional electrical panel and wiring inspection',
-                    tips: 'Recommended for homes over 15 years old',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 200 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            if (homeAge > 25) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Roof Inspection',
-                    category: 'Exterior',
-                    frequency: Math.round(1095 * frequencyModifier), // 3 years
-                    priority: 'high',
-                    cost: 250,
-                    description: 'Professional roof inspection for damage and wear',
-                    tips: 'Critical for older homes to prevent water damage',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 150 * 24 * 60 * 60 * 1000)
-                });
-            }
-
-            return tasks;
-        }
-
-        // Initialize main app
-        function initializeMainApp() {
-            document.getElementById('dashboard-address').textContent = `Managing maintenance for ${propertyData.address}`;
-            updateTaskStats();
-            renderUpcomingTasks();
-            renderAllTasks();
-            updateApiStatus();
-        }
-
-        // Update dashboard stats
-        function updateTaskStats() {
-            const now = new Date();
-            const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-            
-            const overdue = maintenanceTasks.filter(task => task.nextDue < now).length;
-            const thisWeek = maintenanceTasks.filter(task => task.nextDue <= oneWeek && task.nextDue >= now).length;
-            const total = maintenanceTasks.length;
-            const annualCost = maintenanceTasks.reduce((sum, task) => {
-                const yearlyFreq = 365 / task.frequency;
-                return sum + (task.cost * yearlyFreq);
-            }, 0);
-
-            document.getElementById('overdue-count').textContent = overdue;
-            document.getElementById('week-count').textContent = thisWeek;
-            document.getElementById('total-count').textContent = total;
-            document.getElementById('annual-cost').textContent = `${Math.round(annualCost)}`;
-        }
-
-        // Render upcoming tasks
-        function renderUpcomingTasks() {
-            const container = document.getElementById('upcoming-tasks-list');
-            const now = new Date();
-            const twoWeeks = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
-            
-            const upcoming = maintenanceTasks
-                .filter(task => task.nextDue <= twoWeeks)
-                .sort((a, b) => a.nextDue - b.nextDue)
-                .slice(0, 5);
-
-            if (upcoming.length === 0) {
-                container.innerHTML = `
-                    <div class="p-8 text-center text-gray-500">
-                        <div class="text-4xl mb-4">✅</div>
-                        <p class="font-medium">All caught up!</p>
-                        <p class="text-sm">No urgent maintenance tasks in the next two weeks.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = upcoming.map(task => {
-                const daysUntil = Math.ceil((task.nextDue - now) / (1000 * 60 * 60 * 24));
-                const isOverdue = daysUntil < 0;
-                const urgencyClass = isOverdue ? 'border-l-red-500 bg-red-50' : 
-                                   daysUntil <= 3 ? 'border-l-orange-500 bg-orange-50' : 
-                                   'border-l-blue-500 bg-blue-50';
-                
-                return `
-                    <div class="p-6 border-l-4 ${urgencyClass} hover:bg-opacity-75 transition-colors">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h4 class="font-semibold text-gray-900 mb-1">${task.title}</h4>
-                                <p class="text-sm text-gray-600 mb-2">${task.category} • ${task.description}</p>
-                                <div class="flex items-center gap-4 text-xs text-gray-500">
-                                    <span>Due: ${task.nextDue.toLocaleDateString()}</span>
-                                    ${task.cost > 0 ? `<span>Est. Cost: ${task.cost}</span>` : ''}
-                                    <span class="font-medium ${isOverdue ? 'text-red-600' : daysUntil <= 3 ? 'text-orange-600' : 'text-blue-600'}">
-                                        ${isOverdue ? `${Math.abs(daysUntil)} days overdue` : daysUntil === 0 ? 'Due today' : `${daysUntil} days`}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="flex gap-2 ml-4">
-                                <button onclick="completeTask(${task.id})" class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors">
-                                    Complete
-                                </button>
-                                <button onclick="postponeTask(${task.id})" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition-colors">
-                                    Postpone
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Render all tasks
-        function renderAllTasks() {
-            const container = document.getElementById('all-tasks-list');
-            const tasksByCategory = {};
-            
-            maintenanceTasks.forEach(task => {
-                if (!tasksByCategory[task.category]) {
-                    tasksByCategory[task.category] = [];
-                }
-                tasksByCategory[task.category].push(task);
-            });
-
-            container.innerHTML = Object.entries(tasksByCategory).map(([category, tasks]) => `
-                <div class="border-b border-gray-100 last:border-b-0">
-                    <div class="p-6 bg-gray-50">
-                        <h4 class="font-semibold text-gray-900">${category}</h4>
-                    </div>
-                    ${tasks.map(task => {
-                        const now = new Date();
-                        const daysUntil = Math.ceil((task.nextDue - now) / (1000 * 60 * 60 * 24));
-                        const isOverdue = daysUntil < 0;
-                        
-                        return `
-                            <div class="p-6 border-b border-gray-100 last:border-b-0 hover:bg-gray-50">
-                                <div class="flex items-start justify-between">
-                                    <div class="flex-1">
-                                        <h5 class="font-medium text-gray-900 mb-1">${task.title}</h5>
-                                        <p class="text-sm text-gray-600 mb-2">${task.description}</p>
-                                        <div class="flex items-center gap-4 text-xs text-gray-500">
-                                            <span>Every ${Math.round(task.frequency / 30)} months</span>
-                                            <span>Next: ${task.nextDue.toLocaleDateString()}</span>
-                                            ${task.cost > 0 ? `<span>${task.cost}</span>` : '<span>DIY</span>'}
-                                            <span class="font-medium ${isOverdue ? 'text-red-600' : daysUntil <= 7 ? 'text-orange-600' : 'text-gray-500'}">
-                                                ${isOverdue ? 'Overdue' : daysUntil <= 7 ? 'Due soon' : 'Scheduled'}
-                                            </span>
-                                        </div>
-                                        ${task.tips ? `<p class="text-xs text-blue-600 mt-2">💡 ${task.tips}</p>` : ''}
-                                    </div>
-                                    <div class="flex gap-2 ml-4">
-                                        <button onclick="completeTask(${task.id})" class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">
-                                            Complete
-                                        </button>
-                                        <button onclick="editTask(${task.id})" class="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300">
-                                            Edit
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `).join('');
-        }
-
-        // Task actions
-        function completeTask(taskId) {
-            const task = maintenanceTasks.find(t => t.id === taskId);
-            openModal('Complete Task', `
-                <p class="mb-4">Mark "${task.title}" as completed?</p>
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Completion Date</label>
-                        <input type="date" id="completion-date" value="${new Date().toISOString().split('T')[0]}" 
-                               class="w-full px-3 py-2 border rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
-                        <textarea id="completion-notes" placeholder="Any notes about this maintenance..." 
-                                  class="w-full px-3 py-2 border rounded-lg" rows="2"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Actual Cost</label>
-                        <input type="number" id="actual-cost" value="${task.cost}" 
-                               class="w-full px-3 py-2 border rounded-lg" placeholder="0">
-                    </div>
-                </div>
-            `, () => {
-                const completionDate = new Date(document.getElementById('completion-date').value);
-                const notes = document.getElementById('completion-notes').value;
-                const actualCost = parseFloat(document.getElementById('actual-cost').value) || 0;
-                
-                // Update task
-                task.lastCompleted = completionDate;
-                task.nextDue = new Date(completionDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
-                task.actualCost = actualCost;
-                task.notes = notes;
-                
-                saveData();
-                refreshApp();
-                closeModal();
-            });
-            currentModalAction = 'complete';
-        }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -657,41 +6,16 @@ async function searchRealAddresses(query) {
     <title>Casa Care - Smart Home Maintenance</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .gradient-bg { background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); }
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        .slide-up { animation: slideUp 0.3s ease-out; }
+        .gradient-bg { 
+            background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); 
+        }
+        .fade-in { 
+            animation: fadeIn 0.5s ease-in-out; 
+        }
         
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .step-indicator {
-            transition: all 0.3s ease;
-        }
-        
-        .step-active {
-            background: linear-gradient(135deg, #0891b2, #06b6d4);
-            color: white;
-        }
-        
-        .step-completed {
-            background: #10b981;
-            color: white;
-        }
-
-        .address-suggestion {
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        
-        .address-suggestion:hover {
-            background-color: #f3f4f6;
         }
     </style>
 </head>
@@ -705,167 +29,96 @@ async function searchRealAddresses(query) {
             </div>
         </div>
 
-        <!-- API Key Setup (shown first time) -->
-        <div id="api-setup" class="max-w-2xl mx-auto px-4 py-8">
+        <!-- Setup Form -->
+        <div id="setup-form" class="max-w-2xl mx-auto px-4 py-8">
             <div class="bg-white rounded-xl p-8 shadow-lg">
                 <div class="text-center mb-8">
-                    <div class="text-4xl mb-4">🔑</div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Get Started with Real Property Data</h2>
-                    <p class="text-gray-600">To provide accurate property information, we need a free API key from RentSpree</p>
-                </div>
-                
-                <div class="space-y-6">
-                    <div class="bg-blue-50 rounded-lg p-6">
-                        <h3 class="font-semibold text-blue-900 mb-3">Choose your setup option:</h3>
-                        
-                        <div class="space-y-4">
-                            <div class="bg-white rounded-lg p-4 border-2 border-blue-200">
-                                <h4 class="font-medium text-blue-900 mb-2">🔥 Option 1: Google Places API (Recommended)</h4>
-                                <ol class="text-sm text-blue-800 space-y-1 mb-3">
-                                    <li><strong>1.</strong> Go to <a href="https://console.cloud.google.com/apis/library/places-backend.googleapis.com" target="_blank" class="underline hover:text-blue-600">Google Cloud Console</a></li>
-                                    <li><strong>2.</strong> Enable Places API (free $200 credit)</li>
-                                    <li><strong>3.</strong> Create API key</li>
-                                    <li><strong>4.</strong> Paste below</li>
-                                </ol>
-                                <p class="text-xs text-blue-600">💡 Best autocomplete + property data</p>
-                            </div>
-                            
-                            <div class="bg-white rounded-lg p-4 border border-gray-200">
-                                <h4 class="font-medium text-gray-700 mb-2">Option 2: Demo Mode</h4>
-                                <p class="text-sm text-gray-600">Test with realistic sample data (no API needed)</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Google Places API Key (Optional)</label>
-                        <input type="text" id="api-key-input" placeholder="Paste your Google Places API key here..." 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <p class="text-xs text-gray-500 mt-1">Your key is stored locally and never sent to our servers</p>
-                    </div>
-                    
-                    <div class="flex gap-4">
-                        <button onclick="saveApiKey()" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                            Save API Key & Continue
-                        </button>
-                        <button onclick="useDemoMode()" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors font-medium">
-                            Use Demo Mode
-                        </button>
-                    </div>
-                    
-                    <div class="text-center">
-                        <p class="text-xs text-gray-500">Demo mode uses sample data for testing purposes</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Setup Wizard -->
-        <div id="setup-wizard" class="max-w-2xl mx-auto px-4 py-8 hidden">
-            <!-- Progress Indicators -->
-            <div class="flex items-center justify-between mb-8">
-                <div class="flex items-center space-x-4">
-                    <div id="step-1" class="step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">1</div>
-                    <div class="w-12 h-1 bg-gray-200" id="progress-1"></div>
-                    <div id="step-2" class="step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500">2</div>
-                    <div class="w-12 h-1 bg-gray-200" id="progress-2"></div>
-                    <div id="step-3" class="step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500">3</div>
-                    <div class="w-12 h-1 bg-gray-200" id="progress-3"></div>
-                    <div id="step-4" class="step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500">4</div>
-                </div>
-            </div>
-
-            <!-- Step 1: Address Input -->
-            <div id="wizard-step-1" class="wizard-step bg-white rounded-xl p-8 shadow-lg slide-up">
-                <div class="text-center mb-8">
                     <div class="text-4xl mb-4">🏠</div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Let's start with your home</h2>
-                    <p class="text-gray-600">Enter your address and we'll look up detailed property information</p>
-                </div>
-                
-                <div class="space-y-4">
-                    <div class="relative">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Home Address</label>
-                        <input type="text" id="address-input" placeholder="Start typing your address..." 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                               oninput="searchAddresses(this.value)"
-                               autocomplete="off">
-                        
-                        <!-- Address suggestions dropdown -->
-                        <div id="address-suggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 hidden max-h-60 overflow-y-auto">
-                            <!-- Suggestions will be populated here -->
-                        </div>
-                        
-                        <p class="text-xs text-gray-500 mt-1">We'll automatically fetch property details from public records</p>
-                    </div>
-                    
-                    <div id="loading-indicator" class="hidden text-center py-4">
-                        <div class="inline-flex items-center gap-2 text-blue-600">
-                            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                            <span>Looking up property details...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 2: Confirm Property Details -->
-            <div id="wizard-step-2" class="wizard-step bg-white rounded-xl p-8 shadow-lg slide-up hidden">
-                <div class="text-center mb-8">
-                    <div class="text-4xl mb-4">🔍</div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Confirm your property details</h2>
-                    <p class="text-gray-600">Please verify and update any incorrect information</p>
-                </div>
-                
-                <div id="property-details" class="space-y-6">
-                    <!-- Property details will be populated here -->
-                </div>
-                
-                <div class="flex gap-4 mt-8">
-                    <button onclick="prevStep()" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">
-                        Back
-                    </button>
-                    <button onclick="nextStep()" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
-                        Looks Good
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 3: Systems & Features -->
-            <div id="wizard-step-3" class="wizard-step bg-white rounded-xl p-8 shadow-lg slide-up hidden">
-                <div class="text-center mb-8">
-                    <div class="text-4xl mb-4">⚙️</div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Tell us about your home systems</h2>
-                    <p class="text-gray-600">This helps us suggest the right maintenance tasks</p>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Tell us about your home</h2>
+                    <p class="text-gray-600">We'll create a personalized maintenance plan for your property</p>
                 </div>
                 
                 <div class="space-y-6">
+                    <!-- Address -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Home Address</label>
+                        <input type="text" id="address" placeholder="123 Main St, Anytown, NY 12345" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <!-- Basic Property Info -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
+                            <input type="number" id="year-built" value="1995" min="1900" max="2024"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Square Footage</label>
+                            <input type="number" id="sqft" value="2000" min="500" max="10000"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
+                            <select id="bedrooms" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3" selected>3</option>
+                                <option value="4">4</option>
+                                <option value="5+">5+</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
+                            <select id="bathrooms" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                <option value="1">1</option>
+                                <option value="1.5">1.5</option>
+                                <option value="2" selected>2</option>
+                                <option value="2.5">2.5</option>
+                                <option value="3">3</option>
+                                <option value="3.5">3.5</option>
+                                <option value="4+">4+</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Utilities -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Water Source</label>
+                            <select id="water-source" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                <option value="City Water" selected>City Water</option>
+                                <option value="Well Water">Well Water</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Waste Water</label>
+                            <select id="sewer-type" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                <option value="Public Sewer" selected>Public Sewer</option>
+                                <option value="Septic System">Septic System</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- HVAC Systems -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3">Heating & Cooling (select all that apply)</label>
                         <div class="grid grid-cols-2 gap-3">
                             <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="hvac" value="central-ac" class="rounded">
+                                <input type="checkbox" id="central-ac" class="rounded">
                                 <span class="text-sm">Central A/C</span>
                             </label>
                             <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="hvac" value="mini-splits" class="rounded">
+                                <input type="checkbox" id="mini-splits" class="rounded">
                                 <span class="text-sm">Mini-Splits</span>
                             </label>
                             <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="hvac" value="window-units" class="rounded">
-                                <span class="text-sm">Window Units</span>
-                            </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="hvac" value="heat-pump" class="rounded">
+                                <input type="checkbox" id="heat-pump" class="rounded">
                                 <span class="text-sm">Heat Pump</span>
                             </label>
                             <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="hvac" value="baseboard" class="rounded">
+                                <input type="checkbox" id="baseboard" class="rounded">
                                 <span class="text-sm">Baseboard Heat</span>
-                            </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="hvac" value="radiators" class="rounded">
-                                <span class="text-sm">Radiators</span>
                             </label>
                         </div>
                     </div>
@@ -875,131 +128,79 @@ async function searchRealAddresses(query) {
                         <label class="block text-sm font-medium text-gray-700 mb-3">Home Features (select all that apply)</label>
                         <div class="grid grid-cols-2 gap-3">
                             <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="features" value="fireplace" class="rounded">
+                                <input type="checkbox" id="fireplace" class="rounded">
                                 <span class="text-sm">Fireplace</span>
                             </label>
                             <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="features" value="pool" class="rounded">
+                                <input type="checkbox" id="pool" class="rounded">
                                 <span class="text-sm">Pool/Spa</span>
                             </label>
                             <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="features" value="deck" class="rounded">
+                                <input type="checkbox" id="deck" class="rounded">
                                 <span class="text-sm">Deck/Patio</span>
                             </label>
                             <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="features" value="garage" class="rounded">
+                                <input type="checkbox" id="garage" class="rounded">
                                 <span class="text-sm">Garage</span>
                             </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="features" value="basement" class="rounded">
-                                <span class="text-sm">Basement</span>
-                            </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="features" value="security" class="rounded">
-                                <span class="text-sm">Security System</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex gap-4 mt-8">
-                    <button onclick="prevStep()" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">
-                        Back
-                    </button>
-                    <button onclick="nextStep()" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
-                        Continue
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 4: Lifestyle & Preferences -->
-            <div id="wizard-step-4" class="wizard-step bg-white rounded-xl p-8 shadow-lg slide-up hidden">
-                <div class="text-center mb-8">
-                    <div class="text-4xl mb-4">🏡</div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Final questions</h2>
-                    <p class="text-gray-600">This helps us customize maintenance frequencies</p>
-                </div>
-                
-                <div class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Do you have pets?</label>
-                        <div class="flex gap-4">
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="pets" value="yes" class="text-blue-600">
-                                <span>Yes</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="pets" value="no" class="text-blue-600" checked>
-                                <span>No</span>
-                            </label>
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">How many people live in your home?</label>
-                        <select name="occupancy" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option value="1-2">1-2 people</option>
-                            <option value="3-4" selected>3-4 people</option>
-                            <option value="5+">5+ people</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Maintenance approach preference</label>
-                        <div class="space-y-2">
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="approach" value="proactive" class="text-blue-600" checked>
-                                <span class="text-sm">Proactive - I want to stay ahead of issues</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="approach" value="standard" class="text-blue-600">
-                                <span class="text-sm">Standard - Follow typical schedules</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="approach" value="minimal" class="text-blue-600">
-                                <span class="text-sm">Minimal - Only essential maintenance</span>
-                            </label>
+                    <!-- Lifestyle -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Do you have pets?</label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center space-x-2">
+                                    <input type="radio" name="pets" value="no" checked>
+                                    <span>No</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="radio" name="pets" value="yes">
+                                    <span>Yes</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Maintenance Approach</label>
+                            <select id="approach" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                <option value="proactive" selected>Proactive</option>
+                                <option value="standard">Standard</option>
+                                <option value="minimal">Minimal</option>
+                            </select>
                         </div>
                     </div>
-                </div>
-                
-                <div class="flex gap-4 mt-8">
-                    <button onclick="prevStep()" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">
-                        Back
-                    </button>
-                    <button onclick="generateTasks()" class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium">
+
+                    <button onclick="createMaintenancePlan()" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg">
                         🚀 Create My Maintenance Plan
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Main App (hidden initially) -->
+        <!-- Main App -->
         <div id="main-app" class="hidden">
             <!-- Navigation -->
             <div class="max-w-6xl mx-auto px-4 py-6">
                 <div class="flex space-x-1 bg-white rounded-xl p-2 shadow-lg">
-                    <button onclick="showAppTab('dashboard')" id="app-tab-dashboard" class="app-tab-btn bg-blue-100 text-blue-700 px-6 py-3 rounded-lg font-medium">
+                    <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn bg-blue-100 text-blue-700 px-6 py-3 rounded-lg font-medium">
                         📅 Dashboard
                     </button>
-                    <button onclick="showAppTab('tasks')" id="app-tab-tasks" class="app-tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                    <button onclick="showTab('tasks')" id="tab-tasks" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
                         ✅ All Tasks
                     </button>
-                    <button onclick="showAppTab('calendar')" id="app-tab-calendar" class="app-tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
-                        📆 Calendar
-                    </button>
-                    <button onclick="showAppTab('settings')" id="app-tab-settings" class="app-tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                    <button onclick="showTab('settings')" id="tab-settings" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
                         ⚙️ Settings
                     </button>
                 </div>
             </div>
 
-            <!-- Dashboard Tab -->
-            <div id="app-dashboard" class="app-content max-w-6xl mx-auto px-4 pb-8">
-                <!-- Welcome Back -->
+            <!-- Dashboard -->
+            <div id="dashboard-content" class="tab-content max-w-6xl mx-auto px-4 pb-8">
+                <!-- Welcome -->
                 <div class="gradient-bg text-white rounded-2xl p-8 shadow-2xl mb-8">
-                    <h2 class="text-2xl font-bold mb-2">Welcome back! 👋</h2>
-                    <p class="text-blue-100" id="dashboard-address">Managing maintenance for your home</p>
+                    <h2 class="text-2xl font-bold mb-2">Welcome to Casa Care! 👋</h2>
+                    <p class="text-blue-100" id="home-address">Managing maintenance for your home</p>
                 </div>
 
                 <!-- Stats -->
@@ -1035,7 +236,7 @@ async function searchRealAddresses(query) {
                         <div class="flex items-center gap-3">
                             <div class="p-2 bg-green-100 rounded-lg">💰</div>
                             <div>
-                                <p class="text-sm text-gray-600">Est. Annual</p>
+                                <p class="text-sm text-gray-600">Annual Cost</p>
                                 <p id="annual-cost" class="text-2xl font-bold text-gray-900">$0</p>
                             </div>
                         </div>
@@ -1044,22 +245,25 @@ async function searchRealAddresses(query) {
 
                 <!-- Upcoming Tasks -->
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="p-6 border-b border-gray-100">
+                    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
                         <h3 class="text-xl font-bold text-gray-900">Upcoming Tasks</h3>
+                        <button onclick="addTask()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            ➕ Add Task
+                        </button>
                     </div>
-                    <div id="upcoming-tasks-list">
+                    <div id="tasks-list">
                         <!-- Tasks will be populated here -->
                     </div>
                 </div>
             </div>
 
-            <!-- Tasks Tab -->
-            <div id="app-tasks" class="app-content hidden max-w-6xl mx-auto px-4 pb-8">
+            <!-- All Tasks -->
+            <div id="tasks-content" class="tab-content hidden max-w-6xl mx-auto px-4 pb-8">
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
                     <div class="p-6 border-b border-gray-100 flex items-center justify-between">
                         <h3 class="text-xl font-bold text-gray-900">All Maintenance Tasks</h3>
-                        <button onclick="addCustomTask()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                            ➕ Add Custom Task
+                        <button onclick="addTask()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            ➕ Add Task
                         </button>
                     </div>
                     <div id="all-tasks-list">
@@ -1068,35 +272,17 @@ async function searchRealAddresses(query) {
                 </div>
             </div>
 
-            <!-- Calendar Tab -->
-            <div id="app-calendar" class="app-content hidden max-w-6xl mx-auto px-4 pb-8">
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Maintenance Calendar</h3>
-                    <div id="calendar-view">
-                        <p class="text-gray-600">Calendar view coming soon! For now, check the Dashboard for upcoming tasks.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings Tab -->
-            <div id="app-settings" class="app-content hidden max-w-6xl mx-auto px-4 pb-8">
+            <!-- Settings -->
+            <div id="settings-content" class="tab-content hidden max-w-6xl mx-auto px-4 pb-8">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <h3 class="text-xl font-bold text-gray-900 mb-6">Settings</h3>
                     
                     <div class="space-y-6">
                         <div>
                             <h4 class="font-medium text-gray-900 mb-3">Property Information</h4>
-                            <button onclick="restartWizard()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            <button onclick="resetApp()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                                 Update Property Details
                             </button>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-medium text-gray-900 mb-3">API Configuration</h4>
-                            <button onclick="updateApiKey()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 mr-3">
-                                Update API Key
-                            </button>
-                            <span class="text-sm text-gray-600">Currently using: <span id="api-status">Demo Mode</span></span>
                         </div>
                         
                         <div>
@@ -1118,97 +304,306 @@ async function searchRealAddresses(query) {
         <!-- Task Modal -->
         <div id="task-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
             <div class="bg-white rounded-xl max-w-md w-full mx-4 p-6">
-                <h3 class="text-xl font-bold mb-4" id="modal-title">Complete Task</h3>
-                <div id="modal-content"></div>
+                <h3 class="text-xl font-bold mb-4" id="modal-title">Add Task</h3>
+                <div class="space-y-4">
+                    <input type="text" id="task-title" placeholder="Task title" class="w-full p-3 border rounded-lg">
+                    <select id="task-category" class="w-full p-3 border rounded-lg">
+                        <option value="HVAC">HVAC</option>
+                        <option value="Water Systems">Water Systems</option>
+                        <option value="Exterior">Exterior</option>
+                        <option value="Safety">Safety</option>
+                        <option value="General">General</option>
+                    </select>
+                    <input type="number" id="task-cost" placeholder="Estimated cost" class="w-full p-3 border rounded-lg">
+                    <textarea id="task-notes" placeholder="Notes and description" class="w-full p-3 border rounded-lg" rows="3"></textarea>
+                </div>
                 <div class="flex gap-3 mt-6">
                     <button onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg">Cancel</button>
-                    <button onclick="confirmTaskAction()" id="modal-confirm" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Confirm</button>
+                    <button onclick="saveTask()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Save Task</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // App State
-        let currentStep = 1;
-        let propertyData = {};
-        let userPreferences = {};
-        let maintenanceTasks = [];
-        let currentModalAction = null;
-        let apiKey = null;
-        let demoMode = false;
-        let searchTimeout = null;
+        // App data
+        let homeData = {};
+        let tasks = [];
+        let currentEditingTask = null;
 
-        // API Configuration
-        function saveApiKey() {
-            const key = document.getElementById('api-key-input').value.trim();
-            if (!key) {
-                alert('Please enter your API key');
-                return;
+        // Create maintenance plan
+        function createMaintenancePlan() {
+            // Collect form data
+            homeData = {
+                address: document.getElementById('address').value || '123 Main Street',
+                yearBuilt: parseInt(document.getElementById('year-built').value),
+                sqft: parseInt(document.getElementById('sqft').value),
+                bedrooms: document.getElementById('bedrooms').value,
+                bathrooms: document.getElementById('bathrooms').value,
+                waterSource: document.getElementById('water-source').value,
+                sewerType: document.getElementById('sewer-type').value,
+                hasPets: document.querySelector('input[name="pets"]:checked').value === 'yes',
+                approach: document.getElementById('approach').value
+            };
+
+            // Collect selected features
+            homeData.features = {
+                centralAC: document.getElementById('central-ac').checked,
+                miniSplits: document.getElementById('mini-splits').checked,
+                heatPump: document.getElementById('heat-pump').checked,
+                baseboard: document.getElementById('baseboard').checked,
+                fireplace: document.getElementById('fireplace').checked,
+                pool: document.getElementById('pool').checked,
+                deck: document.getElementById('deck').checked,
+                garage: document.getElementById('garage').checked
+            };
+
+            // Generate tasks
+            generateTasks();
+
+            // Show main app
+            document.getElementById('setup-form').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+
+            // Initialize dashboard
+            updateDashboard();
+            saveData();
+        }
+
+        // Generate maintenance tasks
+        function generateTasks() {
+            tasks = [];
+            let id = 1;
+
+            // Frequency modifiers
+            const freqMod = homeData.approach === 'proactive' ? 0.8 : homeData.approach === 'minimal' ? 1.3 : 1.0;
+            const petMod = homeData.hasPets ? 0.75 : 1.0;
+            const homeAge = new Date().getFullYear() - homeData.yearBuilt;
+
+            // HVAC Tasks
+            if (homeData.features.centralAC) {
+                tasks.push({
+                    id: id++,
+                    title: 'Replace HVAC Filter',
+                    category: 'HVAC',
+                    frequency: Math.round(90 * freqMod * petMod),
+                    cost: 25,
+                    priority: 'high',
+                    description: 'Replace central air system filter',
+                    nextDue: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
+
+                tasks.push({
+                    id: id++,
+                    title: 'HVAC Professional Service',
+                    category: 'HVAC',
+                    frequency: Math.round(365 * freqMod),
+                    cost: 150,
+                    priority: 'medium',
+                    description: 'Annual professional HVAC maintenance',
+                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
             }
-            
-            apiKey = key;
-            demoMode = false;
-            localStorage.setItem('casaCareApiKey', key);
-            
-            document.getElementById('api-setup').classList.add('hidden');
-            document.getElementById('setup-wizard').classList.remove('hidden');
-            updateApiStatus();
-        }
 
-        function useDemoMode() {
-            demoMode = true;
-            apiKey = null;
-            localStorage.setItem('casaCareDemoMode', 'true');
-            
-            document.getElementById('api-setup').classList.add('hidden');
-            document.getElementById('setup-wizard').classList.remove('hidden');
-            updateApiStatus();
-        }
+            if (homeData.features.miniSplits) {
+                tasks.push({
+                    id: id++,
+                    title: 'Clean Mini-Split Filters',
+                    category: 'HVAC',
+                    frequency: Math.round(60 * freqMod * petMod),
+                    cost: 0,
+                    priority: 'medium',
+                    description: 'Clean mini-split unit filters',
+                    nextDue: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
+            }
 
-        function updateApiKey() {
-            document.getElementById('api-setup').classList.remove('hidden');
-            document.getElementById('setup-wizard').classList.add('hidden');
-            document.getElementById('main-app').classList.add('hidden');
-        }
+            // Water system tasks
+            if (homeData.waterSource === 'Well Water') {
+                tasks.push({
+                    id: id++,
+                    title: 'Test Well Water',
+                    category: 'Water Systems',
+                    frequency: Math.round(365 * freqMod),
+                    cost: 75,
+                    priority: 'high',
+                    description: 'Annual water quality testing',
+                    nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
+            }
 
-        function updateApiStatus() {
-            const statusElement = document.getElementById('api-status');
-            if (statusElement) {
-                statusElement.textContent = demoMode ? 'Demo Mode' : 'Real Property API';
+            if (homeData.sewerType === 'Septic System') {
+                tasks.push({
+                    id: id++,
+                    title: 'Septic Tank Pumping',
+                    category: 'Water Systems',
+                    frequency: Math.round(1460 * freqMod), // 4 years
+                    cost: 400,
+                    priority: 'high',
+                    description: 'Professional septic pumping',
+                    nextDue: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
+            }
+
+            // General tasks
+            tasks.push({
+                id: id++,
+                title: 'Clean Gutters',
+                category: 'Exterior',
+                frequency: Math.round(182 * freqMod), // twice yearly
+                cost: 150,
+                priority: 'medium',
+                description: 'Clean gutters and downspouts',
+                nextDue: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
+                lastCompleted: null
+            });
+
+            tasks.push({
+                id: id++,
+                title: 'Test Smoke Detectors',
+                category: 'Safety',
+                frequency: Math.round(30 * freqMod), // monthly
+                cost: 0,
+                priority: 'high',
+                description: 'Test smoke and CO detectors',
+                nextDue: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+                lastCompleted: null
+            });
+
+            // Feature-specific tasks
+            if (homeData.features.fireplace) {
+                tasks.push({
+                    id: id++,
+                    title: 'Chimney Inspection',
+                    category: 'Safety',
+                    frequency: Math.round(365 * freqMod),
+                    cost: 300,
+                    priority: 'high',
+                    description: 'Professional chimney cleaning and inspection',
+                    nextDue: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
+            }
+
+            if (homeData.features.deck) {
+                tasks.push({
+                    id: id++,
+                    title: 'Deck Maintenance',
+                    category: 'Exterior',
+                    frequency: Math.round(730 * freqMod), // 2 years
+                    cost: 200,
+                    priority: 'medium',
+                    description: 'Clean and seal deck',
+                    nextDue: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
+            }
+
+            if (homeData.features.pool) {
+                tasks.push({
+                    id: id++,
+                    title: 'Pool Opening/Closing',
+                    category: 'Pool',
+                    frequency: Math.round(182 * freqMod),
+                    cost: 250,
+                    priority: 'medium',
+                    description: 'Seasonal pool maintenance',
+                    nextDue: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
+            }
+
+            // Age-based tasks
+            if (homeAge > 15) {
+                tasks.push({
+                    id: id++,
+                    title: 'Electrical Inspection',
+                    category: 'Safety',
+                    frequency: Math.round(1825 * freqMod), // 5 years
+                    cost: 300,
+                    priority: 'medium',
+                    description: 'Professional electrical inspection',
+                    nextDue: new Date(Date.now() + 200 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
+            }
+
+            if (homeAge > 25) {
+                tasks.push({
+                    id: id++,
+                    title: 'Roof Inspection',
+                    category: 'Exterior',
+                    frequency: Math.round(1095 * freqMod), // 3 years
+                    cost: 250,
+                    priority: 'high',
+                    description: 'Professional roof inspection',
+                    nextDue: new Date(Date.now() + 150 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
             }
         }
 
-        // Address search and autocomplete
-        function searchAddresses(query) {
-            if (searchTimeout) {
-                clearTimeout(searchTimeout);
-            }
+        // Update dashboard
+        function updateDashboard() {
+            document.getElementById('home-address').textContent = `Managing maintenance for ${homeData.address}`;
             
-            if (query.length < 3) {
-                hideAddressSuggestions();
-                return;
-            }
+            const now = new Date();
+            const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
             
-            searchTimeout = setTimeout(() => {
-                if (demoMode) {
-                    showDemoAddressSuggestions(query);
-                } else {
-                    searchRealAddresses(query);
-                }
-            }, 300);
+            const overdue = tasks.filter(task => new Date(task.nextDue) < now).length;
+            const thisWeek = tasks.filter(task => new Date(task.nextDue) <= oneWeek && new Date(task.nextDue) >= now).length;
+            const total = tasks.length;
+            const annualCost = tasks.reduce((sum, task) => {
+                const yearlyFreq = 365 / task.frequency;
+                return sum + (task.cost * yearlyFreq);
+            }, 0);
+
+            document.getElementById('overdue-count').textContent = overdue;
+            document.getElementById('week-count').textContent = thisWeek;
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('annual-cost').textContent = `$${Math.round(annualCost)}`;
+
+            renderTasks();
         }
 
-        function showDemoAddressSuggestions(query) {
-            const suggestions = [
-                "123 Main Street, Anytown, NY 12345",
-                "456 Oak Avenue, Somewhere, CA 90210", 
-                "789 Pine Road, Elsewhere, TX 73301",
-                "321 Elm Street, Nowhere, FL 33101"
-            ].filter(addr => addr.toLowerCase().includes(query.toLowerCase()));
+        // Render tasks
+        function renderTasks() {
+            const upcomingContainer = document.getElementById('tasks-list');
+            const allTasksContainer = document.getElementById('all-tasks-list');
             
-            displayAddressSuggestions(suggestions);
-        }
+            // Get upcoming tasks (next 2 weeks)
+            const now = new Date();
+            const twoWeeks = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+            const upcoming = tasks
+                .filter(task => new Date(task.nextDue) <= twoWeeks)
+                .sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue))
+                .slice(0, 5);
 
-        async function searchRealAddresses(query) {
-            if (!apiKey) {
+            // Render upcoming tasks
+            if (upcoming.length === 0) {
+                upcomingContainer.innerHTML = `
+                    <div class="p-8 text-center text-gray-500">
+                        <div class="text-4xl mb-4">✅</div>
+                        <p class="font-medium">All caught up!</p>
+                        <p class="text-sm">No urgent tasks in the next two weeks.</p>
+                    </div>
+                `;
+            } else {
+                upcomingContainer.innerHTML = upcoming.map(task => {
+                    const daysUntil = Math.ceil((new Date(task.nextDue) - now) / (1000 * 60 * 60 * 24));
+                    const isOverdue = daysUntil < 0;
+                    const urgencyClass = isOverdue ? 'border-l-red-500 bg-red-50' : 
+                                       daysUntil <= 3 ? 'border-l-orange-500 bg-orange-50' : 
+                                       'border-l-blue-500 bg-blue-50';
+                    
+                    return `
+                        <div class="p-6 border-l-4 ${urgencyClass}">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-gray-900 mb-1">${task.title}</h4>
+                                    <p class="text-sm text-gray-600 mb-2">${task.category} • ${task.description}</p>
