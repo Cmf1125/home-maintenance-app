@@ -3,21 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Casa Care - Smart Home Maintenance</title>
+    <title>Casa Care - Home Maintenance</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .gradient-bg { 
-            background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); 
-        }
-        .fade-in { 
-            animation: fadeIn 0.5s ease-in-out; 
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-    </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <div id="app">
@@ -25,28 +12,22 @@
         <div class="bg-white shadow-sm border-b">
             <div class="max-w-4xl mx-auto px-4 py-4">
                 <h1 class="text-2xl font-bold text-gray-900">Casa Care</h1>
-                <p class="text-gray-600">Smart home maintenance, personalized for your property</p>
+                <p class="text-gray-600">Smart home maintenance tracker</p>
             </div>
         </div>
 
         <!-- Setup Form -->
         <div id="setup-form" class="max-w-2xl mx-auto px-4 py-8">
             <div class="bg-white rounded-xl p-8 shadow-lg">
-                <div class="text-center mb-8">
-                    <div class="text-4xl mb-4">🏠</div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Tell us about your home</h2>
-                    <p class="text-gray-600">We'll create a personalized maintenance plan for your property</p>
-                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Tell us about your home</h2>
                 
-                <div class="space-y-6">
-                    <!-- Address -->
+                <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Home Address</label>
-                        <input type="text" id="address" placeholder="123 Main St, Anytown, NY 12345" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="address" placeholder="123 Main St, Anytown, NY" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg">
                     </div>
 
-                    <!-- Basic Property Info -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
@@ -55,555 +36,465 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Square Footage</label>
-                            <input type="number" id="sqft" value="2000" min="500" max="10000"
+                            <input type="number" id="sqft" value="2000" 
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
-                            <select id="bedrooms" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3" selected>3</option>
-                                <option value="4">4</option>
-                                <option value="5+">5+</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
-                            <select id="bathrooms" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                                <option value="1">1</option>
-                                <option value="1.5">1.5</option>
-                                <option value="2" selected>2</option>
-                                <option value="2.5">2.5</option>
-                                <option value="3">3</option>
-                                <option value="3.5">3.5</option>
-                                <option value="4+">4+</option>
-                            </select>
-                        </div>
                     </div>
 
-                    <!-- Utilities -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Water Source</label>
-                            <select id="water-source" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                                <option value="City Water" selected>City Water</option>
-                                <option value="Well Water">Well Water</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Waste Water</label>
-                            <select id="sewer-type" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                                <option value="Public Sewer" selected>Public Sewer</option>
-                                <option value="Septic System">Septic System</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- HVAC Systems -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Heating & Cooling (select all that apply)</label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="central-ac" class="rounded">
-                                <span class="text-sm">Central A/C</span>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">What systems do you have?</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="central-ac" checked>
+                                <span>Central Air/Heat</span>
                             </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="mini-splits" class="rounded">
-                                <span class="text-sm">Mini-Splits</span>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="well-water">
+                                <span>Well Water</span>
                             </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="heat-pump" class="rounded">
-                                <span class="text-sm">Heat Pump</span>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="septic">
+                                <span>Septic System</span>
                             </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="baseboard" class="rounded">
-                                <span class="text-sm">Baseboard Heat</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Home Features -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Home Features (select all that apply)</label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="fireplace" class="rounded">
-                                <span class="text-sm">Fireplace</span>
-                            </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="pool" class="rounded">
-                                <span class="text-sm">Pool/Spa</span>
-                            </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="deck" class="rounded">
-                                <span class="text-sm">Deck/Patio</span>
-                            </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="garage" class="rounded">
-                                <span class="text-sm">Garage</span>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="fireplace">
+                                <span>Fireplace</span>
                             </label>
                         </div>
                     </div>
 
-                    <!-- Lifestyle -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Do you have pets?</label>
-                            <div class="flex gap-4">
-                                <label class="flex items-center space-x-2">
-                                    <input type="radio" name="pets" value="no" checked>
-                                    <span>No</span>
-                                </label>
-                                <label class="flex items-center space-x-2">
-                                    <input type="radio" name="pets" value="yes">
-                                    <span>Yes</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Maintenance Approach</label>
-                            <select id="approach" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                                <option value="proactive" selected>Proactive</option>
-                                <option value="standard">Standard</option>
-                                <option value="minimal">Minimal</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button onclick="createMaintenancePlan()" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg">
-                        🚀 Create My Maintenance Plan
+                    <button onclick="createPlan()" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 font-medium">
+                        Create My Maintenance Plan
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Main App -->
-        <div id="main-app" class="hidden">
-            <!-- Navigation -->
-            <div class="max-w-6xl mx-auto px-4 py-6">
-                <div class="flex space-x-1 bg-white rounded-xl p-2 shadow-lg">
-                    <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn bg-blue-100 text-blue-700 px-6 py-3 rounded-lg font-medium">
-                        📅 Dashboard
+        <div id="main-app" class="hidden max-w-6xl mx-auto px-4 py-8">
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div class="p-6 border-b border-gray-100">
+                    <h3 class="text-xl font-bold text-gray-900">Your Maintenance Tasks</h3>
+                    <p class="text-gray-600" id="home-info">Managing tasks for your home</p>
+                </div>
+                
+                <div id="tasks-container" class="divide-y divide-gray-100">
+                    <!-- Tasks will appear here -->
+                </div>
+
+                <div class="p-6 bg-gray-50">
+                    <button onclick="addCustomTask()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                        ➕ Add Custom Task
                     </button>
-                    <button onclick="showTab('tasks')" id="tab-tasks" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
-                        ✅ All Tasks
+                    <button onclick="exportTasks()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 ml-3">
+                        📄 Export Tasks
                     </button>
-                    <button onclick="showTab('settings')" id="tab-settings" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
-                        ⚙️ Settings
+                    <button onclick="resetApp()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 ml-3">
+                        🔄 Start Over
                     </button>
-                </div>
-            </div>
-
-            <!-- Dashboard -->
-            <div id="dashboard-content" class="tab-content max-w-6xl mx-auto px-4 pb-8">
-                <!-- Welcome -->
-                <div class="gradient-bg text-white rounded-2xl p-8 shadow-2xl mb-8">
-                    <h2 class="text-2xl font-bold mb-2">Welcome to Casa Care! 👋</h2>
-                    <p class="text-blue-100" id="home-address">Managing maintenance for your home</p>
-                </div>
-
-                <!-- Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white rounded-xl p-6 shadow-lg">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-red-100 rounded-lg">⚠️</div>
-                            <div>
-                                <p class="text-sm text-gray-600">Overdue</p>
-                                <p id="overdue-count" class="text-2xl font-bold text-gray-900">0</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-xl p-6 shadow-lg">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-orange-100 rounded-lg">📅</div>
-                            <div>
-                                <p class="text-sm text-gray-600">This Week</p>
-                                <p id="week-count" class="text-2xl font-bold text-gray-900">0</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-xl p-6 shadow-lg">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-blue-100 rounded-lg">📋</div>
-                            <div>
-                                <p class="text-sm text-gray-600">Total Tasks</p>
-                                <p id="total-count" class="text-2xl font-bold text-gray-900">0</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-xl p-6 shadow-lg">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-green-100 rounded-lg">💰</div>
-                            <div>
-                                <p class="text-sm text-gray-600">Annual Cost</p>
-                                <p id="annual-cost" class="text-2xl font-bold text-gray-900">$0</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Upcoming Tasks -->
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
-                        <h3 class="text-xl font-bold text-gray-900">Upcoming Tasks</h3>
-                        <button onclick="addTask()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                            ➕ Add Task
-                        </button>
-                    </div>
-                    <div id="tasks-list">
-                        <!-- Tasks will be populated here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- All Tasks -->
-            <div id="tasks-content" class="tab-content hidden max-w-6xl mx-auto px-4 pb-8">
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
-                        <h3 class="text-xl font-bold text-gray-900">All Maintenance Tasks</h3>
-                        <button onclick="addTask()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                            ➕ Add Task
-                        </button>
-                    </div>
-                    <div id="all-tasks-list">
-                        <!-- All tasks will be populated here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings -->
-            <div id="settings-content" class="tab-content hidden max-w-6xl mx-auto px-4 pb-8">
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-6">Settings</h3>
-                    
-                    <div class="space-y-6">
-                        <div>
-                            <h4 class="font-medium text-gray-900 mb-3">Property Information</h4>
-                            <button onclick="resetApp()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                                Update Property Details
-                            </button>
-                        </div>
-                        
-                        <div>
-                            <h4 class="font-medium text-gray-900 mb-3">Data</h4>
-                            <div class="space-y-2">
-                                <button onclick="exportData()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mr-3">
-                                    📄 Export Data
-                                </button>
-                                <button onclick="clearData()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-                                    🗑️ Clear All Data
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Task Modal -->
+        <!-- Add Task Modal -->
         <div id="task-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
             <div class="bg-white rounded-xl max-w-md w-full mx-4 p-6">
-                <h3 class="text-xl font-bold mb-4" id="modal-title">Add Task</h3>
+                <h3 class="text-xl font-bold mb-4">Add Task</h3>
                 <div class="space-y-4">
-                    <input type="text" id="task-title" placeholder="Task title" class="w-full p-3 border rounded-lg">
-                    <select id="task-category" class="w-full p-3 border rounded-lg">
+                    <input type="text" id="new-task-title" placeholder="Task name" 
+                           class="w-full p-3 border rounded-lg">
+                    <select id="new-task-category" class="w-full p-3 border rounded-lg">
                         <option value="HVAC">HVAC</option>
-                        <option value="Water Systems">Water Systems</option>
+                        <option value="Plumbing">Plumbing</option>
                         <option value="Exterior">Exterior</option>
                         <option value="Safety">Safety</option>
                         <option value="General">General</option>
                     </select>
-                    <input type="number" id="task-cost" placeholder="Estimated cost" class="w-full p-3 border rounded-lg">
-                    <textarea id="task-notes" placeholder="Notes and description" class="w-full p-3 border rounded-lg" rows="3"></textarea>
+                    <input type="number" id="new-task-cost" placeholder="Cost ($)" 
+                           class="w-full p-3 border rounded-lg">
+                    <textarea id="new-task-notes" placeholder="Notes" 
+                              class="w-full p-3 border rounded-lg" rows="3"></textarea>
                 </div>
                 <div class="flex gap-3 mt-6">
-                    <button onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg">Cancel</button>
-                    <button onclick="saveTask()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Save Task</button>
+                    <button onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg">
+                        Cancel
+                    </button>
+                    <button onclick="saveNewTask()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">
+                        Add Task
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // App data
+        console.log('Script starting...');
+        
         let homeData = {};
         let tasks = [];
-        let currentEditingTask = null;
 
-        // Create maintenance plan
-        function createMaintenancePlan() {
-            // Collect form data
+        function createPlan() {
+            console.log('createPlan() called');
+            
+            // Get form data
+            const address = document.getElementById('address').value || 'Your Home';
+            const yearBuilt = parseInt(document.getElementById('year-built').value) || 1995;
+            const sqft = parseInt(document.getElementById('sqft').value) || 2000;
+            const hasCentralAC = document.getElementById('central-ac').checked;
+            const hasWellWater = document.getElementById('well-water').checked;
+            const hasSeptic = document.getElementById('septic').checked;
+            const hasFireplace = document.getElementById('fireplace').checked;
+
+            console.log('Form data:', { address, yearBuilt, sqft, hasCentralAC, hasWellWater, hasSeptic, hasFireplace });
+
             homeData = {
-                address: document.getElementById('address').value || '123 Main Street',
-                yearBuilt: parseInt(document.getElementById('year-built').value),
-                sqft: parseInt(document.getElementById('sqft').value),
-                bedrooms: document.getElementById('bedrooms').value,
-                bathrooms: document.getElementById('bathrooms').value,
-                waterSource: document.getElementById('water-source').value,
-                sewerType: document.getElementById('sewer-type').value,
-                hasPets: document.querySelector('input[name="pets"]:checked').value === 'yes',
-                approach: document.getElementById('approach').value
-            };
-
-            // Collect selected features
-            homeData.features = {
-                centralAC: document.getElementById('central-ac').checked,
-                miniSplits: document.getElementById('mini-splits').checked,
-                heatPump: document.getElementById('heat-pump').checked,
-                baseboard: document.getElementById('baseboard').checked,
-                fireplace: document.getElementById('fireplace').checked,
-                pool: document.getElementById('pool').checked,
-                deck: document.getElementById('deck').checked,
-                garage: document.getElementById('garage').checked
+                address,
+                yearBuilt,
+                sqft,
+                hasCentralAC,
+                hasWellWater,
+                hasSeptic,
+                hasFireplace
             };
 
             // Generate tasks
-            generateTasks();
-
-            // Show main app
-            document.getElementById('setup-form').classList.add('hidden');
-            document.getElementById('main-app').classList.remove('hidden');
-
-            // Initialize dashboard
-            updateDashboard();
-            saveData();
-        }
-
-        // Generate maintenance tasks
-        function generateTasks() {
             tasks = [];
             let id = 1;
 
-            // Frequency modifiers
-            const freqMod = homeData.approach === 'proactive' ? 0.8 : homeData.approach === 'minimal' ? 1.3 : 1.0;
-            const petMod = homeData.hasPets ? 0.75 : 1.0;
-            const homeAge = new Date().getFullYear() - homeData.yearBuilt;
-
             // HVAC Tasks
-            if (homeData.features.centralAC) {
+            if (hasCentralAC) {
                 tasks.push({
                     id: id++,
                     title: 'Replace HVAC Filter',
                     category: 'HVAC',
-                    frequency: Math.round(90 * freqMod * petMod),
+                    description: 'Replace air filter for central heating/cooling system',
+                    frequency: 'Every 3 months',
                     cost: 25,
-                    priority: 'high',
-                    description: 'Replace central air system filter',
-                    nextDue: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    nextDue: getDateInFuture(30), // 30 days from now
+                    status: 'pending'
                 });
 
                 tasks.push({
                     id: id++,
-                    title: 'HVAC Professional Service',
+                    title: 'HVAC Annual Service',
                     category: 'HVAC',
-                    frequency: Math.round(365 * freqMod),
+                    description: 'Professional HVAC system maintenance and tune-up',
+                    frequency: 'Annually',
                     cost: 150,
-                    priority: 'medium',
-                    description: 'Annual professional HVAC maintenance',
-                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
-                });
-            }
-
-            if (homeData.features.miniSplits) {
-                tasks.push({
-                    id: id++,
-                    title: 'Clean Mini-Split Filters',
-                    category: 'HVAC',
-                    frequency: Math.round(60 * freqMod * petMod),
-                    cost: 0,
-                    priority: 'medium',
-                    description: 'Clean mini-split unit filters',
-                    nextDue: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    nextDue: getDateInFuture(60),
+                    status: 'pending'
                 });
             }
 
             // Water system tasks
-            if (homeData.waterSource === 'Well Water') {
+            if (hasWellWater) {
                 tasks.push({
                     id: id++,
                     title: 'Test Well Water',
                     category: 'Water Systems',
-                    frequency: Math.round(365 * freqMod),
+                    description: 'Annual water quality testing for bacteria and contaminants',
+                    frequency: 'Annually',
                     cost: 75,
-                    priority: 'high',
-                    description: 'Annual water quality testing',
-                    nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    nextDue: getDateInFuture(90),
+                    status: 'pending'
                 });
             }
 
-            if (homeData.sewerType === 'Septic System') {
+            if (hasSeptic) {
                 tasks.push({
                     id: id++,
                     title: 'Septic Tank Pumping',
                     category: 'Water Systems',
-                    frequency: Math.round(1460 * freqMod), // 4 years
+                    description: 'Professional septic tank pumping and inspection',
+                    frequency: 'Every 3-5 years',
                     cost: 400,
-                    priority: 'high',
-                    description: 'Professional septic pumping',
-                    nextDue: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    nextDue: getDateInFuture(120),
+                    status: 'pending'
                 });
             }
 
-            // General tasks
+            // Fireplace
+            if (hasFireplace) {
+                tasks.push({
+                    id: id++,
+                    title: 'Chimney Cleaning',
+                    category: 'Safety',
+                    description: 'Professional chimney inspection and cleaning',
+                    frequency: 'Annually',
+                    cost: 300,
+                    nextDue: getDateInFuture(45),
+                    status: 'pending'
+                });
+            }
+
+            // General tasks for everyone
             tasks.push({
                 id: id++,
                 title: 'Clean Gutters',
                 category: 'Exterior',
-                frequency: Math.round(182 * freqMod), // twice yearly
+                description: 'Remove debris from gutters and downspouts',
+                frequency: 'Twice yearly',
                 cost: 150,
-                priority: 'medium',
-                description: 'Clean gutters and downspouts',
-                nextDue: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
-                lastCompleted: null
+                nextDue: getDateInFuture(21),
+                status: 'pending'
             });
 
             tasks.push({
                 id: id++,
                 title: 'Test Smoke Detectors',
                 category: 'Safety',
-                frequency: Math.round(30 * freqMod), // monthly
+                description: 'Test smoke and carbon monoxide detectors',
+                frequency: 'Monthly',
                 cost: 0,
-                priority: 'high',
-                description: 'Test smoke and CO detectors',
-                nextDue: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-                lastCompleted: null
+                nextDue: getDateInFuture(7),
+                status: 'pending'
             });
 
-            // Feature-specific tasks
-            if (homeData.features.fireplace) {
-                tasks.push({
-                    id: id++,
-                    title: 'Chimney Inspection',
-                    category: 'Safety',
-                    frequency: Math.round(365 * freqMod),
-                    cost: 300,
-                    priority: 'high',
-                    description: 'Professional chimney cleaning and inspection',
-                    nextDue: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
-                });
-            }
-
-            if (homeData.features.deck) {
-                tasks.push({
-                    id: id++,
-                    title: 'Deck Maintenance',
-                    category: 'Exterior',
-                    frequency: Math.round(730 * freqMod), // 2 years
-                    cost: 200,
-                    priority: 'medium',
-                    description: 'Clean and seal deck',
-                    nextDue: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
-                });
-            }
-
-            if (homeData.features.pool) {
-                tasks.push({
-                    id: id++,
-                    title: 'Pool Opening/Closing',
-                    category: 'Pool',
-                    frequency: Math.round(182 * freqMod),
-                    cost: 250,
-                    priority: 'medium',
-                    description: 'Seasonal pool maintenance',
-                    nextDue: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
-                });
-            }
-
             // Age-based tasks
-            if (homeAge > 15) {
-                tasks.push({
-                    id: id++,
-                    title: 'Electrical Inspection',
-                    category: 'Safety',
-                    frequency: Math.round(1825 * freqMod), // 5 years
-                    cost: 300,
-                    priority: 'medium',
-                    description: 'Professional electrical inspection',
-                    nextDue: new Date(Date.now() + 200 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
-                });
-            }
-
-            if (homeAge > 25) {
+            const homeAge = new Date().getFullYear() - yearBuilt;
+            if (homeAge > 20) {
                 tasks.push({
                     id: id++,
                     title: 'Roof Inspection',
                     category: 'Exterior',
-                    frequency: Math.round(1095 * freqMod), // 3 years
+                    description: 'Professional roof inspection for damage and wear',
+                    frequency: 'Every 3 years',
                     cost: 250,
-                    priority: 'high',
-                    description: 'Professional roof inspection',
-                    nextDue: new Date(Date.now() + 150 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    nextDue: getDateInFuture(180),
+                    status: 'pending'
                 });
+            }
+
+            console.log('Generated tasks:', tasks);
+
+            // Show main app
+            document.getElementById('setup-form').style.display = 'none';
+            document.getElementById('main-app').classList.remove('hidden');
+
+            // Update display
+            document.getElementById('home-info').textContent = `Managing ${tasks.length} tasks for ${address}`;
+            renderTasks();
+            
+            // Save data
+            saveData();
+            
+            console.log('Plan created successfully!');
+        }
+
+        function getDateInFuture(days) {
+            const date = new Date();
+            date.setDate(date.getDate() + days);
+            return date.toISOString().split('T')[0]; // Return YYYY-MM-DD format
+        }
+
+        function renderTasks() {
+            console.log('Rendering tasks...');
+            const container = document.getElementById('tasks-container');
+            
+            if (tasks.length === 0) {
+                container.innerHTML = '<div class="p-6 text-center text-gray-500">No tasks yet</div>';
+                return;
+            }
+
+            const tasksHTML = tasks.map(task => {
+                const daysUntil = getDaysUntil(task.nextDue);
+                const urgencyClass = daysUntil <= 7 ? 'bg-red-50 border-l-red-500' : 
+                                   daysUntil <= 30 ? 'bg-orange-50 border-l-orange-500' : 
+                                   'bg-blue-50 border-l-blue-500';
+
+                return `
+                    <div class="p-6 border-l-4 ${urgencyClass}">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900 text-lg">${task.title}</h4>
+                                <p class="text-gray-600 mt-1">${task.description}</p>
+                                <div class="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                                    <span class="bg-gray-100 px-2 py-1 rounded">${task.category}</span>
+                                    <span>${task.frequency}</span>
+                                    <span>Due: ${new Date(task.nextDue).toLocaleDateString()}</span>
+                                    <span class="font-medium ${daysUntil <= 7 ? 'text-red-600' : daysUntil <= 30 ? 'text-orange-600' : 'text-blue-600'}">
+                                        ${daysUntil <= 0 ? 'Overdue!' : daysUntil === 1 ? '1 day' : `${daysUntil} days`}
+                                    </span>
+                                    ${task.cost > 0 ? `<span>$${task.cost}</span>` : '<span>DIY</span>'}
+                                </div>
+                            </div>
+                            <div class="flex gap-2 ml-4">
+                                <button onclick="completeTask(${task.id})" 
+                                        class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                                    Complete
+                                </button>
+                                <button onclick="deleteTask(${task.id})" 
+                                        class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = tasksHTML;
+            console.log('Tasks rendered successfully');
+        }
+
+        function getDaysUntil(dateStr) {
+            const today = new Date();
+            const dueDate = new Date(dateStr);
+            const diffTime = dueDate - today;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        }
+
+        function completeTask(taskId) {
+            console.log('Completing task:', taskId);
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                // Move due date forward based on frequency
+                const currentDue = new Date(task.nextDue);
+                let newDue = new Date(currentDue);
+                
+                if (task.frequency.includes('month')) {
+                    const months = task.frequency.includes('3') ? 3 : 1;
+                    newDue.setMonth(newDue.getMonth() + months);
+                } else if (task.frequency.includes('year')) {
+                    newDue.setFullYear(newDue.getFullYear() + 1);
+                } else if (task.frequency.includes('Twice')) {
+                    newDue.setMonth(newDue.getMonth() + 6);
+                } else {
+                    newDue.setMonth(newDue.getMonth() + 1); // Default to monthly
+                }
+                
+                task.nextDue = newDue.toISOString().split('T')[0];
+                renderTasks();
+                saveData();
+                alert(`✅ "${task.title}" completed! Next due: ${newDue.toLocaleDateString()}`);
             }
         }
 
-        // Update dashboard
-        function updateDashboard() {
-            document.getElementById('home-address').textContent = `Managing maintenance for ${homeData.address}`;
-            
-            const now = new Date();
-            const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-            
-            const overdue = tasks.filter(task => new Date(task.nextDue) < now).length;
-            const thisWeek = tasks.filter(task => new Date(task.nextDue) <= oneWeek && new Date(task.nextDue) >= now).length;
-            const total = tasks.length;
-            const annualCost = tasks.reduce((sum, task) => {
-                const yearlyFreq = 365 / task.frequency;
-                return sum + (task.cost * yearlyFreq);
-            }, 0);
-
-            document.getElementById('overdue-count').textContent = overdue;
-            document.getElementById('week-count').textContent = thisWeek;
-            document.getElementById('total-count').textContent = total;
-            document.getElementById('annual-cost').textContent = `$${Math.round(annualCost)}`;
-
-            renderTasks();
+        function deleteTask(taskId) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                tasks = tasks.filter(t => t.id !== taskId);
+                renderTasks();
+                saveData();
+            }
         }
 
-        // Render tasks
-        function renderTasks() {
-            const upcomingContainer = document.getElementById('tasks-list');
-            const allTasksContainer = document.getElementById('all-tasks-list');
-            
-            // Get upcoming tasks (next 2 weeks)
-            const now = new Date();
-            const twoWeeks = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
-            const upcoming = tasks
-                .filter(task => new Date(task.nextDue) <= twoWeeks)
-                .sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue))
-                .slice(0, 5);
+        function addCustomTask() {
+            document.getElementById('task-modal').classList.remove('hidden');
+        }
 
-            // Render upcoming tasks
-            if (upcoming.length === 0) {
-                upcomingContainer.innerHTML = `
-                    <div class="p-8 text-center text-gray-500">
-                        <div class="text-4xl mb-4">✅</div>
-                        <p class="font-medium">All caught up!</p>
-                        <p class="text-sm">No urgent tasks in the next two weeks.</p>
-                    </div>
-                `;
+        function closeModal() {
+            document.getElementById('task-modal').classList.add('hidden');
+            // Clear form
+            document.getElementById('new-task-title').value = '';
+            document.getElementById('new-task-category').value = 'General';
+            document.getElementById('new-task-cost').value = '';
+            document.getElementById('new-task-notes').value = '';
+        }
+
+        function saveNewTask() {
+            const title = document.getElementById('new-task-title').value.trim();
+            const category = document.getElementById('new-task-category').value;
+            const cost = parseFloat(document.getElementById('new-task-cost').value) || 0;
+            const notes = document.getElementById('new-task-notes').value.trim();
+
+            if (!title) {
+                alert('Please enter a task title');
+                return;
+            }
+
+            const newTask = {
+                id: Math.max(...tasks.map(t => t.id), 0) + 1,
+                title: title,
+                category: category,
+                description: notes || 'Custom maintenance task',
+                frequency: 'As needed',
+                cost: cost,
+                nextDue: getDateInFuture(30),
+                status: 'pending'
+            };
+
+            tasks.push(newTask);
+            renderTasks();
+            saveData();
+            closeModal();
+        }
+
+        function exportTasks() {
+            const data = {
+                homeData: homeData,
+                tasks: tasks,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `casa-care-tasks-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function resetApp() {
+            if (confirm('This will clear all your data and start over. Continue?')) {
+                localStorage.removeItem('casaCareData');
+                location.reload();
+            }
+        }
+
+        function saveData() {
+            try {
+                const data = {
+                    homeData: homeData,
+                    tasks: tasks,
+                    lastSaved: new Date().toISOString()
+                };
+                localStorage.setItem('casaCareData', JSON.stringify(data));
+                console.log('Data saved successfully');
+            } catch (error) {
+                console.error('Error saving data:', error);
+            }
+        }
+
+        function loadData() {
+            try {
+                const saved = localStorage.getItem('casaCareData');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    homeData = data.homeData || {};
+                    tasks = data.tasks || [];
+                    console.log('Data loaded:', data);
+                    return true;
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+            return false;
+        }
+
+        // Initialize app
+        function initApp() {
+            console.log('Initializing app...');
+            
+            if (loadData() && tasks.length > 0) {
+                console.log('Found saved data, showing main app');
+                document.getElementById('setup-form').style.display = 'none';
+                document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('home-info').textContent = `Managing ${tasks.length} tasks for ${homeData.address || 'your home'}`;
+                renderTasks();
             } else {
-                upcomingContainer.innerHTML = upcoming.map(task => {
-                    const daysUntil = Math.ceil((new Date(task.nextDue) - now) / (1000 * 60 * 60 * 24));
-                    const isOverdue = daysUntil < 0;
-                    const urgencyClass = isOverdue ? 'border-l-red-500 bg-red-50' : 
-                                       daysUntil <= 3 ? 'border-l-orange-500 bg-orange-50' : 
-                                       'border-l-blue-500 bg-blue-50';
-                    
-                    return `
-                        <div class="p-6 border-l-4 ${urgencyClass}">
-                            <div class="flex items-start justify-between">
-                                <div class="flex-1">
-                                    <h4 class="font-semibold text-gray-900 mb-1">${task.title}</h4>
-                                    <p class="text-sm text-gray-600 mb-2">${task.category} • ${task.description}</p>
+                console.log('No saved data, showing setup form');
+                document.getElementById('setup-form').style.display = 'block';
+            }
+        }
+
+        // Start the app when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, starting app...');
+            initApp();
+        });
+
+        console.log('Script loaded successfully');
+    </script>
+</body>
+</html>
