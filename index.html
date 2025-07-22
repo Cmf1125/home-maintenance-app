@@ -438,3 +438,437 @@
 
             if (homeData.features.deck) {
                 tasks.push({
+                    id: id++,
+                    title: 'Deck Staining/Sealing',
+                    category: 'Exterior',
+                    frequency: Math.round(730 * freqMod), // 2 years
+                    cost: 200,
+                    priority: 'medium',
+                    description: 'Stain or seal deck to protect from weather',
+                    nextDue: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
+            }
+
+            if (homeData.features.pool) {
+                tasks.push({
+                    id: id++,
+                    title: 'Pool Opening/Closing',
+                    category: 'General',
+                    frequency: Math.round(182 * freqMod), // 6 months
+                    cost: 300,
+                    priority: 'high',
+                    description: 'Seasonal pool opening and closing',
+                    nextDue: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
+            }
+
+            // General home maintenance tasks
+            tasks.push(
+                {
+                    id: id++,
+                    title: 'Clean Gutters',
+                    category: 'Exterior',
+                    frequency: Math.round(182 * freqMod), // 6 months
+                    cost: 150,
+                    priority: 'medium',
+                    description: 'Clean gutters and downspouts',
+                    nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                },
+                {
+                    id: id++,
+                    title: 'Test Smoke Detectors',
+                    category: 'Safety',
+                    frequency: Math.round(180 * freqMod), // 6 months
+                    cost: 0,
+                    priority: 'high',
+                    description: 'Test all smoke and carbon monoxide detectors',
+                    nextDue: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                },
+                {
+                    id: id++,
+                    title: 'Inspect Caulking',
+                    category: 'General',
+                    frequency: Math.round(365 * freqMod),
+                    cost: 50,
+                    priority: 'low',
+                    description: 'Check and replace caulking around windows and doors',
+                    nextDue: new Date(Date.now() + 75 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                }
+            );
+
+            console.log('Generated tasks:', tasks);
+        }
+
+        // Tab navigation
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName + '-content').classList.remove('hidden');
+
+            // Update tab button styles
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.classList.remove('bg-blue-100', 'text-blue-700');
+                btn.classList.add('text-gray-600');
+            });
+
+            // Highlight active tab
+            document.getElementById('tab-' + tabName).classList.remove('text-gray-600');
+            document.getElementById('tab-' + tabName).classList.add('bg-blue-100', 'text-blue-700');
+
+            // Update content based on tab
+            if (tabName === 'tasks') {
+                renderAllTasks();
+            } else if (tabName === 'calendar') {
+                renderCalendar();
+            } else if (tabName === 'settings') {
+                updateSettings();
+            }
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            // Update home address
+            document.getElementById('home-address').textContent = `Managing maintenance for ${homeData.address}`;
+
+            // Calculate stats
+            const now = new Date();
+            const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            
+            let overdueCount = 0;
+            let weekCount = 0;
+            let totalCost = 0;
+
+            tasks.forEach(task => {
+                if (task.nextDue < now) {
+                    overdueCount++;
+                }
+                if (task.nextDue <= oneWeek) {
+                    weekCount++;
+                }
+                totalCost += task.cost * (365 / task.frequency);
+            });
+
+            // Update stats
+            document.getElementById('overdue-count').textContent = overdueCount;
+            document.getElementById('week-count').textContent = weekCount;
+            document.getElementById('total-count').textContent = tasks.length;
+            document.getElementById('annual-cost').textContent = '$' + Math.round(totalCost);
+
+            // Render upcoming tasks
+            renderTasks();
+        }
+
+        // Render tasks for dashboard
+        function renderTasks() {
+            const tasksList = document.getElementById('tasks-list');
+            const upcomingTasks = tasks
+                .sort((a, b) => a.nextDue - b.nextDue)
+                .slice(0, 10);
+
+            if (upcomingTasks.length === 0) {
+                tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">No tasks scheduled</div>';
+                return;
+            }
+
+            tasksList.innerHTML = upcomingTasks.map(task => {
+                const daysUntilDue = Math.ceil((task.nextDue - new Date()) / (24 * 60 * 60 * 1000));
+                const overdue = daysUntilDue < 0;
+                const statusClass = overdue ? 'bg-red-50 border-red-200' : daysUntilDue <= 7 ? 'bg-orange-50 border-orange-200' : 'bg-white';
+                
+                return `
+                    <div class="p-6 border-b ${statusClass}">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900">${task.title}</h4>
+                                <p class="text-sm text-gray-600 mt-1">${task.description}</p>
+                                <div class="flex items-center gap-4 mt-2 text-sm">
+                                    <span class="bg-gray-100 px-2 py-1 rounded">${task.category}</span>
+                                    <span class="${overdue ? 'text-red-600' : daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600'}">
+                                        ${overdue ? `${Math.abs(daysUntilDue)} days overdue` : daysUntilDue <= 0 ? 'Due today' : `Due in ${daysUntilDue} days`}
+                                    </span>
+                                    <span class="text-gray-600">$${task.cost}</span>
+                                </div>
+                            </div>
+                            <button onclick="completeTask(${task.id})" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 text-sm">
+                                ✅ Complete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render all tasks
+        function renderAllTasks() {
+            const tasksList = document.getElementById('all-tasks-list');
+            const sortedTasks = tasks.sort((a, b) => a.nextDue - b.nextDue);
+
+            if (sortedTasks.length === 0) {
+                tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">No tasks found</div>';
+                return;
+            }
+
+            tasksList.innerHTML = sortedTasks.map(task => {
+                const daysUntilDue = Math.ceil((task.nextDue - new Date()) / (24 * 60 * 60 * 1000));
+                const overdue = daysUntilDue < 0;
+                
+                return `
+                    <div class="p-6 border-b hover:bg-gray-50">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900">${task.title}</h4>
+                                <p class="text-sm text-gray-600 mt-1">${task.description}</p>
+                                <div class="flex items-center gap-4 mt-2 text-sm">
+                                    <span class="bg-gray-100 px-2 py-1 rounded">${task.category}</span>
+                                    <span class="text-gray-600">Every ${task.frequency} days</span>
+                                    <span class="${overdue ? 'text-red-600' : daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600'}">
+                                        ${overdue ? `${Math.abs(daysUntilDue)} days overdue` : daysUntilDue <= 0 ? 'Due today' : `Due in ${daysUntilDue} days`}
+                                    </span>
+                                    <span class="text-gray-600">$${task.cost}</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="editTask(${task.id})" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 text-sm">
+                                    ✏️ Edit
+                                </button>
+                                <button onclick="completeTask(${task.id})" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 text-sm">
+                                    ✅ Complete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Complete task
+        function completeTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.lastCompleted = new Date();
+                task.nextDue = new Date(Date.now() + task.frequency * 24 * 60 * 60 * 1000);
+                updateDashboard();
+                saveData();
+                
+                // Show completion message
+                alert(`✅ Task "${task.title}" completed! Next due: ${task.nextDue.toLocaleDateString()}`);
+            }
+        }
+
+        // Add task
+        function addTask() {
+            currentEditingTask = null;
+            document.getElementById('modal-title').textContent = 'Add Task';
+            document.getElementById('task-title').value = '';
+            document.getElementById('task-category').value = 'General';
+            document.getElementById('task-cost').value = '';
+            document.getElementById('task-notes').value = '';
+            document.getElementById('task-modal').classList.remove('hidden');
+        }
+
+        // Edit task
+        function editTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                currentEditingTask = task;
+                document.getElementById('modal-title').textContent = 'Edit Task';
+                document.getElementById('task-title').value = task.title;
+                document.getElementById('task-category').value = task.category;
+                document.getElementById('task-cost').value = task.cost;
+                document.getElementById('task-notes').value = task.description;
+                document.getElementById('task-modal').classList.remove('hidden');
+            }
+        }
+
+        // Save task
+        function saveTask() {
+            const title = document.getElementById('task-title').value;
+            const category = document.getElementById('task-category').value;
+            const cost = parseInt(document.getElementById('task-cost').value) || 0;
+            const notes = document.getElementById('task-notes').value;
+
+            if (!title.trim()) {
+                alert('Please enter a task title');
+                return;
+            }
+
+            if (currentEditingTask) {
+                // Update existing task
+                currentEditingTask.title = title;
+                currentEditingTask.category = category;
+                currentEditingTask.cost = cost;
+                currentEditingTask.description = notes;
+            } else {
+                // Add new task
+                const newTask = {
+                    id: Math.max(...tasks.map(t => t.id), 0) + 1,
+                    title: title,
+                    category: category,
+                    frequency: 365, // Default to yearly
+                    cost: cost,
+                    priority: 'medium',
+                    description: notes,
+                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Due in 30 days
+                    lastCompleted: null
+                };
+                tasks.push(newTask);
+            }
+
+            closeModal();
+            updateDashboard();
+            saveData();
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('task-modal').classList.add('hidden');
+            currentEditingTask = null;
+        }
+
+        // Render calendar
+        function renderCalendar() {
+            const calendarView = document.getElementById('calendar-view');
+            const now = new Date();
+            const monthTasks = tasks.filter(task => {
+                const taskDate = new Date(task.nextDue);
+                return taskDate.getMonth() === now.getMonth() && taskDate.getFullYear() === now.getFullYear();
+            });
+
+            if (monthTasks.length === 0) {
+                calendarView.innerHTML = '<p class="text-gray-500 text-center">No tasks scheduled for this month</p>';
+                return;
+            }
+
+            calendarView.innerHTML = `
+                <h4 class="font-semibold text-lg mb-4">${now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</h4>
+                <div class="space-y-3">
+                    ${monthTasks.map(task => `
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-medium">${task.title}</div>
+                                <div class="text-sm text-gray-600">${task.nextDue.toLocaleDateString()}</div>
+                            </div>
+                            <div class="text-sm text-gray-600">$${task.cost}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Update settings
+        function updateSettings() {
+            const propertySummary = document.getElementById('property-summary');
+            const features = [];
+            
+            if (homeData.features.centralAC) features.push('Central AC/Heat');
+            if (homeData.features.miniSplits) features.push('Mini-Splits');
+            if (homeData.features.wellWater) features.push('Well Water');
+            if (homeData.features.septic) features.push('Septic System');
+            if (homeData.features.fireplace) features.push('Fireplace');
+            if (homeData.features.pool) features.push('Pool/Spa');
+            if (homeData.features.deck) features.push('Deck/Patio');
+
+            propertySummary.innerHTML = `
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div><strong>Address:</strong> ${homeData.address}</div>
+                    <div><strong>Year Built:</strong> ${homeData.yearBuilt}</div>
+                    <div><strong>Square Feet:</strong> ${homeData.sqft.toLocaleString()}</div>
+                    <div><strong>Approach:</strong> ${homeData.approach}</div>
+                    <div><strong>Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
+                    <div><strong>Features:</strong> ${features.join(', ') || 'None selected'}</div>
+                </div>
+            `;
+        }
+
+        // Export calendar
+        function exportCalendar() {
+            const calendarData = tasks.map(task => {
+                return {
+                    title: task.title,
+                    description: task.description,
+                    date: task.nextDue.toISOString().split('T')[0],
+                    category: task.category,
+                    cost: task.cost
+                };
+            });
+
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "Title,Description,Date,Category,Cost\n" +
+                calendarData.map(e => `"${e.title}","${e.description}","${e.date}","${e.category}","${e.cost}"`).join("\n");
+
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", "casa_care_calendar.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Export data
+        function exportData() {
+            const data = {
+                homeData: homeData,
+                tasks: tasks,
+                exportDate: new Date().toISOString()
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+            const link = document.createElement("a");
+            link.setAttribute("href", dataStr);
+            link.setAttribute("download", "casa_care_data.json");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Clear data
+        function clearData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                homeData = {};
+                tasks = [];
+                resetApp();
+            }
+        }
+
+        // Reset app
+        function resetApp() {
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('setup-form').style.display = 'block';
+            // Reset form values
+            document.getElementById('address').value = '';
+            document.getElementById('year-built').value = '1995';
+            document.getElementById('sqft').value = '2000';
+            document.querySelector('input[name="pets"][value="no"]').checked = true;
+            document.getElementById('approach').value = 'proactive';
+            // Reset checkboxes
+            document.getElementById('central-ac').checked = true;
+            document.getElementById('mini-splits').checked = false;
+            document.getElementById('well-water').checked = false;
+            document.getElementById('septic').checked = false;
+            document.getElementById('fireplace').checked = false;
+            document.getElementById('pool').checked = false;
+            document.getElementById('deck').checked = false;
+        }
+
+        // Save data (in a real app, this would save to a backend)
+        function saveData() {
+            const data = { homeData: homeData, tasks: tasks };
+            console.log('Data saved:', data);
+        }
+
+        // Initialize app
+        console.log('Casa Care app loaded');
+    </script>
+</body>
+</html>
