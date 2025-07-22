@@ -1133,13 +1133,25 @@
                 return;
             }
             
-            container.innerHTML = suggestions.map(address => `
-                <div class="address-suggestion p-3 border-b border-gray-100 last:border-b-0" onclick="selectAddress('${address}')">
+            container.innerHTML = suggestions.map((address, index) => `
+                <div class="address-suggestion p-3 border-b border-gray-100 last:border-b-0" onclick="selectAddressByIndex(${index})">
                     <div class="text-sm text-gray-900">${address}</div>
                 </div>
             `).join('');
             
+            // Store suggestions temporarily for selection
+            container.dataset.suggestions = JSON.stringify(suggestions);
+            
             container.classList.remove('hidden');
+        }
+
+        function selectAddressByIndex(index) {
+            const container = document.getElementById('address-suggestions');
+            const suggestions = JSON.parse(container.dataset.suggestions || '[]');
+            const address = suggestions[index];
+            if (address) {
+                selectAddress(address);
+            }
         }
 
         function hideAddressSuggestions() {
@@ -2379,7 +2391,7 @@
                                         `<span class="bg-green-100 text-green-800 px-2 py-1 rounded">Under Warranty</span>` :
                                         '<span class="bg-gray-100 text-gray-600 px-2 py-1 rounded">Out of Warranty</span>'
                                     }
-                                    <a href="#" onclick="findParts('${appliance.brand}', '${appliance.model}')" class="text-blue-600 hover:text-blue-800">Find Parts</a>
+                                    <button onclick="findParts(${appliance.id})" class="text-blue-600 hover:text-blue-800">Find Parts</button>
                                 </div>
                                 ${appliance.notes ? `<p class="text-xs text-gray-600 mt-1">Notes: ${appliance.notes}</p>` : ''}
                             </div>
@@ -2417,10 +2429,13 @@
             document.getElementById('avg-age').textContent = avgAge > 0 ? `${Math.round(avgAge)} years` : '0 years';
         }
 
-        function findParts(brand, model) {
-            const searchQuery = `${brand} ${model} replacement parts`;
-            const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
-            window.open(url, '_blank');
+        function findParts(applianceId) {
+            const appliance = appliances.find(a => a.id === applianceId);
+            if (appliance) {
+                const searchQuery = `${appliance.brand} ${appliance.model} replacement parts`;
+                const url = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+                window.open(url, '_blank');
+            }
         }
 
         // Service provider management
