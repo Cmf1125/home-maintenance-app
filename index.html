@@ -12,46 +12,10 @@
         .fade-in { 
             animation: fadeIn 0.5s ease-in-out; 
         }
-        .slide-up { 
-            animation: slideUp 0.3s ease-out; 
-        }
         
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .step-indicator {
-            transition: all 0.3s ease;
-        }
-        
-        .step-active {
-            background: linear-gradient(135deg, #0891b2, #06b6d4);
-            color: white;
-        }
-        
-        .step-completed {
-            background: #10b981;
-            color: white;
-        }
-
-        .system-card {
-            transition: all 0.2s ease;
-        }
-
-        .system-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-
-        .system-card.selected {
-            border-color: #0891b2;
-            background-color: #ecfeff;
         }
     </style>
 </head>
@@ -65,173 +29,68 @@
             </div>
         </div>
 
-        <!-- API Setup Screen -->
-        <div id="api-setup" class="max-w-2xl mx-auto px-4 py-8">
+        <!-- Setup Form -->
+        <div id="setup-form" class="max-w-2xl mx-auto px-4 py-8">
             <div class="bg-white rounded-xl p-8 shadow-lg">
                 <div class="text-center mb-8">
-                    <div class="text-4xl mb-4">🔑</div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Enhanced Property Lookup</h2>
-                    <p class="text-gray-600">Get real property data or use our smart demo mode</p>
-                </div>
-                
-                <div class="space-y-6">
-                    <div class="bg-blue-50 rounded-lg p-6">
-                        <h3 class="font-semibold text-blue-900 mb-3">🚀 Option 1: Real Property Data (Recommended)</h3>
-                        <div class="text-sm text-blue-800 space-y-2">
-                            <p><strong>Google Places API:</strong> Get real address autocomplete and property details</p>
-                            <ol class="ml-4 space-y-1">
-                                <li>1. Go to <a href="https://console.cloud.google.com/google/maps-apis/overview" target="_blank" class="underline hover:text-blue-600">Google Cloud Console</a></li>
-                                <li>2. Enable "Places API" (free $200 credit)</li>
-                                <li>3. Create an API key</li>
-                                <li>4. Paste it below</li>
-                            </ol>
-                            <p class="text-xs text-blue-600 mt-3">💡 About $0.02 per address lookup - very affordable!</p>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Google Places API Key (Optional)</label>
-                        <input type="text" id="api-key-input" placeholder="AIza..." 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <p class="text-xs text-gray-500 mt-1">Stored locally on your device only</p>
-                    </div>
-                    
-                    <div class="flex gap-4">
-                        <button id="use-real-data-btn" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                            Use Real Data
-                        </button>
-                        <button id="use-demo-btn" class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium">
-                            Use Smart Demo
-                        </button>
-                    </div>
-                    
-                    <div class="bg-green-50 rounded-lg p-4">
-                        <h4 class="font-medium text-green-900 mb-2">✨ Smart Demo Mode</h4>
-                        <p class="text-sm text-green-800">Uses intelligent property simulation based on location patterns. Perfect for testing and family use!</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Setup Wizard -->
-        <div id="setup-wizard" class="max-w-2xl mx-auto px-4 py-8 hidden">
-            <!-- Progress Indicators -->
-            <div class="flex items-center justify-between mb-8">
-                <div class="flex items-center space-x-4">
-                    <div id="step-1" class="step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">1</div>
-                    <div class="w-12 h-1 bg-gray-200" id="progress-1"></div>
-                    <div id="step-2" class="step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500">2</div>
-                    <div class="w-12 h-1 bg-gray-200" id="progress-2"></div>
-                    <div id="step-3" class="step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500">3</div>
-                </div>
-            </div>
-
-            <!-- Step 1: Address Input -->
-            <div id="wizard-step-1" class="wizard-step bg-white rounded-xl p-8 shadow-lg slide-up">
-                <div class="text-center mb-8">
                     <div class="text-4xl mb-4">🏠</div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">What's your address?</h2>
-                    <p class="text-gray-600">We'll look up your property details automatically</p>
-                </div>
-                
-                <div class="space-y-4">
-                    <div class="relative">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Home Address</label>
-                        <input type="text" id="address-input" placeholder="Start typing your address..." 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-                               autocomplete="off">
-                        
-                        <div id="address-suggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 hidden max-h-60 overflow-y-auto">
-                            <!-- Suggestions will be populated here -->
-                        </div>
-                    </div>
-                    
-                    <div id="loading-indicator" class="hidden text-center py-8">
-                        <div class="inline-flex items-center gap-3 text-blue-600">
-                            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                            <span class="text-lg">Looking up property details...</span>
-                        </div>
-                    </div>
-                    
-                    <button id="continue-step1" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors hidden">
-                        Continue
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 2: Property Confirmation -->
-            <div id="wizard-step-2" class="wizard-step bg-white rounded-xl p-8 shadow-lg slide-up hidden">
-                <div class="text-center mb-8">
-                    <div class="text-4xl mb-4">🔍</div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Confirm property details</h2>
-                    <p class="text-gray-600">Please verify and update any information</p>
-                </div>
-                
-                <div id="property-details" class="space-y-6">
-                    <!-- Property details will be populated here -->
-                </div>
-                
-                <div class="flex gap-4 mt-8">
-                    <button id="prev-step2" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">
-                        Back
-                    </button>
-                    <button id="next-step2" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
-                        Looks Good
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 3: Home Systems -->
-            <div id="wizard-step-3" class="wizard-step bg-white rounded-xl p-8 shadow-lg slide-up hidden">
-                <div class="text-center mb-8">
-                    <div class="text-4xl mb-4">⚙️</div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Tell us about your home systems</h2>
-                    <p class="text-gray-600">Select all that apply to your home</p>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Tell us about your home</h2>
+                    <p class="text-gray-600">We'll create a personalized maintenance plan for your property</p>
                 </div>
                 
                 <div class="space-y-6">
-                    <!-- HVAC Systems -->
+                    <!-- Address -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Heating & Cooling</label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="hvac" value="central-ac" class="rounded">
-                                <span class="text-sm">Central A/C</span>
-                            </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="hvac" value="mini-splits" class="rounded">
-                                <span class="text-sm">Mini-Splits</span>
-                            </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="hvac" value="heat-pump" class="rounded">
-                                <span class="text-sm">Heat Pump</span>
-                            </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="hvac" value="baseboard" class="rounded">
-                                <span class="text-sm">Baseboard Heat</span>
-                            </label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Home Address</label>
+                        <input type="text" id="address" placeholder="123 Main St, Anytown, NY 12345" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <!-- Basic Property Info -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
+                            <input type="number" id="year-built" value="1995" min="1900" max="2024"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Square Footage</label>
+                            <input type="number" id="sqft" value="2000" min="500" max="10000"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                         </div>
                     </div>
 
-                    <!-- Home Features -->
+                    <!-- Home Systems -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Home Features</label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="features" value="fireplace" class="rounded">
-                                <span class="text-sm">Fireplace</span>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">What systems does your home have?</label>
+                        <div class="space-y-3">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="central-ac" checked>
+                                <span>Central Air/Heat</span>
                             </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="features" value="pool" class="rounded">
-                                <span class="text-sm">Pool/Spa</span>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="mini-splits">
+                                <span>Mini-Split Systems</span>
                             </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="features" value="deck" class="rounded">
-                                <span class="text-sm">Deck/Patio</span>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="well-water">
+                                <span>Well Water</span>
                             </label>
-                            <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="features" value="garage" class="rounded">
-                                <span class="text-sm">Garage</span>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="septic">
+                                <span>Septic System</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="fireplace">
+                                <span>Fireplace</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="pool">
+                                <span>Pool/Spa</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="deck">
+                                <span>Deck/Patio</span>
                             </label>
                         </div>
                     </div>
@@ -252,7 +111,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Maintenance approach</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Maintenance Approach</label>
                             <select id="approach" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                                 <option value="proactive" selected>Proactive</option>
                                 <option value="standard">Standard</option>
@@ -260,14 +119,9 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                
-                <div class="flex gap-4 mt-8">
-                    <button id="prev-step3" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">
-                        Back
-                    </button>
-                    <button id="create-plan" class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium">
-                        🚀 Create My Plan
+
+                    <button onclick="createMaintenancePlan()" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg">
+                        🚀 Create My Maintenance Plan
                     </button>
                 </div>
             </div>
@@ -278,24 +132,27 @@
             <!-- Navigation -->
             <div class="max-w-6xl mx-auto px-4 py-6">
                 <div class="flex space-x-1 bg-white rounded-xl p-2 shadow-lg">
-                    <button data-tab="dashboard" class="tab-btn bg-blue-100 text-blue-700 px-6 py-3 rounded-lg font-medium">
+                    <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn bg-blue-100 text-blue-700 px-6 py-3 rounded-lg font-medium">
                         📅 Dashboard
                     </button>
-                    <button data-tab="tasks" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                    <button onclick="showTab('tasks')" id="tab-tasks" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
                         ✅ All Tasks
                     </button>
-                    <button data-tab="settings" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                    <button onclick="showTab('calendar')" id="tab-calendar" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                        📆 Calendar
+                    </button>
+                    <button onclick="showTab('settings')" id="tab-settings" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
                         ⚙️ Settings
                     </button>
                 </div>
             </div>
 
-            <!-- Dashboard Tab -->
-            <div id="app-dashboard" class="app-content max-w-6xl mx-auto px-4 pb-8">
-                <!-- Welcome Back -->
+            <!-- Dashboard -->
+            <div id="dashboard-content" class="tab-content max-w-6xl mx-auto px-4 pb-8">
+                <!-- Welcome -->
                 <div class="gradient-bg text-white rounded-2xl p-8 shadow-2xl mb-8">
                     <h2 class="text-2xl font-bold mb-2">Welcome to Casa Care! 👋</h2>
-                    <p class="text-blue-100" id="dashboard-address">Managing maintenance for your home</p>
+                    <p class="text-blue-100" id="home-address">Managing maintenance for your home</p>
                 </div>
 
                 <!-- Stats -->
@@ -331,18 +188,20 @@
                         <div class="flex items-center gap-3">
                             <div class="p-2 bg-green-100 rounded-lg">💰</div>
                             <div>
-                                <p class="text-sm text-gray-600">Est. Annual</p>
+                                <p class="text-sm text-gray-600">Annual Cost</p>
                                 <p id="annual-cost" class="text-2xl font-bold text-gray-900">$0</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Upcoming Tasks -->
+                <!-- Tasks -->
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="p-6 border-b border-gray-100">
+                    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
                         <h3 class="text-xl font-bold text-gray-900">Your Maintenance Tasks</h3>
-                        <p class="text-gray-600">Personalized based on your home's systems and features</p>
+                        <button onclick="exportCalendar()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                            📅 Export Calendar
+                        </button>
                     </div>
                     <div id="tasks-list">
                         <!-- Tasks will be populated here -->
@@ -350,12 +209,14 @@
                 </div>
             </div>
 
-            <!-- Tasks Tab -->
-            <div id="app-tasks" class="app-content hidden max-w-6xl mx-auto px-4 pb-8">
+            <!-- All Tasks Tab -->
+            <div id="tasks-content" class="tab-content hidden max-w-6xl mx-auto px-4 pb-8">
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="p-6 border-b border-gray-100">
+                    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
                         <h3 class="text-xl font-bold text-gray-900">All Maintenance Tasks</h3>
-                        <p class="text-gray-600">Complete maintenance schedule organized by category</p>
+                        <button onclick="addTask()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            ➕ Add Task
+                        </button>
                     </div>
                     <div id="all-tasks-list">
                         <!-- All tasks will be populated here -->
@@ -363,8 +224,18 @@
                 </div>
             </div>
 
-            <!-- Settings Tab -->
-            <div id="app-settings" class="app-content hidden max-w-6xl mx-auto px-4 pb-8">
+            <!-- Calendar Tab -->
+            <div id="calendar-content" class="tab-content hidden max-w-6xl mx-auto px-4 pb-8">
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">Maintenance Calendar</h3>
+                    <div id="calendar-view">
+                        <!-- Calendar view will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div id="settings-content" class="tab-content hidden max-w-6xl mx-auto px-4 pb-8">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <h3 class="text-xl font-bold text-gray-900 mb-6">Settings</h3>
                     
@@ -376,7 +247,7 @@
                                     <!-- Property summary will be populated here -->
                                 </div>
                             </div>
-                            <button id="restart-wizard" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            <button onclick="resetApp()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                                 Update Property Details
                             </button>
                         </div>
@@ -384,11 +255,10 @@
                         <div>
                             <h4 class="font-medium text-gray-900 mb-3">Data Management</h4>
                             <div class="space-y-3">
-                                <button id="export-data" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mr-3">
+                                <button onclick="exportData()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mr-3">
                                     📄 Export Data
                                 </button>
-                                <br>
-                                <button id="clear-data" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                                <button onclick="clearData()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
                                     🗑️ Clear All Data
                                 </button>
                             </div>
@@ -401,494 +271,170 @@
         <!-- Task Modal -->
         <div id="task-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
             <div class="bg-white rounded-xl max-w-md w-full mx-4 p-6">
-                <h3 class="text-xl font-bold mb-4" id="modal-title">Task</h3>
-                <div id="modal-content"></div>
+                <h3 class="text-xl font-bold mb-4" id="modal-title">Add Task</h3>
+                <div class="space-y-4">
+                    <input type="text" id="task-title" placeholder="Task name" 
+                           class="w-full p-3 border rounded-lg">
+                    <select id="task-category" class="w-full p-3 border rounded-lg">
+                        <option value="HVAC">HVAC</option>
+                        <option value="Water Systems">Water Systems</option>
+                        <option value="Exterior">Exterior</option>
+                        <option value="Safety">Safety</option>
+                        <option value="General">General</option>
+                    </select>
+                    <input type="number" id="task-cost" placeholder="Estimated cost" 
+                           class="w-full p-3 border rounded-lg">
+                    <textarea id="task-notes" placeholder="Notes and description" 
+                              class="w-full p-3 border rounded-lg" rows="3"></textarea>
+                </div>
                 <div class="flex gap-3 mt-6">
-                    <button id="modal-cancel" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300">Cancel</button>
-                    <button id="modal-confirm" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">Confirm</button>
+                    <button onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg">Cancel</button>
+                    <button onclick="saveTask()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Save Task</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // App state
-        let currentStep = 1;
-        let propertyData = {};
-        let userPreferences = {};
-        let maintenanceTasks = [];
-        let apiKey = null;
-        let demoMode = false;
-        let searchTimeout = null;
+        // App data
+        let homeData = {};
+        let tasks = [];
+        let currentEditingTask = null;
 
-        // Initialize app
-        function initApp() {
-            console.log('App initializing...');
+        // Create maintenance plan
+        function createMaintenancePlan() {
+            console.log('Creating maintenance plan...');
             
-            // Add event listeners for buttons
-            document.getElementById('use-real-data-btn').addEventListener('click', saveApiKey);
-            document.getElementById('use-demo-btn').addEventListener('click', useDemoMode);
-            
-            // Wizard navigation
-            const continueStep1 = document.getElementById('continue-step1');
-            if (continueStep1) {
-                continueStep1.addEventListener('click', () => nextStep());
-            }
-            
-            const prevStep2 = document.getElementById('prev-step2');
-            if (prevStep2) {
-                prevStep2.addEventListener('click', () => prevStep());
-            }
-            
-            const nextStep2 = document.getElementById('next-step2');
-            if (nextStep2) {
-                nextStep2.addEventListener('click', () => nextStep());
-            }
-            
-            const prevStep3 = document.getElementById('prev-step3');
-            if (prevStep3) {
-                prevStep3.addEventListener('click', () => prevStep());
-            }
-            
-            const createPlan = document.getElementById('create-plan');
-            if (createPlan) {
-                createPlan.addEventListener('click', generateMaintenancePlan);
-            }
-            
-            // Tab navigation
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    showAppTab(e.target.dataset.tab);
-                });
-            });
-            
-            // Settings buttons
-            const restartWizard = document.getElementById('restart-wizard');
-            if (restartWizard) {
-                restartWizard.addEventListener('click', () => {
-                    if (confirm('This will clear your current data and start over. Continue?')) {
-                        localStorage.removeItem('casaCareData');
-                        location.reload();
-                    }
-                });
-            }
-            
-            const exportData = document.getElementById('export-data');
-            if (exportData) {
-                exportData.addEventListener('click', exportDataFunc);
-            }
-            
-            const clearData = document.getElementById('clear-data');
-            if (clearData) {
-                clearData.addEventListener('click', () => {
-                    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
-                        localStorage.removeItem('casaCareData');
-                        localStorage.removeItem('casaCareApiKey');
-                        localStorage.removeItem('casaCareDemoMode');
-                        location.reload();
-                    }
-                });
-            }
-            
-            // Modal close
-            const modalCancel = document.getElementById('modal-cancel');
-            if (modalCancel) {
-                modalCancel.addEventListener('click', closeModal);
-            }
-            
-            // Address input
-            const addressInput = document.getElementById('address-input');
-            if (addressInput) {
-                addressInput.addEventListener('input', (e) => {
-                    searchAddresses(e.target.value);
-                });
-            }
-            
-            // Check for saved data
-            checkSavedData();
-        }
-
-        function checkSavedData() {
-            const savedApiKey = localStorage.getItem('casaCareApiKey');
-            const savedDemoMode = localStorage.getItem('casaCareDemoMode');
-            
-            if (savedApiKey) {
-                apiKey = savedApiKey;
-                demoMode = false;
-            } else if (savedDemoMode) {
-                demoMode = true;
-                apiKey = null;
-            }
-
-            const savedData = localStorage.getItem('casaCareData');
-            
-            if (savedData && (apiKey || demoMode)) {
-                try {
-                    const data = JSON.parse(savedData);
-                    if (data.setupComplete) {
-                        propertyData = data.propertyData;
-                        userPreferences = data.userPreferences;
-                        maintenanceTasks = data.maintenanceTasks.map(task => ({
-                            ...task,
-                            nextDue: new Date(task.nextDue),
-                            lastCompleted: task.lastCompleted ? new Date(task.lastCompleted) : null
-                        }));
-                        
-                        showMainApp();
-                        return;
-                    }
-                } catch (e) {
-                    console.error('Error loading saved data:', e);
-                }
-            }
-            
-            if (apiKey || demoMode) {
-                showWizard();
-            } else {
-                showApiSetup();
-            }
-        }
-
-        function showApiSetup() {
-            document.getElementById('api-setup').classList.remove('hidden');
-            document.getElementById('setup-wizard').classList.add('hidden');
-            document.getElementById('main-app').classList.add('hidden');
-        }
-
-        function showWizard() {
-            document.getElementById('api-setup').classList.add('hidden');
-            document.getElementById('setup-wizard').classList.remove('hidden');
-            document.getElementById('main-app').classList.add('hidden');
-        }
-
-        function showMainApp() {
-            document.getElementById('api-setup').classList.add('hidden');
-            document.getElementById('setup-wizard').classList.add('hidden');
-            document.getElementById('main-app').classList.remove('hidden');
-            initializeMainApp();
-        }
-
-        function saveApiKey() {
-            console.log('Save API key clicked');
-            const key = document.getElementById('api-key-input').value.trim();
-            if (!key) {
-                alert('Please enter your API key or use demo mode');
-                return;
-            }
-            
-            apiKey = key;
-            demoMode = false;
-            localStorage.setItem('casaCareApiKey', key);
-            
-            showWizard();
-        }
-
-        function useDemoMode() {
-            console.log('Demo mode clicked');
-            demoMode = true;
-            apiKey = null;
-            localStorage.setItem('casaCareDemoMode', 'true');
-            showWizard();
-        }
-
-        function searchAddresses(query) {
-            if (searchTimeout) {
-                clearTimeout(searchTimeout);
-            }
-            
-            if (query.length < 3) {
-                hideAddressSuggestions();
-                return;
-            }
-            
-            searchTimeout = setTimeout(() => {
-                showDemoAddressSuggestions(query);
-            }, 300);
-        }
-
-        function showDemoAddressSuggestions(query) {
-            const demoAddresses = [
-                "123 Oak Street, Springfield, IL 62701",
-                "456 Maple Avenue, Portland, OR 97201", 
-                "789 Pine Road, Austin, TX 73301",
-                "321 Elm Street, Denver, CO 80201",
-                "654 Cedar Lane, Seattle, WA 98101"
-            ].filter(addr => addr.toLowerCase().includes(query.toLowerCase()));
-            
-            displayAddressSuggestions(demoAddresses);
-        }
-
-        function displayAddressSuggestions(suggestions) {
-            const container = document.getElementById('address-suggestions');
-            
-            if (suggestions.length === 0) {
-                hideAddressSuggestions();
-                return;
-            }
-            
-            container.innerHTML = suggestions.map((address, index) => {
-                const div = document.createElement('div');
-                div.className = 'address-suggestion p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer';
-                div.innerHTML = `<div class="text-sm text-gray-900">${address}</div>`;
-                div.addEventListener('click', () => selectAddress(address));
-                return div.outerHTML;
-            }).join('');
-            
-            container.classList.remove('hidden');
-        }
-
-        function hideAddressSuggestions() {
-            document.getElementById('address-suggestions').classList.add('hidden');
-        }
-
-        function selectAddress(address) {
-            document.getElementById('address-input').value = address;
-            hideAddressSuggestions();
-            document.getElementById('continue-step1').classList.remove('hidden');
-        }
-
-        function nextStep() {
-            if (currentStep === 1) {
-                const address = document.getElementById('address-input').value;
-                if (!address) {
-                    alert('Please enter an address');
-                    return;
-                }
-                lookupPropertyDetails(address);
-            } else if (currentStep === 2) {
-                document.getElementById('wizard-step-2').classList.add('hidden');
-                document.getElementById('wizard-step-3').classList.remove('hidden');
-                currentStep = 3;
-                updateProgressIndicators();
-            }
-        }
-
-        function prevStep() {
-            if (currentStep === 2) {
-                document.getElementById('wizard-step-2').classList.add('hidden');
-                document.getElementById('wizard-step-1').classList.remove('hidden');
-                currentStep = 1;
-                updateProgressIndicators();
-            } else if (currentStep === 3) {
-                document.getElementById('wizard-step-3').classList.add('hidden');
-                document.getElementById('wizard-step-2').classList.remove('hidden');
-                currentStep = 2;
-                updateProgressIndicators();
-            }
-        }
-
-        function updateProgressIndicators() {
-            for (let i = 1; i <= 3; i++) {
-                const step = document.getElementById(`step-${i}`);
-                if (i < currentStep) {
-                    step.className = 'step-indicator step-completed w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold';
-                } else if (i === currentStep) {
-                    step.className = 'step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold';
-                } else {
-                    step.className = 'step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500';
-                }
-            }
-        }
-
-        function lookupPropertyDetails(address) {
-            document.getElementById('loading-indicator').classList.remove('hidden');
-            
-            setTimeout(() => {
-                propertyData = generateSmartPropertyData(address);
-                document.getElementById('loading-indicator').classList.add('hidden');
-                populatePropertyDetails();
-                
-                document.getElementById('wizard-step-1').classList.add('hidden');
-                document.getElementById('wizard-step-2').classList.remove('hidden');
-                currentStep = 2;
-                updateProgressIndicators();
-            }, 1500);
-        }
-
-        function generateSmartPropertyData(address) {
-            const state = address.match(/\b([A-Z]{2})\b/)?.[1] || 'NY';
-            
-            let yearBuilt, sqft, waterSource, sewerType;
-            
-            if (['CA', 'FL', 'TX', 'AZ', 'NV'].includes(state)) {
-                yearBuilt = 1985 + Math.floor(Math.random() * 35);
-                sqft = 1800 + Math.floor(Math.random() * 1500);
-                waterSource = 'City Water';
-                sewerType = 'Public Sewer';
-            } else if (['VT', 'NH', 'ME', 'MT', 'WY', 'ID'].includes(state)) {
-                yearBuilt = 1960 + Math.floor(Math.random() * 45);
-                sqft = 1400 + Math.floor(Math.random() * 1200);
-                waterSource = Math.random() > 0.4 ? 'Well Water' : 'City Water';
-                sewerType = Math.random() > 0.3 ? 'Septic System' : 'Public Sewer';
-            } else {
-                yearBuilt = 1975 + Math.floor(Math.random() * 40);
-                sqft = 1600 + Math.floor(Math.random() * 1400);
-                waterSource = Math.random() > 0.7 ? 'Well Water' : 'City Water';
-                sewerType = Math.random() > 0.6 ? 'Septic System' : 'Public Sewer';
-            }
-            
-            const bedrooms = 2 + Math.floor(Math.random() * 4);
-            const bathrooms = Math.max(1, Math.floor(bedrooms * 0.75)) + (Math.random() > 0.5 ? 0.5 : 0);
-            
-            return {
-                address: address,
-                yearBuilt: yearBuilt,
-                squareFootage: sqft,
-                bedrooms: bedrooms,
-                bathrooms: bathrooms,
-                propertyType: 'Single Family',
-                waterSource: waterSource,
-                sewerType: sewerType,
-                heatingType: yearBuilt > 1990 ? 'Central Air/Heat' : 'Mixed Systems',
-                lotSize: (0.15 + Math.random() * 0.4).toFixed(2) + ' acres'
-            };
-        }
-
-        function populatePropertyDetails() {
-            const container = document.getElementById('property-details');
-            container.innerHTML = `
-                <div class="bg-blue-50 rounded-lg p-4 mb-6">
-                    <h4 class="font-medium text-blue-900 mb-2">📍 ${propertyData.address}</h4>
-                    <p class="text-sm text-blue-700">Property details ${demoMode ? '(Smart Demo Data)' : '(Live Data)'}</p>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
-                        <input type="number" value="${propertyData.yearBuilt}" id="edit-year-built"
-                               class="w-full px-3 py-2 border rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Square Footage</label>
-                        <input type="number" value="${propertyData.squareFootage}" id="edit-sqft"
-                               class="w-full px-3 py-2 border rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
-                        <input type="number" value="${propertyData.bedrooms}" id="edit-bedrooms"
-                               class="w-full px-3 py-2 border rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
-                        <input type="number" step="0.5" value="${propertyData.bathrooms}" id="edit-bathrooms"
-                               class="w-full px-3 py-2 border rounded-lg">
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <p class="text-sm text-gray-600">Water: <strong>${propertyData.waterSource}</strong> • 
-                    Sewer: <strong>${propertyData.sewerType}</strong> • 
-                    Lot: <strong>${propertyData.lotSize}</strong></p>
-                </div>
-            `;
-        }
-
-        function generateMaintenancePlan() {
-            console.log('Generate maintenance plan clicked');
-            
-            // Update property data from edits
-            const editYearBuilt = document.getElementById('edit-year-built');
-            const editSqft = document.getElementById('edit-sqft');
-            const editBedrooms = document.getElementById('edit-bedrooms');
-            const editBathrooms = document.getElementById('edit-bathrooms');
-            
-            if (editYearBuilt) propertyData.yearBuilt = parseInt(editYearBuilt.value);
-            if (editSqft) propertyData.squareFootage = parseInt(editSqft.value);
-            if (editBedrooms) propertyData.bedrooms = parseInt(editBedrooms.value);
-            if (editBathrooms) propertyData.bathrooms = parseFloat(editBathrooms.value);
-            
-            // Collect user preferences
-            userPreferences = {
-                hvacSystems: Array.from(document.querySelectorAll('input[name="hvac"]:checked')).map(cb => cb.value),
-                features: Array.from(document.querySelectorAll('input[name="features"]:checked')).map(cb => cb.value),
-                pets: document.querySelector('input[name="pets"]:checked').value,
+            // Collect form data
+            homeData = {
+                address: document.getElementById('address').value || '123 Main Street',
+                yearBuilt: parseInt(document.getElementById('year-built').value),
+                sqft: parseInt(document.getElementById('sqft').value),
+                hasPets: document.querySelector('input[name="pets"]:checked').value === 'yes',
                 approach: document.getElementById('approach').value
             };
 
+            // Collect selected features
+            homeData.features = {
+                centralAC: document.getElementById('central-ac').checked,
+                miniSplits: document.getElementById('mini-splits').checked,
+                wellWater: document.getElementById('well-water').checked,
+                septic: document.getElementById('septic').checked,
+                fireplace: document.getElementById('fireplace').checked,
+                pool: document.getElementById('pool').checked,
+                deck: document.getElementById('deck').checked
+            };
+
+            console.log('Home data:', homeData);
+
             // Generate tasks
-            maintenanceTasks = generateTasks(propertyData, userPreferences);
-            
-            // Save data
-            saveData();
-            
+            generateTasks();
+
             // Show main app
-            showMainApp();
+            document.getElementById('setup-form').style.display = 'none';
+            document.getElementById('main-app').classList.remove('hidden');
+
+            // Initialize dashboard
+            updateDashboard();
+            saveData();
         }
 
-        function generateTasks(property, preferences) {
-            const tasks = [];
-            let taskId = 1;
+        // Generate maintenance tasks
+        function generateTasks() {
+            tasks = [];
+            let id = 1;
 
-            const frequencyModifier = {
-                'proactive': 0.8,
-                'standard': 1.0,
-                'minimal': 1.3
-            }[preferences.approach];
+            // Frequency modifiers
+            const freqMod = homeData.approach === 'proactive' ? 0.8 : homeData.approach === 'minimal' ? 1.3 : 1.0;
+            const petMod = homeData.hasPets ? 0.75 : 1.0;
+            const homeAge = new Date().getFullYear() - homeData.yearBuilt;
 
-            const petModifier = preferences.pets === 'yes' ? 0.75 : 1.0;
+            console.log('Generating tasks with frequency modifier:', freqMod);
 
             // HVAC Tasks
-            if (preferences.hvacSystems.includes('central-ac')) {
+            if (homeData.features.centralAC) {
                 tasks.push({
-                    id: taskId++,
+                    id: id++,
                     title: 'Replace HVAC Filter',
                     category: 'HVAC',
-                    frequency: Math.round(90 * frequencyModifier * petModifier),
-                    priority: 'high',
+                    frequency: Math.round(90 * freqMod * petMod),
                     cost: 25,
-                    description: 'Replace central air system filter to maintain air quality and efficiency',
-                    tips: preferences.pets === 'yes' ? 'Change more frequently due to pet hair and dander' : 'Standard quarterly replacement',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+                    priority: 'high',
+                    description: 'Replace central air system filter',
+                    nextDue: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
                 });
 
                 tasks.push({
-                    id: taskId++,
+                    id: id++,
                     title: 'HVAC Professional Service',
                     category: 'HVAC',
-                    frequency: Math.round(365 * frequencyModifier),
-                    priority: 'medium',
+                    frequency: Math.round(365 * freqMod),
                     cost: 150,
-                    description: 'Annual professional HVAC maintenance and tune-up',
-                    tips: 'Schedule before peak heating/cooling seasons',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000)
+                    priority: 'medium',
+                    description: 'Annual professional HVAC maintenance',
+                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
                 });
             }
 
-            if (preferences.hvacSystems.includes('mini-splits')) {
+            if (homeData.features.miniSplits) {
                 tasks.push({
-                    id: taskId++,
+                    id: id++,
                     title: 'Clean Mini-Split Filters',
                     category: 'HVAC',
-                    frequency: Math.round(60 * frequencyModifier * petModifier),
-                    priority: 'medium',
+                    frequency: Math.round(60 * freqMod * petMod),
                     cost: 0,
-                    description: 'Remove and wash mini-split unit filters',
-                    tips: 'Rinse with warm water and let dry completely before reinstalling',
-                    lastCompleted: null,
-                    nextDue: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000)
+                    priority: 'medium',
+                    description: 'Clean mini-split unit filters',
+                    nextDue: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
                 });
             }
 
-            // General tasks for everyone
-            tasks.push({
-                id: taskId++,
-                title: 'Clean Gutters and Downspouts',
-                category: 'Exterior',
-                frequency: Math.round(182 * frequencyModifier), // twice yearly
-                priority: 'medium',
-                cost: 150,
-                description: 'Remove debris from gutters and check downspouts for proper drainage',
-                tips: 'Schedule for spring and fall, after leaves have fallen',
-                lastCompleted: null,
-                nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-            });
+            // Water system tasks
+            if (homeData.features.wellWater) {
+                tasks.push({
+                    id: id++,
+                    title: 'Test Well Water',
+                    category: 'Water Systems',
+                    frequency: Math.round(365 * freqMod),
+                    cost: 75,
+                    priority: 'high',
+                    description: 'Annual water quality testing',
+                    nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
+            }
 
-            tasks.push({
-                id: taskId++,
-                title: 'Test Smoke and CO Detectors',
-                category: 'Safety',
-                frequency: Math.round(30 * frequencyModifier),
-                priority: 'high',
-                cost: 0,
-                description: 'Test
+            if (homeData.features.septic) {
+                tasks.push({
+                    id: id++,
+                    title: 'Septic Tank Pumping',
+                    category: 'Water Systems',
+                    frequency: Math.round(1460 * freqMod), // 4 years
+                    cost: 400,
+                    priority: 'high',
+                    description: 'Professional septic pumping',
+                    nextDue: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
+            }
+
+            // Feature-specific tasks
+            if (homeData.features.fireplace) {
+                tasks.push({
+                    id: id++,
+                    title: 'Chimney Inspection',
+                    category: 'Safety',
+                    frequency: Math.round(365 * freqMod),
+                    cost: 300,
+                    priority: 'high',
+                    description: 'Professional chimney cleaning and inspection',
+                    nextDue: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null
+                });
+            }
+
+            if (homeData.features.deck) {
+                tasks.push({
