@@ -40,15 +40,6 @@
             color: white;
         }
 
-        .address-suggestion {
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        
-        .address-suggestion:hover {
-            background-color: #f3f4f6;
-        }
-
         .system-card {
             transition: all 0.2s ease;
         }
@@ -106,10 +97,10 @@
                     </div>
                     
                     <div class="flex gap-4">
-                        <button onclick="saveApiKey()" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        <button id="use-real-data-btn" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium">
                             Use Real Data
                         </button>
-                        <button onclick="useDemoMode()" class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                        <button id="use-demo-btn" class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium">
                             Use Smart Demo
                         </button>
                     </div>
@@ -148,10 +139,8 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Home Address</label>
                         <input type="text" id="address-input" placeholder="Start typing your address..." 
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-                               oninput="searchAddresses(this.value)"
                                autocomplete="off">
                         
-                        <!-- Address suggestions dropdown -->
                         <div id="address-suggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 hidden max-h-60 overflow-y-auto">
                             <!-- Suggestions will be populated here -->
                         </div>
@@ -163,6 +152,10 @@
                             <span class="text-lg">Looking up property details...</span>
                         </div>
                     </div>
+                    
+                    <button id="continue-step1" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors hidden">
+                        Continue
+                    </button>
                 </div>
             </div>
 
@@ -179,27 +172,27 @@
                 </div>
                 
                 <div class="flex gap-4 mt-8">
-                    <button onclick="prevStep()" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">
+                    <button id="prev-step2" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">
                         Back
                     </button>
-                    <button onclick="nextStep()" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
+                    <button id="next-step2" class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
                         Looks Good
                     </button>
                 </div>
             </div>
 
-            <!-- Step 3: Systems & Preferences -->
+            <!-- Step 3: Home Systems -->
             <div id="wizard-step-3" class="wizard-step bg-white rounded-xl p-8 shadow-lg slide-up hidden">
                 <div class="text-center mb-8">
                     <div class="text-4xl mb-4">⚙️</div>
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">Tell us about your home systems</h2>
-                    <p class="text-gray-600">This helps us suggest the right maintenance tasks</p>
+                    <p class="text-gray-600">Select all that apply to your home</p>
                 </div>
                 
                 <div class="space-y-6">
                     <!-- HVAC Systems -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Heating & Cooling (select all that apply)</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Heating & Cooling</label>
                         <div class="grid grid-cols-2 gap-3">
                             <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
                                 <input type="checkbox" name="hvac" value="central-ac" class="rounded">
@@ -222,7 +215,7 @@
 
                     <!-- Home Features -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Home Features (select all that apply)</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Home Features</label>
                         <div class="grid grid-cols-2 gap-3">
                             <label class="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
                                 <input type="checkbox" name="features" value="fireplace" class="rounded">
@@ -243,25 +236,24 @@
                         </div>
                     </div>
 
-                    <!-- Lifestyle Questions -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Preferences -->
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">Do you have pets?</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Do you have pets?</label>
                             <div class="flex gap-4">
                                 <label class="flex items-center space-x-2">
-                                    <input type="radio" name="pets" value="no" checked class="text-blue-600">
+                                    <input type="radio" name="pets" value="no" checked>
                                     <span>No</span>
                                 </label>
                                 <label class="flex items-center space-x-2">
-                                    <input type="radio" name="pets" value="yes" class="text-blue-600">
+                                    <input type="radio" name="pets" value="yes">
                                     <span>Yes</span>
                                 </label>
                             </div>
                         </div>
-
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-3">Maintenance approach</label>
-                            <select id="approach" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Maintenance approach</label>
+                            <select id="approach" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                                 <option value="proactive" selected>Proactive</option>
                                 <option value="standard">Standard</option>
                                 <option value="minimal">Minimal</option>
@@ -271,10 +263,10 @@
                 </div>
                 
                 <div class="flex gap-4 mt-8">
-                    <button onclick="prevStep()" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">
+                    <button id="prev-step3" class="flex-1 bg-gray-200 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors">
                         Back
                     </button>
-                    <button onclick="generateMaintenancePlan()" class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium text-lg">
+                    <button id="create-plan" class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium">
                         🚀 Create My Plan
                     </button>
                 </div>
@@ -286,13 +278,13 @@
             <!-- Navigation -->
             <div class="max-w-6xl mx-auto px-4 py-6">
                 <div class="flex space-x-1 bg-white rounded-xl p-2 shadow-lg">
-                    <button onclick="showAppTab('dashboard')" id="app-tab-dashboard" class="app-tab-btn bg-blue-100 text-blue-700 px-6 py-3 rounded-lg font-medium">
+                    <button data-tab="dashboard" class="tab-btn bg-blue-100 text-blue-700 px-6 py-3 rounded-lg font-medium">
                         📅 Dashboard
                     </button>
-                    <button onclick="showAppTab('tasks')" id="app-tab-tasks" class="app-tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                    <button data-tab="tasks" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
                         ✅ All Tasks
                     </button>
-                    <button onclick="showAppTab('settings')" id="app-tab-settings" class="app-tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                    <button data-tab="settings" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
                         ⚙️ Settings
                     </button>
                 </div>
@@ -349,10 +341,10 @@
                 <!-- Upcoming Tasks -->
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
                     <div class="p-6 border-b border-gray-100">
-                        <h3 class="text-xl font-bold text-gray-900">Upcoming Tasks</h3>
-                        <p class="text-gray-600">Tasks due in the next 2 weeks</p>
+                        <h3 class="text-xl font-bold text-gray-900">Your Maintenance Tasks</h3>
+                        <p class="text-gray-600">Personalized based on your home's systems and features</p>
                     </div>
-                    <div id="upcoming-tasks-list">
+                    <div id="tasks-list">
                         <!-- Tasks will be populated here -->
                     </div>
                 </div>
@@ -361,14 +353,9 @@
             <!-- Tasks Tab -->
             <div id="app-tasks" class="app-content hidden max-w-6xl mx-auto px-4 pb-8">
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
-                        <div>
-                            <h3 class="text-xl font-bold text-gray-900">All Maintenance Tasks</h3>
-                            <p class="text-gray-600">Complete maintenance schedule organized by category</p>
-                        </div>
-                        <button onclick="addCustomTask()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                            ➕ Add Custom Task
-                        </button>
+                    <div class="p-6 border-b border-gray-100">
+                        <h3 class="text-xl font-bold text-gray-900">All Maintenance Tasks</h3>
+                        <p class="text-gray-600">Complete maintenance schedule organized by category</p>
                     </div>
                     <div id="all-tasks-list">
                         <!-- All tasks will be populated here -->
@@ -381,7 +368,7 @@
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <h3 class="text-xl font-bold text-gray-900 mb-6">Settings</h3>
                     
-                    <div class="space-y-8">
+                    <div class="space-y-6">
                         <div>
                             <h4 class="font-medium text-gray-900 mb-3">Property Information</h4>
                             <div class="bg-gray-50 rounded-lg p-4 mb-4">
@@ -389,7 +376,7 @@
                                     <!-- Property summary will be populated here -->
                                 </div>
                             </div>
-                            <button onclick="restartWizard()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            <button id="restart-wizard" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                                 Update Property Details
                             </button>
                         </div>
@@ -397,11 +384,11 @@
                         <div>
                             <h4 class="font-medium text-gray-900 mb-3">Data Management</h4>
                             <div class="space-y-3">
-                                <button onclick="exportData()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mr-3">
+                                <button id="export-data" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mr-3">
                                     📄 Export Data
                                 </button>
                                 <br>
-                                <button onclick="clearData()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                                <button id="clear-data" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
                                     🗑️ Clear All Data
                                 </button>
                             </div>
@@ -417,26 +404,172 @@
                 <h3 class="text-xl font-bold mb-4" id="modal-title">Task</h3>
                 <div id="modal-content"></div>
                 <div class="flex gap-3 mt-6">
-                    <button onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300">Cancel</button>
-                    <button onclick="confirmTaskAction()" id="modal-confirm" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">Confirm</button>
+                    <button id="modal-cancel" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300">Cancel</button>
+                    <button id="modal-confirm" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">Confirm</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Global app state
+        // App state
         let currentStep = 1;
         let propertyData = {};
         let userPreferences = {};
         let maintenanceTasks = [];
-        let currentModalAction = null;
         let apiKey = null;
         let demoMode = false;
         let searchTimeout = null;
 
-        // API and data functions
+        // Initialize app
+        function initApp() {
+            console.log('App initializing...');
+            
+            // Add event listeners for buttons
+            document.getElementById('use-real-data-btn').addEventListener('click', saveApiKey);
+            document.getElementById('use-demo-btn').addEventListener('click', useDemoMode);
+            
+            // Wizard navigation
+            const continueStep1 = document.getElementById('continue-step1');
+            if (continueStep1) {
+                continueStep1.addEventListener('click', () => nextStep());
+            }
+            
+            const prevStep2 = document.getElementById('prev-step2');
+            if (prevStep2) {
+                prevStep2.addEventListener('click', () => prevStep());
+            }
+            
+            const nextStep2 = document.getElementById('next-step2');
+            if (nextStep2) {
+                nextStep2.addEventListener('click', () => nextStep());
+            }
+            
+            const prevStep3 = document.getElementById('prev-step3');
+            if (prevStep3) {
+                prevStep3.addEventListener('click', () => prevStep());
+            }
+            
+            const createPlan = document.getElementById('create-plan');
+            if (createPlan) {
+                createPlan.addEventListener('click', generateMaintenancePlan);
+            }
+            
+            // Tab navigation
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    showAppTab(e.target.dataset.tab);
+                });
+            });
+            
+            // Settings buttons
+            const restartWizard = document.getElementById('restart-wizard');
+            if (restartWizard) {
+                restartWizard.addEventListener('click', () => {
+                    if (confirm('This will clear your current data and start over. Continue?')) {
+                        localStorage.removeItem('casaCareData');
+                        location.reload();
+                    }
+                });
+            }
+            
+            const exportData = document.getElementById('export-data');
+            if (exportData) {
+                exportData.addEventListener('click', exportDataFunc);
+            }
+            
+            const clearData = document.getElementById('clear-data');
+            if (clearData) {
+                clearData.addEventListener('click', () => {
+                    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                        localStorage.removeItem('casaCareData');
+                        localStorage.removeItem('casaCareApiKey');
+                        localStorage.removeItem('casaCareDemoMode');
+                        location.reload();
+                    }
+                });
+            }
+            
+            // Modal close
+            const modalCancel = document.getElementById('modal-cancel');
+            if (modalCancel) {
+                modalCancel.addEventListener('click', closeModal);
+            }
+            
+            // Address input
+            const addressInput = document.getElementById('address-input');
+            if (addressInput) {
+                addressInput.addEventListener('input', (e) => {
+                    searchAddresses(e.target.value);
+                });
+            }
+            
+            // Check for saved data
+            checkSavedData();
+        }
+
+        function checkSavedData() {
+            const savedApiKey = localStorage.getItem('casaCareApiKey');
+            const savedDemoMode = localStorage.getItem('casaCareDemoMode');
+            
+            if (savedApiKey) {
+                apiKey = savedApiKey;
+                demoMode = false;
+            } else if (savedDemoMode) {
+                demoMode = true;
+                apiKey = null;
+            }
+
+            const savedData = localStorage.getItem('casaCareData');
+            
+            if (savedData && (apiKey || demoMode)) {
+                try {
+                    const data = JSON.parse(savedData);
+                    if (data.setupComplete) {
+                        propertyData = data.propertyData;
+                        userPreferences = data.userPreferences;
+                        maintenanceTasks = data.maintenanceTasks.map(task => ({
+                            ...task,
+                            nextDue: new Date(task.nextDue),
+                            lastCompleted: task.lastCompleted ? new Date(task.lastCompleted) : null
+                        }));
+                        
+                        showMainApp();
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Error loading saved data:', e);
+                }
+            }
+            
+            if (apiKey || demoMode) {
+                showWizard();
+            } else {
+                showApiSetup();
+            }
+        }
+
+        function showApiSetup() {
+            document.getElementById('api-setup').classList.remove('hidden');
+            document.getElementById('setup-wizard').classList.add('hidden');
+            document.getElementById('main-app').classList.add('hidden');
+        }
+
+        function showWizard() {
+            document.getElementById('api-setup').classList.add('hidden');
+            document.getElementById('setup-wizard').classList.remove('hidden');
+            document.getElementById('main-app').classList.add('hidden');
+        }
+
+        function showMainApp() {
+            document.getElementById('api-setup').classList.add('hidden');
+            document.getElementById('setup-wizard').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            initializeMainApp();
+        }
+
         function saveApiKey() {
+            console.log('Save API key clicked');
             const key = document.getElementById('api-key-input').value.trim();
             if (!key) {
                 alert('Please enter your API key or use demo mode');
@@ -447,23 +580,17 @@
             demoMode = false;
             localStorage.setItem('casaCareApiKey', key);
             
-            startWizard();
+            showWizard();
         }
 
         function useDemoMode() {
+            console.log('Demo mode clicked');
             demoMode = true;
             apiKey = null;
             localStorage.setItem('casaCareDemoMode', 'true');
-            startWizard();
+            showWizard();
         }
 
-        function startWizard() {
-            document.getElementById('api-setup').classList.add('hidden');
-            document.getElementById('setup-wizard').classList.remove('hidden');
-            updateProgressIndicators();
-        }
-
-        // Address search
         function searchAddresses(query) {
             if (searchTimeout) {
                 clearTimeout(searchTimeout);
@@ -484,7 +611,8 @@
                 "123 Oak Street, Springfield, IL 62701",
                 "456 Maple Avenue, Portland, OR 97201", 
                 "789 Pine Road, Austin, TX 73301",
-                "321 Elm Street, Denver, CO 80201"
+                "321 Elm Street, Denver, CO 80201",
+                "654 Cedar Lane, Seattle, WA 98101"
             ].filter(addr => addr.toLowerCase().includes(query.toLowerCase()));
             
             displayAddressSuggestions(demoAddresses);
@@ -498,21 +626,15 @@
                 return;
             }
             
-            container.innerHTML = suggestions.map((address, index) => 
-                '<div class="address-suggestion p-3 border-b border-gray-100 last:border-b-0" onclick="selectAddressByIndex(' + index + ')"><div class="text-sm text-gray-900">' + address + '</div></div>'
-            ).join('');
+            container.innerHTML = suggestions.map((address, index) => {
+                const div = document.createElement('div');
+                div.className = 'address-suggestion p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer';
+                div.innerHTML = `<div class="text-sm text-gray-900">${address}</div>`;
+                div.addEventListener('click', () => selectAddress(address));
+                return div.outerHTML;
+            }).join('');
             
-            container.dataset.suggestions = JSON.stringify(suggestions);
             container.classList.remove('hidden');
-        }
-
-        function selectAddressByIndex(index) {
-            const container = document.getElementById('address-suggestions');
-            const suggestions = JSON.parse(container.dataset.suggestions || '[]');
-            const address = suggestions[index];
-            if (address) {
-                selectAddress(address);
-            }
         }
 
         function hideAddressSuggestions() {
@@ -522,10 +644,52 @@
         function selectAddress(address) {
             document.getElementById('address-input').value = address;
             hideAddressSuggestions();
-            lookupPropertyDetails(address);
+            document.getElementById('continue-step1').classList.remove('hidden');
         }
 
-        // Property lookup
+        function nextStep() {
+            if (currentStep === 1) {
+                const address = document.getElementById('address-input').value;
+                if (!address) {
+                    alert('Please enter an address');
+                    return;
+                }
+                lookupPropertyDetails(address);
+            } else if (currentStep === 2) {
+                document.getElementById('wizard-step-2').classList.add('hidden');
+                document.getElementById('wizard-step-3').classList.remove('hidden');
+                currentStep = 3;
+                updateProgressIndicators();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep === 2) {
+                document.getElementById('wizard-step-2').classList.add('hidden');
+                document.getElementById('wizard-step-1').classList.remove('hidden');
+                currentStep = 1;
+                updateProgressIndicators();
+            } else if (currentStep === 3) {
+                document.getElementById('wizard-step-3').classList.add('hidden');
+                document.getElementById('wizard-step-2').classList.remove('hidden');
+                currentStep = 2;
+                updateProgressIndicators();
+            }
+        }
+
+        function updateProgressIndicators() {
+            for (let i = 1; i <= 3; i++) {
+                const step = document.getElementById(`step-${i}`);
+                if (i < currentStep) {
+                    step.className = 'step-indicator step-completed w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold';
+                } else if (i === currentStep) {
+                    step.className = 'step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold';
+                } else {
+                    step.className = 'step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500';
+                }
+            }
+        }
+
         function lookupPropertyDetails(address) {
             document.getElementById('loading-indicator').classList.remove('hidden');
             
@@ -533,7 +697,11 @@
                 propertyData = generateSmartPropertyData(address);
                 document.getElementById('loading-indicator').classList.add('hidden');
                 populatePropertyDetails();
-                nextStep();
+                
+                document.getElementById('wizard-step-1').classList.add('hidden');
+                document.getElementById('wizard-step-2').classList.remove('hidden');
+                currentStep = 2;
+                updateProgressIndicators();
             }, 1500);
         }
 
@@ -578,69 +746,57 @@
 
         function populatePropertyDetails() {
             const container = document.getElementById('property-details');
-            container.innerHTML = 
-                '<div class="bg-blue-50 rounded-lg p-4 mb-6">' +
-                    '<h4 class="font-medium text-blue-900 mb-2">📍 ' + propertyData.address + '</h4>' +
-                    '<p class="text-sm text-blue-700">Property details (Smart Demo Data)</p>' +
-                '</div>' +
-                '<div class="grid grid-cols-2 gap-4">' +
-                    '<div>' +
-                        '<label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>' +
-                        '<input type="number" value="' + propertyData.yearBuilt + '" class="w-full px-3 py-2 border rounded-lg" onchange="propertyData.yearBuilt = this.value">' +
-                    '</div>' +
-                    '<div>' +
-                        '<label class="block text-sm font-medium text-gray-700 mb-1">Square Footage</label>' +
-                        '<input type="number" value="' + propertyData.squareFootage + '" class="w-full px-3 py-2 border rounded-lg" onchange="propertyData.squareFootage = this.value">' +
-                    '</div>' +
-                    '<div>' +
-                        '<label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>' +
-                        '<input type="number" value="' + propertyData.bedrooms + '" class="w-full px-3 py-2 border rounded-lg" onchange="propertyData.bedrooms = this.value">' +
-                    '</div>' +
-                    '<div>' +
-                        '<label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>' +
-                        '<input type="number" step="0.5" value="' + propertyData.bathrooms + '" class="w-full px-3 py-2 border rounded-lg" onchange="propertyData.bathrooms = this.value">' +
-                    '</div>' +
-                '</div>' +
-                '<div class="mt-4">' +
-                    '<p class="text-sm text-gray-600">Water: <strong>' + propertyData.waterSource + '</strong> • Sewer: <strong>' + propertyData.sewerType + '</strong> • Lot: <strong>' + propertyData.lotSize + '</strong></p>' +
-                '</div>';
+            container.innerHTML = `
+                <div class="bg-blue-50 rounded-lg p-4 mb-6">
+                    <h4 class="font-medium text-blue-900 mb-2">📍 ${propertyData.address}</h4>
+                    <p class="text-sm text-blue-700">Property details ${demoMode ? '(Smart Demo Data)' : '(Live Data)'}</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
+                        <input type="number" value="${propertyData.yearBuilt}" id="edit-year-built"
+                               class="w-full px-3 py-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Square Footage</label>
+                        <input type="number" value="${propertyData.squareFootage}" id="edit-sqft"
+                               class="w-full px-3 py-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
+                        <input type="number" value="${propertyData.bedrooms}" id="edit-bedrooms"
+                               class="w-full px-3 py-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
+                        <input type="number" step="0.5" value="${propertyData.bathrooms}" id="edit-bathrooms"
+                               class="w-full px-3 py-2 border rounded-lg">
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <p class="text-sm text-gray-600">Water: <strong>${propertyData.waterSource}</strong> • 
+                    Sewer: <strong>${propertyData.sewerType}</strong> • 
+                    Lot: <strong>${propertyData.lotSize}</strong></p>
+                </div>
+            `;
         }
 
-        // Wizard navigation
-        function nextStep() {
-            if (currentStep < 3) {
-                document.getElementById('wizard-step-' + currentStep).classList.add('hidden');
-                currentStep++;
-                document.getElementById('wizard-step-' + currentStep).classList.remove('hidden');
-                updateProgressIndicators();
-            }
-        }
-
-        function prevStep() {
-            if (currentStep > 1) {
-                document.getElementById('wizard-step-' + currentStep).classList.add('hidden');
-                currentStep--;
-                document.getElementById('wizard-step-' + currentStep).classList.remove('hidden');
-                updateProgressIndicators();
-            }
-        }
-
-        function updateProgressIndicators() {
-            for (let i = 1; i <= 3; i++) {
-                const step = document.getElementById('step-' + i);
-                if (i < currentStep) {
-                    step.className = 'step-indicator step-completed w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold';
-                } else if (i === currentStep) {
-                    step.className = 'step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold';
-                } else {
-                    step.className = 'step-indicator w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-500';
-                }
-            }
-        }
-
-        // Generate maintenance plan
         function generateMaintenancePlan() {
-            // Collect preferences
+            console.log('Generate maintenance plan clicked');
+            
+            // Update property data from edits
+            const editYearBuilt = document.getElementById('edit-year-built');
+            const editSqft = document.getElementById('edit-sqft');
+            const editBedrooms = document.getElementById('edit-bedrooms');
+            const editBathrooms = document.getElementById('edit-bathrooms');
+            
+            if (editYearBuilt) propertyData.yearBuilt = parseInt(editYearBuilt.value);
+            if (editSqft) propertyData.squareFootage = parseInt(editSqft.value);
+            if (editBedrooms) propertyData.bedrooms = parseInt(editBedrooms.value);
+            if (editBathrooms) propertyData.bathrooms = parseFloat(editBathrooms.value);
+            
+            // Collect user preferences
             userPreferences = {
                 hvacSystems: Array.from(document.querySelectorAll('input[name="hvac"]:checked')).map(cb => cb.value),
                 features: Array.from(document.querySelectorAll('input[name="features"]:checked')).map(cb => cb.value),
@@ -649,20 +805,16 @@
             };
 
             // Generate tasks
-            maintenanceTasks = generateTaskList(propertyData, userPreferences);
+            maintenanceTasks = generateTasks(propertyData, userPreferences);
             
             // Save data
             saveData();
-
-            // Switch to main app
-            document.getElementById('setup-wizard').classList.add('hidden');
-            document.getElementById('main-app').classList.remove('hidden');
             
-            // Initialize main app
-            initializeMainApp();
+            // Show main app
+            showMainApp();
         }
 
-        function generateTaskList(property, preferences) {
+        function generateTasks(property, preferences) {
             const tasks = [];
             let taskId = 1;
 
@@ -683,9 +835,10 @@
                     frequency: Math.round(90 * frequencyModifier * petModifier),
                     priority: 'high',
                     cost: 25,
-                    description: 'Replace central air system filter',
-                    nextDue: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    description: 'Replace central air system filter to maintain air quality and efficiency',
+                    tips: preferences.pets === 'yes' ? 'Change more frequently due to pet hair and dander' : 'Standard quarterly replacement',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
                 });
 
                 tasks.push({
@@ -695,441 +848,47 @@
                     frequency: Math.round(365 * frequencyModifier),
                     priority: 'medium',
                     cost: 150,
-                    description: 'Annual professional HVAC maintenance',
-                    nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    description: 'Annual professional HVAC maintenance and tune-up',
+                    tips: 'Schedule before peak heating/cooling seasons',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000)
                 });
             }
 
-            // Water system tasks
-            if (property.waterSource === 'Well Water') {
+            if (preferences.hvacSystems.includes('mini-splits')) {
                 tasks.push({
                     id: taskId++,
-                    title: 'Test Well Water Quality',
-                    category: 'Water Systems',
-                    frequency: Math.round(365 * frequencyModifier),
-                    priority: 'high',
-                    cost: 75,
-                    description: 'Annual water quality testing',
-                    nextDue: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    title: 'Clean Mini-Split Filters',
+                    category: 'HVAC',
+                    frequency: Math.round(60 * frequencyModifier * petModifier),
+                    priority: 'medium',
+                    cost: 0,
+                    description: 'Remove and wash mini-split unit filters',
+                    tips: 'Rinse with warm water and let dry completely before reinstalling',
+                    lastCompleted: null,
+                    nextDue: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000)
                 });
             }
 
-            if (property.sewerType === 'Septic System') {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Septic Tank Pumping',
-                    category: 'Water Systems',
-                    frequency: Math.round(1460 * frequencyModifier), // 4 years
-                    priority: 'high',
-                    cost: 400,
-                    description: 'Professional septic pumping',
-                    nextDue: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
-                });
-            }
-
-            // General tasks
+            // General tasks for everyone
             tasks.push({
                 id: taskId++,
-                title: 'Clean Gutters',
+                title: 'Clean Gutters and Downspouts',
                 category: 'Exterior',
-                frequency: Math.round(182 * frequencyModifier),
-                cost: 150,
+                frequency: Math.round(182 * frequencyModifier), // twice yearly
                 priority: 'medium',
-                description: 'Clean gutters and downspouts',
-                nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-                lastCompleted: null
+                cost: 150,
+                description: 'Remove debris from gutters and check downspouts for proper drainage',
+                tips: 'Schedule for spring and fall, after leaves have fallen',
+                lastCompleted: null,
+                nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
             });
 
             tasks.push({
                 id: taskId++,
-                title: 'Test Smoke Detectors',
+                title: 'Test Smoke and CO Detectors',
                 category: 'Safety',
                 frequency: Math.round(30 * frequencyModifier),
-                cost: 0,
                 priority: 'high',
-                description: 'Test smoke and CO detectors',
-                nextDue: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-                lastCompleted: null
-            });
-
-            // Feature-specific tasks
-            if (preferences.features.includes('fireplace')) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Chimney Inspection',
-                    category: 'Safety',
-                    frequency: Math.round(365 * frequencyModifier),
-                    priority: 'high',
-                    cost: 300,
-                    description: 'Professional chimney cleaning',
-                    nextDue: new Date(Date.now() + 75 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
-                });
-            }
-
-            if (preferences.features.includes('pool')) {
-                tasks.push({
-                    id: taskId++,
-                    title: 'Pool Maintenance',
-                    category: 'Pool',
-                    frequency: Math.round(182 * frequencyModifier),
-                    priority: 'medium',
-                    cost: 250,
-                    description: 'Seasonal pool maintenance',
-                    nextDue: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
-                });
-            }
-
-            return tasks;
-        }
-
-        // Main app functions
-        function initializeMainApp() {
-            document.getElementById('dashboard-address').textContent = 'Managing maintenance for ' + propertyData.address;
-            updateTaskStats();
-            renderUpcomingTasks();
-            renderAllTasks();
-            renderPropertySummary();
-        }
-
-        function updateTaskStats() {
-            const now = new Date();
-            const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-            
-            const overdue = maintenanceTasks.filter(task => new Date(task.nextDue) < now).length;
-            const thisWeek = maintenanceTasks.filter(task => new Date(task.nextDue) <= oneWeek && new Date(task.nextDue) >= now).length;
-            const total = maintenanceTasks.length;
-            const annualCost = maintenanceTasks.reduce((sum, task) => {
-                const yearlyFreq = 365 / task.frequency;
-                return sum + (task.cost * yearlyFreq);
-            }, 0);
-
-            document.getElementById('overdue-count').textContent = overdue;
-            document.getElementById('week-count').textContent = thisWeek;
-            document.getElementById('total-count').textContent = total;
-            document.getElementById('annual-cost').textContent = '$' + Math.round(annualCost);
-        }
-
-        function renderUpcomingTasks() {
-            const container = document.getElementById('upcoming-tasks-list');
-            const now = new Date();
-            const twoWeeks = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
-            
-            const upcoming = maintenanceTasks
-                .filter(task => new Date(task.nextDue) <= twoWeeks)
-                .sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue))
-                .slice(0, 5);
-
-            if (upcoming.length === 0) {
-                container.innerHTML = 
-                    '<div class="p-8 text-center text-gray-500">' +
-                        '<div class="text-4xl mb-4">✅</div>' +
-                        '<p class="font-medium">All caught up!</p>' +
-                        '<p class="text-sm">No urgent tasks in the next two weeks.</p>' +
-                    '</div>';
-                return;
-            }
-
-            container.innerHTML = upcoming.map(task => {
-                const daysUntil = Math.ceil((new Date(task.nextDue) - now) / (1000 * 60 * 60 * 24));
-                const isOverdue = daysUntil < 0;
-                const urgencyClass = isOverdue ? 'border-l-red-500 bg-red-50' : 
-                                   daysUntil <= 3 ? 'border-l-orange-500 bg-orange-50' : 
-                                   'border-l-blue-500 bg-blue-50';
-                
-                return '<div class="p-6 border-l-4 ' + urgencyClass + ' hover:bg-opacity-75 transition-colors">' +
-                        '<div class="flex items-start justify-between">' +
-                            '<div class="flex-1">' +
-                                '<h4 class="font-semibold text-gray-900 mb-1">' + task.title + '</h4>' +
-                                '<p class="text-sm text-gray-600 mb-2">' + task.category + ' • ' + task.description + '</p>' +
-                                '<div class="flex items-center gap-4 text-xs text-gray-500">' +
-                                    '<span>Due: ' + new Date(task.nextDue).toLocaleDateString() + '</span>' +
-                                    (task.cost > 0 ? '<span>Cost: $' + task.cost + '</span>' : '<span>DIY</span>') +
-                                    '<span class="font-medium ' + (isOverdue ? 'text-red-600' : daysUntil <= 3 ? 'text-orange-600' : 'text-blue-600') + '">' +
-                                        (isOverdue ? Math.abs(daysUntil) + ' days overdue' : daysUntil === 0 ? 'Due today' : daysUntil + ' days') +
-                                    '</span>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="flex gap-2 ml-4">' +
-                                '<button onclick="completeTask(' + task.id + ')" class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700">Complete</button>' +
-                                '<button onclick="postponeTask(' + task.id + ')" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300">Postpone</button>' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>';
-            }).join('');
-        }
-
-        function renderAllTasks() {
-            const container = document.getElementById('all-tasks-list');
-            const tasksByCategory = {};
-            
-            maintenanceTasks.forEach(task => {
-                if (!tasksByCategory[task.category]) {
-                    tasksByCategory[task.category] = [];
-                }
-                tasksByCategory[task.category].push(task);
-            });
-
-            container.innerHTML = Object.entries(tasksByCategory).map(([category, tasks]) => 
-                '<div class="border-b border-gray-100 last:border-b-0">' +
-                    '<div class="p-6 bg-gray-50">' +
-                        '<h4 class="font-semibold text-gray-900">' + category + ' (' + tasks.length + ' tasks)</h4>' +
-                    '</div>' +
-                    tasks.map(task => {
-                        const now = new Date();
-                        const daysUntil = Math.ceil((new Date(task.nextDue) - now) / (1000 * 60 * 60 * 24));
-                        const isOverdue = daysUntil < 0;
-                        
-                        return '<div class="p-6 border-b border-gray-100 last:border-b-0 hover:bg-gray-50">' +
-                                '<div class="flex items-start justify-between">' +
-                                    '<div class="flex-1">' +
-                                        '<h5 class="font-medium text-gray-900 mb-1">' + task.title + '</h5>' +
-                                        '<p class="text-sm text-gray-600 mb-2">' + task.description + '</p>' +
-                                        '<div class="flex items-center gap-4 text-xs text-gray-500">' +
-                                            '<span>Every ' + Math.round(task.frequency / 30) + ' months</span>' +
-                                            '<span>Next: ' + new Date(task.nextDue).toLocaleDateString() + '</span>' +
-                                            (task.cost > 0 ? '<span>$' + task.cost + '</span>' : '<span>DIY</span>') +
-                                            '<span class="font-medium ' + (isOverdue ? 'text-red-600' : daysUntil <= 7 ? 'text-orange-600' : 'text-gray-500') + '">' +
-                                                (isOverdue ? 'Overdue' : daysUntil <= 7 ? 'Due soon' : 'Scheduled') +
-                                            '</span>' +
-                                        '</div>' +
-                                    '</div>' +
-                                    '<div class="flex gap-2 ml-4">' +
-                                        '<button onclick="completeTask(' + task.id + ')" class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">Complete</button>' +
-                                        '<button onclick="deleteTask(' + task.id + ')" class="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700">Delete</button>' +
-                                    '</div>' +
-                                '</div>' +
-                            '</div>';
-                    }).join('') +
-                '</div>'
-            ).join('');
-        }
-
-        function renderPropertySummary() {
-            const container = document.getElementById('property-summary');
-            const systems = [];
-            
-            if (userPreferences.hvacSystems && userPreferences.hvacSystems.length > 0) {
-                systems.push('HVAC: ' + userPreferences.hvacSystems.join(', '));
-            }
-            if (userPreferences.features && userPreferences.features.length > 0) {
-                systems.push('Features: ' + userPreferences.features.join(', '));
-            }
-
-            container.innerHTML = 
-                '<div class="space-y-2">' +
-                    '<p><strong>Address:</strong> ' + propertyData.address + '</p>' +
-                    '<p><strong>Built:</strong> ' + propertyData.yearBuilt + ' • <strong>Size:</strong> ' + propertyData.squareFootage + ' sq ft</p>' +
-                    '<p><strong>Bedrooms:</strong> ' + propertyData.bedrooms + ' • <strong>Bathrooms:</strong> ' + propertyData.bathrooms + '</p>' +
-                    '<p><strong>Pets:</strong> ' + (userPreferences.pets === 'yes' ? 'Yes' : 'No') + '</p>' +
-                    '<p><strong>Approach:</strong> ' + userPreferences.approach + '</p>' +
-                    (systems.length > 0 ? '<p><strong>Systems:</strong> ' + systems.join(' • ') + '</p>' : '') +
-                '</div>';
-        }
-
-        // Task management
-        function completeTask(taskId) {
-            const task = maintenanceTasks.find(t => t.id === taskId);
-            if (task) {
-                const today = new Date();
-                task.lastCompleted = today;
-                task.nextDue = new Date(today.getTime() + task.frequency * 24 * 60 * 60 * 1000);
-                updateTaskStats();
-                renderUpcomingTasks();
-                renderAllTasks();
-                saveData();
-                alert('✅ "' + task.title + '" completed! Next due: ' + task.nextDue.toLocaleDateString());
-            }
-        }
-
-        function postponeTask(taskId) {
-            const task = maintenanceTasks.find(t => t.id === taskId);
-            if (task) {
-                const newDate = new Date(task.nextDue.getTime() + 7 * 24 * 60 * 60 * 1000);
-                task.nextDue = newDate;
-                updateTaskStats();
-                renderUpcomingTasks();
-                renderAllTasks();
-                saveData();
-                alert('📅 "' + task.title + '" postponed to ' + newDate.toLocaleDateString());
-            }
-        }
-
-        function deleteTask(taskId) {
-            const task = maintenanceTasks.find(t => t.id === taskId);
-            if (task && confirm('Delete "' + task.title + '"?')) {
-                maintenanceTasks = maintenanceTasks.filter(t => t.id !== taskId);
-                updateTaskStats();
-                renderUpcomingTasks();
-                renderAllTasks();
-                saveData();
-            }
-        }
-
-        function addCustomTask() {
-            const title = prompt('Task title:');
-            if (title) {
-                const newTask = {
-                    id: Math.max(...maintenanceTasks.map(t => t.id), 0) + 1,
-                    title: title,
-                    category: 'Custom',
-                    description: 'Custom maintenance task',
-                    frequency: 365,
-                    cost: 0,
-                    priority: 'medium',
-                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
-                };
-                maintenanceTasks.push(newTask);
-                updateTaskStats();
-                renderUpcomingTasks();
-                renderAllTasks();
-                saveData();
-            }
-        }
-
-        // App navigation
-        function showAppTab(tabName) {
-            document.querySelectorAll('.app-content').forEach(content => {
-                content.classList.add('hidden');
-            });
-            
-            document.querySelectorAll('.app-tab-btn').forEach(btn => {
-                btn.className = 'app-tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium';
-            });
-            
-            document.getElementById('app-' + tabName).classList.remove('hidden');
-            document.getElementById('app-tab-' + tabName).className = 'app-tab-btn bg-blue-100 text-blue-700 px-6 py-3 rounded-lg font-medium';
-        }
-
-        // Modal functions
-        function openModal(title, content, confirmAction) {
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-content').innerHTML = content;
-            document.getElementById('modal-confirm').onclick = confirmAction;
-            document.getElementById('task-modal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('task-modal').classList.add('hidden');
-        }
-
-        function confirmTaskAction() {
-            // This will be set by the specific action functions
-        }
-
-        // Data management
-        function saveData() {
-            const data = {
-                propertyData: propertyData,
-                userPreferences: userPreferences,
-                maintenanceTasks: maintenanceTasks,
-                setupComplete: true,
-                apiKey: apiKey,
-                demoMode: demoMode,
-                version: '1.0'
-            };
-            localStorage.setItem('casaCareData', JSON.stringify(data));
-        }
-
-        function exportData() {
-            const data = {
-                propertyData: propertyData,
-                userPreferences: userPreferences,
-                maintenanceTasks: maintenanceTasks,
-                exportDate: new Date().toISOString()
-            };
-            
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'casa-care-data-' + new Date().toISOString().split('T')[0] + '.json';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function clearData() {
-            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
-                localStorage.removeItem('casaCareData');
-                localStorage.removeItem('casaCareApiKey');
-                localStorage.removeItem('casaCareDemoMode');
-                location.reload();
-            }
-        }
-
-        function restartWizard() {
-            if (confirm('This will clear your current data and start over. Continue?')) {
-                localStorage.removeItem('casaCareData');
-                location.reload();
-            }
-        }
-
-        // Initialize app
-        function initApp() {
-            const savedApiKey = localStorage.getItem('casaCareApiKey');
-            const savedDemoMode = localStorage.getItem('casaCareDemoMode');
-            
-            if (savedApiKey) {
-                apiKey = savedApiKey;
-                demoMode = false;
-            } else if (savedDemoMode) {
-                demoMode = true;
-                apiKey = null;
-            }
-
-            const savedData = localStorage.getItem('casaCareData');
-            
-            if (savedData && (apiKey || demoMode)) {
-                try {
-                    const data = JSON.parse(savedData);
-                    if (data.setupComplete) {
-                        propertyData = data.propertyData;
-                        userPreferences = data.userPreferences;
-                        maintenanceTasks = data.maintenanceTasks.map(task => ({
-                            ...task,
-                            nextDue: new Date(task.nextDue),
-                            lastCompleted: task.lastCompleted ? new Date(task.lastCompleted) : null
-                        }));
-                        
-                        document.getElementById('api-setup').classList.add('hidden');
-                        document.getElementById('setup-wizard').classList.add('hidden');
-                        document.getElementById('main-app').classList.remove('hidden');
-                        initializeMainApp();
-                        return;
-                    }
-                } catch (e) {
-                    console.error('Error loading saved data:', e);
-                }
-            }
-            
-            if (apiKey || demoMode) {
-                document.getElementById('api-setup').classList.add('hidden');
-                document.getElementById('setup-wizard').classList.remove('hidden');
-                updateProgressIndicators();
-            } else {
-                document.getElementById('api-setup').classList.remove('hidden');
-            }
-        }
-
-        // Click outside to close address suggestions
-        document.addEventListener('click', function(event) {
-            const addressInput = document.getElementById('address-input');
-            const suggestions = document.getElementById('address-suggestions');
-            
-            if (addressInput && suggestions && 
-                !addressInput.contains(event.target) && 
-                !suggestions.contains(event.target)) {
-                hideAddressSuggestions();
-            }
-        });
-
-        // Start the app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', initApp);
-    </script>
-</body>
-</html>
+                cost: 0,
+                description: 'Test
