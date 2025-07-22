@@ -17,6 +17,25 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #e5e7eb;
+            border: 1px solid #e5e7eb;
+        }
+
+        .calendar-cell {
+            background: white;
+            min-height: 100px;
+            padding: 8px;
+        }
+
+        .address-suggestions {
+            max-height: 200px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -39,11 +58,24 @@
                 </div>
                 
                 <div class="space-y-6">
-                    <!-- Address -->
-                    <div>
+                    <!-- Address with Autocomplete -->
+                    <div class="relative">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Home Address</label>
                         <input type="text" id="address" placeholder="123 Main St, Anytown, NY 12345" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                               oninput="searchAddress(this.value)">
+                        <div id="address-suggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 shadow-lg hidden address-suggestions z-10">
+                            <!-- Address suggestions will appear here -->
+                        </div>
+                        <div id="property-preview" class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg hidden">
+                            <h4 class="font-medium text-blue-900 mb-2">🔍 Property Information Found</h4>
+                            <div id="property-details" class="text-sm text-blue-800">
+                                <!-- Property details will be populated here -->
+                            </div>
+                            <button type="button" onclick="applyPropertyData()" class="mt-2 bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+                                Use This Information
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Basic Property Info -->
@@ -131,17 +163,23 @@
         <div id="main-app" class="hidden">
             <!-- Navigation -->
             <div class="max-w-6xl mx-auto px-4 py-6">
-                <div class="flex space-x-1 bg-white rounded-xl p-2 shadow-lg">
-                    <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn bg-blue-100 text-blue-700 px-6 py-3 rounded-lg font-medium">
+                <div class="flex flex-wrap space-x-1 bg-white rounded-xl p-2 shadow-lg">
+                    <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn bg-blue-100 text-blue-700 px-4 py-3 rounded-lg font-medium text-sm">
                         📅 Dashboard
                     </button>
-                    <button onclick="showTab('tasks')" id="tab-tasks" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                    <button onclick="showTab('tasks')" id="tab-tasks" class="tab-btn text-gray-600 hover:text-gray-900 px-4 py-3 rounded-lg font-medium text-sm">
                         ✅ All Tasks
                     </button>
-                    <button onclick="showTab('calendar')" id="tab-calendar" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                    <button onclick="showTab('calendar')" id="tab-calendar" class="tab-btn text-gray-600 hover:text-gray-900 px-4 py-3 rounded-lg font-medium text-sm">
                         📆 Calendar
                     </button>
-                    <button onclick="showTab('settings')" id="tab-settings" class="tab-btn text-gray-600 hover:text-gray-900 px-6 py-3 rounded-lg font-medium">
+                    <button onclick="showTab('appliances')" id="tab-appliances" class="tab-btn text-gray-600 hover:text-gray-900 px-4 py-3 rounded-lg font-medium text-sm">
+                        🔧 Appliances
+                    </button>
+                    <button onclick="showTab('contractors')" id="tab-contractors" class="tab-btn text-gray-600 hover:text-gray-900 px-4 py-3 rounded-lg font-medium text-sm">
+                        👷 Contractors
+                    </button>
+                    <button onclick="showTab('settings')" id="tab-settings" class="tab-btn text-gray-600 hover:text-gray-900 px-4 py-3 rounded-lg font-medium text-sm">
                         ⚙️ Settings
                     </button>
                 </div>
@@ -214,9 +252,14 @@
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
                     <div class="p-6 border-b border-gray-100 flex items-center justify-between">
                         <h3 class="text-xl font-bold text-gray-900">All Maintenance Tasks</h3>
-                        <button onclick="addTask()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                            ➕ Add Task
-                        </button>
+                        <div class="flex gap-3">
+                            <button onclick="addSeasonalTasks()" class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700">
+                                🍂 Add Seasonal Tasks
+                            </button>
+                            <button onclick="addTask()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                ➕ Add Task
+                            </button>
+                        </div>
                     </div>
                     <div id="all-tasks-list">
                         <!-- All tasks will be populated here -->
@@ -227,9 +270,68 @@
             <!-- Calendar Tab -->
             <div id="calendar-content" class="tab-content hidden max-w-6xl mx-auto px-4 pb-8">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-6">Maintenance Calendar</h3>
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-gray-900">Maintenance Calendar</h3>
+                        <div class="flex items-center gap-4">
+                            <button onclick="changeMonth(-1)" class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-lg">
+                                ← Previous
+                            </button>
+                            <span id="current-month-year" class="font-semibold text-lg">
+                                <!-- Current month/year will be displayed here -->
+                            </span>
+                            <button onclick="changeMonth(1)" class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-lg">
+                                Next →
+                            </button>
+                        </div>
+                    </div>
                     <div id="calendar-view">
-                        <!-- Calendar view will be populated here -->
+                        <!-- Calendar grid will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appliances Tab -->
+            <div id="appliances-content" class="tab-content hidden max-w-6xl mx-auto px-4 pb-8">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="text-xl font-bold text-gray-900">Home Appliances & Equipment</h3>
+                        <button onclick="addAppliance()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            ➕ Add Appliance
+                        </button>
+                    </div>
+                    <div id="appliances-list">
+                        <!-- Appliances will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contractors Tab -->
+            <div id="contractors-content" class="tab-content hidden max-w-6xl mx-auto px-4 pb-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Repair Records -->
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-gray-900">Repair Records</h3>
+                            <button onclick="addRepairRecord()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                ➕ Add Record
+                            </button>
+                        </div>
+                        <div id="repair-records-list">
+                            <!-- Repair records will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Contractor Directory -->
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-gray-900">Contractor Directory</h3>
+                            <button onclick="addContractor()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                                ➕ Add Contractor
+                            </button>
+                        </div>
+                        <div id="contractors-list">
+                            <!-- Contractors will be populated here -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -273,23 +375,157 @@
             <div class="bg-white rounded-xl max-w-md w-full mx-4 p-6">
                 <h3 class="text-xl font-bold mb-4" id="modal-title">Add Task</h3>
                 <div class="space-y-4">
-                    <input type="text" id="task-title" placeholder="Task name" 
-                           class="w-full p-3 border rounded-lg">
-                    <select id="task-category" class="w-full p-3 border rounded-lg">
-                        <option value="HVAC">HVAC</option>
-                        <option value="Water Systems">Water Systems</option>
-                        <option value="Exterior">Exterior</option>
-                        <option value="Safety">Safety</option>
-                        <option value="General">General</option>
-                    </select>
-                    <input type="number" id="task-cost" placeholder="Estimated cost" 
-                           class="w-full p-3 border rounded-lg">
-                    <textarea id="task-notes" placeholder="Notes and description" 
-                              class="w-full p-3 border rounded-lg" rows="3"></textarea>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Task Name</label>
+                        <input type="text" id="task-title" placeholder="e.g., Replace HVAC Filter" 
+                               class="w-full p-3 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select id="task-category" class="w-full p-3 border rounded-lg">
+                            <option value="HVAC">HVAC</option>
+                            <option value="Water Systems">Water Systems</option>
+                            <option value="Exterior">Exterior</option>
+                            <option value="Safety">Safety</option>
+                            <option value="General">General</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Estimated Cost ($)</label>
+                        <input type="number" id="task-cost" placeholder="0" 
+                               class="w-full p-3 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Frequency (days)</label>
+                        <input type="number" id="task-frequency" placeholder="365" value="365"
+                               class="w-full p-3 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes & Description</label>
+                        <textarea id="task-notes" placeholder="Additional details about this task..." 
+                                  class="w-full p-3 border rounded-lg" rows="3"></textarea>
+                    </div>
                 </div>
                 <div class="flex gap-3 mt-6">
                     <button onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg">Cancel</button>
                     <button onclick="saveTask()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Save Task</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appliance Modal -->
+        <div id="appliance-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+            <div class="bg-white rounded-xl max-w-lg w-full mx-4 p-6">
+                <h3 class="text-xl font-bold mb-4" id="appliance-modal-title">Add Appliance</h3>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Appliance Name</label>
+                            <input type="text" id="appliance-name" placeholder="e.g., Main HVAC Unit" 
+                                   class="w-full p-3 border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                            <select id="appliance-type" class="w-full p-3 border rounded-lg">
+                                <option value="HVAC">HVAC System</option>
+                                <option value="Water Heater">Water Heater</option>
+                                <option value="Washer">Washer</option>
+                                <option value="Dryer">Dryer</option>
+                                <option value="Refrigerator">Refrigerator</option>
+                                <option value="Dishwasher">Dishwasher</option>
+                                <option value="Range/Oven">Range/Oven</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+                            <input type="text" id="appliance-brand" placeholder="e.g., Carrier" 
+                                   class="w-full p-3 border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Model Number</label>
+                            <input type="text" id="appliance-model" placeholder="e.g., 24ABC6" 
+                                   class="w-full p-3 border rounded-lg">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Install Date</label>
+                            <input type="date" id="appliance-install-date" 
+                                   class="w-full p-3 border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Warranty Expires</label>
+                            <input type="date" id="appliance-warranty" 
+                                   class="w-full p-3 border rounded-lg">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                        <textarea id="appliance-notes" placeholder="Additional information, serial numbers, etc." 
+                                  class="w-full p-3 border rounded-lg" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeApplianceModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg">Cancel</button>
+                    <button onclick="saveAppliance()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Save Appliance</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seasonal Tasks Modal -->
+        <div id="seasonal-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+            <div class="bg-white rounded-xl max-w-2xl w-full mx-4 p-6">
+                <h3 class="text-xl font-bold mb-4">Add Seasonal Tasks</h3>
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-orange-600 mb-3">🍂 Fall Tasks</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="fall-gutters" checked>
+                                <span class="text-sm">Clean gutters & downspouts</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="fall-furnace">
+                                <span class="text-sm">Schedule furnace inspection</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="fall-chimney">
+                                <span class="text-sm">Chimney cleaning</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="fall-weatherstrip">
+                                <span class="text-sm">Check weatherstripping</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-green-600 mb-3">🌸 Spring Tasks</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="spring-ac" checked>
+                                <span class="text-sm">AC system tune-up</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="spring-deck">
+                                <span class="text-sm">Deck inspection & cleaning</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="spring-exterior">
+                                <span class="text-sm">Exterior pressure washing</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="spring-irrigation">
+                                <span class="text-sm">Irrigation system check</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeSeasonalModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg">Cancel</button>
+                    <button onclick="saveSeasonalTasks()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg">Add Selected Tasks</button>
                 </div>
             </div>
         </div>
@@ -299,7 +535,153 @@
         // App data
         let homeData = {};
         let tasks = [];
+        let appliances = [];
+        let repairRecords = [];
+        let contractors = [];
         let currentEditingTask = null;
+        let currentEditingAppliance = null;
+        let currentPropertyData = null;
+        let currentCalendarDate = new Date();
+
+        // Mock property data for address lookup
+        const mockPropertyDatabase = {
+            '123 oak st': {
+                address: '123 Oak Street, Springfield, IL 62701',
+                yearBuilt: 1978,
+                sqft: 2400,
+                bedrooms: 3,
+                bathrooms: 2,
+                lotSize: 0.3,
+                propertyType: 'Single Family',
+                features: {
+                    centralAC: true,
+                    fireplace: true,
+                    deck: true,
+                    pool: false,
+                    septic: false,
+                    wellWater: false,
+                    miniSplits: false
+                }
+            },
+            '456 pine ave': {
+                address: '456 Pine Avenue, Portland, OR 97201',
+                yearBuilt: 2010,
+                sqft: 1800,
+                bedrooms: 2,
+                bathrooms: 2.5,
+                lotSize: 0.15,
+                propertyType: 'Townhome',
+                features: {
+                    centralAC: true,
+                    fireplace: false,
+                    deck: true,
+                    pool: false,
+                    septic: false,
+                    wellWater: false,
+                    miniSplits: true
+                }
+            },
+            '789 main street': {
+                address: '789 Main Street, Austin, TX 78701',
+                yearBuilt: 1995,
+                sqft: 3200,
+                bedrooms: 4,
+                bathrooms: 3,
+                lotSize: 0.5,
+                propertyType: 'Single Family',
+                features: {
+                    centralAC: true,
+                    fireplace: true,
+                    deck: true,
+                    pool: true,
+                    septic: false,
+                    wellWater: false,
+                    miniSplits: false
+                }
+            }
+        };
+
+        // Address search with mock API
+        function searchAddress(query) {
+            const suggestions = document.getElementById('address-suggestions');
+            
+            if (!query || query.length < 3) {
+                suggestions.classList.add('hidden');
+                return;
+            }
+
+            // Mock address search results
+            const matches = Object.keys(mockPropertyDatabase)
+                .filter(addr => addr.includes(query.toLowerCase()))
+                .map(key => mockPropertyDatabase[key]);
+
+            if (matches.length > 0) {
+                suggestions.innerHTML = matches.map(property => `
+                    <div class="p-3 hover:bg-gray-50 cursor-pointer" onclick="selectAddress('${property.address}')">
+                        <div class="font-medium">${property.address}</div>
+                        <div class="text-sm text-gray-600">${property.yearBuilt} • ${property.sqft.toLocaleString()} sq ft • ${property.propertyType}</div>
+                    </div>
+                `).join('');
+                suggestions.classList.remove('hidden');
+            } else {
+                suggestions.classList.add('hidden');
+            }
+        }
+
+        // Select address from suggestions
+        function selectAddress(address) {
+            document.getElementById('address').value = address;
+            document.getElementById('address-suggestions').classList.add('hidden');
+            
+            // Find property data
+            const propertyKey = Object.keys(mockPropertyDatabase)
+                .find(key => mockPropertyDatabase[key].address === address);
+            
+            if (propertyKey) {
+                currentPropertyData = mockPropertyDatabase[propertyKey];
+                showPropertyPreview(currentPropertyData);
+            }
+        }
+
+        // Show property preview
+        function showPropertyPreview(property) {
+            const preview = document.getElementById('property-preview');
+            const details = document.getElementById('property-details');
+            
+            details.innerHTML = `
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div><strong>Year Built:</strong> ${property.yearBuilt}</div>
+                    <div><strong>Size:</strong> ${property.sqft.toLocaleString()} sq ft</div>
+                    <div><strong>Bedrooms:</strong> ${property.bedrooms}</div>
+                    <div><strong>Bathrooms:</strong> ${property.bathrooms}</div>
+                    <div><strong>Type:</strong> ${property.propertyType}</div>
+                    <div><strong>Lot:</strong> ${property.lotSize} acres</div>
+                </div>
+            `;
+            
+            preview.classList.remove('hidden');
+        }
+
+        // Apply property data to form
+        function applyPropertyData() {
+            if (currentPropertyData) {
+                document.getElementById('year-built').value = currentPropertyData.yearBuilt;
+                document.getElementById('sqft').value = currentPropertyData.sqft;
+                
+                // Apply features
+                const features = currentPropertyData.features;
+                document.getElementById('central-ac').checked = features.centralAC;
+                document.getElementById('mini-splits').checked = features.miniSplits;
+                document.getElementById('well-water').checked = features.wellWater;
+                document.getElementById('septic').checked = features.septic;
+                document.getElementById('fireplace').checked = features.fireplace;
+                document.getElementById('pool').checked = features.pool;
+                document.getElementById('deck').checked = features.deck;
+                
+                document.getElementById('property-preview').classList.add('hidden');
+                alert('✅ Property information applied! You can still modify any details before creating your plan.');
+            }
+        }
 
         // Create maintenance plan
         function createMaintenancePlan() {
@@ -330,6 +712,9 @@
             // Generate tasks
             generateTasks();
 
+            // Add default appliances based on features
+            generateDefaultAppliances();
+
             // Show main app
             document.getElementById('setup-form').style.display = 'none';
             document.getElementById('main-app').classList.remove('hidden');
@@ -337,6 +722,42 @@
             // Initialize dashboard
             updateDashboard();
             saveData();
+        }
+
+        // Generate default appliances
+        function generateDefaultAppliances() {
+            appliances = [];
+            let id = 1;
+
+            if (homeData.features.centralAC) {
+                appliances.push({
+                    id: id++,
+                    name: 'Central HVAC System',
+                    type: 'HVAC',
+                    brand: 'Unknown',
+                    model: 'Unknown',
+                    installDate: '',
+                    warrantyExpires: '',
+                    notes: 'Auto-generated from home setup',
+                    filterType: '16x25x1 MERV 8',
+                    replacementParts: ['Air Filter', 'Thermostat Batteries']
+                });
+            }
+
+            // Always add common appliances
+            appliances.push(
+                {
+                    id: id++,
+                    name: 'Water Heater',
+                    type: 'Water Heater',
+                    brand: 'Unknown',
+                    model: 'Unknown',
+                    installDate: '',
+                    warrantyExpires: '',
+                    notes: 'Standard water heater',
+                    replacementParts: ['Anode Rod', 'Temperature Relief Valve']
+                }
+            );
         }
 
         // Generate maintenance tasks
@@ -347,9 +768,6 @@
             // Frequency modifiers
             const freqMod = homeData.approach === 'proactive' ? 0.8 : homeData.approach === 'minimal' ? 1.3 : 1.0;
             const petMod = homeData.hasPets ? 0.75 : 1.0;
-            const homeAge = new Date().getFullYear() - homeData.yearBuilt;
-
-            console.log('Generating tasks with frequency modifier:', freqMod);
 
             // HVAC Tasks
             if (homeData.features.centralAC) {
@@ -362,7 +780,8 @@
                     priority: 'high',
                     description: 'Replace central air system filter',
                     nextDue: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    lastCompleted: null,
+                    isCompleted: false
                 });
 
                 tasks.push({
@@ -374,7 +793,8 @@
                     priority: 'medium',
                     description: 'Annual professional HVAC maintenance',
                     nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    lastCompleted: null,
+                    isCompleted: false
                 });
             }
 
@@ -388,7 +808,8 @@
                     priority: 'medium',
                     description: 'Clean mini-split unit filters',
                     nextDue: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    lastCompleted: null,
+                    isCompleted: false
                 });
             }
 
@@ -403,7 +824,8 @@
                     priority: 'high',
                     description: 'Annual water quality testing',
                     nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    lastCompleted: null,
+                    isCompleted: false
                 });
             }
 
@@ -412,12 +834,13 @@
                     id: id++,
                     title: 'Septic Tank Pumping',
                     category: 'Water Systems',
-                    frequency: Math.round(1460 * freqMod), // 4 years
+                    frequency: Math.round(1460 * freqMod),
                     cost: 400,
                     priority: 'high',
                     description: 'Professional septic pumping',
                     nextDue: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    lastCompleted: null,
+                    isCompleted: false
                 });
             }
 
@@ -432,7 +855,8 @@
                     priority: 'high',
                     description: 'Professional chimney cleaning and inspection',
                     nextDue: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    lastCompleted: null,
+                    isCompleted: false
                 });
             }
 
@@ -441,12 +865,13 @@
                     id: id++,
                     title: 'Deck Staining/Sealing',
                     category: 'Exterior',
-                    frequency: Math.round(730 * freqMod), // 2 years
+                    frequency: Math.round(730 * freqMod),
                     cost: 200,
                     priority: 'medium',
                     description: 'Stain or seal deck to protect from weather',
                     nextDue: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    lastCompleted: null,
+                    isCompleted: false
                 });
             }
 
@@ -455,12 +880,13 @@
                     id: id++,
                     title: 'Pool Opening/Closing',
                     category: 'General',
-                    frequency: Math.round(182 * freqMod), // 6 months
+                    frequency: Math.round(182 * freqMod),
                     cost: 300,
                     priority: 'high',
                     description: 'Seasonal pool opening and closing',
                     nextDue: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    lastCompleted: null,
+                    isCompleted: false
                 });
             }
 
@@ -470,23 +896,25 @@
                     id: id++,
                     title: 'Clean Gutters',
                     category: 'Exterior',
-                    frequency: Math.round(182 * freqMod), // 6 months
+                    frequency: Math.round(182 * freqMod),
                     cost: 150,
                     priority: 'medium',
                     description: 'Clean gutters and downspouts',
                     nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    lastCompleted: null,
+                    isCompleted: false
                 },
                 {
                     id: id++,
                     title: 'Test Smoke Detectors',
                     category: 'Safety',
-                    frequency: Math.round(180 * freqMod), // 6 months
+                    frequency: Math.round(180 * freqMod),
                     cost: 0,
                     priority: 'high',
                     description: 'Test all smoke and carbon monoxide detectors',
                     nextDue: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    lastCompleted: null,
+                    isCompleted: false
                 },
                 {
                     id: id++,
@@ -497,7 +925,8 @@
                     priority: 'low',
                     description: 'Check and replace caulking around windows and doors',
                     nextDue: new Date(Date.now() + 75 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null
+                    lastCompleted: null,
+                    isCompleted: false
                 }
             );
 
@@ -531,6 +960,10 @@
                 renderAllTasks();
             } else if (tabName === 'calendar') {
                 renderCalendar();
+            } else if (tabName === 'appliances') {
+                renderAppliances();
+            } else if (tabName === 'contractors') {
+                renderContractors();
             } else if (tabName === 'settings') {
                 updateSettings();
             }
@@ -550,10 +983,10 @@
             let totalCost = 0;
 
             tasks.forEach(task => {
-                if (task.nextDue < now) {
+                if (!task.isCompleted && task.nextDue < now) {
                     overdueCount++;
                 }
-                if (task.nextDue <= oneWeek) {
+                if (!task.isCompleted && task.nextDue <= oneWeek) {
                     weekCount++;
                 }
                 totalCost += task.cost * (365 / task.frequency);
@@ -562,7 +995,7 @@
             // Update stats
             document.getElementById('overdue-count').textContent = overdueCount;
             document.getElementById('week-count').textContent = weekCount;
-            document.getElementById('total-count').textContent = tasks.length;
+            document.getElementById('total-count').textContent = tasks.filter(t => !t.isCompleted).length;
             document.getElementById('annual-cost').textContent = '$' + Math.round(totalCost);
 
             // Render upcoming tasks
@@ -573,11 +1006,12 @@
         function renderTasks() {
             const tasksList = document.getElementById('tasks-list');
             const upcomingTasks = tasks
+                .filter(task => !task.isCompleted)
                 .sort((a, b) => a.nextDue - b.nextDue)
                 .slice(0, 10);
 
             if (upcomingTasks.length === 0) {
-                tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">No tasks scheduled</div>';
+                tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All tasks complete! Great job maintaining your home.</div>';
                 return;
             }
 
@@ -612,10 +1046,10 @@
         // Render all tasks
         function renderAllTasks() {
             const tasksList = document.getElementById('all-tasks-list');
-            const sortedTasks = tasks.sort((a, b) => a.nextDue - b.nextDue);
+            const sortedTasks = tasks.filter(t => !t.isCompleted).sort((a, b) => a.nextDue - b.nextDue);
 
             if (sortedTasks.length === 0) {
-                tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">No tasks found</div>';
+                tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All maintenance tasks complete!</div>';
                 return;
             }
 
@@ -658,12 +1092,85 @@
             if (task) {
                 task.lastCompleted = new Date();
                 task.nextDue = new Date(Date.now() + task.frequency * 24 * 60 * 60 * 1000);
+                task.isCompleted = false; // Will be due again in the future
+                
                 updateDashboard();
+                renderCalendar(); // Update calendar if visible
                 saveData();
                 
                 // Show completion message
                 alert(`✅ Task "${task.title}" completed! Next due: ${task.nextDue.toLocaleDateString()}`);
             }
+        }
+
+        // Calendar functions
+        function changeMonth(direction) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const calendarView = document.getElementById('calendar-view');
+            const monthYear = document.getElementById('current-month-year');
+            
+            // Update month/year display
+            monthYear.textContent = currentCalendarDate.toLocaleDateString('en-US', { 
+                month: 'long', 
+                year: 'numeric' 
+            });
+
+            // Get first day of month and days in month
+            const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
+            const lastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay()); // Start from Sunday
+
+            // Generate calendar grid
+            let calendarHTML = '<div class="calendar-grid">';
+            
+            // Day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                calendarHTML += `<div class="bg-gray-100 p-2 font-semibold text-center text-sm">${day}</div>`;
+            });
+
+            // Calendar days
+            const today = new Date();
+            const currentDate = new Date(startDate);
+            
+            for (let i = 0; i < 42; i++) { // 6 weeks * 7 days
+                const isCurrentMonth = currentDate.getMonth() === currentCalendarDate.getMonth();
+                const isToday = currentDate.toDateString() === today.toDateString();
+                
+                // Find tasks for this date
+                const dayTasks = tasks.filter(task => {
+                    const taskDate = new Date(task.nextDue);
+                    return taskDate.toDateString() === currentDate.toDateString() && !task.isCompleted;
+                });
+
+                let cellClass = 'calendar-cell';
+                if (!isCurrentMonth) cellClass += ' text-gray-400 bg-gray-50';
+                if (isToday) cellClass += ' bg-blue-50 border border-blue-200';
+
+                calendarHTML += `
+                    <div class="${cellClass}">
+                        <div class="font-medium ${isToday ? 'text-blue-600' : ''}">${currentDate.getDate()}</div>
+                        <div class="mt-1 space-y-1">
+                            ${dayTasks.map(task => {
+                                const daysUntilDue = Math.ceil((task.nextDue - today) / (24 * 60 * 60 * 1000));
+                                const overdue = daysUntilDue < 0;
+                                const colorClass = overdue ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700';
+                                return `<div class="${colorClass} text-xs p-1 rounded truncate" title="${task.title} - ${task.description}">${task.title}</div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            calendarHTML += '</div>';
+            calendarView.innerHTML = calendarHTML;
         }
 
         // Add task
@@ -673,6 +1180,7 @@
             document.getElementById('task-title').value = '';
             document.getElementById('task-category').value = 'General';
             document.getElementById('task-cost').value = '';
+            document.getElementById('task-frequency').value = '365';
             document.getElementById('task-notes').value = '';
             document.getElementById('task-modal').classList.remove('hidden');
         }
@@ -686,6 +1194,7 @@
                 document.getElementById('task-title').value = task.title;
                 document.getElementById('task-category').value = task.category;
                 document.getElementById('task-cost').value = task.cost;
+                document.getElementById('task-frequency').value = task.frequency;
                 document.getElementById('task-notes').value = task.description;
                 document.getElementById('task-modal').classList.remove('hidden');
             }
@@ -696,6 +1205,7 @@
             const title = document.getElementById('task-title').value;
             const category = document.getElementById('task-category').value;
             const cost = parseInt(document.getElementById('task-cost').value) || 0;
+            const frequency = parseInt(document.getElementById('task-frequency').value) || 365;
             const notes = document.getElementById('task-notes').value;
 
             if (!title.trim()) {
@@ -708,6 +1218,7 @@
                 currentEditingTask.title = title;
                 currentEditingTask.category = category;
                 currentEditingTask.cost = cost;
+                currentEditingTask.frequency = frequency;
                 currentEditingTask.description = notes;
             } else {
                 // Add new task
@@ -715,12 +1226,13 @@
                     id: Math.max(...tasks.map(t => t.id), 0) + 1,
                     title: title,
                     category: category,
-                    frequency: 365, // Default to yearly
+                    frequency: frequency,
                     cost: cost,
                     priority: 'medium',
                     description: notes,
-                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Due in 30 days
-                    lastCompleted: null
+                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                    lastCompleted: null,
+                    isCompleted: false
                 };
                 tasks.push(newTask);
             }
@@ -736,34 +1248,309 @@
             currentEditingTask = null;
         }
 
-        // Render calendar
-        function renderCalendar() {
-            const calendarView = document.getElementById('calendar-view');
-            const now = new Date();
-            const monthTasks = tasks.filter(task => {
-                const taskDate = new Date(task.nextDue);
-                return taskDate.getMonth() === now.getMonth() && taskDate.getFullYear() === now.getFullYear();
+        // Seasonal tasks
+        function addSeasonalTasks() {
+            document.getElementById('seasonal-modal').classList.remove('hidden');
+        }
+
+        function closeSeasonalModal() {
+            document.getElementById('seasonal-modal').classList.add('hidden');
+        }
+
+        function saveSeasonalTasks() {
+            const seasonalTasks = [
+                // Fall tasks
+                { id: 'fall-gutters', title: 'Clean Gutters & Downspouts', category: 'Exterior', cost: 150, season: 'fall' },
+                { id: 'fall-furnace', title: 'Schedule Furnace Inspection', category: 'HVAC', cost: 100, season: 'fall' },
+                { id: 'fall-chimney', title: 'Chimney Cleaning', category: 'Safety', cost: 300, season: 'fall' },
+                { id: 'fall-weatherstrip', title: 'Check Weatherstripping', category: 'General', cost: 50, season: 'fall' },
+                // Spring tasks
+                { id: 'spring-ac', title: 'AC System Tune-up', category: 'HVAC', cost: 120, season: 'spring' },
+                { id: 'spring-deck', title: 'Deck Inspection & Cleaning', category: 'Exterior', cost: 100, season: 'spring' },
+                { id: 'spring-exterior', title: 'Exterior Pressure Washing', category: 'Exterior', cost: 200, season: 'spring' },
+                { id: 'spring-irrigation', title: 'Irrigation System Check', category: 'General', cost: 75, season: 'spring' }
+            ];
+
+            let addedCount = 0;
+            let nextId = Math.max(...tasks.map(t => t.id), 0) + 1;
+
+            seasonalTasks.forEach(seasonalTask => {
+                const checkbox = document.getElementById(seasonalTask.id);
+                if (checkbox && checkbox.checked) {
+                    // Calculate due date based on season
+                    let dueDate = new Date();
+                    if (seasonalTask.season === 'fall') {
+                        dueDate.setMonth(9, 15); // October 15
+                    } else if (seasonalTask.season === 'spring') {
+                        dueDate.setMonth(3, 15); // April 15
+                    }
+
+                    // If the date has passed this year, set for next year
+                    if (dueDate < new Date()) {
+                        dueDate.setFullYear(dueDate.getFullYear() + 1);
+                    }
+
+                    const newTask = {
+                        id: nextId++,
+                        title: seasonalTask.title,
+                        category: seasonalTask.category,
+                        frequency: 365, // Yearly
+                        cost: seasonalTask.cost,
+                        priority: 'medium',
+                        description: `Seasonal ${seasonalTask.season} maintenance task`,
+                        nextDue: dueDate,
+                        lastCompleted: null,
+                        isCompleted: false
+                    };
+
+                    tasks.push(newTask);
+                    addedCount++;
+                }
             });
 
-            if (monthTasks.length === 0) {
-                calendarView.innerHTML = '<p class="text-gray-500 text-center">No tasks scheduled for this month</p>';
+            closeSeasonalModal();
+            
+            if (addedCount > 0) {
+                updateDashboard();
+                saveData();
+                alert(`✅ Added ${addedCount} seasonal task${addedCount === 1 ? '' : 's'} to your maintenance plan!`);
+            }
+        }
+
+        // Appliance management
+        function addAppliance() {
+            currentEditingAppliance = null;
+            document.getElementById('appliance-modal-title').textContent = 'Add Appliance';
+            document.getElementById('appliance-name').value = '';
+            document.getElementById('appliance-type').value = 'HVAC';
+            document.getElementById('appliance-brand').value = '';
+            document.getElementById('appliance-model').value = '';
+            document.getElementById('appliance-install-date').value = '';
+            document.getElementById('appliance-warranty').value = '';
+            document.getElementById('appliance-notes').value = '';
+            document.getElementById('appliance-modal').classList.remove('hidden');
+        }
+
+        function closeApplianceModal() {
+            document.getElementById('appliance-modal').classList.add('hidden');
+            currentEditingAppliance = null;
+        }
+
+        function saveAppliance() {
+            const name = document.getElementById('appliance-name').value;
+            const type = document.getElementById('appliance-type').value;
+            const brand = document.getElementById('appliance-brand').value;
+            const model = document.getElementById('appliance-model').value;
+            const installDate = document.getElementById('appliance-install-date').value;
+            const warranty = document.getElementById('appliance-warranty').value;
+            const notes = document.getElementById('appliance-notes').value;
+
+            if (!name.trim()) {
+                alert('Please enter an appliance name');
                 return;
             }
 
-            calendarView.innerHTML = `
-                <h4 class="font-semibold text-lg mb-4">${now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</h4>
-                <div class="space-y-3">
-                    ${monthTasks.map(task => `
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <div>
-                                <div class="font-medium">${task.title}</div>
-                                <div class="text-sm text-gray-600">${task.nextDue.toLocaleDateString()}</div>
+            if (currentEditingAppliance) {
+                // Update existing appliance
+                currentEditingAppliance.name = name;
+                currentEditingAppliance.type = type;
+                currentEditingAppliance.brand = brand;
+                currentEditingAppliance.model = model;
+                currentEditingAppliance.installDate = installDate;
+                currentEditingAppliance.warrantyExpires = warranty;
+                currentEditingAppliance.notes = notes;
+            } else {
+                // Add new appliance
+                const newAppliance = {
+                    id: Math.max(...appliances.map(a => a.id), 0) + 1,
+                    name: name,
+                    type: type,
+                    brand: brand,
+                    model: model,
+                    installDate: installDate,
+                    warrantyExpires: warranty,
+                    notes: notes,
+                    replacementParts: getReplacementParts(type)
+                };
+                appliances.push(newAppliance);
+            }
+
+            closeApplianceModal();
+            renderAppliances();
+            saveData();
+        }
+
+        function getReplacementParts(type) {
+            const partsByType = {
+                'HVAC': ['Air Filter', 'Thermostat Batteries', 'Blower Motor'],
+                'Water Heater': ['Anode Rod', 'Temperature Relief Valve', 'Heating Element'],
+                'Washer': ['Water Inlet Valve', 'Drive Belt', 'Door Seal'],
+                'Dryer': ['Lint Filter', 'Drive Belt', 'Thermal Fuse'],
+                'Refrigerator': ['Water Filter', 'Door Seal', 'Thermostat'],
+                'Dishwasher': ['Water Filter', 'Door Seal', 'Spray Arm'],
+                'Range/Oven': ['Heating Element', 'Igniter', 'Door Seal']
+            };
+            return partsByType[type] || ['General maintenance parts'];
+        }
+
+        function renderAppliances() {
+            const appliancesList = document.getElementById('appliances-list');
+            
+            if (appliances.length === 0) {
+                appliancesList.innerHTML = '<div class="p-6 text-center text-gray-500">No appliances added yet. Click "Add Appliance" to get started.</div>';
+                return;
+            }
+
+            appliancesList.innerHTML = appliances.map(appliance => {
+                const warrantyStatus = appliance.warrantyExpires && new Date(appliance.warrantyExpires) > new Date() ? 
+                    `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Under Warranty</span>` :
+                    `<span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">Warranty Expired</span>`;
+
+                return `
+                    <div class="p-6 border-b hover:bg-gray-50">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900">${appliance.name}</h4>
+                                <div class="text-sm text-gray-600 mt-1">
+                                    <div class="flex items-center gap-4 mb-2">
+                                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">${appliance.type}</span>
+                                        ${appliance.warrantyExpires ? warrantyStatus : ''}
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div><strong>Brand:</strong> ${appliance.brand || 'Unknown'}</div>
+                                        <div><strong>Model:</strong> ${appliance.model || 'Unknown'}</div>
+                                        ${appliance.installDate ? `<div><strong>Installed:</strong> ${new Date(appliance.installDate).toLocaleDateString()}</div>` : ''}
+                                        ${appliance.warrantyExpires ? `<div><strong>Warranty:</strong> ${new Date(appliance.warrantyExpires).toLocaleDateString()}</div>` : ''}
+                                    </div>
+                                    ${appliance.replacementParts ? `
+                                        <div class="mt-2">
+                                            <strong>Common Parts:</strong> ${appliance.replacementParts.join(', ')}
+                                        </div>
+                                    ` : ''}
+                                    ${appliance.notes ? `<div class="mt-2"><strong>Notes:</strong> ${appliance.notes}</div>` : ''}
+                                </div>
                             </div>
-                            <div class="text-sm text-gray-600">$${task.cost}</div>
+                            <div class="flex gap-2 ml-4">
+                                <button onclick="editAppliance(${appliance.id})" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 text-sm">
+                                    ✏️ Edit
+                                </button>
+                                <button onclick="findParts(${appliance.id})" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 text-sm">
+                                    🔧 Parts
+                                </button>
+                            </div>
                         </div>
-                    `).join('')}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function editAppliance(applianceId) {
+            const appliance = appliances.find(a => a.id === applianceId);
+            if (appliance) {
+                currentEditingAppliance = appliance;
+                document.getElementById('appliance-modal-title').textContent = 'Edit Appliance';
+                document.getElementById('appliance-name').value = appliance.name;
+                document.getElementById('appliance-type').value = appliance.type;
+                document.getElementById('appliance-brand').value = appliance.brand || '';
+                document.getElementById('appliance-model').value = appliance.model || '';
+                document.getElementById('appliance-install-date').value = appliance.installDate || '';
+                document.getElementById('appliance-warranty').value = appliance.warrantyExpires || '';
+                document.getElementById('appliance-notes').value = appliance.notes || '';
+                document.getElementById('appliance-modal').classList.remove('hidden');
+            }
+        }
+
+        function findParts(applianceId) {
+            const appliance = appliances.find(a => a.id === applianceId);
+            if (appliance) {
+                let searchQuery = `${appliance.brand} ${appliance.model} replacement parts`;
+                alert(`🔧 Finding parts for ${appliance.name}\n\nIn a real app, this would:\n• Search for ${appliance.brand} ${appliance.model} parts\n• Show compatible filters, belts, etc.\n• Link to online stores\n• Track part numbers and prices`);
+            }
+        }
+
+        // Contractor management
+        function renderContractors() {
+            renderRepairRecords();
+            renderContractorDirectory();
+        }
+
+        function addRepairRecord() {
+            const description = prompt('Enter repair description:');
+            const contractor = prompt('Contractor name:');
+            const cost = prompt('Total cost (numbers only):');
+            
+            if (description && contractor) {
+                const newRecord = {
+                    id: Math.max(...repairRecords.map(r => r.id), 0) + 1,
+                    date: new Date().toISOString().split('T')[0],
+                    description: description,
+                    contractor: contractor,
+                    cost: parseInt(cost) || 0,
+                    notes: ''
+                };
+                repairRecords.push(newRecord);
+                renderRepairRecords();
+                saveData();
+            }
+        }
+
+        function addContractor() {
+            const name = prompt('Contractor/Company name:');
+            const specialty = prompt('Specialty (e.g., HVAC, Plumbing):');
+            const phone = prompt('Phone number:');
+            
+            if (name) {
+                const newContractor = {
+                    id: Math.max(...contractors.map(c => c.id), 0) + 1,
+                    name: name,
+                    specialty: specialty || 'General',
+                    phone: phone || '',
+                    email: '',
+                    rating: 0,
+                    notes: ''
+                };
+                contractors.push(newContractor);
+                renderContractorDirectory();
+                saveData();
+            }
+        }
+
+        function renderRepairRecords() {
+            const recordsList = document.getElementById('repair-records-list');
+            
+            if (repairRecords.length === 0) {
+                recordsList.innerHTML = '<div class="p-6 text-center text-gray-500">No repair records yet. Build your home\'s maintenance history!</div>';
+                return;
+            }
+
+            recordsList.innerHTML = repairRecords.map(record => `
+                <div class="p-4 border-b hover:bg-gray-50">
+                    <div class="font-medium text-gray-900">${record.description}</div>
+                    <div class="text-sm text-gray-600 mt-1">
+                        <div>${new Date(record.date).toLocaleDateString()} • ${record.contractor}</div>
+                        ${record.cost > 0 ? `<div class="text-green-600 font-medium">$${record.cost}</div>` : ''}
+                    </div>
                 </div>
-            `;
+            `).join('');
+        }
+
+        function renderContractorDirectory() {
+            const contractorsList = document.getElementById('contractors-list');
+            
+            if (contractors.length === 0) {
+                contractorsList.innerHTML = '<div class="p-6 text-center text-gray-500">No contractors added yet. Build your trusted contractor network!</div>';
+                return;
+            }
+
+            contractorsList.innerHTML = contractors.map(contractor => `
+                <div class="p-4 border-b hover:bg-gray-50">
+                    <div class="font-medium text-gray-900">${contractor.name}</div>
+                    <div class="text-sm text-gray-600 mt-1">
+                        <div class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs inline-block">${contractor.specialty}</div>
+                        ${contractor.phone ? `<div class="mt-1">📞 ${contractor.phone}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
         }
 
         // Update settings
@@ -793,7 +1580,7 @@
 
         // Export calendar
         function exportCalendar() {
-            const calendarData = tasks.map(task => {
+            const calendarData = tasks.filter(t => !t.isCompleted).map(task => {
                 return {
                     title: task.title,
                     description: task.description,
@@ -820,6 +1607,9 @@
             const data = {
                 homeData: homeData,
                 tasks: tasks,
+                appliances: appliances,
+                repairRecords: repairRecords,
+                contractors: contractors,
                 exportDate: new Date().toISOString()
             };
 
@@ -837,6 +1627,9 @@
             if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
                 homeData = {};
                 tasks = [];
+                appliances = [];
+                repairRecords = [];
+                contractors = [];
                 resetApp();
             }
         }
@@ -859,11 +1652,20 @@
             document.getElementById('fireplace').checked = false;
             document.getElementById('pool').checked = false;
             document.getElementById('deck').checked = false;
+            
+            // Hide property preview
+            document.getElementById('property-preview').classList.add('hidden');
         }
 
         // Save data (in a real app, this would save to a backend)
         function saveData() {
-            const data = { homeData: homeData, tasks: tasks };
+            const data = { 
+                homeData: homeData, 
+                tasks: tasks, 
+                appliances: appliances,
+                repairRecords: repairRecords,
+                contractors: contractors 
+            };
             console.log('Data saved:', data);
         }
 
