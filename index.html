@@ -52,7 +52,7 @@
         }
 
         .main-content {
-            padding-bottom: 80px; /* Space for bottom nav */
+            padding-bottom: 100px; /* Space for bottom nav */
         }
 
         /* Touch-friendly buttons */
@@ -81,7 +81,7 @@
                         <h1 class="text-xl font-bold text-gray-900">Casa Care</h1>
                         <p class="text-sm text-gray-600" id="header-subtitle">Smart home maintenance</p>
                     </div>
-                    <div class="text-2xl">🏠</div>
+                    <button onclick="showHomeInfo()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn" id="home-icon-btn">🏠</button>
                 </div>
             </div>
         </div>
@@ -98,9 +98,23 @@
                 <div class="space-y-6">
                     <!-- Address -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Home Address</label>
-                        <input type="text" id="address" placeholder="123 Main St, Anytown, NY 12345" 
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
+                        <input type="text" id="address" placeholder="123 Main Street" 
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
+                    </div>
+
+                    <!-- City and Zip -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                            <input type="text" id="city" placeholder="Anytown" 
+                                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Zip Code</label>
+                            <input type="text" id="zipcode" placeholder="12345" 
+                                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+                        </div>
                     </div>
 
                     <!-- Basic Property Info -->
@@ -306,33 +320,17 @@
                     </div>
                 </div>
 
-                <!-- Contractors Tab -->
-                <div id="contractors-content" class="tab-content hidden p-4">
-                    <div class="space-y-6">
-                        <!-- Repair Records -->
-                        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                            <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-                                <h3 class="text-lg font-bold text-gray-900">Repair Records</h3>
-                                <button onclick="addRepairRecord()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm touch-btn">
-                                    ➕ Add
-                                </button>
-                            </div>
-                            <div id="repair-records-list">
-                                <!-- Repair records will be populated here -->
-                            </div>
+                <!-- Documents Tab -->
+                <div id="documents-content" class="tab-content hidden p-4">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-gray-900">Documents</h3>
+                            <button onclick="addDocument()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm touch-btn">
+                                ➕ Add
+                            </button>
                         </div>
-
-                        <!-- Contractor Directory -->
-                        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                            <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-                                <h3 class="text-lg font-bold text-gray-900">Contractors</h3>
-                                <button onclick="addContractor()" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-                                    ➕ Add
-                                </button>
-                            </div>
-                            <div id="contractors-list">
-                                <!-- Contractors will be populated here -->
-                            </div>
+                        <div id="documents-list">
+                            <!-- Documents will be populated here -->
                         </div>
                     </div>
                 </div>
@@ -351,6 +349,37 @@
                             <button onclick="editPropertySettings()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 touch-btn">
                                 ✏️ Edit Property Details
                             </button>
+                        </div>
+
+                        <!-- Contractors Section -->
+                        <div class="bg-white rounded-2xl shadow-lg p-4">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Contractors & Repairs</h3>
+                            
+                            <!-- Repair Records -->
+                            <div class="mb-6">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="font-medium text-gray-900">Repair Records</h4>
+                                    <button onclick="addRepairRecord()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm touch-btn">
+                                        ➕ Add
+                                    </button>
+                                </div>
+                                <div id="repair-records-list" class="bg-gray-50 rounded-lg max-h-40 overflow-y-auto">
+                                    <!-- Repair records will be populated here -->
+                                </div>
+                            </div>
+
+                            <!-- Contractor Directory -->
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="font-medium text-gray-900">Contractor Directory</h4>
+                                    <button onclick="addContractor()" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
+                                        ➕ Add
+                                    </button>
+                                </div>
+                                <div id="contractors-list" class="bg-gray-50 rounded-lg max-h-40 overflow-y-auto">
+                                    <!-- Contractors will be populated here -->
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Data Management -->
@@ -383,7 +412,7 @@
             <div class="bottom-nav">
                 <div class="grid grid-cols-5 gap-1 p-2">
                     <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn flex flex-col items-center p-3 rounded-lg bg-blue-100 text-blue-700 touch-btn">
-                        <div class="text-lg mb-1">📅</div>
+                        <div class="text-lg mb-1">🏠</div>
                         <div class="text-xs">Home</div>
                     </button>
                     <button onclick="showTab('tasks')" id="tab-tasks" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
@@ -391,62 +420,42 @@
                         <div class="text-xs">Tasks</div>
                     </button>
                     <button onclick="showTab('calendar')" id="tab-calendar" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-                        <div class="text-lg mb-1">📆</div>
+                        <div class="text-lg mb-1">🗓️</div>
                         <div class="text-xs">Calendar</div>
                     </button>
                     <button onclick="showTab('appliances')" id="tab-appliances" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
                         <div class="text-lg mb-1">🔧</div>
                         <div class="text-xs">Items</div>
                     </button>
-                    <button onclick="showTab('settings')" id="tab-settings" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-                        <div class="text-lg mb-1">⚙️</div>
-                        <div class="text-xs">Settings</div>
+                    <button onclick="showTab('documents')" id="tab-documents" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
+                        <div class="text-lg mb-1">📄</div>
+                        <div class="text-xs">Docs</div>
+                    </button>
+                </div>
+                <div class="text-center pb-2">
+                    <button onclick="showTab('settings')" id="tab-settings" class="tab-btn flex items-center justify-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 touch-btn text-xs">
+                        <div class="text-base">⚙️</div>
+                        <div>Settings</div>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Task Modal -->
-        <div id="task-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+        <!-- Home Info Modal -->
+        <div id="home-info-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-xl w-full max-w-md p-6">
-                <h3 class="text-xl font-bold mb-4" id="modal-title">Add Task</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Task Name</label>
-                        <input type="text" id="task-title" placeholder="e.g., Replace HVAC Filter" 
-                               class="w-full p-3 border rounded-lg text-base">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                        <select id="task-category" class="w-full p-3 border rounded-lg text-base">
-                            <option value="HVAC">HVAC</option>
-                            <option value="Water Systems">Water Systems</option>
-                            <option value="Exterior">Exterior</option>
-                            <option value="Safety">Safety</option>
-                            <option value="General">General</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Cost ($)</label>
-                            <input type="number" id="task-cost" placeholder="0" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Every (days)</label>
-                            <input type="number" id="task-frequency" placeholder="365" value="365"
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                        <textarea id="task-notes" placeholder="Additional details..." 
-                                  class="w-full p-3 border rounded-lg text-base" rows="3"></textarea>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold">🏠 Home Information</h3>
+                    <button onclick="closeHomeInfoModal()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                    <div id="home-info-display">
+                        <!-- Home info will be populated here -->
                     </div>
                 </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Cancel</button>
-                    <button onclick="saveTask()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Save</button>
+                <div class="flex gap-3">
+                    <button onclick="closeHomeInfoModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Close</button>
+                    <button onclick="editFromHomeInfo()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Edit</button>
                 </div>
             </div>
         </div>
@@ -457,8 +466,18 @@
                 <h3 class="text-xl font-bold mb-4">Edit Property Details</h3>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
                         <input type="text" id="edit-address" class="w-full p-3 border rounded-lg text-base">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                            <input type="text" id="edit-city" class="w-full p-3 border rounded-lg text-base">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Zip Code</label>
+                            <input type="text" id="edit-zipcode" class="w-full p-3 border rounded-lg text-base">
+                        </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -530,7 +549,112 @@
             </div>
         </div>
 
-        <!-- Other modals with mobile optimization... -->
+        <!-- Document Modal -->
+        <div id="document-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-screen overflow-y-auto">
+                <h3 class="text-xl font-bold mb-4" id="document-modal-title">Add Document</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Document Name</label>
+                        <input type="text" id="document-name" placeholder="e.g., Home Insurance Policy" 
+                               class="w-full p-3 border rounded-lg text-base">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Document Type</label>
+                        <select id="document-type" class="w-full p-3 border rounded-lg text-base">
+                            <option value="Insurance">Insurance Policy</option>
+                            <option value="Warranty">Warranty</option>
+                            <option value="Manual">Owner's Manual</option>
+                            <option value="Receipt">Receipt/Invoice</option>
+                            <option value="Permit">Permit/Certificate</option>
+                            <option value="Contract">Service Contract</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Issue Date</label>
+                            <input type="date" id="document-issue-date" 
+                                   class="w-full p-3 border rounded-lg text-base">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Expires</label>
+                            <input type="date" id="document-expiry-date" 
+                                   class="w-full p-3 border rounded-lg text-base">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Company/Provider</label>
+                        <input type="text" id="document-provider" placeholder="e.g., State Farm Insurance" 
+                               class="w-full p-3 border rounded-lg text-base">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Policy/Reference Number</label>
+                        <input type="text" id="document-reference" placeholder="e.g., Policy #12345" 
+                               class="w-full p-3 border rounded-lg text-base">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                        <textarea id="document-notes" placeholder="Additional details..." 
+                                  class="w-full p-3 border rounded-lg text-base" rows="3"></textarea>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <p class="text-sm text-blue-700">📱 <strong>In a full app:</strong> You would upload PDF/photos here. For now, we'll store the document details.</p>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeDocumentModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Cancel</button>
+                    <button onclick="saveDocument()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Modal -->
+        <div id="task-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl w-full max-w-md p-6">
+                <h3 class="text-xl font-bold mb-4" id="modal-title">Add Task</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Task Name</label>
+                        <input type="text" id="task-title" placeholder="e.g., Replace HVAC Filter" 
+                               class="w-full p-3 border rounded-lg text-base">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select id="task-category" class="w-full p-3 border rounded-lg text-base">
+                            <option value="HVAC">HVAC</option>
+                            <option value="Water Systems">Water Systems</option>
+                            <option value="Exterior">Exterior</option>
+                            <option value="Safety">Safety</option>
+                            <option value="General">General</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cost ($)</label>
+                            <input type="number" id="task-cost" placeholder="0" 
+                                   class="w-full p-3 border rounded-lg text-base">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Every (days)</label>
+                            <input type="number" id="task-frequency" placeholder="365" value="365"
+                                   class="w-full p-3 border rounded-lg text-base">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                        <textarea id="task-notes" placeholder="Additional details..." 
+                                  class="w-full p-3 border rounded-lg text-base" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Cancel</button>
+                    <button onclick="saveTask()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other modals... (appliance, seasonal) -->
         <div id="appliance-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-screen overflow-y-auto">
                 <h3 class="text-xl font-bold mb-4" id="appliance-modal-title">Add Appliance</h3>
@@ -651,24 +775,31 @@
         let homeData = {};
         let tasks = [];
         let appliances = [];
+        let documents = [];
         let repairRecords = [];
         let contractors = [];
         let currentEditingTask = null;
         let currentEditingAppliance = null;
+        let currentEditingDocument = null;
         let currentCalendarDate = new Date();
 
-        // Create maintenance plan
+        // Create maintenance plan with updated address handling
         function createMaintenancePlan() {
             console.log('Creating maintenance plan...');
             
-            // Collect form data
+            // Collect form data including separate city and zip
             homeData = {
                 address: document.getElementById('address').value || '123 Main Street',
+                city: document.getElementById('city').value || 'Anytown',
+                zipcode: document.getElementById('zipcode').value || '12345',
                 yearBuilt: parseInt(document.getElementById('year-built').value),
                 sqft: parseInt(document.getElementById('sqft').value),
                 hasPets: document.querySelector('input[name="pets"]:checked').value === 'yes',
                 approach: document.getElementById('approach').value
             };
+
+            // Create full address for display
+            homeData.fullAddress = `${homeData.address}, ${homeData.city} ${homeData.zipcode}`;
 
             // Collect selected features
             homeData.features = {
@@ -694,11 +825,182 @@
             document.getElementById('main-app').classList.remove('hidden');
 
             // Update header
-            document.getElementById('header-subtitle').textContent = homeData.address;
+            document.getElementById('header-subtitle').textContent = homeData.fullAddress;
 
             // Initialize dashboard
             updateDashboard();
             saveData();
+        }
+
+        // Show home info when top-right home icon is clicked
+        function showHomeInfo() {
+            const homeInfoDisplay = document.getElementById('home-info-display');
+            const features = [];
+            
+            if (homeData.features?.centralAC) features.push('Central AC/Heat');
+            if (homeData.features?.miniSplits) features.push('Mini-Splits');
+            if (homeData.features?.wellWater) features.push('Well Water');
+            if (homeData.features?.septic) features.push('Septic System');
+            if (homeData.features?.fireplace) features.push('Fireplace');
+            if (homeData.features?.pool) features.push('Pool/Spa');
+            if (homeData.features?.deck) features.push('Deck/Patio');
+
+            homeInfoDisplay.innerHTML = `
+                <div class="space-y-2 text-sm">
+                    <div><strong>📍 Address:</strong><br>${homeData.fullAddress || 'Not set'}</div>
+                    <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
+                    <div><strong>🎯 Approach:</strong> ${homeData.approach || 'Standard'} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
+                    <div><strong>🏠 Features:</strong><br>${features.join(', ') || 'None selected'}</div>
+                </div>
+            `;
+            
+            document.getElementById('home-info-modal').classList.remove('hidden');
+        }
+
+        function closeHomeInfoModal() {
+            document.getElementById('home-info-modal').classList.add('hidden');
+        }
+
+        function editFromHomeInfo() {
+            closeHomeInfoModal();
+            editPropertySettings();
+        }
+
+        // Documents management
+        function addDocument() {
+            currentEditingDocument = null;
+            document.getElementById('document-modal-title').textContent = 'Add Document';
+            document.getElementById('document-name').value = '';
+            document.getElementById('document-type').value = 'Insurance';
+            document.getElementById('document-issue-date').value = '';
+            document.getElementById('document-expiry-date').value = '';
+            document.getElementById('document-provider').value = '';
+            document.getElementById('document-reference').value = '';
+            document.getElementById('document-notes').value = '';
+            document.getElementById('document-modal').classList.remove('hidden');
+        }
+
+        function closeDocumentModal() {
+            document.getElementById('document-modal').classList.add('hidden');
+            currentEditingDocument = null;
+        }
+
+        function saveDocument() {
+            const name = document.getElementById('document-name').value;
+            const type = document.getElementById('document-type').value;
+            const issueDate = document.getElementById('document-issue-date').value;
+            const expiryDate = document.getElementById('document-expiry-date').value;
+            const provider = document.getElementById('document-provider').value;
+            const reference = document.getElementById('document-reference').value;
+            const notes = document.getElementById('document-notes').value;
+
+            if (!name.trim()) {
+                alert('Please enter a document name');
+                return;
+            }
+
+            if (currentEditingDocument) {
+                // Update existing document
+                currentEditingDocument.name = name;
+                currentEditingDocument.type = type;
+                currentEditingDocument.issueDate = issueDate;
+                currentEditingDocument.expiryDate = expiryDate;
+                currentEditingDocument.provider = provider;
+                currentEditingDocument.reference = reference;
+                currentEditingDocument.notes = notes;
+            } else {
+                // Add new document
+                const newDocument = {
+                    id: Math.max(...documents.map(d => d.id), 0) + 1,
+                    name: name,
+                    type: type,
+                    issueDate: issueDate,
+                    expiryDate: expiryDate,
+                    provider: provider,
+                    reference: reference,
+                    notes: notes,
+                    dateAdded: new Date().toISOString().split('T')[0]
+                };
+                documents.push(newDocument);
+            }
+
+            closeDocumentModal();
+            renderDocuments();
+            saveData();
+        }
+
+        function renderDocuments() {
+            const documentsList = document.getElementById('documents-list');
+            
+            if (documents.length === 0) {
+                documentsList.innerHTML = '<div class="p-6 text-center text-gray-500">No documents added yet. Add insurance policies, warranties, and important home documents.</div>';
+                return;
+            }
+
+            documentsList.innerHTML = documents.map(doc => {
+                const isExpiring = doc.expiryDate && new Date(doc.expiryDate) < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Expires in 30 days
+                const isExpired = doc.expiryDate && new Date(doc.expiryDate) < new Date();
+                
+                let statusBadge = '';
+                if (isExpired) {
+                    statusBadge = '<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">Expired</span>';
+                } else if (isExpiring) {
+                    statusBadge = '<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs">Expiring Soon</span>';
+                } else if (doc.expiryDate) {
+                    statusBadge = '<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Active</span>';
+                }
+
+                return `
+                    <div class="p-4 border-b hover:bg-gray-50">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1 pr-3">
+                                <h4 class="font-semibold text-gray-900 text-sm">${doc.name}</h4>
+                                <div class="text-xs text-gray-600 mt-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">${doc.type}</span>
+                                        ${statusBadge}
+                                    </div>
+                                    ${doc.provider ? `<div><strong>Provider:</strong> ${doc.provider}</div>` : ''}
+                                    ${doc.reference ? `<div><strong>Reference:</strong> ${doc.reference}</div>` : ''}
+                                    ${doc.expiryDate ? `<div><strong>Expires:</strong> ${new Date(doc.expiryDate).toLocaleDateString()}</div>` : ''}
+                                    ${doc.notes ? `<div class="mt-2">${doc.notes}</div>` : ''}
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <button onclick="editDocument(${doc.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs touch-btn">
+                                    ✏️
+                                </button>
+                                <button onclick="viewDocument(${doc.id})" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs touch-btn">
+                                    👁️
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function editDocument(docId) {
+            const doc = documents.find(d => d.id === docId);
+            if (doc) {
+                currentEditingDocument = doc;
+                document.getElementById('document-modal-title').textContent = 'Edit Document';
+                document.getElementById('document-name').value = doc.name;
+                document.getElementById('document-type').value = doc.type;
+                document.getElementById('document-issue-date').value = doc.issueDate || '';
+                document.getElementById('document-expiry-date').value = doc.expiryDate || '';
+                document.getElementById('document-provider').value = doc.provider || '';
+                document.getElementById('document-reference').value = doc.reference || '';
+                document.getElementById('document-notes').value = doc.notes || '';
+                document.getElementById('document-modal').classList.remove('hidden');
+            }
+        }
+
+        function viewDocument(docId) {
+            const doc = documents.find(d => d.id === docId);
+            if (doc) {
+                alert(`📄 ${doc.name}\n\nIn a full app, this would:\n• Display the uploaded document/image\n• Allow sharing or printing\n• Show full document details\n• Enable document annotations`);
+            }
         }
 
         // Generate default appliances
@@ -910,7 +1212,7 @@
             console.log('Generated tasks:', tasks);
         }
 
-        // Tab navigation
+        // Tab navigation - Updated to include documents
         function showTab(tabName) {
             // Hide all tab contents
             const tabContents = document.querySelectorAll('.tab-content');
@@ -939,17 +1241,18 @@
                 renderCalendar();
             } else if (tabName === 'appliances') {
                 renderAppliances();
-            } else if (tabName === 'contractors') {
-                renderContractors();
+            } else if (tabName === 'documents') {
+                renderDocuments();
             } else if (tabName === 'settings') {
                 updateSettings();
+                renderContractors(); // Also render contractors since they're in settings now
             }
         }
 
         // Update dashboard
         function updateDashboard() {
             // Update home address
-            document.getElementById('home-address').textContent = `Managing maintenance for ${homeData.address}`;
+            document.getElementById('home-address').textContent = `Managing maintenance for ${homeData.fullAddress}`;
 
             // Calculate stats
             const now = new Date();
@@ -1020,49 +1323,78 @@
             }).join('');
         }
 
-        // Render all tasks (mobile optimized)
-        function renderAllTasks() {
-            const tasksList = document.getElementById('all-tasks-list');
-            const sortedTasks = tasks.filter(t => !t.isCompleted).sort((a, b) => a.nextDue - b.nextDue);
-
-            if (sortedTasks.length === 0) {
-                tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All tasks complete!</div>';
-                return;
-            }
-
-            tasksList.innerHTML = sortedTasks.map(task => {
-                const daysUntilDue = Math.ceil((task.nextDue - new Date()) / (24 * 60 * 60 * 1000));
-                const overdue = daysUntilDue < 0;
-                
-                return `
-                    <div class="p-4 border-b hover:bg-gray-50">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1 pr-3">
-                                <h4 class="font-semibold text-gray-900 text-sm">${task.title}</h4>
-                                <p class="text-xs text-gray-600 mt-1">${task.description}</p>
-                                <div class="flex items-center gap-3 mt-2 text-xs">
-                                    <span class="bg-gray-100 px-2 py-1 rounded">${task.category}</span>
-                                    <span class="text-gray-600">Every ${task.frequency}d</span>
-                                    <span class="${overdue ? 'text-red-600' : daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600'}">
-                                        ${overdue ? `${Math.abs(daysUntilDue)}d overdue` : daysUntilDue <= 0 ? 'Due today' : `${daysUntilDue}d`}
-                                    </span>
-                                    <span class="text-gray-600">$${task.cost}</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <button onclick="editTask(${task.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs touch-btn">
-                                    ✏️
-                                </button>
-                                <button onclick="completeTask(${task.id})" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs touch-btn">
-                                    ✅
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+        // Property settings functions - Updated to handle city/zip
+        function editPropertySettings() {
+            // Populate the edit modal with current data
+            document.getElementById('edit-address').value = homeData.address || '';
+            document.getElementById('edit-city').value = homeData.city || '';
+            document.getElementById('edit-zipcode').value = homeData.zipcode || '';
+            document.getElementById('edit-year-built').value = homeData.yearBuilt || '';
+            document.getElementById('edit-sqft').value = homeData.sqft || '';
+            
+            // Set checkboxes
+            document.getElementById('edit-central-ac').checked = homeData.features?.centralAC || false;
+            document.getElementById('edit-mini-splits').checked = homeData.features?.miniSplits || false;
+            document.getElementById('edit-well-water').checked = homeData.features?.wellWater || false;
+            document.getElementById('edit-septic').checked = homeData.features?.septic || false;
+            document.getElementById('edit-fireplace').checked = homeData.features?.fireplace || false;
+            document.getElementById('edit-pool').checked = homeData.features?.pool || false;
+            document.getElementById('edit-deck').checked = homeData.features?.deck || false;
+            
+            // Set dropdowns
+            document.getElementById('edit-pets').value = homeData.hasPets ? 'yes' : 'no';
+            document.getElementById('edit-approach').value = homeData.approach || 'standard';
+            
+            document.getElementById('property-modal').classList.remove('hidden');
         }
 
+        function closePropertyModal() {
+            document.getElementById('property-modal').classList.add('hidden');
+        }
+
+        function savePropertySettings() {
+            // Get updated values
+            const newHomeData = {
+                address: document.getElementById('edit-address').value,
+                city: document.getElementById('edit-city').value,
+                zipcode: document.getElementById('edit-zipcode').value,
+                yearBuilt: parseInt(document.getElementById('edit-year-built').value),
+                sqft: parseInt(document.getElementById('edit-sqft').value),
+                hasPets: document.getElementById('edit-pets').value === 'yes',
+                approach: document.getElementById('edit-approach').value,
+                features: {
+                    centralAC: document.getElementById('edit-central-ac').checked,
+                    miniSplits: document.getElementById('edit-mini-splits').checked,
+                    wellWater: document.getElementById('edit-well-water').checked,
+                    septic: document.getElementById('edit-septic').checked,
+                    fireplace: document.getElementById('edit-fireplace').checked,
+                    pool: document.getElementById('edit-pool').checked,
+                    deck: document.getElementById('edit-deck').checked
+                }
+            };
+
+            // Create full address for display
+            newHomeData.fullAddress = `${newHomeData.address}, ${newHomeData.city} ${newHomeData.zipcode}`;
+
+            // Update global homeData
+            homeData = newHomeData;
+            
+            // Update header
+            document.getElementById('header-subtitle').textContent = homeData.fullAddress;
+            
+            // Regenerate tasks if features changed
+            generateTasks();
+            generateDefaultAppliances();
+            
+            closePropertyModal();
+            updateDashboard();
+            updateSettings();
+            saveData();
+            
+            alert('✅ Property settings updated successfully!');
+        }
+
+        // [Rest of the JavaScript functions remain the same - completeTask, calendar functions, etc.]
         // Complete task
         function completeTask(taskId) {
             const task = tasks.find(t => t.id === taskId);
@@ -1151,69 +1483,47 @@
             calendarView.innerHTML = calendarHTML;
         }
 
-        // Property settings functions
-        function editPropertySettings() {
-            // Populate the edit modal with current data
-            document.getElementById('edit-address').value = homeData.address || '';
-            document.getElementById('edit-year-built').value = homeData.yearBuilt || '';
-            document.getElementById('edit-sqft').value = homeData.sqft || '';
-            
-            // Set checkboxes
-            document.getElementById('edit-central-ac').checked = homeData.features?.centralAC || false;
-            document.getElementById('edit-mini-splits').checked = homeData.features?.miniSplits || false;
-            document.getElementById('edit-well-water').checked = homeData.features?.wellWater || false;
-            document.getElementById('edit-septic').checked = homeData.features?.septic || false;
-            document.getElementById('edit-fireplace').checked = homeData.features?.fireplace || false;
-            document.getElementById('edit-pool').checked = homeData.features?.pool || false;
-            document.getElementById('edit-deck').checked = homeData.features?.deck || false;
-            
-            // Set dropdowns
-            document.getElementById('edit-pets').value = homeData.hasPets ? 'yes' : 'no';
-            document.getElementById('edit-approach').value = homeData.approach || 'standard';
-            
-            document.getElementById('property-modal').classList.remove('hidden');
-        }
+        // [Include all other existing functions - renderAllTasks, addTask, etc.]
+        function renderAllTasks() {
+            const tasksList = document.getElementById('all-tasks-list');
+            const sortedTasks = tasks.filter(t => !t.isCompleted).sort((a, b) => a.nextDue - b.nextDue);
 
-        function closePropertyModal() {
-            document.getElementById('property-modal').classList.add('hidden');
-        }
+            if (sortedTasks.length === 0) {
+                tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All tasks complete!</div>';
+                return;
+            }
 
-        function savePropertySettings() {
-            // Get updated values
-            const newHomeData = {
-                address: document.getElementById('edit-address').value,
-                yearBuilt: parseInt(document.getElementById('edit-year-built').value),
-                sqft: parseInt(document.getElementById('edit-sqft').value),
-                hasPets: document.getElementById('edit-pets').value === 'yes',
-                approach: document.getElementById('edit-approach').value,
-                features: {
-                    centralAC: document.getElementById('edit-central-ac').checked,
-                    miniSplits: document.getElementById('edit-mini-splits').checked,
-                    wellWater: document.getElementById('edit-well-water').checked,
-                    septic: document.getElementById('edit-septic').checked,
-                    fireplace: document.getElementById('edit-fireplace').checked,
-                    pool: document.getElementById('edit-pool').checked,
-                    deck: document.getElementById('edit-deck').checked
-                }
-            };
-
-            // Update global homeData
-            homeData = newHomeData;
-            
-            // Update header
-            document.getElementById('header-subtitle').textContent = homeData.address;
-            
-            // Regenerate tasks if features changed
-            // For now, just regenerate all (in production, you'd be smarter about this)
-            generateTasks();
-            generateDefaultAppliances();
-            
-            closePropertyModal();
-            updateDashboard();
-            updateSettings();
-            saveData();
-            
-            alert('✅ Property settings updated successfully!');
+            tasksList.innerHTML = sortedTasks.map(task => {
+                const daysUntilDue = Math.ceil((task.nextDue - new Date()) / (24 * 60 * 60 * 1000));
+                const overdue = daysUntilDue < 0;
+                
+                return `
+                    <div class="p-4 border-b hover:bg-gray-50">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1 pr-3">
+                                <h4 class="font-semibold text-gray-900 text-sm">${task.title}</h4>
+                                <p class="text-xs text-gray-600 mt-1">${task.description}</p>
+                                <div class="flex items-center gap-3 mt-2 text-xs">
+                                    <span class="bg-gray-100 px-2 py-1 rounded">${task.category}</span>
+                                    <span class="text-gray-600">Every ${task.frequency}d</span>
+                                    <span class="${overdue ? 'text-red-600' : daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600'}">
+                                        ${overdue ? `${Math.abs(daysUntilDue)}d overdue` : daysUntilDue <= 0 ? 'Due today' : `${daysUntilDue}d`}
+                                    </span>
+                                    <span class="text-gray-600">$${task.cost}</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <button onclick="editTask(${task.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs touch-btn">
+                                    ✏️
+                                </button>
+                                <button onclick="completeTask(${task.id})" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs touch-btn">
+                                    ✅
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // Task functions
@@ -1299,12 +1609,10 @@
 
         function saveSeasonalTasks() {
             const seasonalTasks = [
-                // Fall tasks
                 { id: 'fall-gutters', title: 'Clean Gutters & Downspouts', category: 'Exterior', cost: 150, season: 'fall' },
                 { id: 'fall-furnace', title: 'Schedule Furnace Inspection', category: 'HVAC', cost: 100, season: 'fall' },
                 { id: 'fall-chimney', title: 'Chimney Cleaning', category: 'Safety', cost: 300, season: 'fall' },
                 { id: 'fall-weatherstrip', title: 'Check Weatherstripping', category: 'General', cost: 50, season: 'fall' },
-                // Spring tasks
                 { id: 'spring-ac', title: 'AC System Tune-up', category: 'HVAC', cost: 120, season: 'spring' },
                 { id: 'spring-deck', title: 'Deck Inspection & Cleaning', category: 'Exterior', cost: 100, season: 'spring' },
                 { id: 'spring-exterior', title: 'Exterior Pressure Washing', category: 'Exterior', cost: 200, season: 'spring' },
@@ -1317,7 +1625,6 @@
             seasonalTasks.forEach(seasonalTask => {
                 const checkbox = document.getElementById(seasonalTask.id);
                 if (checkbox && checkbox.checked) {
-                    // Calculate due date based on season
                     let dueDate = new Date();
                     if (seasonalTask.season === 'fall') {
                         dueDate.setMonth(9, 15); // October 15
@@ -1325,7 +1632,6 @@
                         dueDate.setMonth(3, 15); // April 15
                     }
 
-                    // If the date has passed this year, set for next year
                     if (dueDate < new Date()) {
                         dueDate.setFullYear(dueDate.getFullYear() + 1);
                     }
@@ -1334,7 +1640,7 @@
                         id: nextId++,
                         title: seasonalTask.title,
                         category: seasonalTask.category,
-                        frequency: 365, // Yearly
+                        frequency: 365,
                         cost: seasonalTask.cost,
                         priority: 'medium',
                         description: `Seasonal ${seasonalTask.season} maintenance task`,
@@ -1391,7 +1697,6 @@
             }
 
             if (currentEditingAppliance) {
-                // Update existing appliance
                 currentEditingAppliance.name = name;
                 currentEditingAppliance.type = type;
                 currentEditingAppliance.brand = brand;
@@ -1400,7 +1705,6 @@
                 currentEditingAppliance.warrantyExpires = warranty;
                 currentEditingAppliance.notes = notes;
             } else {
-                // Add new appliance
                 const newAppliance = {
                     id: Math.max(...appliances.map(a => a.id), 0) + 1,
                     name: name,
@@ -1560,7 +1864,7 @@
                     <div class="font-medium text-gray-900 text-sm">${record.description}</div>
                     <div class="text-xs text-gray-600 mt-1">
                         <div>${new Date(record.date).toLocaleDateString()} • ${record.contractor}</div>
-                        ${record.cost > 0 ? `<div class="text-green-600 font-medium">$${record.cost}</div>` : ''}
+                        ${record.cost > 0 ? `<div class="text-green-600 font-medium">${record.cost}</div>` : ''}
                     </div>
                 </div>
             `).join('');
@@ -1600,10 +1904,10 @@
 
             propertySummary.innerHTML = `
                 <div class="space-y-2 text-sm">
-                    <div><strong>Address:</strong> ${homeData.address || 'Not set'}</div>
-                    <div><strong>Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
-                    <div><strong>Approach:</strong> ${homeData.approach || 'Standard'} • <strong>Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
-                    <div><strong>Features:</strong> ${features.join(', ') || 'None selected'}</div>
+                    <div><strong>📍 Address:</strong><br>${homeData.fullAddress || 'Not set'}</div>
+                    <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
+                    <div><strong>🎯 Approach:</strong> ${homeData.approach || 'Standard'} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
+                    <div><strong>🏠 Features:</strong><br>${features.join(', ') || 'None selected'}</div>
                 </div>
             `;
         }
@@ -1638,6 +1942,7 @@
                 homeData: homeData,
                 tasks: tasks,
                 appliances: appliances,
+                documents: documents,
                 repairRecords: repairRecords,
                 contractors: contractors,
                 exportDate: new Date().toISOString()
@@ -1658,6 +1963,7 @@
                 homeData = {};
                 tasks = [];
                 appliances = [];
+                documents = [];
                 repairRecords = [];
                 contractors = [];
                 
@@ -1674,6 +1980,7 @@
                 homeData: homeData, 
                 tasks: tasks, 
                 appliances: appliances,
+                documents: documents,
                 repairRecords: repairRecords,
                 contractors: contractors 
             };
