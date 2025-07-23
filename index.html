@@ -79,7 +79,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-xl font-bold text-gray-900">Casa Care</h1>
-                        <p class="text-sm text-gray-600" id="header-subtitle">Smart home maintenance</p>
+                        <p class="text-sm text-gray-600 cursor-pointer hover:text-blue-600 hover:underline transition-colors" id="header-subtitle" onclick="openRedfin()" title="Click to view on Redfin">Smart home maintenance</p>
                     </div>
                     <button onclick="showHomeInfo()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn" id="home-icon-btn">🏠</button>
                 </div>
@@ -207,7 +207,7 @@
                     <!-- Welcome -->
                     <div class="gradient-bg text-white rounded-2xl p-6 shadow-2xl mb-6">
                         <h2 class="text-xl font-bold mb-2">Welcome to Casa Care! 👋</h2>
-                        <p class="text-blue-100 text-sm" id="home-address">Managing maintenance for your home</p>
+                        <p class="text-blue-100 text-sm cursor-pointer hover:text-white hover:underline transition-colors" id="home-address" onclick="openRedfin()" title="Click to view on Redfin">Managing maintenance for your home</p>
                     </div>
 
                     <!-- Stats Grid -->
@@ -847,7 +847,10 @@
 
             homeInfoDisplay.innerHTML = `
                 <div class="space-y-2 text-sm">
-                    <div><strong>📍 Address:</strong><br>${homeData.fullAddress || 'Not set'}</div>
+                    <div><strong>📍 Address:</strong><br>
+                        <span class="text-blue-600 cursor-pointer hover:underline" onclick="openRedfin()">${homeData.fullAddress || 'Not set'}</span>
+                        <div class="text-xs text-gray-500 mt-1">Click to view on Redfin</div>
+                    </div>
                     <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
                     <div><strong>🎯 Approach:</strong> ${homeData.approach || 'Standard'} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
                     <div><strong>🏠 Features:</strong><br>${features.join(', ') || 'None selected'}</div>
@@ -1321,6 +1324,18 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        // Open Redfin for property details
+        function openRedfin() {
+            if (homeData.fullAddress) {
+                // Format address for Redfin URL
+                const addressParam = encodeURIComponent(homeData.fullAddress);
+                const redfinUrl = `https://www.redfin.com/stingray/do/location-search?location=${addressParam}`;
+                window.open(redfinUrl, '_blank');
+            } else {
+                alert('Please set up your home address first!');
+            }
         }
 
         // Property settings functions - Updated to handle city/zip
@@ -1904,7 +1919,10 @@
 
             propertySummary.innerHTML = `
                 <div class="space-y-2 text-sm">
-                    <div><strong>📍 Address:</strong><br>${homeData.fullAddress || 'Not set'}</div>
+                    <div><strong>📍 Address:</strong><br>
+                        <span class="text-blue-600 cursor-pointer hover:underline" onclick="openRedfin()">${homeData.fullAddress || 'Not set'}</span>
+                        <div class="text-xs text-gray-500">Click to view on Redfin</div>
+                    </div>
                     <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
                     <div><strong>🎯 Approach:</strong> ${homeData.approach || 'Standard'} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
                     <div><strong>🏠 Features:</strong><br>${features.join(', ') || 'None selected'}</div>
