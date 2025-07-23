@@ -85,7 +85,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-xl font-bold text-gray-900">Casa Care</h1>
-                        <p class="text-sm text-gray-600 cursor-pointer hover:text-blue-600 hover:underline transition-colors" id="header-subtitle" onclick="openRedfin(event)" title="Click to view on Redfin">Smart home maintenance</p>
+                        <p class="text-sm text-gray-600 cursor-pointer hover:text-blue-600 hover:underline transition-colors" id="header-subtitle" onclick="openRedfin(event)" title="Click to open Redfin with address copied">Smart home maintenance</p>
                     </div>
                     <button onclick="showHomeInfo()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn" id="home-icon-btn">🏠</button>
                 </div>
@@ -857,8 +857,7 @@
                 <div class="space-y-2 text-sm">
                     <div><strong>📍 Address:</strong><br>
                         <span class="text-blue-600 cursor-pointer hover:underline" onclick="openRedfin(event)">${homeData.fullAddress || 'Not set'}</span>
-                        <div class="text-xs text-gray-500 mt-1">Click to view on Redfin</div>
-                        <div class="text-xs text-blue-500 mt-1">Debug: Open browser console to see search details</div>
+                        <div class="text-xs text-gray-500 mt-1">Click to open Redfin (address will be copied for easy search)</div>
                     </div>
                     <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
                     <div><strong>🎯 Approach:</strong> ${homeData.approach || 'Standard'} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
@@ -1335,32 +1334,32 @@
             }).join('');
         }
 
-        // Open Redfin for property details
+        // Open Redfin for property details - UPDATED VERSION
         function openRedfin(event) {
-            // Prevent any default browser behavior
             if (event) {
                 event.preventDefault();
                 event.stopPropagation();
             }
             
             if (homeData.fullAddress) {
-                const cleanAddress = homeData.fullAddress.trim();
+                const address = homeData.fullAddress.trim();
                 
-                // Show user what we're searching for
-                alert(`Searching Redfin for: "${cleanAddress}"`);
+                // Copy address to clipboard
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(address).then(() => {
+                        alert(`✅ Address copied to clipboard!\n\n"${address}"\n\n📍 Opening Redfin homepage - just paste and search!`);
+                    }).catch(() => {
+                        alert(`📍 Opening Redfin for:\n"${address}"\n\nPlease search for this address on Redfin.`);
+                    });
+                } else {
+                    alert(`📍 Opening Redfin for:\n"${address}"\n\nPlease search for this address on Redfin.`);
+                }
                 
-                // Try the most basic Redfin search format
-                const addressParam = encodeURIComponent(cleanAddress);
-                const redfinUrl = `https://www.redfin.com/stingray/do/location-search?location=${addressParam}`;
-                
-                console.log('Address:', cleanAddress);
-                console.log('URL:', redfinUrl);
-                
-                // Open in new tab
-                window.open(redfinUrl, '_blank');
+                // Always open just the Redfin homepage
+                window.open('https://www.redfin.com', '_blank');
                 
             } else {
-                alert('No address found! homeData.fullAddress is: ' + JSON.stringify(homeData));
+                alert('Please set up your home address first!');
             }
         }
 
@@ -1949,7 +1948,7 @@
                 <div class="space-y-2 text-sm">
                     <div><strong>📍 Address:</strong><br>
                         <span class="text-blue-600 cursor-pointer hover:underline" onclick="openRedfin(event)">${homeData.fullAddress || 'Not set'}</span>
-                        <div class="text-xs text-gray-500">Click to view on Redfin</div>
+                        <div class="text-xs text-gray-500">Click to open Redfin (address will be copied)</div>
                     </div>
                     <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
                     <div><strong>🎯 Approach:</strong> ${homeData.approach || 'Standard'} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
