@@ -1346,20 +1346,21 @@
             if (homeData.fullAddress) {
                 const cleanAddress = homeData.fullAddress.trim();
                 
-                // Debug: Show user what address we're searching for
-                console.log('Searching for address:', cleanAddress);
+                // Show user what we're searching for
+                alert(`Searching Redfin for: "${cleanAddress}"`);
                 
-                // Use Redfin's main search page - this is most reliable
+                // Try the most basic Redfin search format
                 const addressParam = encodeURIComponent(cleanAddress);
-                const redfinUrl = `https://www.redfin.com/search?query=${addressParam}`;
+                const redfinUrl = `https://www.redfin.com/stingray/do/location-search?location=${addressParam}`;
                 
-                console.log('Opening URL:', redfinUrl);
+                console.log('Address:', cleanAddress);
+                console.log('URL:', redfinUrl);
                 
                 // Open in new tab
                 window.open(redfinUrl, '_blank');
                 
             } else {
-                alert('Please set up your home address first!');
+                alert('No address found! homeData.fullAddress is: ' + JSON.stringify(homeData));
             }
         }
 
