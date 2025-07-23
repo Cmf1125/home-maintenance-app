@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no, address=no">
     <title>Casa Care - Smart Home Maintenance</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -69,6 +70,11 @@
             margin: 0 auto;
             border-radius: 1px;
         }
+
+        /* Prevent browser auto-linking of addresses */
+        [onclick*="openRedfin"] {
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -79,7 +85,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-xl font-bold text-gray-900">Casa Care</h1>
-                        <p class="text-sm text-gray-600 cursor-pointer hover:text-blue-600 hover:underline transition-colors" id="header-subtitle" onclick="openRedfin()" title="Click to view on Redfin">Smart home maintenance</p>
+                        <p class="text-sm text-gray-600 cursor-pointer hover:text-blue-600 hover:underline transition-colors" id="header-subtitle" onclick="openRedfin(event)" title="Click to view on Redfin">Smart home maintenance</p>
                     </div>
                     <button onclick="showHomeInfo()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn" id="home-icon-btn">🏠</button>
                 </div>
@@ -848,7 +854,7 @@
             homeInfoDisplay.innerHTML = `
                 <div class="space-y-2 text-sm">
                     <div><strong>📍 Address:</strong><br>
-                        <span class="text-blue-600 cursor-pointer hover:underline" onclick="openRedfin()">${homeData.fullAddress || 'Not set'}</span>
+                        <span class="text-blue-600 cursor-pointer hover:underline" onclick="openRedfin(event)">${homeData.fullAddress || 'Not set'}</span>
                         <div class="text-xs text-gray-500 mt-1">Click to view on Redfin</div>
                     </div>
                     <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
@@ -1327,11 +1333,17 @@
         }
 
         // Open Redfin for property details
-        function openRedfin() {
+        function openRedfin(event) {
+            // Prevent any default browser behavior (like auto-linking to maps)
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
             if (homeData.fullAddress) {
-                // Format address for Redfin URL
+                // Format address for Redfin URL (using their search format)
                 const addressParam = encodeURIComponent(homeData.fullAddress);
-                const redfinUrl = `https://www.redfin.com/stingray/do/location-search?location=${addressParam}`;
+                const redfinUrl = `https://www.redfin.com/search?query=${addressParam}`;
                 window.open(redfinUrl, '_blank');
             } else {
                 alert('Please set up your home address first!');
@@ -1920,7 +1932,7 @@
             propertySummary.innerHTML = `
                 <div class="space-y-2 text-sm">
                     <div><strong>📍 Address:</strong><br>
-                        <span class="text-blue-600 cursor-pointer hover:underline" onclick="openRedfin()">${homeData.fullAddress || 'Not set'}</span>
+                        <span class="text-blue-600 cursor-pointer hover:underline" onclick="openRedfin(event)">${homeData.fullAddress || 'Not set'}</span>
                         <div class="text-xs text-gray-500">Click to view on Redfin</div>
                     </div>
                     <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
