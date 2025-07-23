@@ -806,6 +806,8 @@
 
             // Create full address for display
             homeData.fullAddress = `${homeData.address}, ${homeData.city} ${homeData.zipcode}`;
+            
+            console.log('Full address created:', homeData.fullAddress); // Debug log
 
             // Collect selected features
             homeData.features = {
@@ -856,6 +858,7 @@
                     <div><strong>📍 Address:</strong><br>
                         <span class="text-blue-600 cursor-pointer hover:underline" onclick="openRedfin(event)">${homeData.fullAddress || 'Not set'}</span>
                         <div class="text-xs text-gray-500 mt-1">Click to view on Redfin</div>
+                        <div class="text-xs text-blue-500 mt-1">Debug: Open browser console to see search details</div>
                     </div>
                     <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
                     <div><strong>🎯 Approach:</strong> ${homeData.approach || 'Standard'} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
@@ -1334,17 +1337,27 @@
 
         // Open Redfin for property details
         function openRedfin(event) {
-            // Prevent any default browser behavior (like auto-linking to maps)
+            // Prevent any default browser behavior
             if (event) {
                 event.preventDefault();
                 event.stopPropagation();
             }
             
             if (homeData.fullAddress) {
-                // Format address for Redfin URL (using their search format)
-                const addressParam = encodeURIComponent(homeData.fullAddress);
+                const cleanAddress = homeData.fullAddress.trim();
+                
+                // Debug: Show user what address we're searching for
+                console.log('Searching for address:', cleanAddress);
+                
+                // Use Redfin's main search page - this is most reliable
+                const addressParam = encodeURIComponent(cleanAddress);
                 const redfinUrl = `https://www.redfin.com/search?query=${addressParam}`;
+                
+                console.log('Opening URL:', redfinUrl);
+                
+                // Open in new tab
                 window.open(redfinUrl, '_blank');
+                
             } else {
                 alert('Please set up your home address first!');
             }
@@ -1402,6 +1415,8 @@
 
             // Create full address for display
             newHomeData.fullAddress = `${newHomeData.address}, ${newHomeData.city} ${newHomeData.zipcode}`;
+            
+            console.log('Updated full address:', newHomeData.fullAddress); // Debug log
 
             // Update global homeData
             homeData = newHomeData;
