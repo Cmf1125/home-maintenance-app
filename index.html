@@ -85,7 +85,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-xl font-bold text-gray-900">Casa Care</h1>
-                        <p class="text-sm text-gray-600 cursor-pointer hover:text-blue-600 hover:underline transition-colors" id="header-subtitle" onclick="openRedfin(event)" title="Click to view on Redfin">Smart home maintenance</p>
+                        <p class="text-sm text-gray-600 cursor-pointer hover:text-blue-600 hover:underline transition-colors" id="header-subtitle" onclick="openRedfin(event)" title="Click to view on Realtor.com">Smart home maintenance</p>
                     </div>
                     <button onclick="showHomeInfo()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn" id="home-icon-btn">🏠</button>
                 </div>
@@ -867,7 +867,7 @@
                 <div class="space-y-2 text-sm">
                     <div><strong>📍 Address:</strong><br>
                         <span class="text-blue-600 cursor-pointer hover:underline" onclick="openRedfin(event)">${homeData.fullAddress || 'Not set'}</span>
-                        <div class="text-xs text-gray-500 mt-1">Click to view on Redfin</div>
+                        <div class="text-xs text-gray-500 mt-1">Click to view on Realtor.com</div>
                     </div>
                     <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
                     <div><strong>🎯 Approach:</strong> ${homeData.approach || 'Standard'} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
@@ -1344,7 +1344,7 @@
             }).join('');
         }
 
-        // Open Redfin for property details
+        // Open Realtor.com for property details (most reliable URL structure)
         function openRedfin(event) {
             // Prevent any default browser behavior
             if (event) {
@@ -1355,25 +1355,18 @@
             if (homeData.fullAddress) {
                 const cleanAddress = homeData.fullAddress.trim();
                 
-                // Use Google to search for the property on Redfin - this is the most reliable approach
-                const searchQuery = `"${cleanAddress}" site:redfin.com`;
-                const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+                // Use Realtor.com - they have the most reliable search URLs
+                const addressParam = encodeURIComponent(cleanAddress);
+                const realtorUrl = `https://www.realtor.com/search/properties?searchText=${addressParam}`;
                 
-                // Show user what we're doing
-                const userChoice = confirm(`Looking up "${cleanAddress}" on Redfin.\n\nClick OK to search via Google (most reliable)\nClick Cancel to try Redfin directly`);
+                console.log('Opening Realtor.com for:', cleanAddress);
                 
-                if (userChoice) {
-                    // Use Google search for the property on Redfin
-                    console.log('Google search for:', searchQuery);
-                    window.open(googleUrl, '_blank');
-                } else {
-                    // Just open Redfin homepage and let user search manually
-                    alert(`Please search for: "${cleanAddress}" on Redfin`);
-                    window.open('https://www.redfin.com', '_blank');
-                }
+                // Clean, direct experience
+                window.open(realtorUrl, '_blank');
                 
             } else {
-                alert('No address found! Please set up your home address first.');
+                // Fallback - open Realtor.com homepage
+                window.open('https://www.realtor.com', '_blank');
             }
         }
 
@@ -1964,7 +1957,7 @@
                 <div class="space-y-2 text-sm">
                     <div><strong>📍 Address:</strong><br>
                         <span class="text-blue-600 cursor-pointer hover:underline" onclick="openRedfin(event)">${homeData.fullAddress || 'Not set'}</span>
-                        <div class="text-xs text-gray-500">Click to view on Redfin</div>
+                        <div class="text-xs text-gray-500">Click to view on Realtor.com</div>
                     </div>
                     <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
                     <div><strong>🎯 Approach:</strong> ${homeData.approach || 'Standard'} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
