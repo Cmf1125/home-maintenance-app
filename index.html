@@ -1355,16 +1355,22 @@
             if (homeData.fullAddress) {
                 const cleanAddress = homeData.fullAddress.trim();
                 
-                // Now with proper state formatting, try Redfin's search again
-                const addressParam = encodeURIComponent(cleanAddress);
-                const redfinUrl = `https://www.redfin.com/stingray/do/location-search?location=${addressParam}`;
+                // Use Google to search for the property on Redfin - this is the most reliable approach
+                const searchQuery = `"${cleanAddress}" site:redfin.com`;
+                const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
                 
-                alert(`Searching Redfin for: "${cleanAddress}"`);
-                console.log('Formatted address:', cleanAddress);
-                console.log('Redfin URL:', redfinUrl);
+                // Show user what we're doing
+                const userChoice = confirm(`Looking up "${cleanAddress}" on Redfin.\n\nClick OK to search via Google (most reliable)\nClick Cancel to try Redfin directly`);
                 
-                // Open in new tab
-                window.open(redfinUrl, '_blank');
+                if (userChoice) {
+                    // Use Google search for the property on Redfin
+                    console.log('Google search for:', searchQuery);
+                    window.open(googleUrl, '_blank');
+                } else {
+                    // Just open Redfin homepage and let user search manually
+                    alert(`Please search for: "${cleanAddress}" on Redfin`);
+                    window.open('https://www.redfin.com', '_blank');
+                }
                 
             } else {
                 alert('No address found! Please set up your home address first.');
