@@ -1492,6 +1492,7 @@
         }
 
         // Property settings functions - Updated to handle city/zip
+        // Property settings functions - Updated to handle city/state/zip
         function editPropertySettings() {
             // Populate the edit modal with current data
             document.getElementById('edit-address').value = homeData.address || '';
@@ -1577,6 +1578,7 @@
             alert('✅ Property settings updated successfully!');
         }
 
+        // Helper functions for task setup
         function renderTaskSetup() {
             const taskSetupList = document.getElementById('task-setup-list');
             console.log('🎨 Rendering task setup with', tasks.length, 'tasks');
@@ -1646,7 +1648,31 @@
             console.log('✅ Task setup rendered successfully');
         }
 
-        // Property settings functions - Updated to handle city/state/zip
+        function getSuggestedStartDate(task) {
+            const today = new Date();
+            
+            // Suggest start dates based on task priority and type
+            if (task.priority === 'high') {
+                // High priority tasks start within a week
+                const startDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+                return startDate.toISOString().split('T')[0];
+            } else if (task.frequency <= 90) {
+                // Frequent tasks (every 3 months or less) start soon
+                const startDate = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
+                return startDate.toISOString().split('T')[0];
+            } else {
+                // Less frequent tasks can start in a month
+                const startDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+                return startDate.toISOString().split('T')[0];
+            }
+        }
+
+        function getNextDueFromStart(startDateStr, frequency) {
+            if (!startDateStr) return '';
+            const startDate = new Date(startDateStr);
+            const nextDue = new Date(startDate.getTime() + frequency * 24 * 60 * 60 * 1000);
+            return nextDue.toLocaleDateString();
+        }
         function generateTasks() {
             const oldTasks = [...tasks]; // Save existing tasks with their dates
             tasks = [];
