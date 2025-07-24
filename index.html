@@ -352,6 +352,330 @@
         let tasks = [];
         let currentEditingTask = null;
 
+        // Regional task generation
+        function getClimateRegion(state) {
+            const stateUpper = state.toUpperCase();
+            
+            // Climate regions based on state
+            const regions = {
+                'NORTHEAST_COLD': ['ME', 'NH', 'VT', 'MA', 'RI', 'CT', 'NY', 'NJ', 'PA'],
+                'SOUTHEAST_HUMID': ['DE', 'MD', 'VA', 'WV', 'KY', 'TN', 'NC', 'SC', 'GA', 'FL', 'AL', 'MS', 'AR', 'LA'],
+                'MIDWEST_CONTINENTAL': ['OH', 'IN', 'MI', 'IL', 'WI', 'MN', 'IA', 'MO', 'ND', 'SD', 'NE', 'KS'],
+                'SOUTHWEST_ARID': ['TX', 'OK', 'NM', 'AZ', 'NV', 'UT', 'CO'],
+                'WEST_COAST': ['CA', 'OR', 'WA'],
+                'MOUNTAIN_WEST': ['MT', 'WY', 'ID'],
+                'ALASKA_HAWAII': ['AK', 'HI']
+            };
+            
+            for (const [region, states] of Object.entries(regions)) {
+                if (states.includes(stateUpper)) {
+                    return region;
+                }
+            }
+            
+            return 'GENERAL'; // Default for territories or unrecognized states
+        }
+
+        function generateRegionalTasks(climateRegion) {
+            console.log(`🌍 Adding regional tasks for: ${climateRegion}`);
+            let regionalTasks = [];
+            let id = Math.max(...tasks.map(t => t.id), 0) + 1;
+            
+            switch(climateRegion) {
+                case 'NORTHEAST_COLD':
+                    regionalTasks = [
+                        {
+                            id: id++,
+                            title: 'Winterize Outdoor Pipes',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 50,
+                            priority: 'high',
+                            description: 'Shut off and drain outdoor water lines before first freeze',
+                            season: 'fall'
+                        },
+                        {
+                            id: id++,
+                            title: 'Check Heating System Before Winter',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'high',
+                            description: 'Test heating system operation before cold weather',
+                            season: 'fall'
+                        },
+                        {
+                            id: id++,
+                            title: 'Install Storm Windows',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Install storm windows for winter insulation',
+                            season: 'fall'
+                        },
+                        {
+                            id: id++,
+                            title: 'Check for Ice Dams',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Inspect roof and gutters for ice dam formation',
+                            season: 'winter'
+                        }
+                    ];
+                    break;
+                    
+                case 'SOUTHEAST_HUMID':
+                    regionalTasks = [
+                        {
+                            id: id++,
+                            title: 'Hurricane Season Prep',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 100,
+                            priority: 'high',
+                            description: 'Trim trees, secure outdoor items, check generator',
+                            season: 'spring'
+                        },
+                        {
+                            id: id++,
+                            title: 'AC Pre-Season Tune-Up',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 150,
+                            priority: 'high',
+                            description: 'Professional AC maintenance before summer heat',
+                            season: 'spring'
+                        },
+                        {
+                            id: id++,
+                            title: 'Check for Mold/Humidity Issues',
+                            category: 'Seasonal',
+                            frequency: 180,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Inspect for mold growth due to high humidity',
+                            season: 'summer'
+                        }
+                    ];
+                    break;
+                    
+                case 'SOUTHWEST_ARID':
+                    regionalTasks = [
+                        {
+                            id: id++,
+                            title: 'Drought-Resistant Landscaping Check',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Assess water-efficient landscaping and irrigation',
+                            season: 'spring'
+                        },
+                        {
+                            id: id++,
+                            title: 'Swamp Cooler Maintenance',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 75,
+                            priority: 'medium',
+                            description: 'Clean and service evaporative cooling system',
+                            season: 'spring'
+                        },
+                        {
+                            id: id++,
+                            title: 'Check for Sun Damage',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Inspect exterior for UV damage to paint and materials',
+                            season: 'fall'
+                        }
+                    ];
+                    break;
+                    
+                case 'WEST_COAST':
+                    if (homeData.state.toUpperCase() === 'CA') {
+                        regionalTasks = [
+                            {
+                                id: id++,
+                                title: 'Wildfire Risk Assessment',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 0,
+                                priority: 'high',
+                                description: 'Clear defensible space, check emergency supplies',
+                                season: 'spring'
+                            },
+                            {
+                                id: id++,
+                                title: 'Earthquake Preparedness Check',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 50,
+                                priority: 'medium',
+                                description: 'Secure heavy items, check emergency kit',
+                                season: 'spring'
+                            },
+                            {
+                                id: id++,
+                                title: 'Drought Conservation Check',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 0,
+                                priority: 'medium',
+                                description: 'Assess water usage and conservation measures',
+                                season: 'summer'
+                            }
+                        ];
+                    } else {
+                        // Pacific Northwest (OR, WA)
+                        regionalTasks = [
+                            {
+                                id: id++,
+                                title: 'Rain Gutter Deep Clean',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 100,
+                                priority: 'high',
+                                description: 'Extra gutter maintenance for heavy rain season',
+                                season: 'fall'
+                            },
+                            {
+                                id: id++,
+                                title: 'Mold Prevention Check',
+                                category: 'Seasonal',
+                                frequency: 180,
+                                cost: 0,
+                                priority: 'medium',
+                                description: 'Inspect for moisture and mold in wet climate',
+                                season: 'fall'
+                            }
+                        ];
+                    }
+                    break;
+                    
+                case 'MIDWEST_CONTINENTAL':
+                    regionalTasks = [
+                        {
+                            id: id++,
+                            title: 'Tornado Season Prep',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Check safe room, weather radio, emergency supplies',
+                            season: 'spring'
+                        },
+                        {
+                            id: id++,
+                            title: 'Freeze Protection Check',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'high',
+                            description: 'Insulate pipes, check heating system',
+                            season: 'fall'
+                        }
+                    ];
+                    break;
+                    
+                case 'MOUNTAIN_WEST':
+                    regionalTasks = [
+                        {
+                            id: id++,
+                            title: 'High Altitude HVAC Check',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 100,
+                            priority: 'medium',
+                            description: 'Adjust HVAC for altitude and extreme temperature swings',
+                            season: 'fall'
+                        },
+                        {
+                            id: id++,
+                            title: 'Snow Load Assessment',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'high',
+                            description: 'Check roof structural integrity for snow load',
+                            season: 'fall'
+                        }
+                    ];
+                    break;
+                    
+                case 'ALASKA_HAWAII':
+                    if (homeData.state.toUpperCase() === 'AK') {
+                        regionalTasks = [
+                            {
+                                id: id++,
+                                title: 'Extreme Cold Preparation',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 150,
+                                priority: 'high',
+                                description: 'Winterize all systems for extreme cold',
+                                season: 'fall'
+                            }
+                        ];
+                    } else {
+                        // Hawaii
+                        regionalTasks = [
+                            {
+                                id: id++,
+                                title: 'Hurricane/Tropical Storm Prep',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 100,
+                                priority: 'high',
+                                description: 'Prepare for tropical weather season',
+                                season: 'spring'
+                            },
+                            {
+                                id: id++,
+                                title: 'Salt Air Corrosion Check',
+                                category: 'Seasonal',
+                                frequency: 180,
+                                cost: 0,
+                                priority: 'medium',
+                                description: 'Inspect for salt air damage to metal fixtures',
+                                season: 'summer'
+                            }
+                        ];
+                    }
+                    break;
+                    
+                default:
+                    // General seasonal tasks for unrecognized regions
+                    regionalTasks = [
+                        {
+                            id: id++,
+                            title: 'Seasonal Weather Prep',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Prepare home for upcoming weather changes',
+                            season: 'spring'
+                        }
+                    ];
+            }
+            
+            // Add template properties to all regional tasks
+            regionalTasks.forEach(task => {
+                task.nextDue = null;
+                task.lastCompleted = null;
+                task.isCompleted = false;
+                task.isTemplate = true;
+            });
+            
+            return regionalTasks;
+        }
+
         // Toggle well water sub-options
         function toggleWellWaterOptions() {
             const wellWaterCheckbox = document.getElementById('well-water');
@@ -454,12 +778,26 @@
             if (homeData.features?.basement) features.push('Basement');
             if (homeData.features?.otherFeatures) features.push(homeData.features.otherFeatures);
 
+            // Get climate region for display
+            const climateRegion = getClimateRegion(homeData.state);
+            const regionDisplayNames = {
+                'NORTHEAST_COLD': 'Northeast (Cold Climate)',
+                'SOUTHEAST_HUMID': 'Southeast (Humid Climate)', 
+                'MIDWEST_CONTINENTAL': 'Midwest (Continental Climate)',
+                'SOUTHWEST_ARID': 'Southwest (Arid Climate)',
+                'WEST_COAST': homeData.state.toUpperCase() === 'CA' ? 'California' : 'Pacific Northwest',
+                'MOUNTAIN_WEST': 'Mountain West',
+                'ALASKA_HAWAII': homeData.state.toUpperCase() === 'AK' ? 'Alaska' : 'Hawaii',
+                'GENERAL': 'General Climate'
+            };
+
             taskSetupSummary.innerHTML = `
                 <div class="space-y-1 text-sm">
                     <div><strong>🏠 Address:</strong> ${homeData.fullAddress}</div>
                     <div><strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString()} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt}</div>
                     <div><strong>🎯 Approach:</strong> ${homeData.approach} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
                     <div><strong>⚙️ Features:</strong> ${features.join(', ') || 'None selected'}</div>
+                    <div><strong>🌍 Climate Region:</strong> ${regionDisplayNames[climateRegion]} (includes regional seasonal tasks)</div>
                 </div>
             `;
             
@@ -1067,6 +1405,18 @@
 
             console.log('✅ Task generation complete! Total tasks:', tasks.length);
             console.log('📋 Generated tasks:', tasks.map(t => t.title));
+
+            // Add regional seasonal tasks based on location
+            if (homeData.state) {
+                const climateRegion = getClimateRegion(homeData.state);
+                const regionalTasks = generateRegionalTasks(climateRegion);
+                tasks.push(...regionalTasks);
+                
+                console.log(`🌍 Added ${regionalTasks.length} regional tasks for ${climateRegion}`);
+                console.log('🌍 Regional tasks:', regionalTasks.map(t => t.title));
+            }
+
+            console.log('✅ Final task count:', tasks.length);
         }
 
         // Helper functions for task setup
@@ -1098,18 +1448,23 @@
                                     task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' : 
                                     'bg-gray-100 text-gray-700';
                 
+                const isRegionalTask = task.category === 'Seasonal';
+                const regionalBadge = isRegionalTask ? 
+                    `<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">🌍 Regional</span>` : '';
+                
                 console.log(`🎨 Rendering task: ${task.title} (ID: ${task.id})`);
                 
                 return `
-                    <div class="border border-gray-200 rounded-lg p-4" data-task-id="${task.id}">
+                    <div class="border border-gray-200 rounded-lg p-4 ${isRegionalTask ? 'bg-purple-50' : ''}" data-task-id="${task.id}">
                         <div class="flex justify-between items-start mb-3">
                             <div class="flex-1">
                                 <h4 class="font-semibold text-gray-900">${task.title}</h4>
                                 <p class="text-sm text-gray-600 mt-1">${task.description}</p>
                                 <div class="flex items-center gap-3 mt-2 text-sm">
                                     <span class="bg-gray-100 px-2 py-1 rounded">${task.category}</span>
+                                    ${regionalBadge}
                                     <span class="text-gray-600">Every ${task.frequency} days</span>
-                                    <span class="text-gray-600">$${task.cost}</span>
+                                    <span class="text-gray-600">${task.cost}</span>
                                     <span class="px-2 py-1 rounded text-xs ${priorityClass}">${task.priority} priority</span>
                                 </div>
                             </div>
