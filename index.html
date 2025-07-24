@@ -2276,6 +2276,31 @@
             }
         }
 
+        // Clear data function updated to show setup form properly
+        function clearData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                // Clear variables
+                homeData = {};
+                tasks = [];
+                appliances = [];
+                documents = [];
+                repairRecords = [];
+                contractors = [];
+                
+                // Clear localStorage
+                localStorage.removeItem('casaCareData');
+                
+                // Show setup form and hide others
+                document.getElementById('setup-form').style.display = 'block';
+                document.getElementById('task-setup').classList.add('hidden');
+                document.getElementById('main-app').classList.add('hidden');
+                document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
+                
+                alert('✅ All data cleared. Starting fresh!');
+                console.log('🗑️ All data cleared');
+            }
+        }
+
         // Start the app when page loads
         document.addEventListener('DOMContentLoaded', initializeApp);
         
