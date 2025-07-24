@@ -1260,7 +1260,7 @@
                 });
             }
 
-            // General home maintenance tasks
+            // General home maintenance tasks (always included)
             tasks.push(
                 {
                     id: id++,
@@ -1296,6 +1296,32 @@
                     cost: 50,
                     priority: 'low',
                     description: 'Check and replace caulking around windows and doors',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                },
+                {
+                    id: id++,
+                    title: 'Furnace Filter Replacement',
+                    category: 'HVAC',
+                    frequency: Math.round(90 * freqMod),
+                    cost: 30,
+                    priority: 'high',
+                    description: 'Replace heating system filter',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                },
+                {
+                    id: id++,
+                    title: 'Dryer Vent Cleaning',
+                    category: 'General',
+                    frequency: Math.round(365 * freqMod),
+                    cost: 100,
+                    priority: 'medium',
+                    description: 'Clean dryer vent to prevent fire hazard',
                     nextDue: null,
                     lastCompleted: null,
                     isCompleted: false,
