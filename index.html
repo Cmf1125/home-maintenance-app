@@ -150,9 +150,32 @@
                                 <span>Mini-Split Systems</span>
                             </label>
                             <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="well-water" class="w-5 h-5">
+                                <input type="checkbox" id="boiler" class="w-5 h-5">
+                                <span>Boiler System</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="well-water" class="w-5 h-5" onchange="toggleWellWaterOptions()">
                                 <span>Well Water</span>
                             </label>
+                            <!-- Well Water Sub-options -->
+                            <div id="well-water-options" class="ml-8 space-y-2 hidden">
+                                <label class="flex items-center space-x-3 touch-btn">
+                                    <input type="checkbox" id="sediment-filter" class="w-4 h-4">
+                                    <span class="text-sm">Sediment Filtration</span>
+                                </label>
+                                <label class="flex items-center space-x-3 touch-btn">
+                                    <input type="checkbox" id="uv-filter" class="w-4 h-4">
+                                    <span class="text-sm">UV Filtration</span>
+                                </label>
+                                <label class="flex items-center space-x-3 touch-btn">
+                                    <input type="checkbox" id="water-softener" class="w-4 h-4">
+                                    <span class="text-sm">Water Softener</span>
+                                </label>
+                                <label class="flex items-center space-x-3 touch-btn">
+                                    <input type="checkbox" id="whole-house-filter" class="w-4 h-4">
+                                    <span class="text-sm">Whole House Filter</span>
+                                </label>
+                            </div>
                             <label class="flex items-center space-x-3 touch-btn">
                                 <input type="checkbox" id="septic" class="w-5 h-5">
                                 <span>Septic System</span>
@@ -168,6 +191,14 @@
                             <label class="flex items-center space-x-3 touch-btn">
                                 <input type="checkbox" id="deck" class="w-5 h-5">
                                 <span>Deck/Patio</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="garage" class="w-5 h-5">
+                                <span>Garage</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="basement" class="w-5 h-5">
+                                <span>Basement</span>
                             </label>
                         </div>
                         <!-- Other Features Input -->
@@ -321,6 +352,23 @@
         let tasks = [];
         let currentEditingTask = null;
 
+        // Toggle well water sub-options
+        function toggleWellWaterOptions() {
+            const wellWaterCheckbox = document.getElementById('well-water');
+            const wellWaterOptions = document.getElementById('well-water-options');
+            
+            if (wellWaterCheckbox.checked) {
+                wellWaterOptions.classList.remove('hidden');
+            } else {
+                wellWaterOptions.classList.add('hidden');
+                // Uncheck all sub-options when well water is unchecked
+                document.getElementById('sediment-filter').checked = false;
+                document.getElementById('uv-filter').checked = false;
+                document.getElementById('water-softener').checked = false;
+                document.getElementById('whole-house-filter').checked = false;
+            }
+        }
+
         // Create maintenance plan - now goes to task setup
         function createMaintenancePlan() {
             console.log('🔧 Creating maintenance plan...');
@@ -346,11 +394,18 @@
             homeData.features = {
                 centralAC: document.getElementById('central-ac')?.checked || false,
                 miniSplits: document.getElementById('mini-splits')?.checked || false,
+                boiler: document.getElementById('boiler')?.checked || false,
                 wellWater: document.getElementById('well-water')?.checked || false,
+                sedimentFilter: document.getElementById('sediment-filter')?.checked || false,
+                uvFilter: document.getElementById('uv-filter')?.checked || false,
+                waterSoftener: document.getElementById('water-softener')?.checked || false,
+                wholeHouseFilter: document.getElementById('whole-house-filter')?.checked || false,
                 septic: document.getElementById('septic')?.checked || false,
                 fireplace: document.getElementById('fireplace')?.checked || false,
                 pool: document.getElementById('pool')?.checked || false,
                 deck: document.getElementById('deck')?.checked || false,
+                garage: document.getElementById('garage')?.checked || false,
+                basement: document.getElementById('basement')?.checked || false,
                 otherFeatures: document.getElementById('other-features')?.value || ''
             };
 
@@ -378,11 +433,25 @@
             
             if (homeData.features?.centralAC) features.push('Central AC/Heat');
             if (homeData.features?.miniSplits) features.push('Mini-Splits');
-            if (homeData.features?.wellWater) features.push('Well Water');
+            if (homeData.features?.boiler) features.push('Boiler');
+            if (homeData.features?.wellWater) {
+                let wellWaterText = 'Well Water';
+                const wellWaterSubs = [];
+                if (homeData.features?.sedimentFilter) wellWaterSubs.push('Sediment Filter');
+                if (homeData.features?.uvFilter) wellWaterSubs.push('UV Filter');
+                if (homeData.features?.waterSoftener) wellWaterSubs.push('Water Softener');
+                if (homeData.features?.wholeHouseFilter) wellWaterSubs.push('Whole House Filter');
+                if (wellWaterSubs.length > 0) {
+                    wellWaterText += ` (${wellWaterSubs.join(', ')})`;
+                }
+                features.push(wellWaterText);
+            }
             if (homeData.features?.septic) features.push('Septic System');
             if (homeData.features?.fireplace) features.push('Fireplace');
             if (homeData.features?.pool) features.push('Pool/Spa');
             if (homeData.features?.deck) features.push('Deck/Patio');
+            if (homeData.features?.garage) features.push('Garage');
+            if (homeData.features?.basement) features.push('Basement');
             if (homeData.features?.otherFeatures) features.push(homeData.features.otherFeatures);
 
             taskSetupSummary.innerHTML = `
@@ -439,12 +508,22 @@
             if (homeData.features) {
                 document.getElementById('central-ac').checked = homeData.features.centralAC || false;
                 document.getElementById('mini-splits').checked = homeData.features.miniSplits || false;
+                document.getElementById('boiler').checked = homeData.features.boiler || false;
                 document.getElementById('well-water').checked = homeData.features.wellWater || false;
+                document.getElementById('sediment-filter').checked = homeData.features.sedimentFilter || false;
+                document.getElementById('uv-filter').checked = homeData.features.uvFilter || false;
+                document.getElementById('water-softener').checked = homeData.features.waterSoftener || false;
+                document.getElementById('whole-house-filter').checked = homeData.features.wholeHouseFilter || false;
                 document.getElementById('septic').checked = homeData.features.septic || false;
                 document.getElementById('fireplace').checked = homeData.features.fireplace || false;
                 document.getElementById('pool').checked = homeData.features.pool || false;
                 document.getElementById('deck').checked = homeData.features.deck || false;
+                document.getElementById('garage').checked = homeData.features.garage || false;
+                document.getElementById('basement').checked = homeData.features.basement || false;
                 document.getElementById('other-features').value = homeData.features.otherFeatures || '';
+                
+                // Show/hide well water options
+                toggleWellWaterOptions();
             }
             
             // Set radio buttons and select
@@ -498,14 +577,24 @@
             document.getElementById('sqft').value = '2000';
             document.getElementById('central-ac').checked = true;
             document.getElementById('mini-splits').checked = false;
+            document.getElementById('boiler').checked = false;
             document.getElementById('well-water').checked = false;
+            document.getElementById('sediment-filter').checked = false;
+            document.getElementById('uv-filter').checked = false;
+            document.getElementById('water-softener').checked = false;
+            document.getElementById('whole-house-filter').checked = false;
             document.getElementById('septic').checked = false;
             document.getElementById('fireplace').checked = false;
             document.getElementById('pool').checked = false;
             document.getElementById('deck').checked = false;
+            document.getElementById('garage').checked = false;
+            document.getElementById('basement').checked = false;
             document.getElementById('other-features').value = '';
             document.querySelector('input[name="pets"][value="no"]').checked = true;
             document.getElementById('approach').value = 'proactive';
+            
+            // Hide well water options
+            document.getElementById('well-water-options').classList.add('hidden');
             
             // Reset data
             homeData = {};
@@ -674,19 +763,6 @@
                 },
                 {
                     id: id++,
-                    title: 'Furnace Filter Replacement',
-                    category: 'HVAC',
-                    frequency: 90,
-                    cost: 30,
-                    priority: 'high',
-                    description: 'Replace heating system filter',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                },
-                {
-                    id: id++,
                     title: 'Dryer Vent Cleaning',
                     category: 'General',
                     frequency: 180,
@@ -699,6 +775,23 @@
                     isTemplate: true
                 }
             );
+
+            // Only add furnace filter if they have central AC/heat or boiler
+            if (homeData.features?.centralAC || homeData.features?.boiler) {
+                tasks.push({
+                    id: id++,
+                    title: 'Furnace Filter Replacement',
+                    category: 'HVAC',
+                    frequency: 90,
+                    cost: 30,
+                    priority: 'high',
+                    description: 'Replace heating system filter',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                });
+            }
 
             console.log('✅ Added baseline tasks:', tasks.length);
 
@@ -768,6 +861,7 @@
             // Water system tasks
             if (homeData.features?.wellWater) {
                 console.log('🔧 Adding Well Water tasks...');
+                // Always add basic well water testing
                 tasks.push({
                     id: id++,
                     title: 'Test Well Water',
@@ -782,33 +876,70 @@
                     isTemplate: true
                 });
                 
-                tasks.push({
-                    id: id++,
-                    title: 'Replace Sediment Filter for Water',
-                    category: 'Water Systems',
-                    frequency: 90,
-                    cost: 25,
-                    priority: 'medium',
-                    description: 'Replace sediment filter for well water system',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                });
+                // Add specific filter tasks based on what they selected
+                if (homeData.features?.sedimentFilter) {
+                    tasks.push({
+                        id: id++,
+                        title: 'Replace Sediment Filter for Water',
+                        category: 'Water Systems',
+                        frequency: 90,
+                        cost: 25,
+                        priority: 'medium',
+                        description: 'Replace sediment filter for well water system',
+                        nextDue: null,
+                        lastCompleted: null,
+                        isCompleted: false,
+                        isTemplate: true
+                    });
+                }
                 
-                tasks.push({
-                    id: id++,
-                    title: 'Replace UV Filter',
-                    category: 'Water Systems',
-                    frequency: 365,
-                    cost: 150,
-                    priority: 'medium',
-                    description: 'Replace UV filter for water treatment',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                });
+                if (homeData.features?.uvFilter) {
+                    tasks.push({
+                        id: id++,
+                        title: 'Replace UV Filter',
+                        category: 'Water Systems',
+                        frequency: 365,
+                        cost: 150,
+                        priority: 'medium',
+                        description: 'Replace UV filter for water treatment',
+                        nextDue: null,
+                        lastCompleted: null,
+                        isCompleted: false,
+                        isTemplate: true
+                    });
+                }
+                
+                if (homeData.features?.waterSoftener) {
+                    tasks.push({
+                        id: id++,
+                        title: 'Refill Water Softener Salt',
+                        category: 'Water Systems',
+                        frequency: 60,
+                        cost: 30,
+                        priority: 'medium',
+                        description: 'Check and refill water softener salt',
+                        nextDue: null,
+                        lastCompleted: null,
+                        isCompleted: false,
+                        isTemplate: true
+                    });
+                }
+                
+                if (homeData.features?.wholeHouseFilter) {
+                    tasks.push({
+                        id: id++,
+                        title: 'Replace Whole House Filter',
+                        category: 'Water Systems',
+                        frequency: 180,
+                        cost: 50,
+                        priority: 'medium',
+                        description: 'Replace whole house water filter',
+                        nextDue: null,
+                        lastCompleted: null,
+                        isCompleted: false,
+                        isTemplate: true
+                    });
+                }
             }
 
             if (homeData.features?.septic) {
@@ -873,6 +1004,60 @@
                     cost: 300,
                     priority: 'high',
                     description: 'Seasonal pool opening and closing',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                });
+            }
+
+            // Garage tasks
+            if (homeData.features?.garage) {
+                console.log('🔧 Adding Garage tasks...');
+                tasks.push({
+                    id: id++,
+                    title: 'Garage Door Maintenance',
+                    category: 'General',
+                    frequency: 365,
+                    cost: 50,
+                    priority: 'medium',
+                    description: 'Lubricate garage door hardware and test safety features',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                });
+            }
+
+            // Basement tasks  
+            if (homeData.features?.basement) {
+                console.log('🔧 Adding Basement tasks...');
+                tasks.push({
+                    id: id++,
+                    title: 'Check Basement for Moisture',
+                    category: 'General',
+                    frequency: 180,
+                    cost: 0,
+                    priority: 'medium',
+                    description: 'Inspect basement for signs of moisture, leaks, or mold',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                });
+            }
+
+            // Boiler tasks
+            if (homeData.features?.boiler) {
+                console.log('🔧 Adding Boiler tasks...');
+                tasks.push({
+                    id: id++,
+                    title: 'Boiler Annual Service',
+                    category: 'HVAC',
+                    frequency: 365,
+                    cost: 200,
+                    priority: 'high',
+                    description: 'Professional boiler inspection and maintenance',
                     nextDue: null,
                     lastCompleted: null,
                     isCompleted: false,
