@@ -70,11 +70,6 @@
             margin: 0 auto;
             border-radius: 1px;
         }
-
-        /* Prevent browser auto-linking of addresses */
-        [onclick*="openRedfin"] {
-            pointer-events: auto;
-        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -257,617 +252,13 @@
                 </div>
             </div>
         </div>
-
-        <!-- Main App -->
-        <div id="main-app" class="hidden">
-            <!-- Tab Contents -->
-            <div class="main-content">
-                <!-- Dashboard -->
-                <div id="dashboard-content" class="tab-content p-4">
-                    <!-- Welcome -->
-                    <div class="gradient-bg text-white rounded-2xl p-6 shadow-2xl mb-6">
-                        <h2 class="text-xl font-bold mb-2">Welcome to Casa Care! 👋</h2>
-                        <p class="text-blue-100 text-sm cursor-pointer hover:text-white hover:underline transition-colors" id="home-address" onclick="openRedfin()" title="Click to view on Redfin">Managing maintenance for your home</p>
-                    </div>
-
-                    <!-- Stats Grid -->
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="bg-white rounded-xl p-4 shadow-lg">
-                            <div class="flex items-center gap-3">
-                                <div class="p-2 bg-red-100 rounded-lg text-lg">⚠️</div>
-                                <div>
-                                    <p class="text-xs text-gray-600">Overdue</p>
-                                    <p id="overdue-count" class="text-xl font-bold text-gray-900">0</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl p-4 shadow-lg">
-                            <div class="flex items-center gap-3">
-                                <div class="p-2 bg-orange-100 rounded-lg text-lg">📅</div>
-                                <div>
-                                    <p class="text-xs text-gray-600">This Week</p>
-                                    <p id="week-count" class="text-xl font-bold text-gray-900">0</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl p-4 shadow-lg">
-                            <div class="flex items-center gap-3">
-                                <div class="p-2 bg-blue-100 rounded-lg text-lg">📋</div>
-                                <div>
-                                    <p class="text-xs text-gray-600">Total Tasks</p>
-                                    <p id="total-count" class="text-xl font-bold text-gray-900">0</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl p-4 shadow-lg">
-                            <div class="flex items-center gap-3">
-                                <div class="p-2 bg-green-100 rounded-lg text-lg">💰</div>
-                                <div>
-                                    <p class="text-xs text-gray-600">Annual Cost</p>
-                                    <p id="annual-cost" class="text-xl font-bold text-gray-900">$0</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Upcoming Tasks -->
-                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-                            <h3 class="text-lg font-bold text-gray-900">Upcoming Tasks</h3>
-                            <button onclick="exportCalendar()" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-                                📅 Export
-                            </button>
-                        </div>
-                        <div id="tasks-list">
-                            <!-- Tasks will be populated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- All Tasks Tab -->
-                <div id="tasks-content" class="tab-content hidden p-4">
-                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <div class="p-4 border-b border-gray-100">
-                            <div class="flex items-center justify-between mb-3">
-                                <h3 class="text-lg font-bold text-gray-900">All Tasks</h3>
-                                <button onclick="addTask()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm touch-btn">
-                                    ➕ Add
-                                </button>
-                            </div>
-                            <button onclick="addSeasonalTasks()" class="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 touch-btn">
-                                🍂 Add Seasonal Tasks
-                            </button>
-                        </div>
-                        <div id="all-tasks-list">
-                            <!-- All tasks will be populated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Calendar Tab -->
-                <div id="calendar-content" class="tab-content hidden p-4">
-                    <div class="bg-white rounded-2xl shadow-lg p-4">
-                        <div class="flex items-center justify-between mb-4">
-                            <button onclick="changeMonth(-1)" class="bg-gray-200 hover:bg-gray-300 p-3 rounded-lg touch-btn">
-                                ←
-                            </button>
-                            <h3 id="current-month-year" class="font-bold text-lg text-center flex-1">
-                                <!-- Current month/year will be displayed here -->
-                            </h3>
-                            <button onclick="changeMonth(1)" class="bg-gray-200 hover:bg-gray-300 p-3 rounded-lg touch-btn">
-                                →
-                            </button>
-                        </div>
-                        <div class="swipe-hint mb-4"></div>
-                        <div id="calendar-view">
-                            <!-- Calendar grid will be populated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Appliances Tab -->
-                <div id="appliances-content" class="tab-content hidden p-4">
-                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-                            <h3 class="text-lg font-bold text-gray-900">Appliances</h3>
-                            <button onclick="addAppliance()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm touch-btn">
-                                ➕ Add
-                            </button>
-                        </div>
-                        <div id="appliances-list">
-                            <!-- Appliances will be populated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Documents Tab -->
-                <div id="documents-content" class="tab-content hidden p-4">
-                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-                            <h3 class="text-lg font-bold text-gray-900">Documents</h3>
-                            <button onclick="addDocument()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm touch-btn">
-                                ➕ Add
-                            </button>
-                        </div>
-                        <div id="documents-list">
-                            <!-- Documents will be populated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Settings Tab -->
-                <div id="settings-content" class="tab-content hidden p-4">
-                    <div class="space-y-6">
-                        <!-- Property Information -->
-                        <div class="bg-white rounded-2xl shadow-lg p-4">
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">Property Info</h3>
-                            <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                                <div id="property-summary">
-                                    <!-- Property summary will be populated here -->
-                                </div>
-                            </div>
-                            <button onclick="editPropertySettings()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 touch-btn">
-                                ✏️ Edit Property Details
-                            </button>
-                        </div>
-
-                        <!-- Contractors Section -->
-                        <div class="bg-white rounded-2xl shadow-lg p-4">
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">Contractors & Repairs</h3>
-                            
-                            <!-- Repair Records -->
-                            <div class="mb-6">
-                                <div class="flex items-center justify-between mb-3">
-                                    <h4 class="font-medium text-gray-900">Repair Records</h4>
-                                    <button onclick="addRepairRecord()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm touch-btn">
-                                        ➕ Add
-                                    </button>
-                                </div>
-                                <div id="repair-records-list" class="bg-gray-50 rounded-lg max-h-40 overflow-y-auto">
-                                    <!-- Repair records will be populated here -->
-                                </div>
-                            </div>
-
-                            <!-- Contractor Directory -->
-                            <div>
-                                <div class="flex items-center justify-between mb-3">
-                                    <h4 class="font-medium text-gray-900">Contractor Directory</h4>
-                                    <button onclick="addContractor()" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-                                        ➕ Add
-                                    </button>
-                                </div>
-                                <div id="contractors-list" class="bg-gray-50 rounded-lg max-h-40 overflow-y-auto">
-                                    <!-- Contractors will be populated here -->
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Data Management -->
-                        <div class="bg-white rounded-2xl shadow-lg p-4">
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">Data Management</h3>
-                            <div class="space-y-3">
-                                <button onclick="exportData()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 touch-btn">
-                                    📄 Export All Data
-                                </button>
-                                <button onclick="clearData()" class="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 touch-btn">
-                                    🗑️ Clear All Data
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- App Info -->
-                        <div class="bg-white rounded-2xl shadow-lg p-4">
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">About</h3>
-                            <div class="text-sm text-gray-600 space-y-2">
-                                <p><strong>Casa Care</strong> - Smart Home Maintenance</p>
-                                <p>Version 1.0</p>
-                                <p>Keep your home in perfect condition with personalized maintenance schedules.</p>
-                                <div class="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                                    <p class="text-green-700 text-xs">
-                                        ✅ <strong>Auto-Save:</strong> Your data automatically saves in your browser. No account needed!
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bottom Navigation -->
-            <div class="bottom-nav">
-                <div class="grid grid-cols-5 gap-1 p-2">
-                    <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn flex flex-col items-center p-3 rounded-lg bg-blue-100 text-blue-700 touch-btn">
-                        <div class="text-lg mb-1">🏠</div>
-                        <div class="text-xs">Home</div>
-                    </button>
-                    <button onclick="showTab('tasks')" id="tab-tasks" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-                        <div class="text-lg mb-1">✅</div>
-                        <div class="text-xs">Tasks</div>
-                    </button>
-                    <button onclick="showTab('calendar')" id="tab-calendar" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-                        <div class="text-lg mb-1">🗓️</div>
-                        <div class="text-xs">Calendar</div>
-                    </button>
-                    <button onclick="showTab('appliances')" id="tab-appliances" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-                        <div class="text-lg mb-1">🔧</div>
-                        <div class="text-xs">Items</div>
-                    </button>
-                    <button onclick="showTab('documents')" id="tab-documents" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-                        <div class="text-lg mb-1">📄</div>
-                        <div class="text-xs">Docs</div>
-                    </button>
-                </div>
-                <div class="text-center pb-2">
-                    <button onclick="showTab('settings')" id="tab-settings" class="tab-btn flex items-center justify-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 touch-btn text-xs">
-                        <div class="text-base">⚙️</div>
-                        <div>Settings</div>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Home Info Modal -->
-        <div id="home-info-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-md p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold">🏠 Home Information</h3>
-                    <button onclick="closeHomeInfoModal()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
-                </div>
-                <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                    <div id="home-info-display">
-                        <!-- Home info will be populated here -->
-                    </div>
-                </div>
-                <div class="flex gap-3">
-                    <button onclick="closeHomeInfoModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Close</button>
-                    <button onclick="editFromHomeInfo()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Edit</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Property Settings Modal -->
-        <div id="property-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-screen overflow-y-auto">
-                <h3 class="text-xl font-bold mb-4">Edit Property Details</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
-                        <input type="text" id="edit-address" class="w-full p-3 border rounded-lg text-base">
-                    </div>
-                    <div class="grid grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                            <input type="text" id="edit-city" class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
-                            <input type="text" id="edit-state" maxlength="2" class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Zip Code</label>
-                            <input type="text" id="edit-zipcode" class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
-                            <input type="number" id="edit-year-built" class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Square Feet</label>
-                            <input type="number" id="edit-sqft" class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Home Systems</label>
-                        <div class="space-y-3">
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="edit-central-ac" class="w-5 h-5">
-                                <span>Central Air/Heat</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="edit-mini-splits" class="w-5 h-5">
-                                <span>Mini-Split Systems</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="edit-well-water" class="w-5 h-5">
-                                <span>Well Water</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="edit-septic" class="w-5 h-5">
-                                <span>Septic System</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="edit-fireplace" class="w-5 h-5">
-                                <span>Fireplace</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="edit-pool" class="w-5 h-5">
-                                <span>Pool/Spa</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="edit-deck" class="w-5 h-5">
-                                <span>Deck/Patio</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Pets?</label>
-                            <select id="edit-pets" class="w-full p-3 border rounded-lg text-base">
-                                <option value="no">No</option>
-                                <option value="yes">Yes</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Approach</label>
-                            <select id="edit-approach" class="w-full p-3 border rounded-lg text-base">
-                                <option value="proactive">Proactive</option>
-                                <option value="standard">Standard</option>
-                                <option value="minimal">Minimal</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closePropertyModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Cancel</button>
-                    <button onclick="savePropertySettings()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Save</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Document Modal -->
-        <div id="document-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-screen overflow-y-auto">
-                <h3 class="text-xl font-bold mb-4" id="document-modal-title">Add Document</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Document Name</label>
-                        <input type="text" id="document-name" placeholder="e.g., Home Insurance Policy" 
-                               class="w-full p-3 border rounded-lg text-base">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Document Type</label>
-                        <select id="document-type" class="w-full p-3 border rounded-lg text-base">
-                            <option value="Insurance">Insurance Policy</option>
-                            <option value="Warranty">Warranty</option>
-                            <option value="Manual">Owner's Manual</option>
-                            <option value="Receipt">Receipt/Invoice</option>
-                            <option value="Permit">Permit/Certificate</option>
-                            <option value="Contract">Service Contract</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Issue Date</label>
-                            <input type="date" id="document-issue-date" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Expires</label>
-                            <input type="date" id="document-expiry-date" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Company/Provider</label>
-                        <input type="text" id="document-provider" placeholder="e.g., State Farm Insurance" 
-                               class="w-full p-3 border rounded-lg text-base">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Policy/Reference Number</label>
-                        <input type="text" id="document-reference" placeholder="e.g., Policy #12345" 
-                               class="w-full p-3 border rounded-lg text-base">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                        <textarea id="document-notes" placeholder="Additional details..." 
-                                  class="w-full p-3 border rounded-lg text-base" rows="3"></textarea>
-                    </div>
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <p class="text-sm text-blue-700">📱 <strong>In a full app:</strong> You would upload PDF/photos here. For now, we'll store the document details.</p>
-                    </div>
-                </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closeDocumentModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Cancel</button>
-                    <button onclick="saveDocument()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Save</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Task Detail Modal (for calendar clicks) -->
-        <div id="task-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-md p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold" id="task-detail-title">Task Details</h3>
-                    <button onclick="closeTaskDetailModal()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
-                </div>
-                <div class="space-y-4" id="task-detail-content">
-                    <!-- Task details will be populated here -->
-                </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closeTaskDetailModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Close</button>
-                    <button onclick="completeTaskFromDetail()" id="complete-task-btn" class="flex-1 bg-green-600 text-white py-3 rounded-lg touch-btn">✅ Complete</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Task Modal -->
-        <div id="task-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-md p-6">
-                <h3 class="text-xl font-bold mb-4" id="modal-title">Add Task</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Task Name</label>
-                        <input type="text" id="task-title" placeholder="e.g., Replace HVAC Filter" 
-                               class="w-full p-3 border rounded-lg text-base">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                        <select id="task-category" class="w-full p-3 border rounded-lg text-base">
-                            <option value="HVAC">HVAC</option>
-                            <option value="Water Systems">Water Systems</option>
-                            <option value="Exterior">Exterior</option>
-                            <option value="Safety">Safety</option>
-                            <option value="General">General</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Cost ($)</label>
-                            <input type="number" id="task-cost" placeholder="0" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Every (days)</label>
-                            <input type="number" id="task-frequency" placeholder="365" value="365"
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                        <textarea id="task-notes" placeholder="Additional details..." 
-                                  class="w-full p-3 border rounded-lg text-base" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Cancel</button>
-                    <button onclick="saveTask()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Save</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Other modals... (appliance, seasonal) -->
-        <div id="appliance-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-screen overflow-y-auto">
-                <h3 class="text-xl font-bold mb-4" id="appliance-modal-title">Add Appliance</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                        <input type="text" id="appliance-name" placeholder="e.g., Main HVAC Unit" 
-                               class="w-full p-3 border rounded-lg text-base">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                        <select id="appliance-type" class="w-full p-3 border rounded-lg text-base">
-                            <option value="HVAC">HVAC System</option>
-                            <option value="Water Heater">Water Heater</option>
-                            <option value="Washer">Washer</option>
-                            <option value="Dryer">Dryer</option>
-                            <option value="Refrigerator">Refrigerator</option>
-                            <option value="Dishwasher">Dishwasher</option>
-                            <option value="Range/Oven">Range/Oven</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
-                            <input type="text" id="appliance-brand" placeholder="e.g., Carrier" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Model</label>
-                            <input type="text" id="appliance-model" placeholder="e.g., 24ABC6" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Install Date</label>
-                            <input type="date" id="appliance-install-date" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Warranty Expires</label>
-                            <input type="date" id="appliance-warranty" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                        <textarea id="appliance-notes" placeholder="Serial numbers, etc." 
-                                  class="w-full p-3 border rounded-lg text-base" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closeApplianceModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Cancel</button>
-                    <button onclick="saveAppliance()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Save</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Seasonal Tasks Modal -->
-        <div id="seasonal-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-screen overflow-y-auto">
-                <h3 class="text-xl font-bold mb-4">Add Seasonal Tasks</h3>
-                <div class="space-y-6">
-                    <div>
-                        <h4 class="font-semibold text-orange-600 mb-3">🍂 Fall Tasks</h4>
-                        <div class="space-y-3">
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="fall-gutters" checked class="w-5 h-5">
-                                <span class="text-sm">Clean gutters & downspouts</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="fall-furnace" class="w-5 h-5">
-                                <span class="text-sm">Schedule furnace inspection</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="fall-chimney" class="w-5 h-5">
-                                <span class="text-sm">Chimney cleaning</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="fall-weatherstrip" class="w-5 h-5">
-                                <span class="text-sm">Check weatherstripping</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold text-green-600 mb-3">🌸 Spring Tasks</h4>
-                        <div class="space-y-3">
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="spring-ac" checked class="w-5 h-5">
-                                <span class="text-sm">AC system tune-up</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="spring-deck" class="w-5 h-5">
-                                <span class="text-sm">Deck inspection & cleaning</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="spring-exterior" class="w-5 h-5">
-                                <span class="text-sm">Exterior pressure washing</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="spring-irrigation" class="w-5 h-5">
-                                <span class="text-sm">Irrigation system check</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closeSeasonalModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Cancel</button>
-                    <button onclick="saveSeasonalTasks()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Add Tasks</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
         // App data
         let homeData = {};
         let tasks = [];
-        let appliances = [];
-        let documents = [];
-        let repairRecords = [];
-        let contractors = [];
         let currentEditingTask = null;
-        let currentEditingAppliance = null;
-        let currentEditingDocument = null;
-        let currentCalendarDate = new Date();
 
         // Create maintenance plan - now goes to task setup
         function createMaintenancePlan() {
@@ -907,9 +298,6 @@
             generateTaskTemplates();
             console.log('📋 Tasks generated:', tasks.length, tasks);
 
-            // Add default appliances based on features
-            generateDefaultAppliances();
-
             // Go to task setup screen instead of main app
             document.getElementById('setup-form').style.display = 'none';
             document.getElementById('task-setup').classList.remove('hidden');
@@ -918,9 +306,12 @@
             showTaskSetup();
         }
 
-        // Show home info when top-right home icon is clicked
-        function showHomeInfo() {
-            const homeInfoDisplay = document.getElementById('home-info-display');
+        // Show task setup screen
+        function showTaskSetup() {
+            console.log('📋 Showing task setup screen...');
+            
+            // Update the property summary in task setup
+            const taskSetupSummary = document.getElementById('task-setup-summary');
             const features = [];
             
             if (homeData.features?.centralAC) features.push('Central AC/Heat');
@@ -931,201 +322,156 @@
             if (homeData.features?.pool) features.push('Pool/Spa');
             if (homeData.features?.deck) features.push('Deck/Patio');
 
-            homeInfoDisplay.innerHTML = `
-                <div class="space-y-2 text-sm">
-                    <div><strong>📍 Address:</strong><br>
-                        <a href="https://maps.google.com/?q=${encodeURIComponent(homeData.fullAddress)}" target="_blank" class="text-blue-600 hover:underline">${homeData.fullAddress || 'Not set'}</a>
-                        <div class="text-xs text-gray-500 mt-1">Click to view on Google Maps</div>
-                    </div>
-                    <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
-                    <div><strong>🎯 Approach:</strong> ${homeData.approach || 'Standard'} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
-                    <div><strong>🏠 Features:</strong><br>${features.join(', ') || 'None selected'}</div>
+            taskSetupSummary.innerHTML = `
+                <div class="space-y-1 text-sm">
+                    <div><strong>🏠 Address:</strong> ${homeData.fullAddress}</div>
+                    <div><strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString()} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt}</div>
+                    <div><strong>🎯 Approach:</strong> ${homeData.approach} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
+                    <div><strong>⚙️ Features:</strong> ${features.join(', ') || 'None selected'}</div>
                 </div>
             `;
             
-            document.getElementById('home-info-modal').classList.remove('hidden');
+            // Render the task setup list
+            renderTaskSetup();
         }
 
-        function closeHomeInfoModal() {
-            document.getElementById('home-info-modal').classList.add('hidden');
+        // Add task from setup screen
+        function addTaskFromSetup() {
+            console.log('➕ Adding custom task from setup...');
+            alert('🚧 Custom task creation will be available in the full version. For now, you can edit the generated tasks!');
         }
 
-        function editFromHomeInfo() {
-            closeHomeInfoModal();
-            editPropertySettings();
-        }
-
-        // Documents management
-        function addDocument() {
-            currentEditingDocument = null;
-            document.getElementById('document-modal-title').textContent = 'Add Document';
-            document.getElementById('document-name').value = '';
-            document.getElementById('document-type').value = 'Insurance';
-            document.getElementById('document-issue-date').value = '';
-            document.getElementById('document-expiry-date').value = '';
-            document.getElementById('document-provider').value = '';
-            document.getElementById('document-reference').value = '';
-            document.getElementById('document-notes').value = '';
-            document.getElementById('document-modal').classList.remove('hidden');
-        }
-
-        function closeDocumentModal() {
-            document.getElementById('document-modal').classList.add('hidden');
-            currentEditingDocument = null;
-        }
-
-        function saveDocument() {
-            const name = document.getElementById('document-name').value;
-            const type = document.getElementById('document-type').value;
-            const issueDate = document.getElementById('document-issue-date').value;
-            const expiryDate = document.getElementById('document-expiry-date').value;
-            const provider = document.getElementById('document-provider').value;
-            const reference = document.getElementById('document-reference').value;
-            const notes = document.getElementById('document-notes').value;
-
-            if (!name.trim()) {
-                alert('Please enter a document name');
-                return;
-            }
-
-            if (currentEditingDocument) {
-                // Update existing document
-                currentEditingDocument.name = name;
-                currentEditingDocument.type = type;
-                currentEditingDocument.issueDate = issueDate;
-                currentEditingDocument.expiryDate = expiryDate;
-                currentEditingDocument.provider = provider;
-                currentEditingDocument.reference = reference;
-                currentEditingDocument.notes = notes;
-            } else {
-                // Add new document
-                const newDocument = {
-                    id: Math.max(...documents.map(d => d.id), 0) + 1,
-                    name: name,
-                    type: type,
-                    issueDate: issueDate,
-                    expiryDate: expiryDate,
-                    provider: provider,
-                    reference: reference,
-                    notes: notes,
-                    dateAdded: new Date().toISOString().split('T')[0]
-                };
-                documents.push(newDocument);
-            }
-
-            closeDocumentModal();
-            renderDocuments();
-            saveData();
-        }
-
-        function renderDocuments() {
-            const documentsList = document.getElementById('documents-list');
+        // Go back to home setup
+        function goBackToHomeSetup() {
+            console.log('⬅️ Going back to home setup...');
             
-            if (documents.length === 0) {
-                documentsList.innerHTML = '<div class="p-6 text-center text-gray-500">No documents added yet. Add insurance policies, warranties, and important home documents.</div>';
-                return;
+            // Hide task setup and show setup form
+            document.getElementById('task-setup').classList.add('hidden');
+            document.getElementById('setup-form').style.display = 'block';
+            
+            // Pre-populate the form with current data
+            if (homeData.address) document.getElementById('address').value = homeData.address;
+            if (homeData.city) document.getElementById('city').value = homeData.city;
+            if (homeData.state) document.getElementById('state').value = homeData.state;
+            if (homeData.zipcode) document.getElementById('zipcode').value = homeData.zipcode;
+            if (homeData.yearBuilt) document.getElementById('year-built').value = homeData.yearBuilt;
+            if (homeData.sqft) document.getElementById('sqft').value = homeData.sqft;
+            
+            // Set checkboxes
+            if (homeData.features) {
+                document.getElementById('central-ac').checked = homeData.features.centralAC || false;
+                document.getElementById('mini-splits').checked = homeData.features.miniSplits || false;
+                document.getElementById('well-water').checked = homeData.features.wellWater || false;
+                document.getElementById('septic').checked = homeData.features.septic || false;
+                document.getElementById('fireplace').checked = homeData.features.fireplace || false;
+                document.getElementById('pool').checked = homeData.features.pool || false;
+                document.getElementById('deck').checked = homeData.features.deck || false;
             }
+            
+            // Set radio buttons and select
+            if (homeData.hasPets !== undefined) {
+                document.querySelector(`input[name="pets"][value="${homeData.hasPets ? 'yes' : 'no'}"]`).checked = true;
+            }
+            if (homeData.approach) {
+                document.getElementById('approach').value = homeData.approach;
+            }
+        }
 
-            documentsList.innerHTML = documents.map(doc => {
-                const isExpiring = doc.expiryDate && new Date(doc.expiryDate) < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Expires in 30 days
-                const isExpired = doc.expiryDate && new Date(doc.expiryDate) < new Date();
+        // Finish task setup
+        function finishTaskSetup() {
+            console.log('🚀 Finishing task setup...');
+            
+            // Convert all task templates to actual scheduled tasks
+            tasks.forEach(task => {
+                if (task.isTemplate) {
+                    // Get the start date from the input field
+                    const startDateElement = document.getElementById(`start-date-${task.id}`);
+                    if (startDateElement && startDateElement.value) {
+                        const startDate = new Date(startDateElement.value);
+                        task.nextDue = new Date(startDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
+                    } else {
+                        // Default to suggested date if no custom date set
+                        const suggestedDate = getSuggestedStartDate(task);
+                        const startDate = new Date(suggestedDate);
+                        task.nextDue = new Date(startDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
+                    }
+                    
+                    // Remove the template flag
+                    delete task.isTemplate;
+                }
+            });
+            
+            console.log('✅ Task setup complete! Tasks with dates:', tasks.filter(t => t.nextDue).length);
+            
+            // Show success message
+            alert(`🎉 Setup complete! Created ${tasks.length} maintenance tasks for your home.\n\nThis demo shows the task setup flow. The full app would continue to the main dashboard.`);
+            
+            // For demo purposes, just go back to setup form
+            document.getElementById('task-setup').classList.add('hidden');
+            document.getElementById('setup-form').style.display = 'block';
+            
+            // Reset form
+            document.getElementById('address').value = '';
+            document.getElementById('city').value = '';
+            document.getElementById('state').value = '';
+            document.getElementById('zipcode').value = '';
+            document.getElementById('year-built').value = '1995';
+            document.getElementById('sqft').value = '2000';
+            document.getElementById('central-ac').checked = true;
+            document.getElementById('mini-splits').checked = false;
+            document.getElementById('well-water').checked = false;
+            document.getElementById('septic').checked = false;
+            document.getElementById('fireplace').checked = false;
+            document.getElementById('pool').checked = false;
+            document.getElementById('deck').checked = false;
+            document.querySelector('input[name="pets"][value="no"]').checked = true;
+            document.getElementById('approach').value = 'proactive';
+            
+            // Reset data
+            homeData = {};
+            tasks = [];
+        }
+
+        // Update task start date
+        function updateTaskStartDate(taskId, startDateStr) {
+            console.log(`📅 Updating start date for task ${taskId} to ${startDateStr}`);
+            
+            const task = tasks.find(t => t.id === taskId);
+            if (task && startDateStr) {
+                // Update the "Next Due" field to show when this task will be due
+                const nextDueElement = document.getElementById(`next-due-${taskId}`);
+                if (nextDueElement) {
+                    nextDueElement.value = getNextDueFromStart(startDateStr, task.frequency);
+                }
+            }
+        }
+
+        // Edit task from setup
+        function editTaskFromSetup(taskId) {
+            console.log(`✏️ Editing task ${taskId} from setup screen...`);
+            
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                const newTitle = prompt(`Edit task title:`, task.title);
+                const newCost = prompt(`Edit cost ($):`, task.cost);
+                const newFreq = prompt(`Edit frequency (days):`, task.frequency);
                 
-                let statusBadge = '';
-                if (isExpired) {
-                    statusBadge = '<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">Expired</span>';
-                } else if (isExpiring) {
-                    statusBadge = '<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs">Expiring Soon</span>';
-                } else if (doc.expiryDate) {
-                    statusBadge = '<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Active</span>';
-                }
-
-                return `
-                    <div class="p-4 border-b hover:bg-gray-50">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1 pr-3">
-                                <h4 class="font-semibold text-gray-900 text-sm">${doc.name}</h4>
-                                <div class="text-xs text-gray-600 mt-1">
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">${doc.type}</span>
-                                        ${statusBadge}
-                                    </div>
-                                    ${doc.provider ? `<div><strong>Provider:</strong> ${doc.provider}</div>` : ''}
-                                    ${doc.reference ? `<div><strong>Reference:</strong> ${doc.reference}</div>` : ''}
-                                    ${doc.expiryDate ? `<div><strong>Expires:</strong> ${new Date(doc.expiryDate).toLocaleDateString()}</div>` : ''}
-                                    ${doc.notes ? `<div class="mt-2">${doc.notes}</div>` : ''}
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <button onclick="editDocument(${doc.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs touch-btn">
-                                    ✏️
-                                </button>
-                                <button onclick="viewDocument(${doc.id})" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs touch-btn">
-                                    👁️
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function editDocument(docId) {
-            const doc = documents.find(d => d.id === docId);
-            if (doc) {
-                currentEditingDocument = doc;
-                document.getElementById('document-modal-title').textContent = 'Edit Document';
-                document.getElementById('document-name').value = doc.name;
-                document.getElementById('document-type').value = doc.type;
-                document.getElementById('document-issue-date').value = doc.issueDate || '';
-                document.getElementById('document-expiry-date').value = doc.expiryDate || '';
-                document.getElementById('document-provider').value = doc.provider || '';
-                document.getElementById('document-reference').value = doc.reference || '';
-                document.getElementById('document-notes').value = doc.notes || '';
-                document.getElementById('document-modal').classList.remove('hidden');
+                if (newTitle !== null) task.title = newTitle || task.title;
+                if (newCost !== null) task.cost = parseInt(newCost) || task.cost;
+                if (newFreq !== null) task.frequency = parseInt(newFreq) || task.frequency;
+                
+                // Re-render the task setup
+                renderTaskSetup();
             }
         }
 
-        function viewDocument(docId) {
-            const doc = documents.find(d => d.id === docId);
-            if (doc) {
-                alert(`📄 ${doc.name}\n\nIn a full app, this would:\n• Display the uploaded document/image\n• Allow sharing or printing\n• Show full document details\n• Enable document annotations`);
+        // Show home info when top-right home icon is clicked
+        function showHomeInfo() {
+            if (homeData.fullAddress) {
+                alert(`🏠 Home Info\n\n${homeData.fullAddress}\nBuilt: ${homeData.yearBuilt} • ${homeData.sqft?.toLocaleString()} sq ft\nApproach: ${homeData.approach} • Pets: ${homeData.hasPets ? 'Yes' : 'No'}`);
+            } else {
+                alert('🏠 No home information set yet. Complete the setup to add your home details.');
             }
-        }
-
-        // Generate default appliances
-        function generateDefaultAppliances() {
-            appliances = [];
-            let id = 1;
-
-            if (homeData.features.centralAC) {
-                appliances.push({
-                    id: id++,
-                    name: 'Central HVAC System',
-                    type: 'HVAC',
-                    brand: 'Unknown',
-                    model: 'Unknown',
-                    installDate: '',
-                    warrantyExpires: '',
-                    notes: 'Auto-generated from home setup',
-                    filterType: '16x25x1 MERV 8',
-                    replacementParts: ['Air Filter', 'Thermostat Batteries']
-                });
-            }
-
-            // Always add common appliances
-            appliances.push(
-                {
-                    id: id++,
-                    name: 'Water Heater',
-                    type: 'Water Heater',
-                    brand: 'Unknown',
-                    model: 'Unknown',
-                    installDate: '',
-                    warrantyExpires: '',
-                    notes: 'Standard water heater',
-                    replacementParts: ['Anode Rod', 'Temperature Relief Valve']
-                }
-            );
         }
 
         // Generate task templates (without specific dates)
@@ -1354,230 +700,6 @@
             console.log('📋 Generated tasks:', tasks.map(t => t.title));
         }
 
-        // Tab navigation - Updated to include documents
-        function showTab(tabName) {
-            // Hide all tab contents
-            const tabContents = document.querySelectorAll('.tab-content');
-            tabContents.forEach(content => {
-                content.classList.add('hidden');
-            });
-
-            // Show selected tab content
-            document.getElementById(tabName + '-content').classList.remove('hidden');
-
-            // Update tab button styles
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            tabBtns.forEach(btn => {
-                btn.classList.remove('bg-blue-100', 'text-blue-700');
-                btn.classList.add('text-gray-600');
-            });
-
-            // Highlight active tab
-            document.getElementById('tab-' + tabName).classList.remove('text-gray-600');
-            document.getElementById('tab-' + tabName).classList.add('bg-blue-100', 'text-blue-700');
-
-            // Update content based on tab
-            if (tabName === 'tasks') {
-                renderAllTasks();
-            } else if (tabName === 'calendar') {
-                renderCalendar();
-            } else if (tabName === 'appliances') {
-                renderAppliances();
-            } else if (tabName === 'documents') {
-                renderDocuments();
-            } else if (tabName === 'settings') {
-                updateSettings();
-                renderContractors(); // Also render contractors since they're in settings now
-            }
-        }
-
-        // Update dashboard
-        function updateDashboard() {
-            // Update home address
-            document.getElementById('home-address').textContent = `Managing maintenance for ${homeData.fullAddress}`;
-
-            // Calculate stats
-            const now = new Date();
-            const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-            
-            let overdueCount = 0;
-            let weekCount = 0;
-            let totalCost = 0;
-
-            tasks.forEach(task => {
-                if (!task.isCompleted && task.nextDue < now) {
-                    overdueCount++;
-                }
-                if (!task.isCompleted && task.nextDue <= oneWeek) {
-                    weekCount++;
-                }
-                totalCost += task.cost * (365 / task.frequency);
-            });
-
-            // Update stats
-            document.getElementById('overdue-count').textContent = overdueCount;
-            document.getElementById('week-count').textContent = weekCount;
-            document.getElementById('total-count').textContent = tasks.filter(t => !t.isCompleted).length;
-            document.getElementById('annual-cost').textContent = '$' + Math.round(totalCost);
-
-            // Render upcoming tasks
-            renderTasks();
-        }
-
-        // Render tasks for dashboard (mobile optimized)
-        function renderTasks() {
-            const tasksList = document.getElementById('tasks-list');
-            const upcomingTasks = tasks
-                .filter(task => !task.isCompleted)
-                .sort((a, b) => a.nextDue - b.nextDue)
-                .slice(0, 8); // Show fewer on mobile
-
-            if (upcomingTasks.length === 0) {
-                tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All tasks complete!</div>';
-                return;
-            }
-
-            tasksList.innerHTML = upcomingTasks.map(task => {
-                const daysUntilDue = Math.ceil((task.nextDue - new Date()) / (24 * 60 * 60 * 1000));
-                const overdue = daysUntilDue < 0;
-                const statusClass = overdue ? 'bg-red-50 border-l-4 border-red-400' : daysUntilDue <= 7 ? 'bg-orange-50 border-l-4 border-orange-400' : 'bg-white';
-                
-                return `
-                    <div class="p-4 border-b ${statusClass}">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1 pr-3">
-                                <h4 class="font-semibold text-gray-900 text-sm">${task.title}</h4>
-                                <p class="text-xs text-gray-600 mt-1">${task.description}</p>
-                                <div class="flex items-center gap-3 mt-2 text-xs">
-                                    <span class="bg-gray-100 px-2 py-1 rounded">${task.category}</span>
-                                    <span class="${overdue ? 'text-red-600' : daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600'}">
-                                        ${overdue ? `${Math.abs(daysUntilDue)}d overdue` : daysUntilDue <= 0 ? 'Due today' : `${daysUntilDue}d`}
-                                    </span>
-                                    <span class="text-gray-600">$${task.cost}</span>
-                                </div>
-                            </div>
-                            <button onclick="completeTask(${task.id})" class="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 text-xs touch-btn">
-                                ✅
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Open Realtor.com for property details (most reliable URL structure)
-        function openRedfin(event) {
-            // Prevent any default browser behavior
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            
-            if (homeData.fullAddress) {
-                const cleanAddress = homeData.fullAddress.trim();
-                
-                // Use Realtor.com - they have the most reliable search URLs
-                const addressParam = encodeURIComponent(cleanAddress);
-                const realtorUrl = `https://www.realtor.com/search/properties?searchText=${addressParam}`;
-                
-                console.log('Opening Realtor.com for:', cleanAddress);
-                
-                // Clean, direct experience
-                window.open(realtorUrl, '_blank');
-                
-            } else {
-                // Fallback - open Realtor.com homepage
-                window.open('https://www.realtor.com', '_blank');
-            }
-        }
-
-        // Property settings functions - Updated to handle city/zip
-        // Property settings functions - Updated to handle city/state/zip
-        function editPropertySettings() {
-            // Populate the edit modal with current data
-            document.getElementById('edit-address').value = homeData.address || '';
-            document.getElementById('edit-city').value = homeData.city || '';
-            document.getElementById('edit-state').value = homeData.state || '';
-            document.getElementById('edit-zipcode').value = homeData.zipcode || '';
-            document.getElementById('edit-year-built').value = homeData.yearBuilt || '';
-            document.getElementById('edit-sqft').value = homeData.sqft || '';
-            
-            // Set checkboxes
-            document.getElementById('edit-central-ac').checked = homeData.features?.centralAC || false;
-            document.getElementById('edit-mini-splits').checked = homeData.features?.miniSplits || false;
-            document.getElementById('edit-well-water').checked = homeData.features?.wellWater || false;
-            document.getElementById('edit-septic').checked = homeData.features?.septic || false;
-            document.getElementById('edit-fireplace').checked = homeData.features?.fireplace || false;
-            document.getElementById('edit-pool').checked = homeData.features?.pool || false;
-            document.getElementById('edit-deck').checked = homeData.features?.deck || false;
-            
-            // Set dropdowns
-            document.getElementById('edit-pets').value = homeData.hasPets ? 'yes' : 'no';
-            document.getElementById('edit-approach').value = homeData.approach || 'standard';
-            
-            document.getElementById('property-modal').classList.remove('hidden');
-        }
-
-        function closePropertyModal() {
-            document.getElementById('property-modal').classList.add('hidden');
-        }
-
-        function savePropertySettings() {
-            // Get updated values
-            const newHomeData = {
-                address: document.getElementById('edit-address').value,
-                city: document.getElementById('edit-city').value,
-                state: document.getElementById('edit-state').value,
-                zipcode: document.getElementById('edit-zipcode').value,
-                yearBuilt: parseInt(document.getElementById('edit-year-built').value),
-                sqft: parseInt(document.getElementById('edit-sqft').value),
-                hasPets: document.getElementById('edit-pets').value === 'yes',
-                approach: document.getElementById('edit-approach').value,
-                features: {
-                    centralAC: document.getElementById('edit-central-ac').checked,
-                    miniSplits: document.getElementById('edit-mini-splits').checked,
-                    wellWater: document.getElementById('edit-well-water').checked,
-                    septic: document.getElementById('edit-septic').checked,
-                    fireplace: document.getElementById('edit-fireplace').checked,
-                    pool: document.getElementById('edit-pool').checked,
-                    deck: document.getElementById('edit-deck').checked
-                }
-            };
-
-            // Create full address for display
-            newHomeData.fullAddress = `${newHomeData.address}, ${newHomeData.city}, ${newHomeData.state} ${newHomeData.zipcode}`;
-            
-            console.log('Updated full address:', newHomeData.fullAddress); // Debug log
-
-            // Update global homeData
-            homeData = newHomeData;
-            
-            // Update header
-            document.getElementById('header-subtitle').textContent = homeData.fullAddress;
-            
-            // For existing users, regenerate tasks with proper dates (not templates)
-            const currentTasks = [...tasks]; // Save current tasks
-            generateTasks(); // This will use the old function with actual dates
-            
-            // Merge with existing tasks that have completion history
-            currentTasks.forEach(oldTask => {
-                const newTask = tasks.find(t => t.title === oldTask.title);
-                if (newTask && oldTask.lastCompleted) {
-                    newTask.lastCompleted = oldTask.lastCompleted;
-                    newTask.nextDue = oldTask.nextDue;
-                }
-            });
-            
-            generateDefaultAppliances();
-            
-            closePropertyModal();
-            updateDashboard();
-            updateSettings();
-            saveData();
-            
-            alert('✅ Property settings updated successfully!');
-        }
-
         // Helper functions for task setup
         function renderTaskSetup() {
             const taskSetupList = document.getElementById('task-setup-list');
@@ -1618,7 +740,7 @@
                                 <div class="flex items-center gap-3 mt-2 text-sm">
                                     <span class="bg-gray-100 px-2 py-1 rounded">${task.category}</span>
                                     <span class="text-gray-600">Every ${task.frequency} days</span>
-                                    <span class="text-gray-600">${task.cost}</span>
+                                    <span class="text-gray-600">$${task.cost}</span>
                                     <span class="px-2 py-1 rounded text-xs ${priorityClass}">${task.priority} priority</span>
                                 </div>
                             </div>
@@ -1673,786 +795,8 @@
             const nextDue = new Date(startDate.getTime() + frequency * 24 * 60 * 60 * 1000);
             return nextDue.toLocaleDateString();
         }
-        function generateTasks() {
-            const oldTasks = [...tasks]; // Save existing tasks with their dates
-            tasks = [];
-            let id = Math.max(...oldTasks.map(t => t.id), 0) + 1;
 
-            // Frequency modifiers
-            const freqMod = homeData.approach === 'proactive' ? 0.8 : homeData.approach === 'minimal' ? 1.3 : 1.0;
-            const petMod = homeData.hasPets ? 0.75 : 1.0;
-
-            // Generate new tasks with actual dates
-            const newTasks = [];
-
-            // HVAC Tasks
-            if (homeData.features.centralAC) {
-                newTasks.push({
-                    id: id++,
-                    title: 'Replace HVAC Filter',
-                    category: 'HVAC',
-                    frequency: Math.round(90 * freqMod * petMod),
-                    cost: 25,
-                    priority: 'high',
-                    description: 'Replace central air system filter',
-                    nextDue: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null,
-                    isCompleted: false
-                });
-
-                newTasks.push({
-                    id: id++,
-                    title: 'HVAC Professional Service',
-                    category: 'HVAC',
-                    frequency: Math.round(365 * freqMod),
-                    cost: 150,
-                    priority: 'medium',
-                    description: 'Annual professional HVAC maintenance',
-                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null,
-                    isCompleted: false
-                });
-            }
-
-            // Add all other task types here (same as original generateTasks)...
-            
-            // For now, just merge the templates we have
-            tasks = [...oldTasks, ...newTasks];
-        }
-
-        // [Rest of the JavaScript functions remain the same - completeTask, calendar functions, etc.]
-        // Complete task
-        function completeTask(taskId) {
-            const task = tasks.find(t => t.id === taskId);
-            if (task) {
-                task.lastCompleted = new Date();
-                task.nextDue = new Date(Date.now() + task.frequency * 24 * 60 * 60 * 1000);
-                task.isCompleted = false; // Will be due again in the future
-                
-                updateDashboard();
-                renderCalendar(); // Update calendar if visible
-                saveData();
-                
-                // Show completion message
-                alert(`✅ Task "${task.title}" completed! Next due: ${task.nextDue.toLocaleDateString()}`);
-            }
-        }
-
-        // Calendar functions
-        function changeMonth(direction) {
-            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
-            renderCalendar();
-        }
-
-        function renderCalendar() {
-            const calendarView = document.getElementById('calendar-view');
-            const monthYear = document.getElementById('current-month-year');
-            
-            // Update month/year display
-            monthYear.textContent = currentCalendarDate.toLocaleDateString('en-US', { 
-                month: 'long', 
-                year: 'numeric' 
-            });
-
-            // Get first day of month and days in month
-            const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
-            const lastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0);
-            const startDate = new Date(firstDay);
-            startDate.setDate(startDate.getDate() - firstDay.getDay()); // Start from Sunday
-
-            // Generate calendar grid
-            let calendarHTML = '<div class="calendar-grid">';
-            
-            // Day headers
-            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            dayHeaders.forEach(day => {
-                calendarHTML += `<div class="bg-gray-100 p-2 font-semibold text-center text-xs">${day}</div>`;
-            });
-
-            // Calendar days
-            const today = new Date();
-            const currentDate = new Date(startDate);
-            
-            for (let i = 0; i < 42; i++) { // 6 weeks * 7 days
-                const isCurrentMonth = currentDate.getMonth() === currentCalendarDate.getMonth();
-                const isToday = currentDate.toDateString() === today.toDateString();
-                
-                // Find tasks for this date
-                const dayTasks = tasks.filter(task => {
-                    if (!task.nextDue || task.isCompleted) return false;
-                    const taskDate = new Date(task.nextDue);
-                    return taskDate.toDateString() === currentDate.toDateString();
-                });
-
-                let cellClass = 'calendar-cell';
-                if (!isCurrentMonth) cellClass += ' text-gray-400 bg-gray-50';
-                if (isToday) cellClass += ' bg-blue-50 border border-blue-200';
-
-                const taskElements = dayTasks.slice(0, 2).map(task => {
-                    const daysUntilDue = Math.ceil((task.nextDue - today) / (24 * 60 * 60 * 1000));
-                    const overdue = daysUntilDue < 0;
-                    const colorClass = overdue ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-blue-100 text-blue-700 hover:bg-blue-200';
-                    const taskTitle = task.title.substring(0, 10) + (task.title.length > 10 ? '...' : '');
-                    
-                    return `<div class="${colorClass} text-xs p-1 rounded truncate cursor-pointer transition-colors" 
-                                onclick="showTaskDetail(${task.id})"
-                                title="Click for details: ${task.title}">
-                                ${taskTitle}
-                            </div>`;
-                }).join('');
-
-                const moreTasksElement = dayTasks.length > 2 ? 
-                    `<div class="text-xs text-gray-500 cursor-pointer" onclick="showDayTasks('${currentDate.toDateString()}')">+${dayTasks.length - 2} more</div>` : '';
-
-                calendarHTML += `
-                    <div class="${cellClass}">
-                        <div class="font-medium text-xs ${isToday ? 'text-blue-600' : ''}">${currentDate.getDate()}</div>
-                        <div class="mt-1 space-y-1">
-                            ${taskElements}
-                            ${moreTasksElement}
-                        </div>
-                    </div>
-                `;
-
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-
-            calendarHTML += '</div>';
-            calendarView.innerHTML = calendarHTML;
-        }
-
-        // [Include all other existing functions - renderAllTasks, addTask, etc.]
-        function renderAllTasks() {
-            const tasksList = document.getElementById('all-tasks-list');
-            const sortedTasks = tasks.filter(t => !t.isCompleted).sort((a, b) => a.nextDue - b.nextDue);
-
-            if (sortedTasks.length === 0) {
-                tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All tasks complete!</div>';
-                return;
-            }
-
-            tasksList.innerHTML = sortedTasks.map(task => {
-                const daysUntilDue = Math.ceil((task.nextDue - new Date()) / (24 * 60 * 60 * 1000));
-                const overdue = daysUntilDue < 0;
-                
-                return `
-                    <div class="p-4 border-b hover:bg-gray-50">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1 pr-3">
-                                <h4 class="font-semibold text-gray-900 text-sm">${task.title}</h4>
-                                <p class="text-xs text-gray-600 mt-1">${task.description}</p>
-                                <div class="flex items-center gap-3 mt-2 text-xs">
-                                    <span class="bg-gray-100 px-2 py-1 rounded">${task.category}</span>
-                                    <span class="text-gray-600">Every ${task.frequency}d</span>
-                                    <span class="${overdue ? 'text-red-600' : daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600'}">
-                                        ${overdue ? `${Math.abs(daysUntilDue)}d overdue` : daysUntilDue <= 0 ? 'Due today' : `${daysUntilDue}d`}
-                                    </span>
-                                    <span class="text-gray-600">$${task.cost}</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <button onclick="editTask(${task.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs touch-btn">
-                                    ✏️
-                                </button>
-                                <button onclick="completeTask(${task.id})" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs touch-btn">
-                                    ✅
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Task functions
-        function addTask() {
-            currentEditingTask = null;
-            document.getElementById('modal-title').textContent = 'Add Task';
-            document.getElementById('task-title').value = '';
-            document.getElementById('task-category').value = 'General';
-            document.getElementById('task-cost').value = '';
-            document.getElementById('task-frequency').value = '365';
-            document.getElementById('task-notes').value = '';
-            document.getElementById('task-modal').classList.remove('hidden');
-        }
-
-        function editTask(taskId) {
-            const task = tasks.find(t => t.id === taskId);
-            if (task) {
-                currentEditingTask = task;
-                document.getElementById('modal-title').textContent = 'Edit Task';
-                document.getElementById('task-title').value = task.title;
-                document.getElementById('task-category').value = task.category;
-                document.getElementById('task-cost').value = task.cost;
-                document.getElementById('task-frequency').value = task.frequency;
-                document.getElementById('task-notes').value = task.description;
-                document.getElementById('task-modal').classList.remove('hidden');
-            }
-        }
-
-        function saveTask() {
-            const title = document.getElementById('task-title').value;
-            const category = document.getElementById('task-category').value;
-            const cost = parseInt(document.getElementById('task-cost').value) || 0;
-            const frequency = parseInt(document.getElementById('task-frequency').value) || 365;
-            const notes = document.getElementById('task-notes').value;
-
-            if (!title.trim()) {
-                alert('Please enter a task title');
-                return;
-            }
-
-            if (currentEditingTask) {
-                // Update existing task
-                currentEditingTask.title = title;
-                currentEditingTask.category = category;
-                currentEditingTask.cost = cost;
-                currentEditingTask.frequency = frequency;
-                currentEditingTask.description = notes;
-                
-                // If we're in task setup, refresh the setup display
-                if (!document.getElementById('task-setup').classList.contains('hidden')) {
-                    renderTaskSetup();
-                }
-            } else {
-                // Add new task
-                const newTask = {
-                    id: Math.max(...tasks.map(t => t.id), 0) + 1,
-                    title: title,
-                    category: category,
-                    frequency: frequency,
-                    cost: cost,
-                    priority: 'medium',
-                    description: notes,
-                    nextDue: document.getElementById('task-setup').classList.contains('hidden') ? 
-                        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : null, // Set date later if in setup
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: !document.getElementById('task-setup').classList.contains('hidden')
-                };
-                tasks.push(newTask);
-                
-                // If we're in task setup, refresh the setup display
-                if (!document.getElementById('task-setup').classList.contains('hidden')) {
-                    renderTaskSetup();
-                }
-            }
-
-            closeModal();
-            updateDashboard();
-            saveData();
-        }
-
-        function closeModal() {
-            document.getElementById('task-modal').classList.add('hidden');
-            currentEditingTask = null;
-        }
-
-        // Seasonal tasks
-        function addSeasonalTasks() {
-            document.getElementById('seasonal-modal').classList.remove('hidden');
-        }
-
-        function closeSeasonalModal() {
-            document.getElementById('seasonal-modal').classList.add('hidden');
-        }
-
-        function saveSeasonalTasks() {
-            const seasonalTasks = [
-                { id: 'fall-gutters', title: 'Clean Gutters & Downspouts', category: 'Exterior', cost: 150, season: 'fall' },
-                { id: 'fall-furnace', title: 'Schedule Furnace Inspection', category: 'HVAC', cost: 100, season: 'fall' },
-                { id: 'fall-chimney', title: 'Chimney Cleaning', category: 'Safety', cost: 300, season: 'fall' },
-                { id: 'fall-weatherstrip', title: 'Check Weatherstripping', category: 'General', cost: 50, season: 'fall' },
-                { id: 'spring-ac', title: 'AC System Tune-up', category: 'HVAC', cost: 120, season: 'spring' },
-                { id: 'spring-deck', title: 'Deck Inspection & Cleaning', category: 'Exterior', cost: 100, season: 'spring' },
-                { id: 'spring-exterior', title: 'Exterior Pressure Washing', category: 'Exterior', cost: 200, season: 'spring' },
-                { id: 'spring-irrigation', title: 'Irrigation System Check', category: 'General', cost: 75, season: 'spring' }
-            ];
-
-            let addedCount = 0;
-            let nextId = Math.max(...tasks.map(t => t.id), 0) + 1;
-
-            seasonalTasks.forEach(seasonalTask => {
-                const checkbox = document.getElementById(seasonalTask.id);
-                if (checkbox && checkbox.checked) {
-                    let dueDate = new Date();
-                    if (seasonalTask.season === 'fall') {
-                        dueDate.setMonth(9, 15); // October 15
-                    } else if (seasonalTask.season === 'spring') {
-                        dueDate.setMonth(3, 15); // April 15
-                    }
-
-                    if (dueDate < new Date()) {
-                        dueDate.setFullYear(dueDate.getFullYear() + 1);
-                    }
-
-                    const newTask = {
-                        id: nextId++,
-                        title: seasonalTask.title,
-                        category: seasonalTask.category,
-                        frequency: 365,
-                        cost: seasonalTask.cost,
-                        priority: 'medium',
-                        description: `Seasonal ${seasonalTask.season} maintenance task`,
-                        nextDue: dueDate,
-                        lastCompleted: null,
-                        isCompleted: false
-                    };
-
-                    tasks.push(newTask);
-                    addedCount++;
-                }
-            });
-
-            closeSeasonalModal();
-            
-            if (addedCount > 0) {
-                updateDashboard();
-                saveData();
-                alert(`✅ Added ${addedCount} seasonal task${addedCount === 1 ? '' : 's'}!`);
-            }
-        }
-
-        // Appliance management
-        function addAppliance() {
-            currentEditingAppliance = null;
-            document.getElementById('appliance-modal-title').textContent = 'Add Appliance';
-            document.getElementById('appliance-name').value = '';
-            document.getElementById('appliance-type').value = 'HVAC';
-            document.getElementById('appliance-brand').value = '';
-            document.getElementById('appliance-model').value = '';
-            document.getElementById('appliance-install-date').value = '';
-            document.getElementById('appliance-warranty').value = '';
-            document.getElementById('appliance-notes').value = '';
-            document.getElementById('appliance-modal').classList.remove('hidden');
-        }
-
-        function closeApplianceModal() {
-            document.getElementById('appliance-modal').classList.add('hidden');
-            currentEditingAppliance = null;
-        }
-
-        function saveAppliance() {
-            const name = document.getElementById('appliance-name').value;
-            const type = document.getElementById('appliance-type').value;
-            const brand = document.getElementById('appliance-brand').value;
-            const model = document.getElementById('appliance-model').value;
-            const installDate = document.getElementById('appliance-install-date').value;
-            const warranty = document.getElementById('appliance-warranty').value;
-            const notes = document.getElementById('appliance-notes').value;
-
-            if (!name.trim()) {
-                alert('Please enter an appliance name');
-                return;
-            }
-
-            if (currentEditingAppliance) {
-                currentEditingAppliance.name = name;
-                currentEditingAppliance.type = type;
-                currentEditingAppliance.brand = brand;
-                currentEditingAppliance.model = model;
-                currentEditingAppliance.installDate = installDate;
-                currentEditingAppliance.warrantyExpires = warranty;
-                currentEditingAppliance.notes = notes;
-            } else {
-                const newAppliance = {
-                    id: Math.max(...appliances.map(a => a.id), 0) + 1,
-                    name: name,
-                    type: type,
-                    brand: brand,
-                    model: model,
-                    installDate: installDate,
-                    warrantyExpires: warranty,
-                    notes: notes,
-                    replacementParts: getReplacementParts(type)
-                };
-                appliances.push(newAppliance);
-            }
-
-            closeApplianceModal();
-            renderAppliances();
-            saveData();
-        }
-
-        function getReplacementParts(type) {
-            const partsByType = {
-                'HVAC': ['Air Filter', 'Thermostat Batteries', 'Blower Motor'],
-                'Water Heater': ['Anode Rod', 'Temperature Relief Valve', 'Heating Element'],
-                'Washer': ['Water Inlet Valve', 'Drive Belt', 'Door Seal'],
-                'Dryer': ['Lint Filter', 'Drive Belt', 'Thermal Fuse'],
-                'Refrigerator': ['Water Filter', 'Door Seal', 'Thermostat'],
-                'Dishwasher': ['Water Filter', 'Door Seal', 'Spray Arm'],
-                'Range/Oven': ['Heating Element', 'Igniter', 'Door Seal']
-            };
-            return partsByType[type] || ['General maintenance parts'];
-        }
-
-        function renderAppliances() {
-            const appliancesList = document.getElementById('appliances-list');
-            
-            if (appliances.length === 0) {
-                appliancesList.innerHTML = '<div class="p-6 text-center text-gray-500">No appliances added yet.</div>';
-                return;
-            }
-
-            appliancesList.innerHTML = appliances.map(appliance => {
-                const warrantyStatus = appliance.warrantyExpires && new Date(appliance.warrantyExpires) > new Date() ? 
-                    `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Under Warranty</span>` :
-                    '';
-
-                return `
-                    <div class="p-4 border-b hover:bg-gray-50">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1 pr-3">
-                                <h4 class="font-semibold text-gray-900 text-sm">${appliance.name}</h4>
-                                <div class="text-xs text-gray-600 mt-1">
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">${appliance.type}</span>
-                                        ${warrantyStatus}
-                                    </div>
-                                    <div class="space-y-1">
-                                        <div><strong>Brand:</strong> ${appliance.brand || 'Unknown'}</div>
-                                        <div><strong>Model:</strong> ${appliance.model || 'Unknown'}</div>
-                                        ${appliance.installDate ? `<div><strong>Installed:</strong> ${new Date(appliance.installDate).toLocaleDateString()}</div>` : ''}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <button onclick="editAppliance(${appliance.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs touch-btn">
-                                    ✏️
-                                </button>
-                                <button onclick="findParts(${appliance.id})" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs touch-btn">
-                                    🔧
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function editAppliance(applianceId) {
-            const appliance = appliances.find(a => a.id === applianceId);
-            if (appliance) {
-                currentEditingAppliance = appliance;
-                document.getElementById('appliance-modal-title').textContent = 'Edit Appliance';
-                document.getElementById('appliance-name').value = appliance.name;
-                document.getElementById('appliance-type').value = appliance.type;
-                document.getElementById('appliance-brand').value = appliance.brand || '';
-                document.getElementById('appliance-model').value = appliance.model || '';
-                document.getElementById('appliance-install-date').value = appliance.installDate || '';
-                document.getElementById('appliance-warranty').value = appliance.warrantyExpires || '';
-                document.getElementById('appliance-notes').value = appliance.notes || '';
-                document.getElementById('appliance-modal').classList.remove('hidden');
-            }
-        }
-
-        function findParts(applianceId) {
-            const appliance = appliances.find(a => a.id === applianceId);
-            if (appliance) {
-                alert(`🔧 Finding parts for ${appliance.name}\n\nCommon parts:\n• ${appliance.replacementParts?.join('\n• ') || 'None listed'}\n\nIn a full app, this would link to parts suppliers!`);
-            }
-        }
-
-        // Contractor management
-        function renderContractors() {
-            renderRepairRecords();
-            renderContractorDirectory();
-        }
-
-        function addRepairRecord() {
-            const description = prompt('Enter repair description:');
-            const contractor = prompt('Contractor name:');
-            const cost = prompt('Total cost (numbers only):');
-            
-            if (description && contractor) {
-                const newRecord = {
-                    id: Math.max(...repairRecords.map(r => r.id), 0) + 1,
-                    date: new Date().toISOString().split('T')[0],
-                    description: description,
-                    contractor: contractor,
-                    cost: parseInt(cost) || 0,
-                    notes: ''
-                };
-                repairRecords.push(newRecord);
-                renderRepairRecords();
-                saveData();
-            }
-        }
-
-        function addContractor() {
-            const name = prompt('Contractor/Company name:');
-            const specialty = prompt('Specialty (e.g., HVAC, Plumbing):');
-            const phone = prompt('Phone number:');
-            
-            if (name) {
-                const newContractor = {
-                    id: Math.max(...contractors.map(c => c.id), 0) + 1,
-                    name: name,
-                    specialty: specialty || 'General',
-                    phone: phone || '',
-                    email: '',
-                    rating: 0,
-                    notes: ''
-                };
-                contractors.push(newContractor);
-                renderContractorDirectory();
-                saveData();
-            }
-        }
-
-        function renderRepairRecords() {
-            const recordsList = document.getElementById('repair-records-list');
-            
-            if (repairRecords.length === 0) {
-                recordsList.innerHTML = '<div class="p-4 text-center text-gray-500 text-sm">No repair records yet. Build your home\'s history!</div>';
-                return;
-            }
-
-            recordsList.innerHTML = repairRecords.map(record => `
-                <div class="p-4 border-b hover:bg-gray-50">
-                    <div class="font-medium text-gray-900 text-sm">${record.description}</div>
-                    <div class="text-xs text-gray-600 mt-1">
-                        <div>${new Date(record.date).toLocaleDateString()} • ${record.contractor}</div>
-                        ${record.cost > 0 ? `<div class="text-green-600 font-medium">${record.cost}</div>` : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderContractorDirectory() {
-            const contractorsList = document.getElementById('contractors-list');
-            
-            if (contractors.length === 0) {
-                contractorsList.innerHTML = '<div class="p-4 text-center text-gray-500 text-sm">No contractors added yet.</div>';
-                return;
-            }
-
-            contractorsList.innerHTML = contractors.map(contractor => `
-                <div class="p-4 border-b hover:bg-gray-50">
-                    <div class="font-medium text-gray-900 text-sm">${contractor.name}</div>
-                    <div class="text-xs text-gray-600 mt-1">
-                        <div class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs inline-block mb-1">${contractor.specialty}</div>
-                        ${contractor.phone ? `<div class="mt-1">📞 ${contractor.phone}</div>` : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Update settings
-        function updateSettings() {
-            const propertySummary = document.getElementById('property-summary');
-            const features = [];
-            
-            if (homeData.features?.centralAC) features.push('Central AC/Heat');
-            if (homeData.features?.miniSplits) features.push('Mini-Splits');
-            if (homeData.features?.wellWater) features.push('Well Water');
-            if (homeData.features?.septic) features.push('Septic System');
-            if (homeData.features?.fireplace) features.push('Fireplace');
-            if (homeData.features?.pool) features.push('Pool/Spa');
-            if (homeData.features?.deck) features.push('Deck/Patio');
-
-            propertySummary.innerHTML = `
-                <div class="space-y-2 text-sm">
-                    <div><strong>📍 Address:</strong><br>
-                        <a href="https://maps.google.com/?q=${encodeURIComponent(homeData.fullAddress)}" target="_blank" class="text-blue-600 hover:underline">${homeData.fullAddress || 'Not set'}</a>
-                        <div class="text-xs text-gray-500">Click to view on Google Maps</div>
-                    </div>
-                    <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
-                    <div><strong>🎯 Approach:</strong> ${homeData.approach || 'Standard'} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
-                    <div><strong>🏠 Features:</strong><br>${features.join(', ') || 'None selected'}</div>
-                </div>
-            `;
-        }
-
-        // Export calendar
-        function exportCalendar() {
-            const calendarData = tasks.filter(t => !t.isCompleted).map(task => {
-                return {
-                    title: task.title,
-                    description: task.description,
-                    date: task.nextDue.toISOString().split('T')[0],
-                    category: task.category,
-                    cost: task.cost
-                };
-            });
-
-            const csvContent = "data:text/csv;charset=utf-8," + 
-                "Title,Description,Date,Category,Cost\n" +
-                calendarData.map(e => `"${e.title}","${e.description}","${e.date}","${e.category}","${e.cost}"`).join("\n");
-
-            const link = document.createElement("a");
-            link.setAttribute("href", encodeURI(csvContent));
-            link.setAttribute("download", "casa_care_calendar.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // Export data
-        function exportData() {
-            const data = {
-                homeData: homeData,
-                tasks: tasks,
-                appliances: appliances,
-                documents: documents,
-                repairRecords: repairRecords,
-                contractors: contractors,
-                exportDate: new Date().toISOString(),
-                version: '1.0'
-            };
-
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
-            const link = document.createElement("a");
-            link.setAttribute("href", dataStr);
-            link.setAttribute("download", "casa_care_backup.json");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            alert('📄 Data exported! Your data is also automatically saved in your browser.');
-        }
-
-        // Clear data
-        function clearData() {
-            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
-                // Clear variables
-                homeData = {};
-                tasks = [];
-                appliances = [];
-                documents = [];
-                repairRecords = [];
-                contractors = [];
-                
-                // Clear localStorage
-                localStorage.removeItem('casaCareData');
-                
-                // Go back to setup
-                document.getElementById('main-app').classList.add('hidden');
-                document.getElementById('setup-form').style.display = 'block';
-                document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
-                
-                alert('✅ All data cleared. Starting fresh!');
-                console.log('🗑️ All data cleared');
-            }
-        }
-
-        // Save data to localStorage (now actually works!)
-        function saveData() {
-            const data = { 
-                homeData: homeData, 
-                tasks: tasks, 
-                appliances: appliances,
-                documents: documents,
-                repairRecords: repairRecords,
-                contractors: contractors,
-                version: '1.0'
-            };
-            
-            try {
-                localStorage.setItem('casaCareData', JSON.stringify(data));
-                console.log('✅ Data saved to browser storage');
-            } catch (error) {
-                console.error('❌ Failed to save data:', error);
-            }
-        }
-
-        // Load data from localStorage
-        function loadData() {
-            try {
-                const savedData = localStorage.getItem('casaCareData');
-                if (savedData) {
-                    const data = JSON.parse(savedData);
-                    
-                    // Restore all data
-                    homeData = data.homeData || {};
-                    tasks = data.tasks || [];
-                    appliances = data.appliances || [];
-                    documents = data.documents || [];
-                    repairRecords = data.repairRecords || [];
-                    contractors = data.contractors || [];
-                    
-                    // Restore dates (they get stringified in JSON)
-                    tasks.forEach(task => {
-                        if (task.nextDue) task.nextDue = new Date(task.nextDue);
-                        if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
-                    });
-                    
-                    console.log('✅ Data loaded from browser storage');
-                    return true;
-                }
-            } catch (error) {
-                console.error('❌ Failed to load data:', error);
-            }
-            return false;
-        }
-
-        // Check if user has existing data
-        function hasExistingData() {
-            return loadData() && homeData.fullAddress;
-        }
-
-        // Initialize app
-        function initializeApp() {
-            console.log('🏠 Casa Care mobile app loaded');
-            
-            // Try to load existing data
-            if (hasExistingData()) {
-                // User has existing data - show main app
-                document.getElementById('setup-form').style.display = 'none';
-                document.getElementById('task-setup').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('hidden');
-                
-                // Update header
-                document.getElementById('header-subtitle').textContent = homeData.fullAddress;
-                
-                // Initialize dashboard
-                updateDashboard();
-                
-                console.log('👋 Welcome back! Loaded existing home data');
-            } else {
-                // New user - show setup form
-                document.getElementById('setup-form').style.display = 'block';
-                document.getElementById('task-setup').classList.add('hidden');
-                document.getElementById('main-app').classList.add('hidden');
-                console.log('🆕 New user - showing setup form');
-            }
-        }
-
-        // Clear data function updated to show setup form properly
-        function clearData() {
-            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
-                // Clear variables
-                homeData = {};
-                tasks = [];
-                appliances = [];
-                documents = [];
-                repairRecords = [];
-                contractors = [];
-                
-                // Clear localStorage
-                localStorage.removeItem('casaCareData');
-                
-                // Show setup form and hide others
-                document.getElementById('setup-form').style.display = 'block';
-                document.getElementById('task-setup').classList.add('hidden');
-                document.getElementById('main-app').classList.add('hidden');
-                document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
-                
-                alert('✅ All data cleared. Starting fresh!');
-                console.log('🗑️ All data cleared');
-            }
-        }
-
-        // Start the app when page loads
-        document.addEventListener('DOMContentLoaded', initializeApp);
-        
-        // Also initialize immediately in case DOM is already loaded
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeApp);
-        } else {
-            initializeApp();
-        }
+        console.log('🏠 Casa Care task setup demo loaded!');
     </script>
 </body>
 </html>
