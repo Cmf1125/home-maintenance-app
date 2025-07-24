@@ -430,6 +430,39 @@
             switch(climateRegion) {
                 case 'NORTHEAST_COLD':
                     regionalTasks = [
+                        // Spring Tasks
+                        {
+                            id: id++,
+                            title: 'Remove Storm Windows',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Remove storm windows and install screens for warmer weather',
+                            season: 'spring'
+                        },
+                        {
+                            id: id++,
+                            title: 'Check AC Before Summer',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 100,
+                            priority: 'medium',
+                            description: 'Test air conditioning system before hot weather arrives',
+                            season: 'spring'
+                        },
+                        // Summer Tasks
+                        {
+                            id: id++,
+                            title: 'Deep Clean Gutters',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 150,
+                            priority: 'medium',
+                            description: 'Summer gutter cleaning and inspection for storm season',
+                            season: 'summer'
+                        },
+                        // Fall Tasks
                         {
                             id: id++,
                             title: 'Winterize Outdoor Pipes',
@@ -462,6 +495,17 @@
                         },
                         {
                             id: id++,
+                            title: 'Rake Leaves & Clean Yard',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 100,
+                            priority: 'medium',
+                            description: 'Fall yard cleanup and leaf removal',
+                            season: 'fall'
+                        },
+                        // Winter Tasks
+                        {
+                            id: id++,
                             title: 'Check for Ice Dams',
                             category: 'Seasonal',
                             frequency: 365,
@@ -475,6 +519,7 @@
                     
                 case 'SOUTHEAST_HUMID':
                     regionalTasks = [
+                        // Spring Tasks
                         {
                             id: id++,
                             title: 'Hurricane Season Prep',
@@ -495,21 +540,55 @@
                             description: 'Professional AC maintenance before summer heat',
                             season: 'spring'
                         },
+                        // Summer Tasks
                         {
                             id: id++,
                             title: 'Check for Mold/Humidity Issues',
                             category: 'Seasonal',
-                            frequency: 180,
+                            frequency: 365,
                             cost: 0,
                             priority: 'medium',
                             description: 'Inspect for mold growth due to high humidity',
                             season: 'summer'
+                        },
+                        {
+                            id: id++,
+                            title: 'Deep Clean AC Filters',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 25,
+                            priority: 'high',
+                            description: 'Extra AC filter maintenance during peak usage',
+                            season: 'summer'
+                        },
+                        // Fall Tasks
+                        {
+                            id: id++,
+                            title: 'Post-Hurricane Season Inspection',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Inspect property for storm damage after hurricane season',
+                            season: 'fall'
+                        },
+                        // Winter Tasks
+                        {
+                            id: id++,
+                            title: 'Mild Winter Maintenance',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'low',
+                            description: 'Check heating system and weather seal during mild winter',
+                            season: 'winter'
                         }
                     ];
                     break;
                     
                 case 'SOUTHWEST_ARID':
                     regionalTasks = [
+                        // Spring Tasks
                         {
                             id: id++,
                             title: 'Drought-Resistant Landscaping Check',
@@ -530,6 +609,18 @@
                             description: 'Clean and service evaporative cooling system',
                             season: 'spring'
                         },
+                        // Summer Tasks
+                        {
+                            id: id++,
+                            title: 'Extreme Heat HVAC Check',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 100,
+                            priority: 'high',
+                            description: 'Extra AC maintenance during extreme summer heat',
+                            season: 'summer'
+                        },
+                        // Fall Tasks
                         {
                             id: id++,
                             title: 'Check for Sun Damage',
@@ -539,6 +630,17 @@
                             priority: 'medium',
                             description: 'Inspect exterior for UV damage to paint and materials',
                             season: 'fall'
+                        },
+                        // Winter Tasks
+                        {
+                            id: id++,
+                            title: 'Desert Winter Prep',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'low',
+                            description: 'Prepare for cooler desert temperatures and potential frost',
+                            season: 'winter'
                         }
                     ];
                     break;
@@ -546,6 +648,7 @@
                 case 'WEST_COAST':
                     if (homeData.state.toUpperCase() === 'CA') {
                         regionalTasks = [
+                            // Spring Tasks
                             {
                                 id: id++,
                                 title: 'Wildfire Risk Assessment',
@@ -566,6 +669,7 @@
                                 description: 'Secure heavy items, check emergency kit',
                                 season: 'spring'
                             },
+                            // Summer Tasks
                             {
                                 id: id++,
                                 title: 'Drought Conservation Check',
@@ -575,11 +679,66 @@
                                 priority: 'medium',
                                 description: 'Assess water usage and conservation measures',
                                 season: 'summer'
+                            },
+                            {
+                                id: id++,
+                                title: 'Fire Season Vigilance',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 0,
+                                priority: 'high',
+                                description: 'Monitor fire conditions and maintain defensible space',
+                                season: 'summer'
+                            },
+                            // Fall Tasks
+                            {
+                                id: id++,
+                                title: 'Santa Ana Wind Prep',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 0,
+                                priority: 'medium',
+                                description: 'Secure outdoor items for high wind season',
+                                season: 'fall'
+                            },
+                            // Winter Tasks
+                            {
+                                id: id++,
+                                title: 'Rain Season Prep',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 50,
+                                priority: 'medium',
+                                description: 'Prepare drainage and check for leaks before rain season',
+                                season: 'winter'
                             }
                         ];
                     } else {
                         // Pacific Northwest (OR, WA)
                         regionalTasks = [
+                            // Spring Tasks
+                            {
+                                id: id++,
+                                title: 'Spring Gutter Deep Clean',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 100,
+                                priority: 'high',
+                                description: 'Clean gutters after heavy winter rains',
+                                season: 'spring'
+                            },
+                            // Summer Tasks
+                            {
+                                id: id++,
+                                title: 'Dry Season Fire Prep',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 0,
+                                priority: 'medium',
+                                description: 'Prepare for dry summer fire season',
+                                season: 'summer'
+                            },
+                            // Fall Tasks
                             {
                                 id: id++,
                                 title: 'Rain Gutter Deep Clean',
@@ -594,11 +753,22 @@
                                 id: id++,
                                 title: 'Mold Prevention Check',
                                 category: 'Seasonal',
-                                frequency: 180,
+                                frequency: 365,
                                 cost: 0,
                                 priority: 'medium',
                                 description: 'Inspect for moisture and mold in wet climate',
                                 season: 'fall'
+                            },
+                            // Winter Tasks
+                            {
+                                id: id++,
+                                title: 'Winter Storm Prep',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 0,
+                                priority: 'medium',
+                                description: 'Prepare for Pacific Northwest winter storms',
+                                season: 'winter'
                             }
                         ];
                     }
@@ -606,6 +776,7 @@
                     
                 case 'MIDWEST_CONTINENTAL':
                     regionalTasks = [
+                        // Spring Tasks
                         {
                             id: id++,
                             title: 'Tornado Season Prep',
@@ -618,6 +789,28 @@
                         },
                         {
                             id: id++,
+                            title: 'Spring Thaw Inspection',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Check for winter damage after snow melt',
+                            season: 'spring'
+                        },
+                        // Summer Tasks
+                        {
+                            id: id++,
+                            title: 'Severe Weather Prep',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Prepare for summer storms and high winds',
+                            season: 'summer'
+                        },
+                        // Fall Tasks
+                        {
+                            id: id++,
                             title: 'Freeze Protection Check',
                             category: 'Seasonal',
                             frequency: 365,
@@ -625,12 +818,56 @@
                             priority: 'high',
                             description: 'Insulate pipes, check heating system',
                             season: 'fall'
+                        },
+                        {
+                            id: id++,
+                            title: 'Winter Weather Prep',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 50,
+                            priority: 'high',
+                            description: 'Prepare for harsh winter conditions',
+                            season: 'fall'
+                        },
+                        // Winter Tasks
+                        {
+                            id: id++,
+                            title: 'Snow Load Management',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Monitor and manage snow accumulation on roof',
+                            season: 'winter'
                         }
                     ];
                     break;
                     
                 case 'MOUNTAIN_WEST':
                     regionalTasks = [
+                        // Spring Tasks
+                        {
+                            id: id++,
+                            title: 'Spring Altitude Adjustment',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Adjust systems for spring altitude conditions',
+                            season: 'spring'
+                        },
+                        // Summer Tasks
+                        {
+                            id: id++,
+                            title: 'High Altitude UV Protection',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 50,
+                            priority: 'medium',
+                            description: 'Check exterior protection from intense UV at altitude',
+                            season: 'summer'
+                        },
+                        // Fall Tasks
                         {
                             id: id++,
                             title: 'High Altitude HVAC Check',
@@ -650,6 +887,17 @@
                             priority: 'high',
                             description: 'Check roof structural integrity for snow load',
                             season: 'fall'
+                        },
+                        // Winter Tasks
+                        {
+                            id: id++,
+                            title: 'Extreme Cold Mountain Prep',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 100,
+                            priority: 'high',
+                            description: 'Prepare for extreme mountain winter conditions',
+                            season: 'winter'
                         }
                     ];
                     break;
@@ -657,6 +905,29 @@
                 case 'ALASKA_HAWAII':
                     if (homeData.state.toUpperCase() === 'AK') {
                         regionalTasks = [
+                            // Spring Tasks
+                            {
+                                id: id++,
+                                title: 'Post-Winter Inspection',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 100,
+                                priority: 'high',
+                                description: 'Comprehensive inspection after extreme winter',
+                                season: 'spring'
+                            },
+                            // Summer Tasks
+                            {
+                                id: id++,
+                                title: 'Summer Maintenance Window',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 200,
+                                priority: 'high',
+                                description: 'Complete major maintenance during brief summer',
+                                season: 'summer'
+                            },
+                            // Fall Tasks
                             {
                                 id: id++,
                                 title: 'Extreme Cold Preparation',
@@ -671,6 +942,7 @@
                     } else {
                         // Hawaii
                         regionalTasks = [
+                            // Spring Tasks
                             {
                                 id: id++,
                                 title: 'Hurricane/Tropical Storm Prep',
@@ -681,15 +953,38 @@
                                 description: 'Prepare for tropical weather season',
                                 season: 'spring'
                             },
+                            // Summer Tasks
                             {
                                 id: id++,
                                 title: 'Salt Air Corrosion Check',
                                 category: 'Seasonal',
-                                frequency: 180,
+                                frequency: 365,
                                 cost: 0,
                                 priority: 'medium',
                                 description: 'Inspect for salt air damage to metal fixtures',
                                 season: 'summer'
+                            },
+                            // Fall Tasks
+                            {
+                                id: id++,
+                                title: 'Trade Wind Season Prep',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 0,
+                                priority: 'low',
+                                description: 'Prepare for trade wind season',
+                                season: 'fall'
+                            },
+                            // Winter Tasks
+                            {
+                                id: id++,
+                                title: 'Tropical Winter Maintenance',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 0,
+                                priority: 'low',
+                                description: 'Year-round tropical climate maintenance',
+                                season: 'winter'
                             }
                         ];
                     }
@@ -700,13 +995,43 @@
                     regionalTasks = [
                         {
                             id: id++,
-                            title: 'Seasonal Weather Prep',
+                            title: 'Spring Weather Prep',
                             category: 'Seasonal',
                             frequency: 365,
                             cost: 0,
                             priority: 'medium',
-                            description: 'Prepare home for upcoming weather changes',
+                            description: 'Prepare home for spring weather changes',
                             season: 'spring'
+                        },
+                        {
+                            id: id++,
+                            title: 'Summer Maintenance Check',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Summer maintenance and cooling system check',
+                            season: 'summer'
+                        },
+                        {
+                            id: id++,
+                            title: 'Fall Weather Prep',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Prepare home for fall weather changes',
+                            season: 'fall'
+                        },
+                        {
+                            id: id++,
+                            title: 'Winter Weather Prep',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Prepare home for winter weather changes',
+                            season: 'winter'
                         }
                     ];
             }
@@ -1646,17 +1971,46 @@
         function getSuggestedStartDate(task) {
             const today = new Date();
             
-            // Suggest start dates based on task priority and type
+            // Smart seasonal defaults based on task season
+            if (task.season) {
+                const currentMonth = today.getMonth(); // 0-11
+                let targetMonth;
+                
+                switch(task.season) {
+                    case 'spring':
+                        targetMonth = 2; // March (0-indexed)
+                        break;
+                    case 'summer':
+                        targetMonth = 5; // June
+                        break;
+                    case 'fall':
+                        targetMonth = 8; // September
+                        break;
+                    case 'winter':
+                        targetMonth = 10; // November
+                        break;
+                    default:
+                        targetMonth = currentMonth;
+                }
+                
+                let targetYear = today.getFullYear();
+                // If the target month has passed this year, default to next year
+                if (targetMonth < currentMonth || (targetMonth === currentMonth && today.getDate() > 15)) {
+                    targetYear++;
+                }
+                
+                const seasonalDate = new Date(targetYear, targetMonth, 15); // 15th of target month
+                return seasonalDate.toISOString().split('T')[0];
+            }
+            
+            // Regular task defaults based on priority
             if (task.priority === 'high') {
-                // High priority tasks start within a week
                 const startDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
                 return startDate.toISOString().split('T')[0];
             } else if (task.frequency <= 90) {
-                // Frequent tasks (every 3 months or less) start soon
                 const startDate = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
                 return startDate.toISOString().split('T')[0];
             } else {
-                // Less frequent tasks can start in a month
                 const startDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
                 return startDate.toISOString().split('T')[0];
             }
