@@ -413,6 +413,11 @@
                                 <p><strong>Casa Care</strong> - Smart Home Maintenance</p>
                                 <p>Version 1.0</p>
                                 <p>Keep your home in perfect condition with personalized maintenance schedules.</p>
+                                <div class="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                    <p class="text-green-700 text-xs">
+                                        ✅ <strong>Auto-Save:</strong> Your data automatically saves in your browser. No account needed!
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1999,21 +2004,25 @@
                 documents: documents,
                 repairRecords: repairRecords,
                 contractors: contractors,
-                exportDate: new Date().toISOString()
+                exportDate: new Date().toISOString(),
+                version: '1.0'
             };
 
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
             const link = document.createElement("a");
             link.setAttribute("href", dataStr);
-            link.setAttribute("download", "casa_care_data.json");
+            link.setAttribute("download", "casa_care_backup.json");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            
+            alert('📄 Data exported! Your data is also automatically saved in your browser.');
         }
 
         // Clear data
         function clearData() {
             if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                // Clear variables
                 homeData = {};
                 tasks = [];
                 appliances = [];
@@ -2021,14 +2030,20 @@
                 repairRecords = [];
                 contractors = [];
                 
+                // Clear localStorage
+                localStorage.removeItem('casaCareData');
+                
                 // Go back to setup
                 document.getElementById('main-app').classList.add('hidden');
                 document.getElementById('setup-form').style.display = 'block';
                 document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
+                
+                alert('✅ All data cleared. Starting fresh!');
+                console.log('🗑️ All data cleared');
             }
         }
 
-        // Save data (in a real app, this would save to a backend)
+        // Save data to localStorage (now actually works!)
         function saveData() {
             const data = { 
                 homeData: homeData, 
@@ -2036,13 +2051,85 @@
                 appliances: appliances,
                 documents: documents,
                 repairRecords: repairRecords,
-                contractors: contractors 
+                contractors: contractors,
+                version: '1.0'
             };
-            console.log('Data saved:', data);
+            
+            try {
+                localStorage.setItem('casaCareData', JSON.stringify(data));
+                console.log('✅ Data saved to browser storage');
+            } catch (error) {
+                console.error('❌ Failed to save data:', error);
+            }
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            try {
+                const savedData = localStorage.getItem('casaCareData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    
+                    // Restore all data
+                    homeData = data.homeData || {};
+                    tasks = data.tasks || [];
+                    appliances = data.appliances || [];
+                    documents = data.documents || [];
+                    repairRecords = data.repairRecords || [];
+                    contractors = data.contractors || [];
+                    
+                    // Restore dates (they get stringified in JSON)
+                    tasks.forEach(task => {
+                        if (task.nextDue) task.nextDue = new Date(task.nextDue);
+                        if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
+                    });
+                    
+                    console.log('✅ Data loaded from browser storage');
+                    return true;
+                }
+            } catch (error) {
+                console.error('❌ Failed to load data:', error);
+            }
+            return false;
+        }
+
+        // Check if user has existing data
+        function hasExistingData() {
+            return loadData() && homeData.fullAddress;
         }
 
         // Initialize app
-        console.log('Casa Care mobile app loaded');
+        function initializeApp() {
+            console.log('🏠 Casa Care mobile app loaded');
+            
+            // Try to load existing data
+            if (hasExistingData()) {
+                // User has existing data - show main app
+                document.getElementById('setup-form').style.display = 'none';
+                document.getElementById('main-app').classList.remove('hidden');
+                
+                // Update header
+                document.getElementById('header-subtitle').textContent = homeData.fullAddress;
+                
+                // Initialize dashboard
+                updateDashboard();
+                
+                console.log('👋 Welcome back! Loaded existing home data');
+            } else {
+                // New user - show setup form
+                console.log('🆕 New user - showing setup form');
+            }
+        }
+
+        // Start the app when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+        
+        // Also initialize immediately in case DOM is already loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
     </script>
 </body>
 </html>
