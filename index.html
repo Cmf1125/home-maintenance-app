@@ -170,6 +170,13 @@
                                 <span>Deck/Patio</span>
                             </label>
                         </div>
+                        <!-- Other Features Input -->
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Other Features</label>
+                            <input type="text" id="other-features" placeholder="e.g., Hot tub, Generator, Solar panels..." 
+                                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+                            <p class="text-xs text-gray-500 mt-1">List any additional features not mentioned above</p>
+                        </div>
                     </div>
 
                     <!-- Preferences -->
@@ -209,13 +216,18 @@
             <div class="bg-white rounded-xl p-6 shadow-lg max-w-2xl mx-auto">
                 <div class="text-center mb-6">
                     <div class="text-4xl mb-4">📋</div>
-                    <h2 class="text-xl font-bold text-gray-900 mb-2">Review Your Maintenance Tasks</h2>
-                    <p class="text-gray-600 text-sm">We've created a personalized task list. Review and set start dates for each task.</p>
+                    <h2 class="text-xl font-bold text-gray-900 mb-2">Let's Review Your Maintenance Tasks!</h2>
+                    <p class="text-gray-600 text-sm">I've preloaded some tasks, but please take a look and edit them for accuracy! You can also add additional tasks that I've missed.</p>
                 </div>
                 
                 <div class="mb-6">
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                        <h3 class="font-semibold text-blue-900 mb-2">📍 Property Summary</h3>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-semibold text-blue-900">📍 Property Summary</h3>
+                            <button onclick="editPropertyFromTaskSetup()" class="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 text-sm touch-btn">
+                                ✏️ Edit Property
+                            </button>
+                        </div>
                         <div id="task-setup-summary" class="text-sm text-blue-800">
                             <!-- Property summary will go here -->
                         </div>
@@ -226,14 +238,9 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-bold text-gray-900">Your Maintenance Schedule</h3>
-                            <div class="flex gap-2">
-                                <button onclick="window.console.log('Debug Info:', {homeData, tasks, taskCount: tasks.length})" class="bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm touch-btn">
-                                    🐛 Debug
-                                </button>
-                                <button onclick="addTaskFromSetup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-                                    ➕ Add Custom Task
-                                </button>
-                            </div>
+                            <button onclick="addTaskFromSetup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
+                                ➕ Add Custom Task
+                            </button>
                         </div>
                         
                         <div id="task-setup-list" class="space-y-4">
@@ -249,6 +256,60 @@
                             🚀 Complete Setup
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Edit Modal -->
+        <div id="task-edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl w-full max-w-md p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold" id="task-edit-title">Edit Task</h3>
+                    <button onclick="closeTaskEditModal()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Task Name</label>
+                        <input type="text" id="edit-task-name" class="w-full p-3 border rounded-lg text-base">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cost ($)</label>
+                            <input type="number" id="edit-task-cost" class="w-full p-3 border rounded-lg text-base">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
+                            <select id="edit-task-frequency" class="w-full p-3 border rounded-lg text-base">
+                                <option value="7">Every 7 days</option>
+                                <option value="30">Every 30 days</option>
+                                <option value="60">Every 60 days</option>
+                                <option value="90">Every 90 days</option>
+                                <option value="180">Every 180 days</option>
+                                <option value="365">Every 365 days</option>
+                                <option value="730">Every 2 years</option>
+                                <option value="1095">Every 3 years</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                        <select id="edit-task-priority" class="w-full p-3 border rounded-lg text-base">
+                            <option value="high">High Priority</option>
+                            <option value="medium">Medium Priority</option>
+                            <option value="low">Low Priority</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea id="edit-task-description" class="w-full p-3 border rounded-lg text-base" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="deleteTaskFromEdit()" class="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 touch-btn">
+                        🗑️ Delete
+                    </button>
+                    <button onclick="closeTaskEditModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Cancel</button>
+                    <button onclick="saveTaskFromEdit()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Save</button>
                 </div>
             </div>
         </div>
@@ -289,7 +350,8 @@
                 septic: document.getElementById('septic')?.checked || false,
                 fireplace: document.getElementById('fireplace')?.checked || false,
                 pool: document.getElementById('pool')?.checked || false,
-                deck: document.getElementById('deck')?.checked || false
+                deck: document.getElementById('deck')?.checked || false,
+                otherFeatures: document.getElementById('other-features')?.value || ''
             };
 
             console.log('🏠 Features collected:', homeData.features);
@@ -321,6 +383,7 @@
             if (homeData.features?.fireplace) features.push('Fireplace');
             if (homeData.features?.pool) features.push('Pool/Spa');
             if (homeData.features?.deck) features.push('Deck/Patio');
+            if (homeData.features?.otherFeatures) features.push(homeData.features.otherFeatures);
 
             taskSetupSummary.innerHTML = `
                 <div class="space-y-1 text-sm">
@@ -335,10 +398,25 @@
             renderTaskSetup();
         }
 
-        // Add task from setup screen
+        // Add task from setup screen - now fully functional
         function addTaskFromSetup() {
             console.log('➕ Adding custom task from setup...');
-            alert('🚧 Custom task creation will be available in the full version. For now, you can edit the generated tasks!');
+            
+            // Open the edit modal in "add" mode
+            currentEditingTask = null;
+            document.getElementById('task-edit-title').textContent = 'Add Custom Task';
+            document.getElementById('edit-task-name').value = '';
+            document.getElementById('edit-task-cost').value = '0';
+            document.getElementById('edit-task-frequency').value = '365';
+            document.getElementById('edit-task-priority').value = 'medium';
+            document.getElementById('edit-task-description').value = '';
+            document.getElementById('task-edit-modal').classList.remove('hidden');
+        }
+
+        // Edit property from task setup
+        function editPropertyFromTaskSetup() {
+            console.log('✏️ Editing property from task setup...');
+            goBackToHomeSetup();
         }
 
         // Go back to home setup
@@ -366,6 +444,7 @@
                 document.getElementById('fireplace').checked = homeData.features.fireplace || false;
                 document.getElementById('pool').checked = homeData.features.pool || false;
                 document.getElementById('deck').checked = homeData.features.deck || false;
+                document.getElementById('other-features').value = homeData.features.otherFeatures || '';
             }
             
             // Set radio buttons and select
@@ -424,6 +503,7 @@
             document.getElementById('fireplace').checked = false;
             document.getElementById('pool').checked = false;
             document.getElementById('deck').checked = false;
+            document.getElementById('other-features').value = '';
             document.querySelector('input[name="pets"][value="no"]').checked = true;
             document.getElementById('approach').value = 'proactive';
             
@@ -446,21 +526,83 @@
             }
         }
 
-        // Edit task from setup
+        // Edit task from setup - now uses proper modal
         function editTaskFromSetup(taskId) {
             console.log(`✏️ Editing task ${taskId} from setup screen...`);
             
             const task = tasks.find(t => t.id === taskId);
             if (task) {
-                const newTitle = prompt(`Edit task title:`, task.title);
-                const newCost = prompt(`Edit cost ($):`, task.cost);
-                const newFreq = prompt(`Edit frequency (days):`, task.frequency);
-                
-                if (newTitle !== null) task.title = newTitle || task.title;
-                if (newCost !== null) task.cost = parseInt(newCost) || task.cost;
-                if (newFreq !== null) task.frequency = parseInt(newFreq) || task.frequency;
-                
-                // Re-render the task setup
+                currentEditingTask = task;
+                document.getElementById('task-edit-title').textContent = 'Edit Task';
+                document.getElementById('edit-task-name').value = task.title;
+                document.getElementById('edit-task-cost').value = task.cost;
+                document.getElementById('edit-task-frequency').value = task.frequency;
+                document.getElementById('edit-task-priority').value = task.priority;
+                document.getElementById('edit-task-description').value = task.description;
+                document.getElementById('task-edit-modal').classList.remove('hidden');
+            }
+        }
+
+        // Task edit modal functions
+        function closeTaskEditModal() {
+            document.getElementById('task-edit-modal').classList.add('hidden');
+            currentEditingTask = null;
+        }
+
+        function saveTaskFromEdit() {
+            const name = document.getElementById('edit-task-name').value;
+            const cost = parseInt(document.getElementById('edit-task-cost').value) || 0;
+            const frequency = parseInt(document.getElementById('edit-task-frequency').value);
+            const priority = document.getElementById('edit-task-priority').value;
+            const description = document.getElementById('edit-task-description').value;
+
+            if (!name.trim()) {
+                alert('Please enter a task name');
+                return;
+            }
+
+            if (currentEditingTask) {
+                // Update existing task
+                currentEditingTask.title = name;
+                currentEditingTask.cost = cost;
+                currentEditingTask.frequency = frequency;
+                currentEditingTask.priority = priority;
+                currentEditingTask.description = description;
+            } else {
+                // Add new task
+                const newTask = {
+                    id: Math.max(...tasks.map(t => t.id), 0) + 1,
+                    title: name,
+                    category: 'General',
+                    frequency: frequency,
+                    cost: cost,
+                    priority: priority,
+                    description: description,
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                };
+                tasks.push(newTask);
+            }
+
+            closeTaskEditModal();
+            renderTaskSetup();
+        }
+
+        function deleteTaskFromEdit() {
+            if (currentEditingTask && confirm(`Are you sure you want to delete "${currentEditingTask.title}"?`)) {
+                tasks = tasks.filter(t => t.id !== currentEditingTask.id);
+                closeTaskEditModal();
+                renderTaskSetup();
+            }
+        }
+
+        // Direct delete from task list
+        function deleteTaskDirect(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task && confirm(`Are you sure you want to delete "${task.title}"?`)) {
+                tasks = tasks.filter(t => t.id !== taskId);
                 renderTaskSetup();
             }
         }
@@ -495,7 +637,7 @@
                     id: id++,
                     title: 'Test Smoke Detectors',
                     category: 'Safety',
-                    frequency: Math.round(180 * freqMod),
+                    frequency: 365,
                     cost: 0,
                     priority: 'high',
                     description: 'Test all smoke and carbon monoxide detectors',
@@ -508,7 +650,7 @@
                     id: id++,
                     title: 'Clean Gutters',
                     category: 'Exterior',
-                    frequency: Math.round(182 * freqMod),
+                    frequency: 180,
                     cost: 150,
                     priority: 'medium',
                     description: 'Clean gutters and downspouts',
@@ -521,7 +663,7 @@
                     id: id++,
                     title: 'Inspect Caulking',
                     category: 'General',
-                    frequency: Math.round(365 * freqMod),
+                    frequency: 180,
                     cost: 50,
                     priority: 'low',
                     description: 'Check and replace caulking around windows and doors',
@@ -534,7 +676,7 @@
                     id: id++,
                     title: 'Furnace Filter Replacement',
                     category: 'HVAC',
-                    frequency: Math.round(90 * freqMod),
+                    frequency: 90,
                     cost: 30,
                     priority: 'high',
                     description: 'Replace heating system filter',
@@ -547,7 +689,7 @@
                     id: id++,
                     title: 'Dryer Vent Cleaning',
                     category: 'General',
-                    frequency: Math.round(365 * freqMod),
+                    frequency: 180,
                     cost: 100,
                     priority: 'medium',
                     description: 'Clean dryer vent to prevent fire hazard',
@@ -567,7 +709,7 @@
                     id: id++,
                     title: 'Replace HVAC Filter',
                     category: 'HVAC',
-                    frequency: Math.round(90 * freqMod * petMod),
+                    frequency: 90,
                     cost: 25,
                     priority: 'high',
                     description: 'Replace central air system filter',
@@ -581,7 +723,7 @@
                     id: id++,
                     title: 'HVAC Professional Service',
                     category: 'HVAC',
-                    frequency: Math.round(365 * freqMod),
+                    frequency: 365,
                     cost: 150,
                     priority: 'medium',
                     description: 'Annual professional HVAC maintenance',
@@ -596,12 +738,26 @@
                 console.log('🔧 Adding Mini-Split tasks...');
                 tasks.push({
                     id: id++,
-                    title: 'Clean Mini-Split Filters',
+                    title: 'Mini Split Filter Clean',
                     category: 'HVAC',
-                    frequency: Math.round(60 * freqMod * petMod),
+                    frequency: 30,
                     cost: 0,
                     priority: 'medium',
                     description: 'Clean mini-split unit filters',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                });
+                
+                tasks.push({
+                    id: id++,
+                    title: 'Mini Split Filter Replacement',
+                    category: 'HVAC',
+                    frequency: 365,
+                    cost: 25,
+                    priority: 'medium',
+                    description: 'Replace mini-split unit filters',
                     nextDue: null,
                     lastCompleted: null,
                     isCompleted: false,
@@ -616,10 +772,38 @@
                     id: id++,
                     title: 'Test Well Water',
                     category: 'Water Systems',
-                    frequency: Math.round(365 * freqMod),
+                    frequency: 365,
                     cost: 75,
                     priority: 'high',
                     description: 'Annual water quality testing',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                });
+                
+                tasks.push({
+                    id: id++,
+                    title: 'Replace Sediment Filter for Water',
+                    category: 'Water Systems',
+                    frequency: 90,
+                    cost: 25,
+                    priority: 'medium',
+                    description: 'Replace sediment filter for well water system',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                });
+                
+                tasks.push({
+                    id: id++,
+                    title: 'Replace UV Filter',
+                    category: 'Water Systems',
+                    frequency: 365,
+                    cost: 150,
+                    priority: 'medium',
+                    description: 'Replace UV filter for water treatment',
                     nextDue: null,
                     lastCompleted: null,
                     isCompleted: false,
@@ -633,7 +817,7 @@
                     id: id++,
                     title: 'Septic Tank Pumping',
                     category: 'Water Systems',
-                    frequency: Math.round(1460 * freqMod),
+                    frequency: 1095,
                     cost: 400,
                     priority: 'high',
                     description: 'Professional septic pumping',
@@ -649,9 +833,9 @@
                 console.log('🔧 Adding Fireplace tasks...');
                 tasks.push({
                     id: id++,
-                    title: 'Chimney Inspection',
+                    title: 'Chimney Sweep',
                     category: 'Safety',
-                    frequency: Math.round(365 * freqMod),
+                    frequency: 365,
                     cost: 300,
                     priority: 'high',
                     description: 'Professional chimney cleaning and inspection',
@@ -668,7 +852,7 @@
                     id: id++,
                     title: 'Deck Staining/Sealing',
                     category: 'Exterior',
-                    frequency: Math.round(730 * freqMod),
+                    frequency: 730,
                     cost: 200,
                     priority: 'medium',
                     description: 'Stain or seal deck to protect from weather',
@@ -685,7 +869,7 @@
                     id: id++,
                     title: 'Pool Opening/Closing',
                     category: 'General',
-                    frequency: Math.round(182 * freqMod),
+                    frequency: 180,
                     cost: 300,
                     priority: 'high',
                     description: 'Seasonal pool opening and closing',
@@ -744,9 +928,14 @@
                                     <span class="px-2 py-1 rounded text-xs ${priorityClass}">${task.priority} priority</span>
                                 </div>
                             </div>
-                            <button onclick="editTaskFromSetup(${task.id})" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 text-sm touch-btn" data-task-edit="${task.id}">
-                                ✏️ Edit
-                            </button>
+                            <div class="flex flex-col gap-2">
+                                <button onclick="editTaskFromSetup(${task.id})" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 text-sm touch-btn" data-task-edit="${task.id}">
+                                    ✏️ Edit
+                                </button>
+                                <button onclick="deleteTaskDirect(${task.id})" class="bg-red-100 text-red-700 px-3 py-1 rounded-lg hover:bg-red-200 text-sm touch-btn" title="Delete task">
+                                    🗑️
+                                </button>
+                            </div>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-3">
