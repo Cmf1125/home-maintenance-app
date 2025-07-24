@@ -123,26 +123,49 @@
                         </div>
                     </div>
 
+                    <!-- Other Features Input -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Other Features</label>
+                        <input type="text" id="other-features" placeholder="e.g., Hot tub, Generator, Solar panels..." 
+                               class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+                        <p class="text-xs text-gray-500 mt-1">List any additional features not mentioned above</p>
+                    </div>
+
                     <!-- Basic Property Info -->
                     <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Property Type</label>
+                            <select id="property-type" class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+                                <option value="single-family">Single Family Home</option>
+                                <option value="townhouse">Townhouse</option>
+                                <option value="condo">Condo</option>
+                                <option value="apartment">Apartment</option>
+                                <option value="mobile-home">Mobile Home</option>
+                            </select>
+                        </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Year Built</label>
                             <input type="number" id="year-built" value="1995" min="1900" max="2024"
                                    class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
                         </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Square Feet</label>
                             <input type="number" id="sqft" value="2000" min="500" max="10000"
                                    class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
                         </div>
+                        <div class="mt-6"> <!-- Empty space for alignment -->
+                        </div>
                     </div>
 
                     <!-- Home Systems -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Home Systems</label>
-                        <div class="space-y-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Heating & Cooling Systems</label>
+                        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
                             <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="central-ac" checked class="w-5 h-5">
+                                <input type="checkbox" id="central-ac" class="w-5 h-5">
                                 <span>Central Air/Heat</span>
                             </label>
                             <label class="flex items-center space-x-3 touch-btn">
@@ -150,8 +173,27 @@
                                 <span>Mini-Split Systems</span>
                             </label>
                             <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="wall-ac" class="w-5 h-5">
+                                <span>Wall Air Conditioners</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="electric-baseboard" class="w-5 h-5">
+                                <span>Electric Baseboard Heat</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
                                 <input type="checkbox" id="boiler" class="w-5 h-5">
                                 <span>Boiler System</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Water & Sewer Systems -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Water & Sewer Systems</label>
+                        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="municipal-water" class="w-5 h-5">
+                                <span>Municipal Water</span>
                             </label>
                             <label class="flex items-center space-x-3 touch-btn">
                                 <input type="checkbox" id="well-water" class="w-5 h-5" onchange="toggleWellWaterOptions()">
@@ -177,9 +219,20 @@
                                 </label>
                             </div>
                             <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="municipal-sewer" class="w-5 h-5">
+                                <span>Municipal Sewer</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
                                 <input type="checkbox" id="septic" class="w-5 h-5">
                                 <span>Septic System</span>
                             </label>
+                        </div>
+                    </div>
+
+                    <!-- Other Home Features -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Other Home Features</label>
+                        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
                             <label class="flex items-center space-x-3 touch-btn">
                                 <input type="checkbox" id="fireplace" class="w-5 h-5">
                                 <span>Fireplace</span>
@@ -200,13 +253,6 @@
                                 <input type="checkbox" id="basement" class="w-5 h-5">
                                 <span>Basement</span>
                             </label>
-                        </div>
-                        <!-- Other Features Input -->
-                        <div class="mt-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Other Features</label>
-                            <input type="text" id="other-features" placeholder="e.g., Hot tub, Generator, Solar panels..." 
-                                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-                            <p class="text-xs text-gray-500 mt-1">List any additional features not mentioned above</p>
                         </div>
                     </div>
 
@@ -703,6 +749,7 @@
                 city: document.getElementById('city').value || 'Anytown',
                 state: document.getElementById('state').value || 'NY',
                 zipcode: document.getElementById('zipcode').value || '12345',
+                propertyType: document.getElementById('property-type').value || 'single-family',
                 yearBuilt: parseInt(document.getElementById('year-built').value) || 2000,
                 sqft: parseInt(document.getElementById('sqft').value) || 2000,
                 hasPets: document.querySelector('input[name="pets"]:checked')?.value === 'yes',
@@ -716,15 +763,24 @@
 
             // Collect selected features
             homeData.features = {
+                // Heating & Cooling
                 centralAC: document.getElementById('central-ac')?.checked || false,
                 miniSplits: document.getElementById('mini-splits')?.checked || false,
+                wallAC: document.getElementById('wall-ac')?.checked || false,
+                electricBaseboard: document.getElementById('electric-baseboard')?.checked || false,
                 boiler: document.getElementById('boiler')?.checked || false,
+                
+                // Water & Sewer
+                municipalWater: document.getElementById('municipal-water')?.checked || false,
                 wellWater: document.getElementById('well-water')?.checked || false,
                 sedimentFilter: document.getElementById('sediment-filter')?.checked || false,
                 uvFilter: document.getElementById('uv-filter')?.checked || false,
                 waterSoftener: document.getElementById('water-softener')?.checked || false,
                 wholeHouseFilter: document.getElementById('whole-house-filter')?.checked || false,
+                municipalSewer: document.getElementById('municipal-sewer')?.checked || false,
                 septic: document.getElementById('septic')?.checked || false,
+                
+                // Other Features
                 fireplace: document.getElementById('fireplace')?.checked || false,
                 pool: document.getElementById('pool')?.checked || false,
                 deck: document.getElementById('deck')?.checked || false,
@@ -755,9 +811,16 @@
             const taskSetupSummary = document.getElementById('task-setup-summary');
             const features = [];
             
-            if (homeData.features?.centralAC) features.push('Central AC/Heat');
-            if (homeData.features?.miniSplits) features.push('Mini-Splits');
-            if (homeData.features?.boiler) features.push('Boiler');
+            // Organize features for display
+            const heatingCooling = [];
+            if (homeData.features?.centralAC) heatingCooling.push('Central AC/Heat');
+            if (homeData.features?.miniSplits) heatingCooling.push('Mini-Splits');
+            if (homeData.features?.wallAC) heatingCooling.push('Wall AC');
+            if (homeData.features?.electricBaseboard) heatingCooling.push('Electric Baseboard');
+            if (homeData.features?.boiler) heatingCooling.push('Boiler');
+
+            const waterSewer = [];
+            if (homeData.features?.municipalWater) waterSewer.push('Municipal Water');
             if (homeData.features?.wellWater) {
                 let wellWaterText = 'Well Water';
                 const wellWaterSubs = [];
@@ -768,15 +831,18 @@
                 if (wellWaterSubs.length > 0) {
                     wellWaterText += ` (${wellWaterSubs.join(', ')})`;
                 }
-                features.push(wellWaterText);
+                waterSewer.push(wellWaterText);
             }
-            if (homeData.features?.septic) features.push('Septic System');
-            if (homeData.features?.fireplace) features.push('Fireplace');
-            if (homeData.features?.pool) features.push('Pool/Spa');
-            if (homeData.features?.deck) features.push('Deck/Patio');
-            if (homeData.features?.garage) features.push('Garage');
-            if (homeData.features?.basement) features.push('Basement');
-            if (homeData.features?.otherFeatures) features.push(homeData.features.otherFeatures);
+            if (homeData.features?.municipalSewer) waterSewer.push('Municipal Sewer');
+            if (homeData.features?.septic) waterSewer.push('Septic System');
+
+            const otherFeatures = [];
+            if (homeData.features?.fireplace) otherFeatures.push('Fireplace');
+            if (homeData.features?.pool) otherFeatures.push('Pool/Spa');
+            if (homeData.features?.deck) otherFeatures.push('Deck/Patio');
+            if (homeData.features?.garage) otherFeatures.push('Garage');
+            if (homeData.features?.basement) otherFeatures.push('Basement');
+            if (homeData.features?.otherFeatures) otherFeatures.push(homeData.features.otherFeatures);
 
             // Get climate region for display
             const climateRegion = getClimateRegion(homeData.state);
@@ -791,12 +857,22 @@
                 'GENERAL': 'General Climate'
             };
 
+            const propertyTypeDisplay = {
+                'single-family': 'Single Family Home',
+                'townhouse': 'Townhouse',
+                'condo': 'Condo',
+                'apartment': 'Apartment',
+                'mobile-home': 'Mobile Home'
+            };
+
             taskSetupSummary.innerHTML = `
                 <div class="space-y-1 text-sm">
                     <div><strong>🏠 Address:</strong> ${homeData.fullAddress}</div>
-                    <div><strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString()} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt}</div>
+                    <div><strong>🏢 Type:</strong> ${propertyTypeDisplay[homeData.propertyType]} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString()} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt}</div>
                     <div><strong>🎯 Approach:</strong> ${homeData.approach} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
-                    <div><strong>⚙️ Features:</strong> ${features.join(', ') || 'None selected'}</div>
+                    ${heatingCooling.length > 0 ? `<div><strong>🌡️ Heating/Cooling:</strong> ${heatingCooling.join(', ')}</div>` : ''}
+                    ${waterSewer.length > 0 ? `<div><strong>💧 Water/Sewer:</strong> ${waterSewer.join(', ')}</div>` : ''}
+                    ${otherFeatures.length > 0 ? `<div><strong>⚙️ Other Features:</strong> ${otherFeatures.join(', ')}</div>` : ''}
                     <div><strong>🌍 Climate Region:</strong> ${regionDisplayNames[climateRegion]} (includes regional seasonal tasks)</div>
                 </div>
             `;
@@ -839,6 +915,7 @@
             if (homeData.city) document.getElementById('city').value = homeData.city;
             if (homeData.state) document.getElementById('state').value = homeData.state;
             if (homeData.zipcode) document.getElementById('zipcode').value = homeData.zipcode;
+            if (homeData.propertyType) document.getElementById('property-type').value = homeData.propertyType;
             if (homeData.yearBuilt) document.getElementById('year-built').value = homeData.yearBuilt;
             if (homeData.sqft) document.getElementById('sqft').value = homeData.sqft;
             
@@ -846,12 +923,16 @@
             if (homeData.features) {
                 document.getElementById('central-ac').checked = homeData.features.centralAC || false;
                 document.getElementById('mini-splits').checked = homeData.features.miniSplits || false;
+                document.getElementById('wall-ac').checked = homeData.features.wallAC || false;
+                document.getElementById('electric-baseboard').checked = homeData.features.electricBaseboard || false;
                 document.getElementById('boiler').checked = homeData.features.boiler || false;
+                document.getElementById('municipal-water').checked = homeData.features.municipalWater || false;
                 document.getElementById('well-water').checked = homeData.features.wellWater || false;
                 document.getElementById('sediment-filter').checked = homeData.features.sedimentFilter || false;
                 document.getElementById('uv-filter').checked = homeData.features.uvFilter || false;
                 document.getElementById('water-softener').checked = homeData.features.waterSoftener || false;
                 document.getElementById('whole-house-filter').checked = homeData.features.wholeHouseFilter || false;
+                document.getElementById('municipal-sewer').checked = homeData.features.municipalSewer || false;
                 document.getElementById('septic').checked = homeData.features.septic || false;
                 document.getElementById('fireplace').checked = homeData.features.fireplace || false;
                 document.getElementById('pool').checked = homeData.features.pool || false;
@@ -911,16 +992,21 @@
             document.getElementById('city').value = '';
             document.getElementById('state').value = '';
             document.getElementById('zipcode').value = '';
+            document.getElementById('property-type').value = 'single-family';
             document.getElementById('year-built').value = '1995';
             document.getElementById('sqft').value = '2000';
-            document.getElementById('central-ac').checked = true;
+            document.getElementById('central-ac').checked = false;
             document.getElementById('mini-splits').checked = false;
+            document.getElementById('wall-ac').checked = false;
+            document.getElementById('electric-baseboard').checked = false;
             document.getElementById('boiler').checked = false;
+            document.getElementById('municipal-water').checked = false;
             document.getElementById('well-water').checked = false;
             document.getElementById('sediment-filter').checked = false;
             document.getElementById('uv-filter').checked = false;
             document.getElementById('water-softener').checked = false;
             document.getElementById('whole-house-filter').checked = false;
+            document.getElementById('municipal-sewer').checked = false;
             document.getElementById('septic').checked = false;
             document.getElementById('fireplace').checked = false;
             document.getElementById('pool').checked = false;
@@ -1059,7 +1145,7 @@
             console.log('📊 Frequency modifiers - approach:', freqMod, 'pets:', petMod);
 
             // ALWAYS include these essential tasks for every home
-            tasks.push(
+            const baseTasks = [
                 {
                     id: id++,
                     title: 'Test Smoke Detectors',
@@ -1068,32 +1154,6 @@
                     cost: 0,
                     priority: 'high',
                     description: 'Test all smoke and carbon monoxide detectors',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                },
-                {
-                    id: id++,
-                    title: 'Clean Gutters',
-                    category: 'Exterior',
-                    frequency: 180,
-                    cost: 150,
-                    priority: 'medium',
-                    description: 'Clean gutters and downspouts',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                },
-                {
-                    id: id++,
-                    title: 'Inspect Caulking',
-                    category: 'General',
-                    frequency: 180,
-                    cost: 50,
-                    priority: 'low',
-                    description: 'Check and replace caulking around windows and doors',
                     nextDue: null,
                     lastCompleted: null,
                     isCompleted: false,
@@ -1112,7 +1172,57 @@
                     isCompleted: false,
                     isTemplate: true
                 }
-            );
+            ];
+
+            // Property-type specific tasks
+            if (homeData.propertyType === 'single-family' || homeData.propertyType === 'townhouse' || homeData.propertyType === 'mobile-home') {
+                // Tasks for homes with exterior responsibility
+                baseTasks.push(
+                    {
+                        id: id++,
+                        title: 'Clean Gutters',
+                        category: 'Exterior',
+                        frequency: 180,
+                        cost: 150,
+                        priority: 'medium',
+                        description: 'Clean gutters and downspouts',
+                        nextDue: null,
+                        lastCompleted: null,
+                        isCompleted: false,
+                        isTemplate: true
+                    },
+                    {
+                        id: id++,
+                        title: 'Inspect Caulking',
+                        category: 'General',
+                        frequency: 180,
+                        cost: 50,
+                        priority: 'low',
+                        description: 'Check and replace caulking around windows and doors',
+                        nextDue: null,
+                        lastCompleted: null,
+                        isCompleted: false,
+                        isTemplate: true
+                    }
+                );
+            } else {
+                // Condo/Apartment tasks (no exterior maintenance typically)
+                baseTasks.push({
+                    id: id++,
+                    title: 'Inspect Window Seals',
+                    category: 'General',
+                    frequency: 365,
+                    cost: 0,
+                    priority: 'low',
+                    description: 'Check window and door seals for air leaks',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                });
+            }
+
+            tasks.push(...baseTasks);
 
             // Only add furnace filter if they have central AC/heat or boiler
             if (homeData.features?.centralAC || homeData.features?.boiler) {
@@ -1189,6 +1299,40 @@
                     cost: 25,
                     priority: 'medium',
                     description: 'Replace mini-split unit filters',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                });
+            }
+
+            if (homeData.features?.wallAC) {
+                console.log('🔧 Adding Wall AC tasks...');
+                tasks.push({
+                    id: id++,
+                    title: 'Wall AC Filter Clean',
+                    category: 'HVAC',
+                    frequency: 30,
+                    cost: 0,
+                    priority: 'medium',
+                    description: 'Clean wall air conditioner filters',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                });
+            }
+
+            if (homeData.features?.electricBaseboard) {
+                console.log('🔧 Adding Electric Baseboard tasks...');
+                tasks.push({
+                    id: id++,
+                    title: 'Clean Electric Baseboard Heaters',
+                    category: 'HVAC',
+                    frequency: 180,
+                    cost: 0,
+                    priority: 'medium',
+                    description: 'Clean dust from electric baseboard heating elements',
                     nextDue: null,
                     lastCompleted: null,
                     isCompleted: false,
