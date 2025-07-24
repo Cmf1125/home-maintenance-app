@@ -231,9 +231,14 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-bold text-gray-900">Your Maintenance Schedule</h3>
-                            <button onclick="addTaskFromSetup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-                                ➕ Add Custom Task
-                            </button>
+                            <div class="flex gap-2">
+                                <button onclick="window.console.log('Debug Info:', {homeData, tasks, taskCount: tasks.length})" class="bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm touch-btn">
+                                    🐛 Debug
+                                </button>
+                                <button onclick="addTaskFromSetup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
+                                    ➕ Add Custom Task
+                                </button>
+                            </div>
                         </div>
                         
                         <div id="task-setup-list" class="space-y-4">
@@ -866,7 +871,7 @@
 
         // Create maintenance plan - now goes to task setup
         function createMaintenancePlan() {
-            console.log('Creating maintenance plan...');
+            console.log('🔧 Creating maintenance plan...');
             
             // Collect form data including separate city, state and zip
             homeData = {
@@ -874,34 +879,33 @@
                 city: document.getElementById('city').value || 'Anytown',
                 state: document.getElementById('state').value || 'NY',
                 zipcode: document.getElementById('zipcode').value || '12345',
-                yearBuilt: parseInt(document.getElementById('year-built').value),
-                sqft: parseInt(document.getElementById('sqft').value),
-                hasPets: document.querySelector('input[name="pets"]:checked').value === 'yes',
-                approach: document.getElementById('approach').value
+                yearBuilt: parseInt(document.getElementById('year-built').value) || 2000,
+                sqft: parseInt(document.getElementById('sqft').value) || 2000,
+                hasPets: document.querySelector('input[name="pets"]:checked')?.value === 'yes',
+                approach: document.getElementById('approach').value || 'standard'
             };
 
             // Create full address for display
             homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
             
-            console.log('Full address created:', homeData.fullAddress);
+            console.log('🏠 Home data collected:', homeData);
 
             // Collect selected features
             homeData.features = {
-                centralAC: document.getElementById('central-ac').checked,
-                miniSplits: document.getElementById('mini-splits').checked,
-                wellWater: document.getElementById('well-water').checked,
-                septic: document.getElementById('septic').checked,
-                fireplace: document.getElementById('fireplace').checked,
-                pool: document.getElementById('pool').checked,
-                deck: document.getElementById('deck').checked
+                centralAC: document.getElementById('central-ac')?.checked || false,
+                miniSplits: document.getElementById('mini-splits')?.checked || false,
+                wellWater: document.getElementById('well-water')?.checked || false,
+                septic: document.getElementById('septic')?.checked || false,
+                fireplace: document.getElementById('fireplace')?.checked || false,
+                pool: document.getElementById('pool')?.checked || false,
+                deck: document.getElementById('deck')?.checked || false
             };
 
-            console.log('Home data:', homeData);
-            console.log('Features:', homeData.features);
+            console.log('🏠 Features collected:', homeData.features);
 
             // Generate tasks (without specific dates yet)
             generateTaskTemplates();
-            console.log('Tasks generated:', tasks.length);
+            console.log('📋 Tasks generated:', tasks.length, tasks);
 
             // Add default appliances based on features
             generateDefaultAppliances();
@@ -1126,6 +1130,10 @@
 
         // Generate task templates (without specific dates)
         function generateTaskTemplates() {
+            console.log('🔧 Starting task generation...');
+            console.log('📊 Home features:', homeData.features);
+            console.log('📊 Approach:', homeData.approach, 'Pets:', homeData.hasPets);
+            
             tasks = [];
             let id = 1;
 
@@ -1133,11 +1141,82 @@
             const freqMod = homeData.approach === 'proactive' ? 0.8 : homeData.approach === 'minimal' ? 1.3 : 1.0;
             const petMod = homeData.hasPets ? 0.75 : 1.0;
 
-            console.log('Generating tasks with frequency modifier:', freqMod, 'pet modifier:', petMod);
+            console.log('📊 Frequency modifiers - approach:', freqMod, 'pets:', petMod);
+
+            // ALWAYS include these essential tasks for every home
+            tasks.push(
+                {
+                    id: id++,
+                    title: 'Test Smoke Detectors',
+                    category: 'Safety',
+                    frequency: Math.round(180 * freqMod),
+                    cost: 0,
+                    priority: 'high',
+                    description: 'Test all smoke and carbon monoxide detectors',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                },
+                {
+                    id: id++,
+                    title: 'Clean Gutters',
+                    category: 'Exterior',
+                    frequency: Math.round(182 * freqMod),
+                    cost: 150,
+                    priority: 'medium',
+                    description: 'Clean gutters and downspouts',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                },
+                {
+                    id: id++,
+                    title: 'Inspect Caulking',
+                    category: 'General',
+                    frequency: Math.round(365 * freqMod),
+                    cost: 50,
+                    priority: 'low',
+                    description: 'Check and replace caulking around windows and doors',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                },
+                {
+                    id: id++,
+                    title: 'Furnace Filter Replacement',
+                    category: 'HVAC',
+                    frequency: Math.round(90 * freqMod),
+                    cost: 30,
+                    priority: 'high',
+                    description: 'Replace heating system filter',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                },
+                {
+                    id: id++,
+                    title: 'Dryer Vent Cleaning',
+                    category: 'General',
+                    frequency: Math.round(365 * freqMod),
+                    cost: 100,
+                    priority: 'medium',
+                    description: 'Clean dryer vent to prevent fire hazard',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                }
+            );
+
+            console.log('✅ Added baseline tasks:', tasks.length);
 
             // HVAC Tasks
-            if (homeData.features.centralAC) {
-                console.log('Adding central AC tasks');
+            if (homeData.features?.centralAC) {
+                console.log('🔧 Adding Central AC tasks...');
                 tasks.push({
                     id: id++,
                     title: 'Replace HVAC Filter',
@@ -1167,8 +1246,8 @@
                 });
             }
 
-            if (homeData.features.miniSplits) {
-                console.log('Adding mini-split tasks');
+            if (homeData.features?.miniSplits) {
+                console.log('🔧 Adding Mini-Split tasks...');
                 tasks.push({
                     id: id++,
                     title: 'Clean Mini-Split Filters',
@@ -1185,8 +1264,8 @@
             }
 
             // Water system tasks
-            if (homeData.features.wellWater) {
-                console.log('Adding well water tasks');
+            if (homeData.features?.wellWater) {
+                console.log('🔧 Adding Well Water tasks...');
                 tasks.push({
                     id: id++,
                     title: 'Test Well Water',
@@ -1202,8 +1281,8 @@
                 });
             }
 
-            if (homeData.features.septic) {
-                console.log('Adding septic tasks');
+            if (homeData.features?.septic) {
+                console.log('🔧 Adding Septic tasks...');
                 tasks.push({
                     id: id++,
                     title: 'Septic Tank Pumping',
@@ -1211,7 +1290,7 @@
                     frequency: Math.round(1460 * freqMod),
                     cost: 400,
                     priority: 'high',
-                    description: 'Professional septic pumping (every 4 years)',
+                    description: 'Professional septic pumping',
                     nextDue: null,
                     lastCompleted: null,
                     isCompleted: false,
@@ -1220,8 +1299,8 @@
             }
 
             // Feature-specific tasks
-            if (homeData.features.fireplace) {
-                console.log('Adding fireplace tasks');
+            if (homeData.features?.fireplace) {
+                console.log('🔧 Adding Fireplace tasks...');
                 tasks.push({
                     id: id++,
                     title: 'Chimney Inspection',
@@ -1237,8 +1316,8 @@
                 });
             }
 
-            if (homeData.features.deck) {
-                console.log('Adding deck tasks');
+            if (homeData.features?.deck) {
+                console.log('🔧 Adding Deck tasks...');
                 tasks.push({
                     id: id++,
                     title: 'Deck Staining/Sealing',
@@ -1246,7 +1325,7 @@
                     frequency: Math.round(730 * freqMod),
                     cost: 200,
                     priority: 'medium',
-                    description: 'Stain or seal deck to protect from weather (every 2 years)',
+                    description: 'Stain or seal deck to protect from weather',
                     nextDue: null,
                     lastCompleted: null,
                     isCompleted: false,
@@ -1254,16 +1333,16 @@
                 });
             }
 
-            if (homeData.features.pool) {
-                console.log('Adding pool tasks');
+            if (homeData.features?.pool) {
+                console.log('🔧 Adding Pool tasks...');
                 tasks.push({
                     id: id++,
                     title: 'Pool Opening/Closing',
-                    category: 'Pool',
+                    category: 'General',
                     frequency: Math.round(182 * freqMod),
                     cost: 300,
                     priority: 'high',
-                    description: 'Seasonal pool opening and closing (twice per year)',
+                    description: 'Seasonal pool opening and closing',
                     nextDue: null,
                     lastCompleted: null,
                     isCompleted: false,
@@ -1271,65 +1350,8 @@
                 });
             }
 
-            // General home maintenance tasks - these are added for everyone
-            console.log('Adding general maintenance tasks');
-            tasks.push(
-                {
-                    id: id++,
-                    title: 'Clean Gutters',
-                    category: 'Exterior',
-                    frequency: Math.round(182 * freqMod),
-                    cost: 150,
-                    priority: 'medium',
-                    description: 'Clean gutters and downspouts (twice per year)',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                },
-                {
-                    id: id++,
-                    title: 'Test Smoke Detectors',
-                    category: 'Safety',
-                    frequency: Math.round(180 * freqMod),
-                    cost: 0,
-                    priority: 'high',
-                    description: 'Test all smoke and carbon monoxide detectors',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                },
-                {
-                    id: id++,
-                    title: 'Inspect Caulking',
-                    category: 'General',
-                    frequency: Math.round(365 * freqMod),
-                    cost: 50,
-                    priority: 'low',
-                    description: 'Check and replace caulking around windows and doors',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                },
-                {
-                    id: id++,
-                    title: 'Check Weather Stripping',
-                    category: 'General',
-                    frequency: Math.round(365 * freqMod),
-                    cost: 25,
-                    priority: 'low',
-                    description: 'Inspect and replace weather stripping around doors and windows',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                }
-            );
-
-            console.log('Generated task templates:', tasks.length, 'tasks');
-            tasks.forEach(task => console.log('Task:', task.title, 'Category:', task.category));
+            console.log('✅ Task generation complete! Total tasks:', tasks.length);
+            console.log('📋 Generated tasks:', tasks.map(t => t.title));
         }
 
         // Tab navigation - Updated to include documents
