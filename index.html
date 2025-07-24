@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -649,17 +649,20 @@
                             <option value="General">General</option>
                         </select>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Cost ($)</label>
-                            <input type="number" id="task-cost" placeholder="0" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Every (days)</label>
-                            <input type="number" id="task-frequency" placeholder="365" value="365"
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Estimated Cost ($)</label>
+                        <input type="number" id="task-cost" placeholder="0" 
+                               class="w-full p-3 border rounded-lg text-base">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                        <input type="date" id="task-start-date" 
+                               class="w-full p-3 border rounded-lg text-base">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Repeat Every (days)</label>
+                        <input type="number" id="task-frequency" placeholder="365" value="365"
+                               class="w-full p-3 border rounded-lg text-base">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
@@ -734,7 +737,39 @@
             </div>
         </div>
 
-        <!-- Seasonal Tasks Modal -->
+        <!-- Initial Task Setup Modal -->
+        <div id="initial-setup-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl w-full max-w-lg p-6 max-h-screen overflow-y-auto">
+                <h3 class="text-xl font-bold mb-4">📅 Set Your Maintenance Schedule</h3>
+                <p class="text-gray-600 text-sm mb-6">When did you last complete these tasks? We'll schedule future maintenance from these dates.</p>
+                
+                <div id="initial-tasks-list" class="space-y-4">
+                    <!-- Initial tasks will be populated here -->
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button onclick="skipInitialSetup()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Skip for Now</button>
+                    <button onclick="saveInitialSetup()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Set Schedule</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Detail Modal -->
+        <div id="task-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl w-full max-w-md p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold" id="task-detail-title">Task Details</h3>
+                    <button onclick="closeTaskDetailModal()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+                </div>
+                <div id="task-detail-content">
+                    <!-- Task details will be populated here -->
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeTaskDetailModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Close</button>
+                    <button onclick="editTaskFromDetail()" id="edit-task-btn" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Edit Task</button>
+                </div>
+            </div>
+        </div>
         <div id="seasonal-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-screen overflow-y-auto">
                 <h3 class="text-xl font-bold mb-4">Add Seasonal Tasks</h3>
@@ -802,6 +837,7 @@
         let currentEditingAppliance = null;
         let currentEditingDocument = null;
         let currentCalendarDate = new Date();
+        let currentDetailTask = null;
 
         // Create maintenance plan with updated address handling
         function createMaintenancePlan() {
@@ -837,22 +873,15 @@
 
             console.log('Home data:', homeData);
 
-            // Generate tasks
+            // Generate tasks (without initial dates)
             generateTasks();
 
             // Add default appliances based on features
             generateDefaultAppliances();
 
-            // Show main app
+            // Show initial task setup instead of going straight to dashboard
             document.getElementById('setup-form').style.display = 'none';
-            document.getElementById('main-app').classList.remove('hidden');
-
-            // Update header
-            document.getElementById('header-subtitle').textContent = homeData.fullAddress;
-
-            // Initialize dashboard
-            updateDashboard();
-            saveData();
+            showInitialTaskSetup();
         }
 
         // Show home info when top-right home icon is clicked
@@ -1029,7 +1058,81 @@
             }
         }
 
-        // Generate default appliances
+        // Show initial task setup modal
+        function showInitialTaskSetup() {
+            const tasksList = document.getElementById('initial-tasks-list');
+            
+            tasksList.innerHTML = tasks.map(task => `
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-medium text-gray-900">${task.title}</h4>
+                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">${task.category}</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3">${task.description}</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Last completed</label>
+                            <input type="date" id="task-date-${task.id}" class="w-full p-2 border rounded text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Every ${task.frequency} days</label>
+                            <div class="p-2 bg-gray-50 rounded text-sm text-gray-600">${task.cost}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('initial-setup-modal').classList.remove('hidden');
+        }
+
+        function saveInitialSetup() {
+            let scheduledCount = 0;
+            
+            tasks.forEach(task => {
+                const dateInput = document.getElementById(`task-date-${task.id}`);
+                if (dateInput && dateInput.value) {
+                    const lastCompleted = new Date(dateInput.value);
+                    task.lastCompleted = lastCompleted;
+                    task.nextDue = new Date(lastCompleted.getTime() + task.frequency * 24 * 60 * 60 * 1000);
+                    task.isCompleted = false;
+                    scheduledCount++;
+                } else {
+                    // Default to due in 30 days if no date set
+                    task.nextDue = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+                    task.lastCompleted = null;
+                    task.isCompleted = false;
+                }
+            });
+            
+            document.getElementById('initial-setup-modal').classList.add('hidden');
+            
+            // Now show main app
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('header-subtitle').textContent = homeData.fullAddress;
+            updateDashboard();
+            saveData();
+            
+            if (scheduledCount > 0) {
+                alert(`✅ Welcome to Casa Care! Scheduled ${scheduledCount} maintenance tasks based on your dates.`);
+            }
+        }
+
+        function skipInitialSetup() {
+            // Set all tasks to default schedule (due in 30 days)
+            tasks.forEach(task => {
+                task.nextDue = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+                task.lastCompleted = null;
+                task.isCompleted = false;
+            });
+            
+            document.getElementById('initial-setup-modal').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('header-subtitle').textContent = homeData.fullAddress;
+            updateDashboard();
+            saveData();
+            
+            alert('✅ Welcome to Casa Care! You can set specific dates for tasks later in the Tasks tab.');
+        }
         function generateDefaultAppliances() {
             appliances = [];
             let id = 1;
@@ -1065,7 +1168,7 @@
             );
         }
 
-        // Generate maintenance tasks
+        // Generate maintenance tasks (without setting initial dates)
         function generateTasks() {
             tasks = [];
             let id = 1;
@@ -1083,8 +1186,8 @@
                     frequency: Math.round(90 * freqMod * petMod),
                     cost: 25,
                     priority: 'high',
-                    description: 'Replace central air system filter',
-                    nextDue: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                    description: 'Replace central air system filter to maintain air quality and system efficiency',
+                    nextDue: null, // Will be set by user in initial setup
                     lastCompleted: null,
                     isCompleted: false
                 });
@@ -1096,8 +1199,8 @@
                     frequency: Math.round(365 * freqMod),
                     cost: 150,
                     priority: 'medium',
-                    description: 'Annual professional HVAC maintenance',
-                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                    description: 'Annual professional HVAC inspection, cleaning, and tune-up',
+                    nextDue: null,
                     lastCompleted: null,
                     isCompleted: false
                 });
@@ -1111,8 +1214,8 @@
                     frequency: Math.round(60 * freqMod * petMod),
                     cost: 0,
                     priority: 'medium',
-                    description: 'Clean mini-split unit filters',
-                    nextDue: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+                    description: 'Clean mini-split unit filters to maintain efficiency and air quality',
+                    nextDue: null,
                     lastCompleted: null,
                     isCompleted: false
                 });
@@ -1127,8 +1230,8 @@
                     frequency: Math.round(365 * freqMod),
                     cost: 75,
                     priority: 'high',
-                    description: 'Annual water quality testing',
-                    nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
+                    description: 'Annual water quality testing for bacteria, minerals, and contaminants',
+                    nextDue: null,
                     lastCompleted: null,
                     isCompleted: false
                 });
@@ -1142,8 +1245,8 @@
                     frequency: Math.round(1460 * freqMod),
                     cost: 400,
                     priority: 'high',
-                    description: 'Professional septic pumping',
-                    nextDue: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
+                    description: 'Professional septic tank pumping and inspection',
+                    nextDue: null,
                     lastCompleted: null,
                     isCompleted: false
                 });
@@ -1158,8 +1261,8 @@
                     frequency: Math.round(365 * freqMod),
                     cost: 300,
                     priority: 'high',
-                    description: 'Professional chimney cleaning and inspection',
-                    nextDue: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+                    description: 'Professional chimney cleaning and safety inspection',
+                    nextDue: null,
                     lastCompleted: null,
                     isCompleted: false
                 });
@@ -1173,8 +1276,8 @@
                     frequency: Math.round(730 * freqMod),
                     cost: 200,
                     priority: 'medium',
-                    description: 'Stain or seal deck to protect from weather',
-                    nextDue: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+                    description: 'Stain or seal deck to protect from weather damage',
+                    nextDue: null,
                     lastCompleted: null,
                     isCompleted: false
                 });
@@ -1188,8 +1291,8 @@
                     frequency: Math.round(182 * freqMod),
                     cost: 300,
                     priority: 'high',
-                    description: 'Seasonal pool opening and closing',
-                    nextDue: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
+                    description: 'Seasonal pool opening and closing service',
+                    nextDue: null,
                     lastCompleted: null,
                     isCompleted: false
                 });
@@ -1204,8 +1307,8 @@
                     frequency: Math.round(182 * freqMod),
                     cost: 150,
                     priority: 'medium',
-                    description: 'Clean gutters and downspouts',
-                    nextDue: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
+                    description: 'Clean gutters and downspouts to prevent water damage',
+                    nextDue: null,
                     lastCompleted: null,
                     isCompleted: false
                 },
@@ -1216,8 +1319,8 @@
                     frequency: Math.round(180 * freqMod),
                     cost: 0,
                     priority: 'high',
-                    description: 'Test all smoke and carbon monoxide detectors',
-                    nextDue: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+                    description: 'Test all smoke and carbon monoxide detectors, replace batteries',
+                    nextDue: null,
                     lastCompleted: null,
                     isCompleted: false
                 },
@@ -1228,17 +1331,51 @@
                     frequency: Math.round(365 * freqMod),
                     cost: 50,
                     priority: 'low',
-                    description: 'Check and replace caulking around windows and doors',
-                    nextDue: new Date(Date.now() + 75 * 24 * 60 * 60 * 1000),
+                    description: 'Check and replace caulking around windows, doors, and fixtures',
+                    nextDue: null,
                     lastCompleted: null,
                     isCompleted: false
                 }
             );
 
-            console.log('Generated tasks:', tasks);
+            console.log('Generated tasks (dates to be set by user):', tasks);
         }
 
-        // Tab navigation - Updated to include documents
+        // Generate default appliances
+        function generateDefaultAppliances() {
+            appliances = [];
+            let id = 1;
+
+            if (homeData.features.centralAC) {
+                appliances.push({
+                    id: id++,
+                    name: 'Central HVAC System',
+                    type: 'HVAC',
+                    brand: 'Unknown',
+                    model: 'Unknown',
+                    installDate: '',
+                    warrantyExpires: '',
+                    notes: 'Auto-generated from home setup',
+                    filterType: '16x25x1 MERV 8',
+                    replacementParts: ['Air Filter', 'Thermostat Batteries']
+                });
+            }
+
+            // Always add common appliances
+            appliances.push(
+                {
+                    id: id++,
+                    name: 'Water Heater',
+                    type: 'Water Heater',
+                    brand: 'Unknown',
+                    model: 'Unknown',
+                    installDate: '',
+                    warrantyExpires: '',
+                    notes: 'Standard water heater',
+                    replacementParts: ['Anode Rod', 'Temperature Relief Valve']
+                }
+            );
+        }
         function showTab(tabName) {
             // Hide all tab contents
             const tabContents = document.querySelectorAll('.tab-content');
@@ -1280,29 +1417,921 @@
             // Update home address
             document.getElementById('home-address').textContent = `Managing maintenance for ${homeData.fullAddress}`;
 
-            // Calculate stats
+            // Calculate stats (only for tasks with due dates)
             const now = new Date();
             const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
             
             let overdueCount = 0;
             let weekCount = 0;
             let totalCost = 0;
+            let scheduledTasks = 0;
 
             tasks.forEach(task => {
-                if (!task.isCompleted && task.nextDue < now) {
-                    overdueCount++;
+                if (task.nextDue && !task.isCompleted) {
+                    scheduledTasks++;
+                    if (task.nextDue < now) {
+                        overdueCount++;
+                    }
+                    if (task.nextDue <= oneWeek) {
+                        weekCount++;
+                    }
+                    totalCost += task.cost * (365 / task.frequency);
                 }
-                if (!task.isCompleted && task.nextDue <= oneWeek) {
-                    weekCount++;
-                }
-                totalCost += task.cost * (365 / task.frequency);
             });
 
             // Update stats
             document.getElementById('overdue-count').textContent = overdueCount;
             document.getElementById('week-count').textContent = weekCount;
-            document.getElementById('total-count').textContent = tasks.filter(t => !t.isCompleted).length;
-            document.getElementById('annual-cost').textContent = '$' + Math.round(totalCost);
+            document.getElementById('total-count').textContent = scheduledTasks;
+            document.getElementById('annual-cost').textContent = '
+
+        // Render tasks for dashboard (mobile optimized)
+        function renderTasks() {
+            const tasksList = document.getElementById('tasks-list');
+            const upcomingTasks = tasks
+                .filter(task => !task.isCompleted && task.nextDue) // Only show tasks with due dates
+                .sort((a, b) => a.nextDue - b.nextDue)
+                .slice(0, 8); // Show fewer on mobile
+
+            const unscheduledTasks = tasks.filter(task => !task.isCompleted && !task.nextDue);
+
+            if (upcomingTasks.length === 0 && unscheduledTasks.length === 0) {
+                tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All tasks complete!</div>';
+                return;
+            }
+
+            let tasksHTML = '';
+
+            // Show unscheduled tasks first if any
+            if (unscheduledTasks.length > 0) {
+                tasksHTML += `
+                    <div class="p-4 border-b bg-yellow-50 border-l-4 border-yellow-400">
+                        <h4 class="font-semibold text-gray-900 mb-2">⏰ Tasks Need Scheduling</h4>
+                        <p class="text-sm text-gray-600 mb-3">${unscheduledTasks.length} task${unscheduledTasks.length === 1 ? '' : 's'} need start dates. Click a task to schedule it.</p>
+                        <div class="space-y-2">
+                            ${unscheduledTasks.slice(0, 3).map(task => `
+                                <div onclick="editTask(${task.id})" class="cursor-pointer hover:bg-yellow-100 p-2 rounded">
+                                    <span class="text-sm font-medium">${task.title}</span>
+                                    <span class="bg-gray-100 px-2 py-1 rounded text-xs ml-2">${task.category}</span>
+                                </div>
+                            `).join('')}
+                            ${unscheduledTasks.length > 3 ? `<div class="text-xs text-gray-500">+${unscheduledTasks.length - 3} more</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Show scheduled upcoming tasks
+            tasksHTML += upcomingTasks.map(task => {
+                const daysUntilDue = Math.ceil((task.nextDue - new Date()) / (24 * 60 * 60 * 1000));
+                const overdue = daysUntilDue < 0;
+                const statusClass = overdue ? 'bg-red-50 border-l-4 border-red-400' : daysUntilDue <= 7 ? 'bg-orange-50 border-l-4 border-orange-400' : 'bg-white';
+                
+                return `
+                    <div class="p-4 border-b ${statusClass}">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1 pr-3">
+                                <h4 class="font-semibold text-gray-900 text-sm">${task.title}</h4>
+                                <p class="text-xs text-gray-600 mt-1">${task.description}</p>
+                                <div class="flex items-center gap-3 mt-2 text-xs">
+                                    <span class="bg-gray-100 px-2 py-1 rounded">${task.category}</span>
+                                    <span class="${overdue ? 'text-red-600' : daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600'}">
+                                        ${overdue ? `${Math.abs(daysUntilDue)}d overdue` : daysUntilDue <= 0 ? 'Due today' : `${daysUntilDue}d`}
+                                    </span>
+                                    <span class="text-gray-600">${task.cost}</span>
+                                </div>
+                            </div>
+                            <button onclick="completeTask(${task.id})" class="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 text-xs touch-btn">
+                                ✅
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            tasksList.innerHTML = tasksHTML;
+        }
+
+        // Open Realtor.com for property details (most reliable URL structure)
+        function openRedfin(event) {
+            // Prevent any default browser behavior
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            if (homeData.fullAddress) {
+                const cleanAddress = homeData.fullAddress.trim();
+                
+                // Use Realtor.com - they have the most reliable search URLs
+                const addressParam = encodeURIComponent(cleanAddress);
+                const realtorUrl = `https://www.realtor.com/search/properties?searchText=${addressParam}`;
+                
+                console.log('Opening Realtor.com for:', cleanAddress);
+                
+                // Clean, direct experience
+                window.open(realtorUrl, '_blank');
+                
+            } else {
+                // Fallback - open Realtor.com homepage
+                window.open('https://www.realtor.com', '_blank');
+            }
+        }
+
+        // Property settings functions - Updated to handle city/zip
+        function editPropertySettings() {
+            // Populate the edit modal with current data
+            document.getElementById('edit-address').value = homeData.address || '';
+            document.getElementById('edit-city').value = homeData.city || '';
+            document.getElementById('edit-state').value = homeData.state || '';
+            document.getElementById('edit-zipcode').value = homeData.zipcode || '';
+            document.getElementById('edit-year-built').value = homeData.yearBuilt || '';
+            document.getElementById('edit-sqft').value = homeData.sqft || '';
+            
+            // Set checkboxes
+            document.getElementById('edit-central-ac').checked = homeData.features?.centralAC || false;
+            document.getElementById('edit-mini-splits').checked = homeData.features?.miniSplits || false;
+            document.getElementById('edit-well-water').checked = homeData.features?.wellWater || false;
+            document.getElementById('edit-septic').checked = homeData.features?.septic || false;
+            document.getElementById('edit-fireplace').checked = homeData.features?.fireplace || false;
+            document.getElementById('edit-pool').checked = homeData.features?.pool || false;
+            document.getElementById('edit-deck').checked = homeData.features?.deck || false;
+            
+            // Set dropdowns
+            document.getElementById('edit-pets').value = homeData.hasPets ? 'yes' : 'no';
+            document.getElementById('edit-approach').value = homeData.approach || 'standard';
+            
+            document.getElementById('property-modal').classList.remove('hidden');
+        }
+
+        function closePropertyModal() {
+            document.getElementById('property-modal').classList.add('hidden');
+        }
+
+        function savePropertySettings() {
+            // Get updated values
+            const newHomeData = {
+                address: document.getElementById('edit-address').value,
+                city: document.getElementById('edit-city').value,
+                state: document.getElementById('edit-state').value,
+                zipcode: document.getElementById('edit-zipcode').value,
+                yearBuilt: parseInt(document.getElementById('edit-year-built').value),
+                sqft: parseInt(document.getElementById('edit-sqft').value),
+                hasPets: document.getElementById('edit-pets').value === 'yes',
+                approach: document.getElementById('edit-approach').value,
+                features: {
+                    centralAC: document.getElementById('edit-central-ac').checked,
+                    miniSplits: document.getElementById('edit-mini-splits').checked,
+                    wellWater: document.getElementById('edit-well-water').checked,
+                    septic: document.getElementById('edit-septic').checked,
+                    fireplace: document.getElementById('edit-fireplace').checked,
+                    pool: document.getElementById('edit-pool').checked,
+                    deck: document.getElementById('edit-deck').checked
+                }
+            };
+
+            // Create full address for display
+            newHomeData.fullAddress = `${newHomeData.address}, ${newHomeData.city}, ${newHomeData.state} ${newHomeData.zipcode}`;
+            
+            console.log('Updated full address:', newHomeData.fullAddress); // Debug log
+
+            // Update global homeData
+            homeData = newHomeData;
+            
+            // Update header
+            document.getElementById('header-subtitle').textContent = homeData.fullAddress;
+            
+            // Regenerate tasks if features changed
+            generateTasks();
+            generateDefaultAppliances();
+            
+            closePropertyModal();
+            updateDashboard();
+            updateSettings();
+            saveData();
+            
+            alert('✅ Property settings updated successfully!');
+        }
+
+        // [Rest of the JavaScript functions remain the same - completeTask, calendar functions, etc.]
+        // Complete task
+        function completeTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.lastCompleted = new Date();
+                task.nextDue = new Date(Date.now() + task.frequency * 24 * 60 * 60 * 1000);
+                task.isCompleted = false; // Will be due again in the future
+                
+                updateDashboard();
+                renderCalendar(); // Update calendar if visible
+                saveData();
+                
+                // Show completion message
+                alert(`✅ Task "${task.title}" completed! Next due: ${task.nextDue.toLocaleDateString()}`);
+            }
+        }
+
+        // Calendar functions
+        function changeMonth(direction) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const calendarView = document.getElementById('calendar-view');
+            const monthYear = document.getElementById('current-month-year');
+            
+            // Update month/year display
+            monthYear.textContent = currentCalendarDate.toLocaleDateString('en-US', { 
+                month: 'long', 
+                year: 'numeric' 
+            });
+
+            // Get first day of month and days in month
+            const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
+            const lastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay()); // Start from Sunday
+
+            // Generate calendar grid
+            let calendarHTML = '<div class="calendar-grid">';
+            
+            // Day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                calendarHTML += `<div class="bg-gray-100 p-2 font-semibold text-center text-xs">${day}</div>`;
+            });
+
+            // Calendar days
+            const today = new Date();
+            const currentDate = new Date(startDate);
+            
+            for (let i = 0; i < 42; i++) { // 6 weeks * 7 days
+                const isCurrentMonth = currentDate.getMonth() === currentCalendarDate.getMonth();
+                const isToday = currentDate.toDateString() === today.toDateString();
+                
+                // Find tasks for this date
+                const dayTasks = tasks.filter(task => {
+                    if (!task.nextDue || task.isCompleted) return false;
+                    const taskDate = new Date(task.nextDue);
+                    return taskDate.toDateString() === currentDate.toDateString();
+                });
+
+                let cellClass = 'calendar-cell';
+                if (!isCurrentMonth) cellClass += ' text-gray-400 bg-gray-50';
+                if (isToday) cellClass += ' bg-blue-50 border border-blue-200';
+
+                calendarHTML += `
+                    <div class="${cellClass}">
+                        <div class="font-medium text-xs ${isToday ? 'text-blue-600' : ''}">${currentDate.getDate()}</div>
+                        <div class="mt-1 space-y-1">
+                            ${dayTasks.slice(0, 2).map(task => {
+                                const daysUntilDue = Math.ceil((task.nextDue - today) / (24 * 60 * 60 * 1000));
+                                const overdue = daysUntilDue < 0;
+                                const colorClass = overdue ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700';
+                                return `<div class="${colorClass} text-xs p-1 rounded truncate cursor-pointer hover:opacity-80" 
+                                            onclick="showTaskDetail(${task.id})" 
+                                            title="Click for details: ${task.description}">
+                                            ${task.title.substring(0, 10)}${task.title.length > 10 ? '...' : ''}
+                                        </div>`;
+                            }).join('')}
+                            ${dayTasks.length > 2 ? `<div class="text-xs text-gray-500 cursor-pointer" onclick="showDayTasks('${currentDate.toDateString()}')">+${dayTasks.length - 2} more</div>` : ''}
+                        </div>
+                    </div>
+                `;
+
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            calendarHTML += '</div>';
+            calendarView.innerHTML = calendarHTML;
+        }
+
+        // [Include all other existing functions - renderAllTasks, addTask, etc.]
+        function renderAllTasks() {
+            const tasksList = document.getElementById('all-tasks-list');
+            const sortedTasks = tasks.filter(t => !t.isCompleted).sort((a, b) => a.nextDue - b.nextDue);
+
+            if (sortedTasks.length === 0) {
+                tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All tasks complete!</div>';
+                return;
+            }
+
+            tasksList.innerHTML = sortedTasks.map(task => {
+                const daysUntilDue = Math.ceil((task.nextDue - new Date()) / (24 * 60 * 60 * 1000));
+                const overdue = daysUntilDue < 0;
+                
+                return `
+                    <div class="p-4 border-b hover:bg-gray-50">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1 pr-3">
+                                <h4 class="font-semibold text-gray-900 text-sm">${task.title}</h4>
+                                <p class="text-xs text-gray-600 mt-1">${task.description}</p>
+                                <div class="flex items-center gap-3 mt-2 text-xs">
+                                    <span class="bg-gray-100 px-2 py-1 rounded">${task.category}</span>
+                                    <span class="text-gray-600">Every ${task.frequency}d</span>
+                                    <span class="${overdue ? 'text-red-600' : daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600'}">
+                                        ${overdue ? `${Math.abs(daysUntilDue)}d overdue` : daysUntilDue <= 0 ? 'Due today' : `${daysUntilDue}d`}
+                                    </span>
+                                    <span class="text-gray-600">$${task.cost}</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <button onclick="editTask(${task.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs touch-btn">
+                                    ✏️
+                                </button>
+                                <button onclick="completeTask(${task.id})" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs touch-btn">
+                                    ✅
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Task functions
+        function addTask() {
+            currentEditingTask = null;
+            document.getElementById('modal-title').textContent = 'Add Task';
+            document.getElementById('task-title').value = '';
+            document.getElementById('task-category').value = 'General';
+            document.getElementById('task-cost').value = '';
+            document.getElementById('task-frequency').value = '365';
+            document.getElementById('task-start-date').value = '';
+            document.getElementById('task-notes').value = '';
+            document.getElementById('task-modal').classList.remove('hidden');
+        }
+
+        function editTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                currentEditingTask = task;
+                document.getElementById('modal-title').textContent = 'Edit Task';
+                document.getElementById('task-title').value = task.title;
+                document.getElementById('task-category').value = task.category;
+                document.getElementById('task-cost').value = task.cost;
+                document.getElementById('task-frequency').value = task.frequency;
+                document.getElementById('task-notes').value = task.description;
+                
+                // Set start date based on last completed or calculate from next due
+                if (task.lastCompleted) {
+                    document.getElementById('task-start-date').value = task.lastCompleted.toISOString().split('T')[0];
+                } else if (task.nextDue) {
+                    // Calculate when it was "last completed" based on next due date
+                    const calculatedStart = new Date(task.nextDue.getTime() - task.frequency * 24 * 60 * 60 * 1000);
+                    document.getElementById('task-start-date').value = calculatedStart.toISOString().split('T')[0];
+                } else {
+                    document.getElementById('task-start-date').value = '';
+                }
+                
+                document.getElementById('task-modal').classList.remove('hidden');
+            }
+        }
+
+        function saveTask() {
+            const title = document.getElementById('task-title').value;
+            const category = document.getElementById('task-category').value;
+            const cost = parseInt(document.getElementById('task-cost').value) || 0;
+            const frequency = parseInt(document.getElementById('task-frequency').value) || 365;
+            const startDate = document.getElementById('task-start-date').value;
+            const notes = document.getElementById('task-notes').value;
+
+            if (!title.trim()) {
+                alert('Please enter a task title');
+                return;
+            }
+
+            if (currentEditingTask) {
+                // Update existing task
+                currentEditingTask.title = title;
+                currentEditingTask.category = category;
+                currentEditingTask.cost = cost;
+                currentEditingTask.frequency = frequency;
+                currentEditingTask.description = notes;
+                
+                // Update dates if start date is provided
+                if (startDate) {
+                    const lastCompleted = new Date(startDate);
+                    currentEditingTask.lastCompleted = lastCompleted;
+                    currentEditingTask.nextDue = new Date(lastCompleted.getTime() + frequency * 24 * 60 * 60 * 1000);
+                }
+            } else {
+                // Add new task
+                const newTask = {
+                    id: Math.max(...tasks.map(t => t.id), 0) + 1,
+                    title: title,
+                    category: category,
+                    frequency: frequency,
+                    cost: cost,
+                    priority: 'medium',
+                    description: notes,
+                    isCompleted: false
+                };
+                
+                // Set dates based on start date
+                if (startDate) {
+                    const lastCompleted = new Date(startDate);
+                    newTask.lastCompleted = lastCompleted;
+                    newTask.nextDue = new Date(lastCompleted.getTime() + frequency * 24 * 60 * 60 * 1000);
+                } else {
+                    // Default to due in 30 days if no start date
+                    newTask.nextDue = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+                    newTask.lastCompleted = null;
+                }
+                
+                tasks.push(newTask);
+            }
+
+            closeModal();
+            updateDashboard();
+            saveData();
+        }
+
+        function closeModal() {
+            document.getElementById('task-modal').classList.add('hidden');
+            currentEditingTask = null;
+        }
+
+        // Seasonal tasks
+        function addSeasonalTasks() {
+            document.getElementById('seasonal-modal').classList.remove('hidden');
+        }
+
+        function closeSeasonalModal() {
+            document.getElementById('seasonal-modal').classList.add('hidden');
+        }
+
+        function saveSeasonalTasks() {
+            const seasonalTasks = [
+                { id: 'fall-gutters', title: 'Clean Gutters & Downspouts', category: 'Exterior', cost: 150, season: 'fall' },
+                { id: 'fall-furnace', title: 'Schedule Furnace Inspection', category: 'HVAC', cost: 100, season: 'fall' },
+                { id: 'fall-chimney', title: 'Chimney Cleaning', category: 'Safety', cost: 300, season: 'fall' },
+                { id: 'fall-weatherstrip', title: 'Check Weatherstripping', category: 'General', cost: 50, season: 'fall' },
+                { id: 'spring-ac', title: 'AC System Tune-up', category: 'HVAC', cost: 120, season: 'spring' },
+                { id: 'spring-deck', title: 'Deck Inspection & Cleaning', category: 'Exterior', cost: 100, season: 'spring' },
+                { id: 'spring-exterior', title: 'Exterior Pressure Washing', category: 'Exterior', cost: 200, season: 'spring' },
+                { id: 'spring-irrigation', title: 'Irrigation System Check', category: 'General', cost: 75, season: 'spring' }
+            ];
+
+            let addedCount = 0;
+            let nextId = Math.max(...tasks.map(t => t.id), 0) + 1;
+
+            seasonalTasks.forEach(seasonalTask => {
+                const checkbox = document.getElementById(seasonalTask.id);
+                if (checkbox && checkbox.checked) {
+                    let dueDate = new Date();
+                    if (seasonalTask.season === 'fall') {
+                        dueDate.setMonth(9, 15); // October 15
+                    } else if (seasonalTask.season === 'spring') {
+                        dueDate.setMonth(3, 15); // April 15
+                    }
+
+                    if (dueDate < new Date()) {
+                        dueDate.setFullYear(dueDate.getFullYear() + 1);
+                    }
+
+                    const newTask = {
+                        id: nextId++,
+                        title: seasonalTask.title,
+                        category: seasonalTask.category,
+                        frequency: 365,
+                        cost: seasonalTask.cost,
+                        priority: 'medium',
+                        description: `Seasonal ${seasonalTask.season} maintenance task`,
+                        nextDue: dueDate,
+                        lastCompleted: null,
+                        isCompleted: false
+                    };
+
+                    tasks.push(newTask);
+                    addedCount++;
+                }
+            });
+
+            closeSeasonalModal();
+            
+            if (addedCount > 0) {
+                updateDashboard();
+                saveData();
+                alert(`✅ Added ${addedCount} seasonal task${addedCount === 1 ? '' : 's'}!`);
+            }
+        }
+
+        // Appliance management
+        function addAppliance() {
+            currentEditingAppliance = null;
+            document.getElementById('appliance-modal-title').textContent = 'Add Appliance';
+            document.getElementById('appliance-name').value = '';
+            document.getElementById('appliance-type').value = 'HVAC';
+            document.getElementById('appliance-brand').value = '';
+            document.getElementById('appliance-model').value = '';
+            document.getElementById('appliance-install-date').value = '';
+            document.getElementById('appliance-warranty').value = '';
+            document.getElementById('appliance-notes').value = '';
+            document.getElementById('appliance-modal').classList.remove('hidden');
+        }
+
+        function closeApplianceModal() {
+            document.getElementById('appliance-modal').classList.add('hidden');
+            currentEditingAppliance = null;
+        }
+
+        function saveAppliance() {
+            const name = document.getElementById('appliance-name').value;
+            const type = document.getElementById('appliance-type').value;
+            const brand = document.getElementById('appliance-brand').value;
+            const model = document.getElementById('appliance-model').value;
+            const installDate = document.getElementById('appliance-install-date').value;
+            const warranty = document.getElementById('appliance-warranty').value;
+            const notes = document.getElementById('appliance-notes').value;
+
+            if (!name.trim()) {
+                alert('Please enter an appliance name');
+                return;
+            }
+
+            if (currentEditingAppliance) {
+                currentEditingAppliance.name = name;
+                currentEditingAppliance.type = type;
+                currentEditingAppliance.brand = brand;
+                currentEditingAppliance.model = model;
+                currentEditingAppliance.installDate = installDate;
+                currentEditingAppliance.warrantyExpires = warranty;
+                currentEditingAppliance.notes = notes;
+            } else {
+                const newAppliance = {
+                    id: Math.max(...appliances.map(a => a.id), 0) + 1,
+                    name: name,
+                    type: type,
+                    brand: brand,
+                    model: model,
+                    installDate: installDate,
+                    warrantyExpires: warranty,
+                    notes: notes,
+                    replacementParts: getReplacementParts(type)
+                };
+                appliances.push(newAppliance);
+            }
+
+            closeApplianceModal();
+            renderAppliances();
+            saveData();
+        }
+
+        function getReplacementParts(type) {
+            const partsByType = {
+                'HVAC': ['Air Filter', 'Thermostat Batteries', 'Blower Motor'],
+                'Water Heater': ['Anode Rod', 'Temperature Relief Valve', 'Heating Element'],
+                'Washer': ['Water Inlet Valve', 'Drive Belt', 'Door Seal'],
+                'Dryer': ['Lint Filter', 'Drive Belt', 'Thermal Fuse'],
+                'Refrigerator': ['Water Filter', 'Door Seal', 'Thermostat'],
+                'Dishwasher': ['Water Filter', 'Door Seal', 'Spray Arm'],
+                'Range/Oven': ['Heating Element', 'Igniter', 'Door Seal']
+            };
+            return partsByType[type] || ['General maintenance parts'];
+        }
+
+        function renderAppliances() {
+            const appliancesList = document.getElementById('appliances-list');
+            
+            if (appliances.length === 0) {
+                appliancesList.innerHTML = '<div class="p-6 text-center text-gray-500">No appliances added yet.</div>';
+                return;
+            }
+
+            appliancesList.innerHTML = appliances.map(appliance => {
+                const warrantyStatus = appliance.warrantyExpires && new Date(appliance.warrantyExpires) > new Date() ? 
+                    `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Under Warranty</span>` :
+                    '';
+
+                return `
+                    <div class="p-4 border-b hover:bg-gray-50">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1 pr-3">
+                                <h4 class="font-semibold text-gray-900 text-sm">${appliance.name}</h4>
+                                <div class="text-xs text-gray-600 mt-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">${appliance.type}</span>
+                                        ${warrantyStatus}
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div><strong>Brand:</strong> ${appliance.brand || 'Unknown'}</div>
+                                        <div><strong>Model:</strong> ${appliance.model || 'Unknown'}</div>
+                                        ${appliance.installDate ? `<div><strong>Installed:</strong> ${new Date(appliance.installDate).toLocaleDateString()}</div>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <button onclick="editAppliance(${appliance.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs touch-btn">
+                                    ✏️
+                                </button>
+                                <button onclick="findParts(${appliance.id})" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs touch-btn">
+                                    🔧
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function editAppliance(applianceId) {
+            const appliance = appliances.find(a => a.id === applianceId);
+            if (appliance) {
+                currentEditingAppliance = appliance;
+                document.getElementById('appliance-modal-title').textContent = 'Edit Appliance';
+                document.getElementById('appliance-name').value = appliance.name;
+                document.getElementById('appliance-type').value = appliance.type;
+                document.getElementById('appliance-brand').value = appliance.brand || '';
+                document.getElementById('appliance-model').value = appliance.model || '';
+                document.getElementById('appliance-install-date').value = appliance.installDate || '';
+                document.getElementById('appliance-warranty').value = appliance.warrantyExpires || '';
+                document.getElementById('appliance-notes').value = appliance.notes || '';
+                document.getElementById('appliance-modal').classList.remove('hidden');
+            }
+        }
+
+        function findParts(applianceId) {
+            const appliance = appliances.find(a => a.id === applianceId);
+            if (appliance) {
+                alert(`🔧 Finding parts for ${appliance.name}\n\nCommon parts:\n• ${appliance.replacementParts?.join('\n• ') || 'None listed'}\n\nIn a full app, this would link to parts suppliers!`);
+            }
+        }
+
+        // Contractor management
+        function renderContractors() {
+            renderRepairRecords();
+            renderContractorDirectory();
+        }
+
+        function addRepairRecord() {
+            const description = prompt('Enter repair description:');
+            const contractor = prompt('Contractor name:');
+            const cost = prompt('Total cost (numbers only):');
+            
+            if (description && contractor) {
+                const newRecord = {
+                    id: Math.max(...repairRecords.map(r => r.id), 0) + 1,
+                    date: new Date().toISOString().split('T')[0],
+                    description: description,
+                    contractor: contractor,
+                    cost: parseInt(cost) || 0,
+                    notes: ''
+                };
+                repairRecords.push(newRecord);
+                renderRepairRecords();
+                saveData();
+            }
+        }
+
+        function addContractor() {
+            const name = prompt('Contractor/Company name:');
+            const specialty = prompt('Specialty (e.g., HVAC, Plumbing):');
+            const phone = prompt('Phone number:');
+            
+            if (name) {
+                const newContractor = {
+                    id: Math.max(...contractors.map(c => c.id), 0) + 1,
+                    name: name,
+                    specialty: specialty || 'General',
+                    phone: phone || '',
+                    email: '',
+                    rating: 0,
+                    notes: ''
+                };
+                contractors.push(newContractor);
+                renderContractorDirectory();
+                saveData();
+            }
+        }
+
+        function renderRepairRecords() {
+            const recordsList = document.getElementById('repair-records-list');
+            
+            if (repairRecords.length === 0) {
+                recordsList.innerHTML = '<div class="p-4 text-center text-gray-500 text-sm">No repair records yet. Build your home\'s history!</div>';
+                return;
+            }
+
+            recordsList.innerHTML = repairRecords.map(record => `
+                <div class="p-4 border-b hover:bg-gray-50">
+                    <div class="font-medium text-gray-900 text-sm">${record.description}</div>
+                    <div class="text-xs text-gray-600 mt-1">
+                        <div>${new Date(record.date).toLocaleDateString()} • ${record.contractor}</div>
+                        ${record.cost > 0 ? `<div class="text-green-600 font-medium">${record.cost}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderContractorDirectory() {
+            const contractorsList = document.getElementById('contractors-list');
+            
+            if (contractors.length === 0) {
+                contractorsList.innerHTML = '<div class="p-4 text-center text-gray-500 text-sm">No contractors added yet.</div>';
+                return;
+            }
+
+            contractorsList.innerHTML = contractors.map(contractor => `
+                <div class="p-4 border-b hover:bg-gray-50">
+                    <div class="font-medium text-gray-900 text-sm">${contractor.name}</div>
+                    <div class="text-xs text-gray-600 mt-1">
+                        <div class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs inline-block mb-1">${contractor.specialty}</div>
+                        ${contractor.phone ? `<div class="mt-1">📞 ${contractor.phone}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update settings
+        function updateSettings() {
+            const propertySummary = document.getElementById('property-summary');
+            const features = [];
+            
+            if (homeData.features?.centralAC) features.push('Central AC/Heat');
+            if (homeData.features?.miniSplits) features.push('Mini-Splits');
+            if (homeData.features?.wellWater) features.push('Well Water');
+            if (homeData.features?.septic) features.push('Septic System');
+            if (homeData.features?.fireplace) features.push('Fireplace');
+            if (homeData.features?.pool) features.push('Pool/Spa');
+            if (homeData.features?.deck) features.push('Deck/Patio');
+
+            propertySummary.innerHTML = `
+                <div class="space-y-2 text-sm">
+                    <div><strong>📍 Address:</strong><br>
+                        <a href="https://maps.google.com/?q=${encodeURIComponent(homeData.fullAddress)}" target="_blank" class="text-blue-600 hover:underline">${homeData.fullAddress || 'Not set'}</a>
+                        <div class="text-xs text-gray-500">Click to view on Google Maps</div>
+                    </div>
+                    <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
+                    <div><strong>🎯 Approach:</strong> ${homeData.approach || 'Standard'} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
+                    <div><strong>🏠 Features:</strong><br>${features.join(', ') || 'None selected'}</div>
+                </div>
+            `;
+        }
+
+        // Export calendar
+        function exportCalendar() {
+            const calendarData = tasks.filter(t => !t.isCompleted).map(task => {
+                return {
+                    title: task.title,
+                    description: task.description,
+                    date: task.nextDue.toISOString().split('T')[0],
+                    category: task.category,
+                    cost: task.cost
+                };
+            });
+
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "Title,Description,Date,Category,Cost\n" +
+                calendarData.map(e => `"${e.title}","${e.description}","${e.date}","${e.category}","${e.cost}"`).join("\n");
+
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", "casa_care_calendar.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Export data
+        function exportData() {
+            const data = {
+                homeData: homeData,
+                tasks: tasks,
+                appliances: appliances,
+                documents: documents,
+                repairRecords: repairRecords,
+                contractors: contractors,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+            const link = document.createElement("a");
+            link.setAttribute("href", dataStr);
+            link.setAttribute("download", "casa_care_backup.json");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('📄 Data exported! Your data is also automatically saved in your browser.');
+        }
+
+        // Clear data
+        function clearData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                // Clear variables
+                homeData = {};
+                tasks = [];
+                appliances = [];
+                documents = [];
+                repairRecords = [];
+                contractors = [];
+                
+                // Clear localStorage
+                localStorage.removeItem('casaCareData');
+                
+                // Go back to setup
+                document.getElementById('main-app').classList.add('hidden');
+                document.getElementById('setup-form').style.display = 'block';
+                document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
+                
+                alert('✅ All data cleared. Starting fresh!');
+                console.log('🗑️ All data cleared');
+            }
+        }
+
+        // Save data to localStorage (now actually works!)
+        function saveData() {
+            const data = { 
+                homeData: homeData, 
+                tasks: tasks, 
+                appliances: appliances,
+                documents: documents,
+                repairRecords: repairRecords,
+                contractors: contractors,
+                version: '1.0'
+            };
+            
+            try {
+                localStorage.setItem('casaCareData', JSON.stringify(data));
+                console.log('✅ Data saved to browser storage');
+            } catch (error) {
+                console.error('❌ Failed to save data:', error);
+            }
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            try {
+                const savedData = localStorage.getItem('casaCareData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    
+                    // Restore all data
+                    homeData = data.homeData || {};
+                    tasks = data.tasks || [];
+                    appliances = data.appliances || [];
+                    documents = data.documents || [];
+                    repairRecords = data.repairRecords || [];
+                    contractors = data.contractors || [];
+                    
+                    // Restore dates (they get stringified in JSON)
+                    tasks.forEach(task => {
+                        if (task.nextDue) task.nextDue = new Date(task.nextDue);
+                        if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
+                    });
+                    
+                    console.log('✅ Data loaded from browser storage');
+                    return true;
+                }
+            } catch (error) {
+                console.error('❌ Failed to load data:', error);
+            }
+            return false;
+        }
+
+        // Check if user has existing data
+        function hasExistingData() {
+            return loadData() && homeData.fullAddress;
+        }
+
+        // Initialize app
+        function initializeApp() {
+            console.log('🏠 Casa Care mobile app loaded');
+            
+            // Try to load existing data
+            if (hasExistingData()) {
+                // User has existing data - show main app
+                document.getElementById('setup-form').style.display = 'none';
+                document.getElementById('main-app').classList.remove('hidden');
+                
+                // Update header
+                document.getElementById('header-subtitle').textContent = homeData.fullAddress;
+                
+                // Initialize dashboard
+                updateDashboard();
+                
+                console.log('👋 Welcome back! Loaded existing home data');
+            } else {
+                // New user - show setup form
+                console.log('🆕 New user - showing setup form');
+            }
+        }
+
+        // Start the app when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+        
+        // Also initialize immediately in case DOM is already loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+    </script>
+</body>
+</html> + Math.round(totalCost);
 
             // Render upcoming tasks
             renderTasks();
@@ -1509,8 +2538,9 @@
                 
                 // Find tasks for this date
                 const dayTasks = tasks.filter(task => {
+                    if (!task.nextDue || task.isCompleted) return false;
                     const taskDate = new Date(task.nextDue);
-                    return taskDate.toDateString() === currentDate.toDateString() && !task.isCompleted;
+                    return taskDate.toDateString() === currentDate.toDateString();
                 });
 
                 let cellClass = 'calendar-cell';
@@ -1525,9 +2555,13 @@
                                 const daysUntilDue = Math.ceil((task.nextDue - today) / (24 * 60 * 60 * 1000));
                                 const overdue = daysUntilDue < 0;
                                 const colorClass = overdue ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700';
-                                return `<div class="${colorClass} text-xs p-1 rounded truncate" title="${task.title}">${task.title.substring(0, 10)}${task.title.length > 10 ? '...' : ''}</div>`;
+                                return `<div class="${colorClass} text-xs p-1 rounded truncate cursor-pointer hover:opacity-80" 
+                                            onclick="showTaskDetail(${task.id})" 
+                                            title="Click for details: ${task.description}">
+                                            ${task.title.substring(0, 10)}${task.title.length > 10 ? '...' : ''}
+                                        </div>`;
                             }).join('')}
-                            ${dayTasks.length > 2 ? `<div class="text-xs text-gray-500">+${dayTasks.length - 2} more</div>` : ''}
+                            ${dayTasks.length > 2 ? `<div class="text-xs text-gray-500 cursor-pointer" onclick="showDayTasks('${currentDate.toDateString()}')">+${dayTasks.length - 2} more</div>` : ''}
                         </div>
                     </div>
                 `;
@@ -1590,6 +2624,7 @@
             document.getElementById('task-category').value = 'General';
             document.getElementById('task-cost').value = '';
             document.getElementById('task-frequency').value = '365';
+            document.getElementById('task-start-date').value = '';
             document.getElementById('task-notes').value = '';
             document.getElementById('task-modal').classList.remove('hidden');
         }
@@ -1604,6 +2639,18 @@
                 document.getElementById('task-cost').value = task.cost;
                 document.getElementById('task-frequency').value = task.frequency;
                 document.getElementById('task-notes').value = task.description;
+                
+                // Set start date based on last completed or calculate from next due
+                if (task.lastCompleted) {
+                    document.getElementById('task-start-date').value = task.lastCompleted.toISOString().split('T')[0];
+                } else if (task.nextDue) {
+                    // Calculate when it was "last completed" based on next due date
+                    const calculatedStart = new Date(task.nextDue.getTime() - task.frequency * 24 * 60 * 60 * 1000);
+                    document.getElementById('task-start-date').value = calculatedStart.toISOString().split('T')[0];
+                } else {
+                    document.getElementById('task-start-date').value = '';
+                }
+                
                 document.getElementById('task-modal').classList.remove('hidden');
             }
         }
@@ -1613,6 +2660,7 @@
             const category = document.getElementById('task-category').value;
             const cost = parseInt(document.getElementById('task-cost').value) || 0;
             const frequency = parseInt(document.getElementById('task-frequency').value) || 365;
+            const startDate = document.getElementById('task-start-date').value;
             const notes = document.getElementById('task-notes').value;
 
             if (!title.trim()) {
@@ -1627,6 +2675,13 @@
                 currentEditingTask.cost = cost;
                 currentEditingTask.frequency = frequency;
                 currentEditingTask.description = notes;
+                
+                // Update dates if start date is provided
+                if (startDate) {
+                    const lastCompleted = new Date(startDate);
+                    currentEditingTask.lastCompleted = lastCompleted;
+                    currentEditingTask.nextDue = new Date(lastCompleted.getTime() + frequency * 24 * 60 * 60 * 1000);
+                }
             } else {
                 // Add new task
                 const newTask = {
@@ -1637,10 +2692,20 @@
                     cost: cost,
                     priority: 'medium',
                     description: notes,
-                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null,
                     isCompleted: false
                 };
+                
+                // Set dates based on start date
+                if (startDate) {
+                    const lastCompleted = new Date(startDate);
+                    newTask.lastCompleted = lastCompleted;
+                    newTask.nextDue = new Date(lastCompleted.getTime() + frequency * 24 * 60 * 60 * 1000);
+                } else {
+                    // Default to due in 30 days if no start date
+                    newTask.nextDue = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+                    newTask.lastCompleted = null;
+                }
+                
                 tasks.push(newTask);
             }
 
