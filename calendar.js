@@ -12,7 +12,29 @@ class CasaCareCalendar {
         this.createCalendarHTML();
         this.bindEvents();
         this.renderCalendar();
+        this.logTaskDates(); // Debug: show all task dates
         console.log('📅 Calendar initialized');
+    }
+
+    logTaskDates() {
+        console.log('🔍 DEBUGGING TASK DATES:');
+        if (window.tasks && window.tasks.length > 0) {
+            window.tasks.forEach((task, index) => {
+                if (task.nextDue) {
+                    const taskDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
+                    console.log(`Task ${index + 1}: "${task.title}" due on ${taskDate.toDateString()} (${taskDate.toISOString().split('T')[0]})`);
+                }
+            });
+        }
+        console.log(`📅 Currently viewing: ${this.getMonthName()} ${this.currentYear}`);
+    }
+
+    getMonthName() {
+        const monthNames = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        return monthNames[this.currentMonth];
     }
 
     createCalendarHTML() {
@@ -50,6 +72,13 @@ class CasaCareCalendar {
                 <div class="p-4 bg-gray-100 text-sm">
                     <strong>Debug Info:</strong> 
                     <span id="debug-info">Loading...</span>
+                    <br>
+                    <strong>Task Date Range:</strong> 
+                    <span id="date-range-info">Calculating...</span>
+                    <br>
+                    <button onclick="window.casaCareCalendar.goToTaskMonth()" class="bg-blue-500 text-white px-2 py-1 rounded text-xs mt-1">
+                        Go to First Task Month
+                    </button>
                 </div>
 
                 <!-- Selected Day Panel -->
@@ -90,22 +119,51 @@ class CasaCareCalendar {
 
     updateDebugInfo() {
         const debugElement = document.getElementById('debug-info');
+        const dateRangeElement = document.getElementById('date-range-info');
+        
         if (debugElement) {
             const taskCount = window.tasks ? window.tasks.length : 0;
             const tasksWithDates = window.tasks ? window.tasks.filter(t => t.nextDue).length : 0;
             debugElement.textContent = `${taskCount} total tasks, ${tasksWithDates} with due dates`;
         }
+
+        if (dateRangeElement && window.tasks) {
+            const taskDates = window.tasks
+                .filter(t => t.nextDue)
+                .map(t => t.nextDue instanceof Date ? t.nextDue : new Date(t.nextDue))
+                .sort((a, b) => a - b);
+            
+            if (taskDates.length > 0) {
+                const firstDate = taskDates[0].toDateString();
+                const lastDate = taskDates[taskDates.length - 1].toDateString();
+                dateRangeElement.textContent = `${firstDate} to ${lastDate}`;
+            } else {
+                dateRangeElement.textContent = 'No tasks with dates';
+            }
+        }
+    }
+
+    goToTaskMonth() {
+        if (window.tasks) {
+            const taskDates = window.tasks
+                .filter(t => t.nextDue)
+                .map(t => t.nextDue instanceof Date ? t.nextDue : new Date(t.nextDue))
+                .sort((a, b) => a - b);
+            
+            if (taskDates.length > 0) {
+                const firstTaskDate = taskDates[0];
+                this.currentMonth = firstTaskDate.getMonth();
+                this.currentYear = firstTaskDate.getFullYear();
+                this.renderCalendar();
+                console.log(`📅 Jumped to ${this.getMonthName()} ${this.currentYear}`);
+            }
+        }
     }
 
     updateMonthYearDisplay() {
-        const monthNames = [
-            'January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'
-        ];
-        
         const monthYearElement = document.getElementById('calendar-month-year');
         if (monthYearElement) {
-            monthYearElement.textContent = `${monthNames[this.currentMonth]} ${this.currentYear}`;
+            monthYearElement.textContent = `${this.getMonthName()} ${this.currentYear}`;
         }
     }
 
@@ -220,10 +278,24 @@ class CasaCareCalendar {
                 taskDate = new Date(task.nextDue);
             }
             
-            return this.isSameDay(taskDate, date);
+            // Normalize both dates to avoid timezone issues
+            const normalizedTaskDate = new Date(taskDate.getFullYear(), taskDate.getMonth(), taskDate.getDate());
+            const normalizedSearchDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            
+            const matches = normalizedTaskDate.getTime() === normalizedSearchDate.getTime();
+            
+            // Debug log for the first few checks
+            if (date.getDate() <= 3) {
+                console.log(`🔍 Comparing task "${task.title}": ${normalizedTaskDate.toDateString()} vs ${normalizedSearchDate.toDateString()} = ${matches}`);
+            }
+            
+            return matches;
         });
 
-        console.log(`📅 Found ${tasksForDate.length} tasks for ${date.toDateString()}`);
+        if (tasksForDate.length > 0) {
+            console.log(`📅 Found ${tasksForDate.length} tasks for ${date.toDateString()}`);
+        }
+        
         return tasksForDate;
     }
 
