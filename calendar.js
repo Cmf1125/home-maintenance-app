@@ -12,11 +12,15 @@ class CasaCareCalendar {
         this.createCalendarHTML();
         this.bindEvents();
         this.renderCalendar();
+        console.log('📅 Calendar initialized');
     }
 
     createCalendarHTML() {
         const calendarContainer = document.getElementById('calendar-view');
-        if (!calendarContainer) return;
+        if (!calendarContainer) {
+            console.error('❌ Calendar container not found');
+            return;
+        }
 
         calendarContainer.innerHTML = `
             <div class="calendar-container">
@@ -40,6 +44,12 @@ class CasaCareCalendar {
                     
                     <!-- Calendar days will be inserted here -->
                     <div id="calendar-days" class="calendar-days-container"></div>
+                </div>
+
+                <!-- Debug Info -->
+                <div class="p-4 bg-gray-100 text-sm">
+                    <strong>Debug Info:</strong> 
+                    <span id="debug-info">Loading...</span>
                 </div>
 
                 <!-- Selected Day Panel -->
@@ -75,6 +85,16 @@ class CasaCareCalendar {
     renderCalendar() {
         this.updateMonthYearDisplay();
         this.renderCalendarDays();
+        this.updateDebugInfo();
+    }
+
+    updateDebugInfo() {
+        const debugElement = document.getElementById('debug-info');
+        if (debugElement) {
+            const taskCount = window.tasks ? window.tasks.length : 0;
+            const tasksWithDates = window.tasks ? window.tasks.filter(t => t.nextDue).length : 0;
+            debugElement.textContent = `${taskCount} total tasks, ${tasksWithDates} with due dates`;
+        }
     }
 
     updateMonthYearDisplay() {
@@ -183,12 +203,28 @@ class CasaCareCalendar {
     }
 
     getTasksForDate(date) {
-        if (!window.tasks) return [];
+        // Check if window.tasks exists and has data
+        if (!window.tasks || !Array.isArray(window.tasks)) {
+            console.warn('⚠️ No tasks data available for calendar');
+            return [];
+        }
 
-        return window.tasks.filter(task => {
+        const tasksForDate = window.tasks.filter(task => {
             if (!task.nextDue) return false;
-            return this.isSameDay(new Date(task.nextDue), date);
+            
+            // Handle both Date objects and string dates
+            let taskDate;
+            if (task.nextDue instanceof Date) {
+                taskDate = task.nextDue;
+            } else {
+                taskDate = new Date(task.nextDue);
+            }
+            
+            return this.isSameDay(taskDate, date);
         });
+
+        console.log(`📅 Found ${tasksForDate.length} tasks for ${date.toDateString()}`);
+        return tasksForDate;
     }
 
     selectDay(date, dayTasks) {
@@ -234,7 +270,8 @@ class CasaCareCalendar {
     }
 
     renderDayPanelTask(task) {
-        const isOverdue = new Date(task.nextDue) < new Date();
+        const taskDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
+        const isOverdue = taskDate < new Date();
         const priorityClass = `priority-${task.priority}`;
         const overdueClass = isOverdue ? 'overdue' : '';
 
@@ -300,6 +337,7 @@ class CasaCareCalendar {
 
     // Public method to refresh calendar when tasks change
     refresh() {
+        console.log('📅 Refreshing calendar...');
         this.renderCalendar();
     }
 }
@@ -309,8 +347,9 @@ function rescheduleTask(taskId) {
     const task = window.tasks.find(t => t.id === taskId);
     if (!task) return;
 
+    const currentDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
     const newDateStr = prompt(`Reschedule "${task.title}" to (YYYY-MM-DD):`, 
-                             task.nextDue.toISOString().split('T')[0]);
+                             currentDate.toISOString().split('T')[0]);
     
     if (newDateStr) {
         const newDate = new Date(newDateStr + 'T12:00:00');
@@ -331,10 +370,18 @@ function rescheduleTask(taskId) {
     }
 }
 
-// Initialize calendar when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    // Only initialize if calendar view exists
-    if (document.getElementById('calendar-view')) {
+// Initialize calendar - but wait for tasks to be loaded
+function initializeCalendar() {
+    // Only initialize if calendar view exists and we have tasks
+    if (document.getElementById('calendar-view') && window.tasks) {
         window.casaCareCalendar = new CasaCareCalendar();
+        console.log('✅ Calendar initialized with tasks');
+    } else {
+        console.log('⏳ Waiting for calendar view or tasks data...');
     }
+}
+
+// Try to initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(initializeCalendar, 100); // Small delay to ensure tasks are loaded
 });
