@@ -270,7 +270,7 @@ function rescheduleTaskFromDashboard(taskId) {
     }
 
     const currentDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
-    const newDateStr = prompt(`Reschedule "${task.title}" to (YYYY-MM-DD):`, 
+    const newDateStr = prompt(`Reschedule "${task.title}" to (MM-DD-YYYY):`, 
                              currentDate.toISOString().split('T')[0]);
     
     if (newDateStr) {
