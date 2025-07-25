@@ -292,7 +292,7 @@ function rescheduleTaskFromDashboard(taskId) {
             console.log(`✅ Task ${task.title} rescheduled to ${newDate.toLocaleDateString()}`);
             alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
         } else {
-            alert('❌ Invalid date format. Please use YYYY-MM-DD format.');
+            alert('❌ Invalid date format. Please use MM-DD-YYYY format.');
         }
     }
 }
