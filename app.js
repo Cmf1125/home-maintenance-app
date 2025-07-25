@@ -53,7 +53,7 @@ function createMaintenancePlan() {
     
     try {
         // Collect home data
-        homeData = {
+       homeData = {
     address: document.getElementById('address').value || '123 Main Street',
     city: document.getElementById('city').value || 'Anytown',
     state: document.getElementById('state').value || 'NY',
