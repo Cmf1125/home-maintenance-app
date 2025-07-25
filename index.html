@@ -278,64 +278,81 @@
         <!-- Main App (Dashboard & Calendar) -->
         <div id="main-app" class="hidden">
             <div class="main-content">
-                <!-- Dashboard View -->
-                <div id="dashboard-view" class="p-4">
-                    <!-- Welcome -->
-                    <div class="gradient-bg text-white rounded-2xl p-6 shadow-2xl mb-6">
-                        <h2 class="text-xl font-bold mb-2">Welcome to Casa Care! 👋</h2>
-                        <p class="text-blue-100 text-sm" id="home-address">Managing maintenance for your home</p>
-                    </div>
+               <!-- Enhanced Dashboard View -->
+<div id="dashboard-view" class="p-4">
+    <!-- Welcome -->
+    <div class="gradient-bg text-white rounded-2xl p-6 shadow-2xl mb-6">
+        <h2 class="text-xl font-bold mb-2">Welcome to Casa Care! 👋</h2>
+        <p class="text-blue-100 text-sm" id="home-address">Managing maintenance for your home</p>
+    </div>
 
-                    <!-- Stats Grid -->
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="bg-white rounded-xl p-4 shadow-lg">
-                            <div class="flex items-center gap-3">
-                                <div class="p-2 bg-red-100 rounded-lg text-lg">⚠️</div>
-                                <div>
-                                    <p class="text-xs text-gray-600">Overdue</p>
-                                    <p id="overdue-count" class="text-xl font-bold text-gray-900">0</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl p-4 shadow-lg">
-                            <div class="flex items-center gap-3">
-                                <div class="p-2 bg-orange-100 rounded-lg text-lg">📅</div>
-                                <div>
-                                    <p class="text-xs text-gray-600">This Week</p>
-                                    <p id="week-count" class="text-xl font-bold text-gray-900">0</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl p-4 shadow-lg">
-                            <div class="flex items-center gap-3">
-                                <div class="p-2 bg-blue-100 rounded-lg text-lg">📋</div>
-                                <div>
-                                    <p class="text-xs text-gray-600">Total Tasks</p>
-                                    <p id="total-count" class="text-xl font-bold text-gray-900">0</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl p-4 shadow-lg">
-                            <div class="flex items-center gap-3">
-                                <div class="p-2 bg-green-100 rounded-lg text-lg">💰</div>
-                                <div>
-                                    <p class="text-xs text-gray-600">Annual Cost</p>
-                                    <p id="annual-cost" class="text-xl font-bold text-gray-900">$0</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Upcoming Tasks -->
-                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <div class="p-4 border-b border-gray-100">
-                            <h3 class="text-lg font-bold text-gray-900">Upcoming Tasks</h3>
-                        </div>
-                        <div id="tasks-list">
-                            <!-- Tasks will be populated here -->
-                        </div>
-                    </div>
+    <!-- Interactive Stats Grid -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+        <div id="overdue-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-red-100 rounded-lg text-lg">⚠️</div>
+                <div>
+                    <p class="text-xs text-gray-600">Overdue</p>
+                    <p id="overdue-count" class="text-xl font-bold text-gray-900">0</p>
                 </div>
+            </div>
+            <div class="text-xs text-gray-500 mt-2">Click to view overdue tasks</div>
+        </div>
+        
+        <div id="week-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-orange-100 rounded-lg text-lg">📅</div>
+                <div>
+                    <p class="text-xs text-gray-600">This Week</p>
+                    <p id="week-count" class="text-xl font-bold text-gray-900">0</p>
+                </div>
+            </div>
+            <div class="text-xs text-gray-500 mt-2">Click to view week's tasks</div>
+        </div>
+        
+        <div id="total-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-blue-100 rounded-lg text-lg">📋</div>
+                <div>
+                    <p class="text-xs text-gray-600">Total Tasks</p>
+                    <p id="total-count" class="text-xl font-bold text-gray-900">0</p>
+                </div>
+            </div>
+            <div class="text-xs text-gray-500 mt-2">Click to view all tasks</div>
+        </div>
+        
+        <div id="cost-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-green-100 rounded-lg text-lg">💰</div>
+                <div>
+                    <p class="text-xs text-gray-600">Annual Cost</p>
+                    <p id="annual-cost" class="text-xl font-bold text-gray-900">$0</p>
+                </div>
+            </div>
+            <div class="text-xs text-gray-500 mt-2">Click to sort by cost</div>
+        </div>
+    </div>
+
+    <!-- Enhanced Tasks Section -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 id="tasks-list-title" class="text-lg font-bold text-gray-900">Upcoming Tasks</h3>
+            <div class="flex gap-2">
+                <button onclick="showAllTasks()" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg hover:bg-gray-200 text-sm touch-btn">
+                    🔄 Show All
+                </button>
+                <button onclick="exportTaskList()" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 text-sm touch-btn">
+                    📋 Export List
+                </button>
+            </div>
+        </div>
+        
+        <!-- Tasks List -->
+        <div id="tasks-list">
+            <!-- Enhanced tasks will be populated here -->
+        </div>
+    </div>
+</div>
 
                 <!-- Calendar View -->
                 <div id="calendar-view" class="hidden">
