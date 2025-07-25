@@ -331,4 +331,273 @@
     .filter-controls {
         display: none;
     }
+}/* Mobile-First Responsive Improvements */
+
+/* Better Mobile Stats Grid */
+@media (max-width: 768px) {
+    /* Single column stats on very small screens */
+    @media (max-width: 480px) {
+        .grid.grid-cols-2 {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+    }
+    
+    /* Larger touch targets for stat cards */
+    .stat-card {
+        padding: 1rem;
+        min-height: 80px;
+    }
+    
+    .stat-card .text-xl {
+        font-size: 1.5rem;
+    }
+    
+    /* Better mobile dashboard padding */
+    #dashboard-view {
+        padding: 0.75rem;
+    }
+    
+    /* Welcome card mobile optimization */
+    .gradient-bg {
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    .gradient-bg h2 {
+        font-size: 1.125rem;
+    }
+}
+
+/* Mobile Task Cards */
+@media (max-width: 768px) {
+    .enhanced-task-card {
+        padding: 1rem;
+    }
+    
+    .enhanced-task-card .flex {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .task-dates {
+        align-items: flex-start !important;
+        text-align: left !important;
+        margin-top: 0.5rem;
+    }
+    
+    .task-actions {
+        flex-direction: row !important;
+        gap: 0.5rem;
+        justify-content: stretch;
+    }
+    
+    .task-actions button {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .task-meta-row {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    /* Larger touch targets for task buttons */
+    .task-action-btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        min-height: 44px;
+    }
+}
+
+/* Mobile Bottom Navigation */
+@media (max-width: 768px) {
+    .bottom-nav {
+        padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+        box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+    
+    .tab-btn {
+        padding: 1rem 0.5rem;
+        min-height: 60px;
+    }
+    
+    .tab-btn .text-lg {
+        font-size: 1.25rem;
+    }
+    
+    .tab-btn .text-xs {
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+}
+
+/* Mobile Modal Improvements */
+@media (max-width: 768px) {
+    .fixed.inset-0.flex {
+        padding: 1rem;
+        align-items: flex-end;
+    }
+    
+    .fixed.inset-0.flex > div {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        border-radius: 1rem 1rem 0 0;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+    
+    /* Date picker modal mobile optimization */
+    #date-picker-modal .bg-white {
+        animation: slideUp 0.3s ease-out;
+    }
+    
+    /* Task edit modal mobile optimization */
+    #task-edit-modal .bg-white {
+        animation: slideUp 0.3s ease-out;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Mobile Typography */
+@media (max-width: 768px) {
+    /* Slightly larger text for better readability */
+    .text-xs {
+        font-size: 0.8125rem;
+    }
+    
+    .text-sm {
+        font-size: 0.9375rem;
+    }
+    
+    /* Better contrast for mobile */
+    .text-gray-600 {
+        color: #4b5563;
+    }
+    
+    .text-gray-500 {
+        color: #6b7280;
+    }
+}
+
+/* Mobile Form Improvements */
+@media (max-width: 768px) {
+    /* Larger input fields for mobile */
+    .form-input,
+    input[type="date"],
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+        padding: 1rem;
+        font-size: 1rem;
+        min-height: 48px;
+    }
+    
+    /* Better button sizing */
+    .touch-btn {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 0.75rem 1rem;
+    }
+    
+    /* Quick date buttons in date picker */
+    .grid.grid-cols-2.gap-2 button {
+        padding: 0.875rem;
+        font-size: 0.9375rem;
+    }
+}
+
+/* Mobile Calendar Improvements */
+@media (max-width: 768px) {
+    .calendar-container {
+        margin: 0.5rem;
+    }
+    
+    .calendar-day {
+        min-height: 70px;
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .calendar-day-header {
+        padding: 0.75rem 0.25rem;
+        font-size: 0.8125rem;
+    }
+    
+    .day-number {
+        font-size: 0.9375rem;
+    }
+    
+    .selected-day-panel {
+        max-height: 60vh;
+    }
+    
+    .day-panel-task {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .task-actions {
+        flex-direction: row;
+    }
+}
+
+/* Mobile Accessibility */
+@media (max-width: 768px) {
+    /* Larger focus indicators for mobile */
+    .stat-card:focus,
+    .task-action-btn:focus,
+    .touch-btn:focus {
+        outline: 3px solid #0891b2;
+        outline-offset: 2px;
+    }
+    
+    /* Better contrast for mobile screens */
+    .bg-white {
+        background-color: #ffffff;
+    }
+    
+    .shadow-lg {
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.15), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+    }
+}
+
+/* Prevent horizontal scroll on mobile */
+@media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+    }
+    
+    .main-content {
+        padding-bottom: 120px; /* More space for mobile nav */
+    }
+}
+
+/* Mobile-specific animations */
+@media (max-width: 768px) {
+    .stat-card:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+    
+    .task-action-btn:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+}
+
+/* Dark mode preparation for mobile */
+@media (prefers-color-scheme: dark) and (max-width: 768px) {
+    /* We can add dark mode later if needed */
 }
