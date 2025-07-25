@@ -1,0 +1,46 @@
+.gradient-bg { 
+    background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); 
+}
+
+.touch-btn {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    z-index: 50;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.main-content {
+    padding-bottom: 100px;
+}
+
+.task-category {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.seasonal-spring { 
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0); 
+}
+
+.seasonal-summer { 
+    background: linear-gradient(135deg, #fef3c7, #fed7aa); 
+}
+
+.seasonal-fall { 
+    background: linear-gradient(135deg, #fed7aa, #fdba74); 
+}
+
+.seasonal-winter { 
+    background: linear-gradient(135deg, #e0e7ff, #c7d2fe); 
+}
