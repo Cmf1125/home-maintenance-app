@@ -3,44 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="format-detection" content="telephone=no, address=no">
     <title>Casa Care - Smart Home Maintenance</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .gradient-bg { 
             background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); 
         }
-        .fade-in { 
-            animation: fadeIn 0.5s ease-in-out; 
+        .touch-btn {
+            min-height: 44px;
+            min-width: 44px;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 1px;
-            background-color: #e5e7eb;
-            border: 1px solid #e5e7eb;
-        }
-
-        .calendar-cell {
-            background: white;
-            min-height: 80px;
-            padding: 4px;
-        }
-
-        @media (min-width: 768px) {
-            .calendar-cell {
-                min-height: 100px;
-                padding: 8px;
-            }
-        }
-
-        /* Mobile bottom nav */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -51,64 +23,24 @@
             z-index: 50;
             padding-bottom: env(safe-area-inset-bottom);
         }
-
         .main-content {
-            padding-bottom: 100px; /* Space for bottom nav */
+            padding-bottom: 100px;
         }
-
-        /* Touch-friendly buttons */
-        .touch-btn {
-            min-height: 44px;
-            min-width: 44px;
-        }
-
-        /* Swipe indicators */
-        .swipe-hint {
-            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
-            height: 2px;
-            width: 40px;
-            margin: 0 auto;
-            border-radius: 1px;
-        }
-
-        /* Task category sections */
-        .task-category-section {
+        .task-category {
             border: 1px solid #e5e7eb;
             border-radius: 0.75rem;
             overflow: hidden;
+            margin-bottom: 1rem;
         }
-
-        .task-category-header {
-            background: #f9fafb;
-            padding: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        /* Seasonal task styling */
-        .seasonal-section {
-            background: linear-gradient(135deg, #fef3c7, #fde68a);
-        }
-
-        .seasonal-section.spring {
-            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-        }
-
-        .seasonal-section.summer {
-            background: linear-gradient(135deg, #fef3c7, #fed7aa);
-        }
-
-        .seasonal-section.fall {
-            background: linear-gradient(135deg, #fed7aa, #fdba74);
-        }
-
-        .seasonal-section.winter {
-            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
-        }
+        .seasonal-spring { background: linear-gradient(135deg, #dcfce7, #bbf7d0); }
+        .seasonal-summer { background: linear-gradient(135deg, #fef3c7, #fed7aa); }
+        .seasonal-fall { background: linear-gradient(135deg, #fed7aa, #fdba74); }
+        .seasonal-winter { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <div id="app">
-        <!-- Mobile Header -->
+        <!-- Header -->
         <div class="bg-white shadow-sm border-b sticky top-0 z-40">
             <div class="px-4 py-4">
                 <div class="flex items-center justify-between">
@@ -116,7 +48,7 @@
                         <h1 class="text-xl font-bold text-gray-900">Casa Care</h1>
                         <p class="text-sm text-gray-600" id="header-subtitle">Smart home maintenance</p>
                     </div>
-                    <button onclick="showHomeInfo()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn" id="home-icon-btn">🏠</button>
+                    <button onclick="showHomeInfo()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn">🏠</button>
                 </div>
             </div>
         </div>
@@ -138,7 +70,7 @@
                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
                     </div>
 
-                    <!-- City, State and Zip -->
+                    <!-- City, State, Zip -->
                     <div class="grid grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
@@ -157,7 +89,7 @@
                         </div>
                     </div>
 
-                    <!-- Other Features Input -->
+                    <!-- Other Features -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Other Features</label>
                         <input type="text" id="other-features" placeholder="e.g., Hot tub, Generator, Solar panels..." 
@@ -165,7 +97,7 @@
                         <p class="text-xs text-gray-500 mt-1">List any additional features not mentioned below</p>
                     </div>
 
-                    <!-- Basic Property Info -->
+                    <!-- Property Info -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Property Type</label>
@@ -184,17 +116,13 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Square Feet</label>
-                            <input type="number" id="sqft" value="2000" min="500" max="10000"
-                                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-                        </div>
-                        <div class="mt-6"> <!-- Empty space for alignment -->
-                        </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Square Feet</label>
+                        <input type="number" id="sqft" value="2000" min="500" max="10000"
+                               class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
                     </div>
 
-                    <!-- Home Systems -->
+                    <!-- Heating & Cooling Systems -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3">Heating & Cooling Systems</label>
                         <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
@@ -328,67 +256,64 @@
                 <div class="text-center mb-6">
                     <div class="text-4xl mb-4">📋</div>
                     <h2 class="text-xl font-bold text-gray-900 mb-2">Review Your Maintenance Tasks</h2>
-                    <p class="text-gray-600 text-sm">We've created a personalized task list organized by category and season. Review and set start dates for each task.</p>
+                    <p class="text-gray-600 text-sm">We've created a personalized task list organized by category and season.</p>
                 </div>
                 
-                <div class="mb-6">
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="font-semibold text-blue-900">📍 Property Summary</h3>
-                            <button onclick="editPropertyFromTaskSetup()" class="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 text-sm touch-btn">
-                                ✏️ Edit Property
-                            </button>
-                        </div>
-                        <div id="task-setup-summary" class="text-sm text-blue-800">
-                            <!-- Property summary will go here -->
-                        </div>
+                <!-- Property Summary -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-semibold text-blue-900">📍 Property Summary</h3>
+                        <button onclick="goBackToHomeSetup()" class="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 text-sm touch-btn">
+                            ✏️ Edit Property
+                        </button>
+                    </div>
+                    <div id="task-setup-summary" class="text-sm text-blue-800">
+                        <!-- Property summary will go here -->
                     </div>
                 </div>
 
-                <div class="space-y-6">
-                    <!-- Task Categories Overview -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h3 class="font-semibold text-gray-900 mb-3">📊 Task Summary</h3>
-                        <div id="task-summary-stats" class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                            <!-- Task stats will be populated here -->
-                        </div>
+                <!-- Task Summary Stats -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <h3 class="font-semibold text-gray-900 mb-3">📊 Task Summary</h3>
+                    <div id="task-summary-stats" class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <!-- Task stats will be populated here -->
                     </div>
+                </div>
 
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-900">Your Maintenance Schedule</h3>
-                        <div class="flex gap-2">
-                            <button onclick="addTaskFromSetup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-                                ➕ Add Custom Task
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="task-setup-categories" class="space-y-6">
-                        <!-- Task categories will be populated here -->
-                    </div>
+                <!-- Add Custom Task Button -->
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-900">Your Maintenance Schedule</h3>
+                    <button onclick="addTaskFromSetup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
+                        ➕ Add Custom Task
+                    </button>
+                </div>
+                
+                <!-- Task Categories -->
+                <div id="task-categories" class="space-y-6">
+                    <!-- Task categories will be populated here -->
+                </div>
 
-                    <div class="flex gap-3 mt-8">
-                        <button onclick="goBackToHomeSetup()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">
-                            ← Back to Home Info
-                        </button>
-                        <button onclick="finishTaskSetup()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 touch-btn">
-                            🚀 Complete Setup
-                        </button>
-                    </div>
+                <!-- Navigation Buttons -->
+                <div class="flex gap-3 mt-8">
+                    <button onclick="goBackToHomeSetup()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">
+                        ← Back to Home Info
+                    </button>
+                    <button onclick="finishTaskSetup()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 touch-btn">
+                        🚀 Complete Setup
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Main App -->
+        <!-- Main App (Simple Dashboard) -->
         <div id="main-app" class="hidden">
-            <!-- Tab Contents -->
             <div class="main-content">
                 <!-- Dashboard -->
-                <div id="dashboard-content" class="tab-content p-4">
+                <div class="p-4">
                     <!-- Welcome -->
                     <div class="gradient-bg text-white rounded-2xl p-6 shadow-2xl mb-6">
                         <h2 class="text-xl font-bold mb-2">Welcome to Casa Care! 👋</h2>
-                        <p class="text-blue-100 text-sm cursor-pointer hover:text-white hover:underline transition-colors" id="home-address" onclick="openRedfin()" title="Click to view on Redfin">Managing maintenance for your home</p>
+                        <p class="text-blue-100 text-sm" id="home-address">Managing maintenance for your home</p>
                     </div>
 
                     <!-- Stats Grid -->
@@ -433,162 +358,11 @@
 
                     <!-- Upcoming Tasks -->
                     <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                        <div class="p-4 border-b border-gray-100">
                             <h3 class="text-lg font-bold text-gray-900">Upcoming Tasks</h3>
-                            <button onclick="exportCalendar()" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-                                📅 Export
-                            </button>
                         </div>
                         <div id="tasks-list">
                             <!-- Tasks will be populated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- All Tasks Tab -->
-                <div id="tasks-content" class="tab-content hidden p-4">
-                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <div class="p-4 border-b border-gray-100">
-                            <div class="flex items-center justify-between mb-3">
-                                <h3 class="text-lg font-bold text-gray-900">All Tasks</h3>
-                                <button onclick="addTask()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm touch-btn">
-                                    ➕ Add
-                                </button>
-                            </div>
-                            <button onclick="addSeasonalTasks()" class="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 touch-btn">
-                                🍂 Add Seasonal Tasks
-                            </button>
-                        </div>
-                        <div id="all-tasks-list">
-                            <!-- All tasks will be populated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Calendar Tab -->
-                <div id="calendar-content" class="tab-content hidden p-4">
-                    <div class="bg-white rounded-2xl shadow-lg p-4">
-                        <div class="flex items-center justify-between mb-4">
-                            <button onclick="changeMonth(-1)" class="bg-gray-200 hover:bg-gray-300 p-3 rounded-lg touch-btn">
-                                ←
-                            </button>
-                            <h3 id="current-month-year" class="font-bold text-lg text-center flex-1">
-                                <!-- Current month/year will be displayed here -->
-                            </h3>
-                            <button onclick="changeMonth(1)" class="bg-gray-200 hover:bg-gray-300 p-3 rounded-lg touch-btn">
-                                →
-                            </button>
-                        </div>
-                        <div class="swipe-hint mb-4"></div>
-                        <div id="calendar-view">
-                            <!-- Calendar grid will be populated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Appliances Tab -->
-                <div id="appliances-content" class="tab-content hidden p-4">
-                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-                            <h3 class="text-lg font-bold text-gray-900">Appliances</h3>
-                            <button onclick="addAppliance()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm touch-btn">
-                                ➕ Add
-                            </button>
-                        </div>
-                        <div id="appliances-list">
-                            <!-- Appliances will be populated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Documents Tab -->
-                <div id="documents-content" class="tab-content hidden p-4">
-                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-                            <h3 class="text-lg font-bold text-gray-900">Documents</h3>
-                            <button onclick="addDocument()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm touch-btn">
-                                ➕ Add
-                            </button>
-                        </div>
-                        <div id="documents-list">
-                            <!-- Documents will be populated here -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Settings Tab -->
-                <div id="settings-content" class="tab-content hidden p-4">
-                    <div class="space-y-6">
-                        <!-- Property Information -->
-                        <div class="bg-white rounded-2xl shadow-lg p-4">
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">Property Info</h3>
-                            <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                                <div id="property-summary">
-                                    <!-- Property summary will be populated here -->
-                                </div>
-                            </div>
-                            <button onclick="editPropertySettings()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 touch-btn">
-                                ✏️ Edit Property Details
-                            </button>
-                        </div>
-
-                        <!-- Contractors Section -->
-                        <div class="bg-white rounded-2xl shadow-lg p-4">
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">Contractors & Repairs</h3>
-                            
-                            <!-- Repair Records -->
-                            <div class="mb-6">
-                                <div class="flex items-center justify-between mb-3">
-                                    <h4 class="font-medium text-gray-900">Repair Records</h4>
-                                    <button onclick="addRepairRecord()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm touch-btn">
-                                        ➕ Add
-                                    </button>
-                                </div>
-                                <div id="repair-records-list" class="bg-gray-50 rounded-lg max-h-40 overflow-y-auto">
-                                    <!-- Repair records will be populated here -->
-                                </div>
-                            </div>
-
-                            <!-- Contractor Directory -->
-                            <div>
-                                <div class="flex items-center justify-between mb-3">
-                                    <h4 class="font-medium text-gray-900">Contractor Directory</h4>
-                                    <button onclick="addContractor()" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-                                        ➕ Add
-                                    </button>
-                                </div>
-                                <div id="contractors-list" class="bg-gray-50 rounded-lg max-h-40 overflow-y-auto">
-                                    <!-- Contractors will be populated here -->
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Data Management -->
-                        <div class="bg-white rounded-2xl shadow-lg p-4">
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">Data Management</h3>
-                            <div class="space-y-3">
-                                <button onclick="exportData()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 touch-btn">
-                                    📄 Export All Data
-                                </button>
-                                <button onclick="clearData()" class="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 touch-btn">
-                                    🗑️ Clear All Data
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- App Info -->
-                        <div class="bg-white rounded-2xl shadow-lg p-4">
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">About</h3>
-                            <div class="text-sm text-gray-600 space-y-2">
-                                <p><strong>Casa Care</strong> - Smart Home Maintenance</p>
-                                <p>Version 2.0</p>
-                                <p>Keep your home in perfect condition with personalized maintenance schedules.</p>
-                                <div class="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                                    <p class="text-green-700 text-xs">
-                                        ✅ <strong>Auto-Save:</strong> Your data automatically saves in your browser. No account needed!
-                                    </p>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -596,53 +370,19 @@
 
             <!-- Bottom Navigation -->
             <div class="bottom-nav">
-                <div class="grid grid-cols-5 gap-1 p-2">
+                <div class="grid grid-cols-3 gap-1 p-2">
                     <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn flex flex-col items-center p-3 rounded-lg bg-blue-100 text-blue-700 touch-btn">
                         <div class="text-lg mb-1">🏠</div>
                         <div class="text-xs">Home</div>
                     </button>
-                    <button onclick="showTab('tasks')" id="tab-tasks" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-                        <div class="text-lg mb-1">✅</div>
-                        <div class="text-xs">Tasks</div>
+                    <button onclick="clearData()" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
+                        <div class="text-lg mb-1">🗑️</div>
+                        <div class="text-xs">Reset</div>
                     </button>
-                    <button onclick="showTab('calendar')" id="tab-calendar" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-                        <div class="text-lg mb-1">🗓️</div>
-                        <div class="text-xs">Calendar</div>
-                    </button>
-                    <button onclick="showTab('appliances')" id="tab-appliances" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-                        <div class="text-lg mb-1">🔧</div>
-                        <div class="text-xs">Items</div>
-                    </button>
-                    <button onclick="showTab('documents')" id="tab-documents" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
+                    <button onclick="exportData()" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
                         <div class="text-lg mb-1">📄</div>
-                        <div class="text-xs">Docs</div>
+                        <div class="text-xs">Export</div>
                     </button>
-                </div>
-                <div class="text-center pb-2">
-                    <button onclick="showTab('settings')" id="tab-settings" class="tab-btn flex items-center justify-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 touch-btn text-xs">
-                        <div class="text-base">⚙️</div>
-                        <div>Settings</div>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- All Modals -->
-        <!-- Home Info Modal -->
-        <div id="home-info-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-md p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold">🏠 Home Information</h3>
-                    <button onclick="closeHomeInfoModal()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
-                </div>
-                <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                    <div id="home-info-display">
-                        <!-- Home info will be populated here -->
-                    </div>
-                </div>
-                <div class="flex gap-3">
-                    <button onclick="closeHomeInfoModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Close</button>
-                    <button onclick="editFromHomeInfo()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Edit</button>
                 </div>
             </div>
         </div>
@@ -665,17 +405,8 @@
                             <input type="number" id="edit-task-cost" class="w-full p-3 border rounded-lg text-base">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
-                            <select id="edit-task-frequency" class="w-full p-3 border rounded-lg text-base">
-                                <option value="7">Every 7 days</option>
-                                <option value="30">Every 30 days</option>
-                                <option value="60">Every 60 days</option>
-                                <option value="90">Every 90 days</option>
-                                <option value="180">Every 180 days</option>
-                                <option value="365">Every 365 days</option>
-                                <option value="730">Every 2 years</option>
-                                <option value="1095">Every 3 years</option>
-                            </select>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Frequency (days)</label>
+                            <input type="number" id="edit-task-frequency" class="w-full p-3 border rounded-lg text-base">
                         </div>
                     </div>
                     <div>
@@ -700,340 +431,40 @@
                 </div>
             </div>
         </div>
-
-        <!-- All other modals (Property, Document, Task, etc.) -->
-        <!-- Property Settings Modal -->
-        <div id="property-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-screen overflow-y-auto">
-                <h3 class="text-xl font-bold mb-4">Edit Property Details</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
-                        <input type="text" id="edit-address" class="w-full p-3 border rounded-lg text-base">
-                    </div>
-                    <div class="grid grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                            <input type="text" id="edit-city" class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
-                            <input type="text" id="edit-state" maxlength="2" class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Zip Code</label>
-                            <input type="text" id="edit-zipcode" class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
-                            <input type="number" id="edit-year-built" class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Square Feet</label>
-                            <input type="number" id="edit-sqft" class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Home Systems</label>
-                        <div class="space-y-3">
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="edit-central-ac" class="w-5 h-5">
-                                <span>Central Air/Heat</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="edit-mini-splits" class="w-5 h-5">
-                                <span>Mini-Split Systems</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="edit-well-water" class="w-5 h-5">
-                                <span>Well Water</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="edit-septic" class="w-5 h-5">
-                                <span>Septic System</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="edit-fireplace" class="w-5 h-5">
-                                <span>Fireplace</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="edit-pool" class="w-5 h-5">
-                                <span>Pool/Spa</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="edit-deck" class="w-5 h-5">
-                                <span>Deck/Patio</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Pets?</label>
-                            <select id="edit-pets" class="w-full p-3 border rounded-lg text-base">
-                                <option value="no">No</option>
-                                <option value="yes">Yes</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Approach</label>
-                            <select id="edit-approach" class="w-full p-3 border rounded-lg text-base">
-                                <option value="proactive">Proactive</option>
-                                <option value="standard">Standard</option>
-                                <option value="minimal">Minimal</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closePropertyModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Cancel</button>
-                    <button onclick="savePropertySettings()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Save</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Task Modal -->
-        <div id="task-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-md p-6">
-                <h3 class="text-xl font-bold mb-4" id="modal-title">Add Task</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Task Name</label>
-                        <input type="text" id="task-title" placeholder="e.g., Replace HVAC Filter" 
-                               class="w-full p-3 border rounded-lg text-base">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                        <select id="task-category" class="w-full p-3 border rounded-lg text-base">
-                            <option value="HVAC">HVAC</option>
-                            <option value="Water Systems">Water Systems</option>
-                            <option value="Exterior">Exterior</option>
-                            <option value="Safety">Safety</option>
-                            <option value="General">General</option>
-                            <option value="Seasonal">Seasonal</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Cost ($)</label>
-                            <input type="number" id="task-cost" placeholder="0" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Every (days)</label>
-                            <input type="number" id="task-frequency" placeholder="365" value="365"
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                        <textarea id="task-notes" placeholder="Additional details..." 
-                                  class="w-full p-3 border rounded-lg text-base" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Cancel</button>
-                    <button onclick="saveTask()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Save</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Other modals continue here... -->
-        <div id="document-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-screen overflow-y-auto">
-                <h3 class="text-xl font-bold mb-4" id="document-modal-title">Add Document</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Document Name</label>
-                        <input type="text" id="document-name" placeholder="e.g., Home Insurance Policy" 
-                               class="w-full p-3 border rounded-lg text-base">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Document Type</label>
-                        <select id="document-type" class="w-full p-3 border rounded-lg text-base">
-                            <option value="Insurance">Insurance Policy</option>
-                            <option value="Warranty">Warranty</option>
-                            <option value="Manual">Owner's Manual</option>
-                            <option value="Receipt">Receipt/Invoice</option>
-                            <option value="Permit">Permit/Certificate</option>
-                            <option value="Contract">Service Contract</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Issue Date</label>
-                            <input type="date" id="document-issue-date" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Expires</label>
-                            <input type="date" id="document-expiry-date" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Company/Provider</label>
-                        <input type="text" id="document-provider" placeholder="e.g., State Farm Insurance" 
-                               class="w-full p-3 border rounded-lg text-base">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Policy/Reference Number</label>
-                        <input type="text" id="document-reference" placeholder="e.g., Policy #12345" 
-                               class="w-full p-3 border rounded-lg text-base">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                        <textarea id="document-notes" placeholder="Additional details..." 
-                                  class="w-full p-3 border rounded-lg text-base" rows="3"></textarea>
-                    </div>
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <p class="text-sm text-blue-700">📱 <strong>In a full app:</strong> You would upload PDF/photos here. For now, we'll store the document details.</p>
-                    </div>
-                </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closeDocumentModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Cancel</button>
-                    <button onclick="saveDocument()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Save</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="appliance-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-screen overflow-y-auto">
-                <h3 class="text-xl font-bold mb-4" id="appliance-modal-title">Add Appliance</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                        <input type="text" id="appliance-name" placeholder="e.g., Main HVAC Unit" 
-                               class="w-full p-3 border rounded-lg text-base">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                        <select id="appliance-type" class="w-full p-3 border rounded-lg text-base">
-                            <option value="HVAC">HVAC System</option>
-                            <option value="Water Heater">Water Heater</option>
-                            <option value="Washer">Washer</option>
-                            <option value="Dryer">Dryer</option>
-                            <option value="Refrigerator">Refrigerator</option>
-                            <option value="Dishwasher">Dishwasher</option>
-                            <option value="Range/Oven">Range/Oven</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
-                            <input type="text" id="appliance-brand" placeholder="e.g., Carrier" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Model</label>
-                            <input type="text" id="appliance-model" placeholder="e.g., 24ABC6" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Install Date</label>
-                            <input type="date" id="appliance-install-date" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Warranty Expires</label>
-                            <input type="date" id="appliance-warranty" 
-                                   class="w-full p-3 border rounded-lg text-base">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                        <textarea id="appliance-notes" placeholder="Serial numbers, etc." 
-                                  class="w-full p-3 border rounded-lg text-base" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closeApplianceModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Cancel</button>
-                    <button onclick="saveAppliance()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Save</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Seasonal Tasks Modal -->
-        <div id="seasonal-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-screen overflow-y-auto">
-                <h3 class="text-xl font-bold mb-4">Add Seasonal Tasks</h3>
-                <div class="space-y-6">
-                    <div>
-                        <h4 class="font-semibold text-orange-600 mb-3">🍂 Fall Tasks</h4>
-                        <div class="space-y-3">
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="fall-gutters" checked class="w-5 h-5">
-                                <span class="text-sm">Clean gutters & downspouts</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="fall-furnace" class="w-5 h-5">
-                                <span class="text-sm">Schedule furnace inspection</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="fall-chimney" class="w-5 h-5">
-                                <span class="text-sm">Chimney cleaning</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="fall-weatherstrip" class="w-5 h-5">
-                                <span class="text-sm">Check weatherstripping</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold text-green-600 mb-3">🌸 Spring Tasks</h4>
-                        <div class="space-y-3">
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="spring-ac" checked class="w-5 h-5">
-                                <span class="text-sm">AC system tune-up</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="spring-deck" class="w-5 h-5">
-                                <span class="text-sm">Deck inspection & cleaning</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="spring-exterior" class="w-5 h-5">
-                                <span class="text-sm">Exterior pressure washing</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="spring-irrigation" class="w-5 h-5">
-                                <span class="text-sm">Irrigation system check</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closeSeasonalModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">Cancel</button>
-                    <button onclick="saveSeasonalTasks()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg touch-btn">Add Tasks</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
         // App data
         let homeData = {};
         let tasks = [];
-        let appliances = [];
-        let documents = [];
-        let repairRecords = [];
-        let contractors = [];
         let currentEditingTask = null;
-        let currentEditingAppliance = null;
-        let currentEditingDocument = null;
-        let currentCalendarDate = new Date();
 
-        // Regional task generation
+        // Toggle well water sub-options
+        function toggleWellWaterOptions() {
+            console.log('🔧 Toggling well water options...');
+            const wellWaterCheckbox = document.getElementById('well-water');
+            const wellWaterOptions = document.getElementById('well-water-options');
+            
+            if (wellWaterCheckbox && wellWaterOptions) {
+                if (wellWaterCheckbox.checked) {
+                    wellWaterOptions.classList.remove('hidden');
+                    console.log('✅ Well water options shown');
+                } else {
+                    wellWaterOptions.classList.add('hidden');
+                    // Uncheck all sub-options
+                    const subOptions = ['sediment-filter', 'uv-filter', 'water-softener', 'whole-house-filter'];
+                    subOptions.forEach(id => {
+                        const element = document.getElementById(id);
+                        if (element) element.checked = false;
+                    });
+                    console.log('✅ Well water options hidden and cleared');
+                }
+            }
+        }
+
+        // Climate region detection
         function getClimateRegion(state) {
             const stateUpper = state.toUpperCase();
-            
-            // Climate regions based on state
             const regions = {
                 'NORTHEAST_COLD': ['ME', 'NH', 'VT', 'MA', 'RI', 'CT', 'NY', 'NJ', 'PA'],
                 'SOUTHEAST_HUMID': ['DE', 'MD', 'VA', 'WV', 'KY', 'TN', 'NC', 'SC', 'GA', 'FL', 'AL', 'MS', 'AR', 'LA'],
@@ -1049,747 +480,86 @@
                     return region;
                 }
             }
-            
-            return 'GENERAL'; // Default for territories or unrecognized states
+            return 'GENERAL';
         }
 
-        function generateRegionalTasks(climateRegion) {
-            console.log(`🌍 Adding regional tasks for: ${climateRegion}`);
-            console.log(`🏢 Property type: ${homeData.propertyType}`);
-            
-            let regionalTasks = [];
-            let id = Math.max(...tasks.map(t => t.id), 0) + 1;
-            
-            // Determine if this is a property type that handles exterior maintenance
-            const hasExteriorResponsibility = homeData.propertyType === 'single-family' || 
-                                            homeData.propertyType === 'townhouse' || 
-                                            homeData.propertyType === 'mobile-home';
-            
-            console.log(`🏠 Has exterior responsibility: ${hasExteriorResponsibility}`);
-            
-            switch(climateRegion) {
-                case 'NORTHEAST_COLD':
-                    regionalTasks = [
-                        // Spring Tasks
-                        {
-                            id: id++,
-                            title: 'Check AC Before Summer',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'medium',
-                            description: 'Test air conditioning system before hot weather arrives',
-                            season: 'spring',
-                            requiresExterior: false
-                        },
-                        // Summer Tasks
-                        {
-                            id: id++,
-                            title: 'Monitor Indoor Humidity',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'medium',
-                            description: 'Check for excessive humidity and mold in summer months',
-                            season: 'summer',
-                            requiresExterior: false
-                        },
-                        // Fall Tasks
-                        {
-                            id: id++,
-                            title: 'Check Heating System Before Winter',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'high',
-                            description: 'Test heating system operation before cold weather',
-                            season: 'fall',
-                            requiresExterior: false
-                        },
-                        {
-                            id: id++,
-                            title: 'Weather Strip Door/Window Check',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 25,
-                            priority: 'medium',
-                            description: 'Check and replace weather stripping around doors and windows',
-                            season: 'fall',
-                            requiresExterior: false
-                        },
-                        // Winter Tasks
-                        {
-                            id: id++,
-                            title: 'Winter Emergency Kit Check',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 50,
-                            priority: 'medium',
-                            description: 'Prepare emergency supplies for winter weather',
-                            season: 'winter',
-                            requiresExterior: false
-                        }
-                    ];
-                    
-                    // Add exterior tasks only for properties with exterior responsibility
-                    if (hasExteriorResponsibility) {
-                        regionalTasks.push(
-                            {
-                                id: id++,
-                                title: 'Remove Storm Windows',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 0,
-                                priority: 'medium',
-                                description: 'Remove storm windows and install screens for warmer weather',
-                                season: 'spring',
-                                requiresExterior: true
-                            },
-                            {
-                                id: id++,
-                                title: 'Deep Clean Gutters',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 150,
-                                priority: 'medium',
-                                description: 'Summer gutter cleaning and inspection for storm season',
-                                season: 'summer',
-                                requiresExterior: true
-                            },
-                            {
-                                id: id++,
-                                title: 'Winterize Outdoor Pipes',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 50,
-                                priority: 'high',
-                                description: 'Shut off and drain outdoor water lines before first freeze',
-                                season: 'fall',
-                                requiresExterior: true
-                            },
-                            {
-                                id: id++,
-                                title: 'Install Storm Windows',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 0,
-                                priority: 'medium',
-                                description: 'Install storm windows for winter insulation',
-                                season: 'fall',
-                                requiresExterior: true
-                            },
-                            {
-                                id: id++,
-                                title: 'Rake Leaves & Clean Yard',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 100,
-                                priority: 'medium',
-                                description: 'Fall yard cleanup and leaf removal',
-                                season: 'fall',
-                                requiresExterior: true
-                            },
-                            {
-                                id: id++,
-                                title: 'Check for Ice Dams',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 0,
-                                priority: 'medium',
-                                description: 'Inspect roof and gutters for ice dam formation',
-                                season: 'winter',
-                                requiresExterior: true
-                            }
-                        );
-                    }
-                    break;
-                    
-                case 'SOUTHEAST_HUMID':
-                    regionalTasks = [
-                        // Spring Tasks
-                        {
-                            id: id++,
-                            title: 'AC Pre-Season Tune-Up',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 150,
-                            priority: 'high',
-                            description: 'Professional AC maintenance before summer heat',
-                            season: 'spring',
-                            requiresExterior: false
-                        },
-                        {
-                            id: id++,
-                            title: 'Hurricane Emergency Kit Check',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 50,
-                            priority: 'high',
-                            description: 'Update emergency supplies for hurricane season',
-                            season: 'spring',
-                            requiresExterior: false
-                        },
-                        // Summer Tasks
-                        {
-                            id: id++,
-                            title: 'Check for Mold/Humidity Issues',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'medium',
-                            description: 'Inspect for mold growth due to high humidity',
-                            season: 'summer',
-                            requiresExterior: false
-                        },
-                        {
-                            id: id++,
-                            title: 'Deep Clean AC Filters',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 25,
-                            priority: 'high',
-                            description: 'Extra AC filter maintenance during peak usage',
-                            season: 'summer',
-                            requiresExterior: false
-                        },
-                        // Fall Tasks
-                        {
-                            id: id++,
-                            title: 'Post-Hurricane Season Inspection',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'medium',
-                            description: 'Inspect your unit for any storm-related issues',
-                            season: 'fall',
-                            requiresExterior: false
-                        },
-                        // Winter Tasks
-                        {
-                            id: id++,
-                            title: 'Mild Winter HVAC Check',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'low',
-                            description: 'Check heating system during mild winter months',
-                            season: 'winter',
-                            requiresExterior: false
-                        }
-                    ];
-                    
-                    if (hasExteriorResponsibility) {
-                        regionalTasks.push({
-                            id: id++,
-                            title: 'Hurricane Season Exterior Prep',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 100,
-                            priority: 'high',
-                            description: 'Trim trees, secure outdoor items, check drainage',
-                            season: 'spring',
-                            requiresExterior: true
-                        });
-                    }
-                    break;
-                    
-                case 'SOUTHWEST_ARID':
-                    regionalTasks = [
-                        // Spring Tasks
-                        {
-                            id: id++,
-                            title: 'AC System Pre-Summer Check',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 100,
-                            priority: 'high',
-                            description: 'Prepare cooling system for extreme summer heat',
-                            season: 'spring',
-                            requiresExterior: false
-                        },
-                        // Summer Tasks
-                        {
-                            id: id++,
-                            title: 'Extreme Heat HVAC Check',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'high',
-                            description: 'Monitor AC performance during extreme summer heat',
-                            season: 'summer',
-                            requiresExterior: false
-                        },
-                        // Fall Tasks
-                        {
-                            id: id++,
-                            title: 'Check for Heat Damage',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'medium',
-                            description: 'Inspect unit for heat-related wear and damage',
-                            season: 'fall',
-                            requiresExterior: false
-                        },
-                        // Winter Tasks
-                        {
-                            id: id++,
-                            title: 'Desert Winter Prep',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'low',
-                            description: 'Prepare for cooler desert temperatures',
-                            season: 'winter',
-                            requiresExterior: false
-                        }
-                    ];
-                    
-                    if (hasExteriorResponsibility) {
-                        regionalTasks.push(
-                            {
-                                id: id++,
-                                title: 'Drought-Resistant Landscaping Check',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 0,
-                                priority: 'medium',
-                                description: 'Assess water-efficient landscaping and irrigation',
-                                season: 'spring',
-                                requiresExterior: true
-                            },
-                            {
-                                id: id++,
-                                title: 'Swamp Cooler Maintenance',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 75,
-                                priority: 'medium',
-                                description: 'Clean and service evaporative cooling system',
-                                season: 'spring',
-                                requiresExterior: true
-                            },
-                            {
-                                id: id++,
-                                title: 'Check for Sun Damage',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 0,
-                                priority: 'medium',
-                                description: 'Inspect exterior for UV damage to paint and materials',
-                                season: 'fall',
-                                requiresExterior: true
-                            }
-                        );
-                    }
-                    break;
-                    
-                case 'WEST_COAST':
-                    if (homeData.state.toUpperCase() === 'CA') {
-                        regionalTasks = [
-                            // Spring Tasks
-                            {
-                                id: id++,
-                                title: 'Earthquake Emergency Kit Check',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 50,
-                                priority: 'medium',
-                                description: 'Update emergency supplies and secure items in unit',
-                                season: 'spring',
-                                requiresExterior: false
-                            },
-                            // Summer Tasks
-                            {
-                                id: id++,
-                                title: 'Drought Conservation Check',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 0,
-                                priority: 'medium',
-                                description: 'Assess water usage and conservation in your unit',
-                                season: 'summer',
-                                requiresExterior: false
-                            },
-                            {
-                                id: id++,
-                                title: 'Fire Safety Check',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 0,
-                                priority: 'high',
-                                description: 'Review fire evacuation plan and emergency supplies',
-                                season: 'summer',
-                                requiresExterior: false
-                            },
-                            // Fall Tasks
-                            {
-                                id: id++,
-                                title: 'Wildfire Emergency Plan Review',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 0,
-                                priority: 'high',
-                                description: 'Update evacuation plan and emergency supplies',
-                                season: 'fall',
-                                requiresExterior: false
-                            },
-                            // Winter Tasks
-                            {
-                                id: id++,
-                                title: 'Rain Season Prep',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 0,
-                                priority: 'medium',
-                                description: 'Check for leaks and prepare for rain season',
-                                season: 'winter',
-                                requiresExterior: false
-                            }
-                        ];
-                        
-                        if (hasExteriorResponsibility) {
-                            regionalTasks.push(
-                                {
-                                    id: id++,
-                                    title: 'Wildfire Risk Assessment',
-                                    category: 'Seasonal',
-                                    frequency: 365,
-                                    cost: 0,
-                                    priority: 'high',
-                                    description: 'Clear defensible space, check emergency supplies',
-                                    season: 'spring',
-                                    requiresExterior: true
-                                },
-                                {
-                                    id: id++,
-                                    title: 'Santa Ana Wind Prep',
-                                    category: 'Seasonal',
-                                    frequency: 365,
-                                    cost: 0,
-                                    priority: 'medium',
-                                    description: 'Secure outdoor items for high wind season',
-                                    season: 'fall',
-                                    requiresExterior: true
-                                }
-                            );
-                        }
-                    } else {
-                        // Pacific Northwest (OR, WA) - similar pattern for apartments vs houses
-                        regionalTasks = [
-                            {
-                                id: id++,
-                                title: 'Mold Prevention Check',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 0,
-                                priority: 'medium',
-                                description: 'Inspect unit for moisture and mold in wet climate',
-                                season: 'fall',
-                                requiresExterior: false
-                            },
-                            {
-                                id: id++,
-                                title: 'Winter Storm Prep',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 0,
-                                priority: 'medium',
-                                description: 'Prepare emergency supplies for Pacific Northwest storms',
-                                season: 'winter',
-                                requiresExterior: false
-                            }
-                        ];
-                        
-                        if (hasExteriorResponsibility) {
-                            regionalTasks.push(
-                                {
-                                    id: id++,
-                                    title: 'Spring Gutter Deep Clean',
-                                    category: 'Seasonal',
-                                    frequency: 365,
-                                    cost: 100,
-                                    priority: 'high',
-                                    description: 'Clean gutters after heavy winter rains',
-                                    season: 'spring',
-                                    requiresExterior: true
-                                },
-                                {
-                                    id: id++,
-                                    title: 'Rain Gutter Deep Clean',
-                                    category: 'Seasonal',
-                                    frequency: 365,
-                                    cost: 100,
-                                    priority: 'high',
-                                    description: 'Extra gutter maintenance for heavy rain season',
-                                    season: 'fall',
-                                    requiresExterior: true
-                                }
-                            );
-                        }
-                    }
-                    break;
-                    
-                case 'MIDWEST_CONTINENTAL':
-                    regionalTasks = [
-                        // Spring Tasks
-                        {
-                            id: id++,
-                            title: 'Tornado Emergency Kit Check',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'medium',
-                            description: 'Check emergency supplies and know safe areas in building',
-                            season: 'spring',
-                            requiresExterior: false
-                        },
-                        // Summer Tasks
-                        {
-                            id: id++,
-                            title: 'Severe Weather Prep',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'medium',
-                            description: 'Prepare for summer storms and know emergency procedures',
-                            season: 'summer',
-                            requiresExterior: false
-                        },
-                        // Fall Tasks
-                        {
-                            id: id++,
-                            title: 'Winter Weather Emergency Prep',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 50,
-                            priority: 'high',
-                            description: 'Prepare emergency supplies for harsh winter',
-                            season: 'fall',
-                            requiresExterior: false
-                        },
-                        // Winter Tasks
-                        {
-                            id: id++,
-                            title: 'Extreme Cold Check',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'medium',
-                            description: 'Monitor heating and check for frozen pipes in unit',
-                            season: 'winter',
-                            requiresExterior: false
-                        }
-                    ];
-                    
-                    if (hasExteriorResponsibility) {
-                        regionalTasks.push(
-                            {
-                                id: id++,
-                                title: 'Spring Thaw Inspection',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 0,
-                                priority: 'medium',
-                                description: 'Check for winter damage after snow melt',
-                                season: 'spring',
-                                requiresExterior: true
-                            },
-                            {
-                                id: id++,
-                                title: 'Freeze Protection Check',
-                                category: 'Seasonal',
-                                frequency: 365,
-                                cost: 0,
-                                priority: 'high',
-                                description: 'Insulate exposed pipes, check heating system',
-                                season: 'fall',
-                                requiresExterior: true
-                            }
-                        );
-                    }
-                    break;
-                    
-                default:
-                    // Simplified seasonal tasks for all property types
-                    regionalTasks = [
-                        {
-                            id: id++,
-                            title: 'Spring System Check',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'medium',
-                            description: 'Check HVAC and prepare for warmer weather',
-                            season: 'spring',
-                            requiresExterior: false
-                        },
-                        {
-                            id: id++,
-                            title: 'Summer Maintenance Check',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'medium',
-                            description: 'Monitor cooling system and humidity levels',
-                            season: 'summer',
-                            requiresExterior: false
-                        },
-                        {
-                            id: id++,
-                            title: 'Fall Weather Prep',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'medium',
-                            description: 'Prepare heating system for cooler weather',
-                            season: 'fall',
-                            requiresExterior: false
-                        },
-                        {
-                            id: id++,
-                            title: 'Winter System Monitor',
-                            category: 'Seasonal',
-                            frequency: 365,
-                            cost: 0,
-                            priority: 'medium',
-                            description: 'Monitor heating and check for drafts',
-                            season: 'winter',
-                            requiresExterior: false
-                        }
-                    ];
-            }
-            
-            // Filter out exterior tasks for apartments/condos
-            const filteredTasks = regionalTasks.filter(task => {
-                if (hasExteriorResponsibility) {
-                    return true; // Include all tasks for properties with exterior responsibility
-                } else {
-                    return !task.requiresExterior; // Only include non-exterior tasks for apartments/condos
-                }
-            });
-            
-            console.log(`🏠 Generated ${regionalTasks.length} total regional tasks, filtered to ${filteredTasks.length} for property type`);
-            
-            // Add template properties to all regional tasks
-            filteredTasks.forEach(task => {
-                task.nextDue = null;
-                task.lastCompleted = null;
-                task.isCompleted = false;
-                task.isTemplate = true;
-                // Remove the requiresExterior property as it's no longer needed
-                delete task.requiresExterior;
-            });
-            
-            return filteredTasks;
-        }
-
-        // Toggle well water sub-options
-        function toggleWellWaterOptions() {
-            const wellWaterCheckbox = document.getElementById('well-water');
-            const wellWaterOptions = document.getElementById('well-water-options');
-            
-            if (wellWaterCheckbox.checked) {
-                wellWaterOptions.classList.remove('hidden');
-            } else {
-                wellWaterOptions.classList.add('hidden');
-                // Uncheck all sub-options when well water is unchecked
-                document.getElementById('sediment-filter').checked = false;
-                document.getElementById('uv-filter').checked = false;
-                document.getElementById('water-softener').checked = false;
-                document.getElementById('whole-house-filter').checked = false;
-            }
-        }
-
-        // Create maintenance plan - now goes to task setup
+        // Create maintenance plan
         function createMaintenancePlan() {
             console.log('🔧 Creating maintenance plan...');
             
-            // Collect form data including separate city, state and zip
-            homeData = {
-                address: document.getElementById('address').value || '123 Main Street',
-                city: document.getElementById('city').value || 'Anytown',
-                state: document.getElementById('state').value || 'NY',
-                zipcode: document.getElementById('zipcode').value || '12345',
-                propertyType: document.getElementById('property-type').value || 'single-family',
-                yearBuilt: parseInt(document.getElementById('year-built').value) || 2000,
-                sqft: parseInt(document.getElementById('sqft').value) || 2000,
-                hasPets: document.querySelector('input[name="pets"]:checked')?.value === 'yes',
-                approach: document.getElementById('approach').value || 'standard'
-            };
+            try {
+                // Collect home data
+                homeData = {
+                    address: document.getElementById('address').value || '123 Main Street',
+                    city: document.getElementById('city').value || 'Anytown',
+                    state: document.getElementById('state').value || 'NY',
+                    zipcode: document.getElementById('zipcode').value || '12345',
+                    propertyType: document.getElementById('property-type').value || 'single-family',
+                    yearBuilt: parseInt(document.getElementById('year-built').value) || 2000,
+                    sqft: parseInt(document.getElementById('sqft').value) || 2000,
+                    hasPets: document.querySelector('input[name="pets"]:checked')?.value === 'yes',
+                    approach: document.getElementById('approach').value || 'standard'
+                };
 
-            // Create full address for display
-            homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
-            
-            console.log('🏠 Home data collected:', homeData);
+                homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
 
-            // Collect selected features
-            homeData.features = {
-                // Heating & Cooling
-                centralAC: document.getElementById('central-ac')?.checked || false,
-                miniSplits: document.getElementById('mini-splits')?.checked || false,
-                wallAC: document.getElementById('wall-ac')?.checked || false,
-                electricBaseboard: document.getElementById('electric-baseboard')?.checked || false,
-                boiler: document.getElementById('boiler')?.checked || false,
+                // Collect features
+                homeData.features = {
+                    centralAC: document.getElementById('central-ac')?.checked || false,
+                    miniSplits: document.getElementById('mini-splits')?.checked || false,
+                    wallAC: document.getElementById('wall-ac')?.checked || false,
+                    electricBaseboard: document.getElementById('electric-baseboard')?.checked || false,
+                    boiler: document.getElementById('boiler')?.checked || false,
+                    municipalWater: document.getElementById('municipal-water')?.checked || false,
+                    wellWater: document.getElementById('well-water')?.checked || false,
+                    sedimentFilter: document.getElementById('sediment-filter')?.checked || false,
+                    uvFilter: document.getElementById('uv-filter')?.checked || false,
+                    waterSoftener: document.getElementById('water-softener')?.checked || false,
+                    wholeHouseFilter: document.getElementById('whole-house-filter')?.checked || false,
+                    municipalSewer: document.getElementById('municipal-sewer')?.checked || false,
+                    septic: document.getElementById('septic')?.checked || false,
+                    fireplace: document.getElementById('fireplace')?.checked || false,
+                    pool: document.getElementById('pool')?.checked || false,
+                    deck: document.getElementById('deck')?.checked || false,
+                    garage: document.getElementById('garage')?.checked || false,
+                    basement: document.getElementById('basement')?.checked || false,
+                    otherFeatures: document.getElementById('other-features')?.value || ''
+                };
+
+                console.log('🏠 Home data collected:', homeData);
+                console.log('🏠 Features collected:', homeData.features);
+
+                // Generate tasks
+                generateTaskTemplates();
+                console.log('📋 Tasks generated:', tasks.length);
+
+                // Show task setup
+                document.getElementById('setup-form').style.display = 'none';
+                document.getElementById('task-setup').classList.remove('hidden');
+                showTaskSetup();
                 
-                // Water & Sewer
-                municipalWater: document.getElementById('municipal-water')?.checked || false,
-                wellWater: document.getElementById('well-water')?.checked || false,
-                sedimentFilter: document.getElementById('sediment-filter')?.checked || false,
-                uvFilter: document.getElementById('uv-filter')?.checked || false,
-                waterSoftener: document.getElementById('water-softener')?.checked || false,
-                wholeHouseFilter: document.getElementById('whole-house-filter')?.checked || false,
-                municipalSewer: document.getElementById('municipal-sewer')?.checked || false,
-                septic: document.getElementById('septic')?.checked || false,
+                console.log('✅ Successfully moved to task setup screen');
                 
-                // Other Features
-                fireplace: document.getElementById('fireplace')?.checked || false,
-                pool: document.getElementById('pool')?.checked || false,
-                deck: document.getElementById('deck')?.checked || false,
-                garage: document.getElementById('garage')?.checked || false,
-                basement: document.getElementById('basement')?.checked || false,
-                otherFeatures: document.getElementById('other-features')?.value || ''
-            };
-
-            console.log('🏠 Features collected:', homeData.features);
-
-            // Generate tasks (without specific dates yet)
-            generateTaskTemplates();
-            console.log('📋 Tasks generated:', tasks.length, tasks);
-
-            // Add default appliances based on features
-            generateDefaultAppliances();
-
-            // Go to task setup screen instead of main app
-            document.getElementById('setup-form').style.display = 'none';
-            document.getElementById('task-setup').classList.remove('hidden');
-
-            // Show task setup
-            showTaskSetup();
+            } catch (error) {
+                console.error('❌ Error in createMaintenancePlan:', error);
+                alert('❌ Error creating maintenance plan. Check console for details.');
+            }
         }
 
-        // Generate task templates (without specific dates)
+        // Generate task templates
         function generateTaskTemplates() {
             console.log('🔧 Starting task generation...');
-            console.log('📊 Home features:', homeData.features);
-            console.log('📊 Approach:', homeData.approach, 'Pets:', homeData.hasPets);
             
             tasks = [];
             let id = 1;
 
-            // Frequency modifiers
-            const freqMod = homeData.approach === 'proactive' ? 0.8 : homeData.approach === 'minimal' ? 1.3 : 1.0;
-            const petMod = homeData.hasPets ? 0.75 : 1.0;
-
-            console.log('📊 Frequency modifiers - approach:', freqMod, 'pets:', petMod);
-
-            // ALWAYS include these essential tasks for every home
-            const baseTasks = [
+            // Essential tasks for all homes
+            const essentialTasks = [
                 {
                     id: id++,
                     title: 'Test Smoke Detectors',
                     category: 'Safety',
-                    frequency: 365,
+                    frequency: 180,
                     cost: 0,
                     priority: 'high',
                     description: 'Test all smoke and carbon monoxide detectors',
@@ -1802,7 +572,7 @@
                     id: id++,
                     title: 'Dryer Vent Cleaning',
                     category: 'General',
-                    frequency: 180,
+                    frequency: 365,
                     cost: 100,
                     priority: 'medium',
                     description: 'Clean dryer vent to prevent fire hazard',
@@ -1814,9 +584,10 @@
             ];
 
             // Property-type specific tasks
-            if (homeData.propertyType === 'single-family' || homeData.propertyType === 'townhouse' || homeData.propertyType === 'mobile-home') {
-                // Tasks for homes with exterior responsibility
-                baseTasks.push(
+            const hasExteriorResponsibility = ['single-family', 'townhouse', 'mobile-home'].includes(homeData.propertyType);
+            
+            if (hasExteriorResponsibility) {
+                essentialTasks.push(
                     {
                         id: id++,
                         title: 'Clean Gutters',
@@ -1834,7 +605,7 @@
                         id: id++,
                         title: 'Inspect Caulking',
                         category: 'General',
-                        frequency: 180,
+                        frequency: 365,
                         cost: 50,
                         priority: 'low',
                         description: 'Check and replace caulking around windows and doors',
@@ -1845,8 +616,7 @@
                     }
                 );
             } else {
-                // Condo/Apartment tasks (no exterior maintenance typically)
-                baseTasks.push({
+                essentialTasks.push({
                     id: id++,
                     title: 'Inspect Window Seals',
                     category: 'General',
@@ -1861,66 +631,46 @@
                 });
             }
 
-            tasks.push(...baseTasks);
-
-            // Only add furnace filter if they have central AC/heat or boiler
-            if (homeData.features?.centralAC || homeData.features?.boiler) {
-                tasks.push({
-                    id: id++,
-                    title: 'Furnace Filter Replacement',
-                    category: 'HVAC',
-                    frequency: 90,
-                    cost: 30,
-                    priority: 'high',
-                    description: 'Replace heating system filter',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                });
-            }
-
-            console.log('✅ Added baseline tasks:', tasks.length);
+            tasks.push(...essentialTasks);
 
             // HVAC Tasks
-            if (homeData.features?.centralAC) {
-                console.log('🔧 Adding Central AC tasks...');
-                tasks.push({
-                    id: id++,
-                    title: 'Replace HVAC Filter',
-                    category: 'HVAC',
-                    frequency: 90,
-                    cost: 25,
-                    priority: 'high',
-                    description: 'Replace central air system filter',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                });
-
-                tasks.push({
-                    id: id++,
-                    title: 'HVAC Professional Service',
-                    category: 'HVAC',
-                    frequency: 365,
-                    cost: 150,
-                    priority: 'medium',
-                    description: 'Annual professional HVAC maintenance',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                });
+            if (homeData.features.centralAC) {
+                tasks.push(
+                    {
+                        id: id++,
+                        title: 'Replace HVAC Filter',
+                        category: 'HVAC',
+                        frequency: 90,
+                        cost: 25,
+                        priority: 'high',
+                        description: 'Replace central air system filter',
+                        nextDue: null,
+                        lastCompleted: null,
+                        isCompleted: false,
+                        isTemplate: true
+                    },
+                    {
+                        id: id++,
+                        title: 'HVAC Professional Service',
+                        category: 'HVAC',
+                        frequency: 365,
+                        cost: 150,
+                        priority: 'medium',
+                        description: 'Annual professional HVAC maintenance',
+                        nextDue: null,
+                        lastCompleted: null,
+                        isCompleted: false,
+                        isTemplate: true
+                    }
+                );
             }
 
-            if (homeData.features?.miniSplits) {
-                console.log('🔧 Adding Mini-Split tasks...');
+            if (homeData.features.miniSplits) {
                 tasks.push({
                     id: id++,
-                    title: 'Mini Split Filter Clean',
+                    title: 'Clean Mini-Split Filters',
                     category: 'HVAC',
-                    frequency: 30,
+                    frequency: 60,
                     cost: 0,
                     priority: 'medium',
                     description: 'Clean mini-split unit filters',
@@ -1929,27 +679,12 @@
                     isCompleted: false,
                     isTemplate: true
                 });
-                
-                tasks.push({
-                    id: id++,
-                    title: 'Mini Split Filter Replacement',
-                    category: 'HVAC',
-                    frequency: 365,
-                    cost: 25,
-                    priority: 'medium',
-                    description: 'Replace mini-split unit filters',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                });
             }
 
-            if (homeData.features?.wallAC) {
-                console.log('🔧 Adding Wall AC tasks...');
+            if (homeData.features.wallAC) {
                 tasks.push({
                     id: id++,
-                    title: 'Wall AC Filter Clean',
+                    title: 'Clean Wall AC Filters',
                     category: 'HVAC',
                     frequency: 30,
                     cost: 0,
@@ -1962,8 +697,7 @@
                 });
             }
 
-            if (homeData.features?.electricBaseboard) {
-                console.log('🔧 Adding Electric Baseboard tasks...');
+            if (homeData.features.electricBaseboard) {
                 tasks.push({
                     id: id++,
                     title: 'Clean Electric Baseboard Heaters',
@@ -1979,10 +713,24 @@
                 });
             }
 
-            // Water system tasks
-            if (homeData.features?.wellWater) {
-                console.log('🔧 Adding Well Water tasks...');
-                // Always add basic well water testing
+            if (homeData.features.boiler) {
+                tasks.push({
+                    id: id++,
+                    title: 'Boiler Annual Service',
+                    category: 'HVAC',
+                    frequency: 365,
+                    cost: 200,
+                    priority: 'high',
+                    description: 'Professional boiler inspection and maintenance',
+                    nextDue: null,
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true
+                });
+            }
+
+            // Water System Tasks
+            if (homeData.features.wellWater) {
                 tasks.push({
                     id: id++,
                     title: 'Test Well Water',
@@ -1996,12 +744,11 @@
                     isCompleted: false,
                     isTemplate: true
                 });
-                
-                // Add specific filter tasks based on what they selected
-                if (homeData.features?.sedimentFilter) {
+
+                if (homeData.features.sedimentFilter) {
                     tasks.push({
                         id: id++,
-                        title: 'Replace Sediment Filter for Water',
+                        title: 'Replace Sediment Filter',
                         category: 'Water Systems',
                         frequency: 90,
                         cost: 25,
@@ -2013,8 +760,8 @@
                         isTemplate: true
                     });
                 }
-                
-                if (homeData.features?.uvFilter) {
+
+                if (homeData.features.uvFilter) {
                     tasks.push({
                         id: id++,
                         title: 'Replace UV Filter',
@@ -2029,8 +776,8 @@
                         isTemplate: true
                     });
                 }
-                
-                if (homeData.features?.waterSoftener) {
+
+                if (homeData.features.waterSoftener) {
                     tasks.push({
                         id: id++,
                         title: 'Refill Water Softener Salt',
@@ -2045,8 +792,8 @@
                         isTemplate: true
                     });
                 }
-                
-                if (homeData.features?.wholeHouseFilter) {
+
+                if (homeData.features.wholeHouseFilter) {
                     tasks.push({
                         id: id++,
                         title: 'Replace Whole House Filter',
@@ -2063,13 +810,12 @@
                 }
             }
 
-            if (homeData.features?.septic) {
-                console.log('🔧 Adding Septic tasks...');
+            if (homeData.features.septic) {
                 tasks.push({
                     id: id++,
                     title: 'Septic Tank Pumping',
                     category: 'Water Systems',
-                    frequency: 1095,
+                    frequency: 1095, // 3 years
                     cost: 400,
                     priority: 'high',
                     description: 'Professional septic pumping',
@@ -2080,12 +826,11 @@
                 });
             }
 
-            // Feature-specific tasks
-            if (homeData.features?.fireplace) {
-                console.log('🔧 Adding Fireplace tasks...');
+            // Other Feature Tasks
+            if (homeData.features.fireplace) {
                 tasks.push({
                     id: id++,
-                    title: 'Chimney Sweep',
+                    title: 'Chimney Inspection & Cleaning',
                     category: 'Safety',
                     frequency: 365,
                     cost: 300,
@@ -2098,13 +843,12 @@
                 });
             }
 
-            if (homeData.features?.deck) {
-                console.log('🔧 Adding Deck tasks...');
+            if (homeData.features.deck) {
                 tasks.push({
                     id: id++,
                     title: 'Deck Staining/Sealing',
                     category: 'Exterior',
-                    frequency: 730,
+                    frequency: 730, // 2 years
                     cost: 200,
                     priority: 'medium',
                     description: 'Stain or seal deck to protect from weather',
@@ -2115,13 +859,12 @@
                 });
             }
 
-            if (homeData.features?.pool) {
-                console.log('🔧 Adding Pool tasks...');
+            if (homeData.features.pool) {
                 tasks.push({
                     id: id++,
                     title: 'Pool Opening/Closing',
                     category: 'General',
-                    frequency: 180,
+                    frequency: 182, // Twice yearly
                     cost: 300,
                     priority: 'high',
                     description: 'Seasonal pool opening and closing',
@@ -2132,9 +875,7 @@
                 });
             }
 
-            // Garage tasks
-            if (homeData.features?.garage) {
-                console.log('🔧 Adding Garage tasks...');
+            if (homeData.features.garage) {
                 tasks.push({
                     id: id++,
                     title: 'Garage Door Maintenance',
@@ -2150,9 +891,7 @@
                 });
             }
 
-            // Basement tasks  
-            if (homeData.features?.basement) {
-                console.log('🔧 Adding Basement tasks...');
+            if (homeData.features.basement) {
                 tasks.push({
                     id: id++,
                     title: 'Check Basement for Moisture',
@@ -2168,82 +907,299 @@
                 });
             }
 
-            // Boiler tasks
-            if (homeData.features?.boiler) {
-                console.log('🔧 Adding Boiler tasks...');
-                tasks.push({
-                    id: id++,
-                    title: 'Boiler Annual Service',
-                    category: 'HVAC',
-                    frequency: 365,
-                    cost: 200,
-                    priority: 'high',
-                    description: 'Professional boiler inspection and maintenance',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                });
-            }
-
-            console.log('✅ Task generation complete! Total tasks:', tasks.length);
-            console.log('📋 Generated tasks:', tasks.map(t => t.title));
-
-            // Add regional seasonal tasks based on location
+            // Generate regional seasonal tasks
             if (homeData.state) {
                 const climateRegion = getClimateRegion(homeData.state);
-                const regionalTasks = generateRegionalTasks(climateRegion);
+                const regionalTasks = generateRegionalTasks(climateRegion, id, hasExteriorResponsibility);
                 tasks.push(...regionalTasks);
-                
                 console.log(`🌍 Added ${regionalTasks.length} regional tasks for ${climateRegion}`);
-                console.log('🌍 Regional tasks:', regionalTasks.map(t => t.title));
             }
 
             console.log('✅ Final task count:', tasks.length);
+        }
+
+        // Generate regional seasonal tasks
+        function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibility) {
+            let regionalTasks = [];
+            let id = startingId;
+
+            switch(climateRegion) {
+                case 'NORTHEAST_COLD':
+                    regionalTasks = [
+                        {
+                            id: id++,
+                            title: 'Check AC Before Summer',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Test air conditioning system before hot weather arrives',
+                            season: 'spring',
+                            nextDue: null,
+                            lastCompleted: null,
+                            isCompleted: false,
+                            isTemplate: true
+                        },
+                        {
+                            id: id++,
+                            title: 'Check Heating Before Winter',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'high',
+                            description: 'Test heating system operation before cold weather',
+                            season: 'fall',
+                            nextDue: null,
+                            lastCompleted: null,
+                            isCompleted: false,
+                            isTemplate: true
+                        },
+                        {
+                            id: id++,
+                            title: 'Weather Strip Check',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 25,
+                            priority: 'medium',
+                            description: 'Check and replace weather stripping around doors and windows',
+                            season: 'fall',
+                            nextDue: null,
+                            lastCompleted: null,
+                            isCompleted: false,
+                            isTemplate: true
+                        },
+                        {
+                            id: id++,
+                            title: 'Winter Emergency Kit Check',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 50,
+                            priority: 'medium',
+                            description: 'Prepare emergency supplies for winter weather',
+                            season: 'winter',
+                            nextDue: null,
+                            lastCompleted: null,
+                            isCompleted: false,
+                            isTemplate: true
+                        }
+                    ];
+
+                    if (hasExteriorResponsibility) {
+                        regionalTasks.push(
+                            {
+                                id: id++,
+                                title: 'Winterize Outdoor Pipes',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 50,
+                                priority: 'high',
+                                description: 'Shut off and drain outdoor water lines before first freeze',
+                                season: 'fall',
+                                nextDue: null,
+                                lastCompleted: null,
+                                isCompleted: false,
+                                isTemplate: true
+                            },
+                            {
+                                id: id++,
+                                title: 'Check for Ice Dams',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 0,
+                                priority: 'medium',
+                                description: 'Inspect roof and gutters for ice dam formation',
+                                season: 'winter',
+                                nextDue: null,
+                                lastCompleted: null,
+                                isCompleted: false,
+                                isTemplate: true
+                            }
+                        );
+                    }
+                    break;
+
+                case 'SOUTHEAST_HUMID':
+                    regionalTasks = [
+                        {
+                            id: id++,
+                            title: 'AC Pre-Season Tune-Up',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 150,
+                            priority: 'high',
+                            description: 'Professional AC maintenance before summer heat',
+                            season: 'spring',
+                            nextDue: null,
+                            lastCompleted: null,
+                            isCompleted: false,
+                            isTemplate: true
+                        },
+                        {
+                            id: id++,
+                            title: 'Hurricane Emergency Kit Check',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 50,
+                            priority: 'high',
+                            description: 'Update emergency supplies for hurricane season',
+                            season: 'spring',
+                            nextDue: null,
+                            lastCompleted: null,
+                            isCompleted: false,
+                            isTemplate: true
+                        },
+                        {
+                            id: id++,
+                            title: 'Check for Mold/Humidity Issues',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Inspect for mold growth due to high humidity',
+                            season: 'summer',
+                            nextDue: null,
+                            lastCompleted: null,
+                            isCompleted: false,
+                            isTemplate: true
+                        }
+                    ];
+                    break;
+
+                case 'WEST_COAST':
+                    if (homeData.state.toUpperCase() === 'CA') {
+                        regionalTasks = [
+                            {
+                                id: id++,
+                                title: 'Earthquake Emergency Kit Check',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 50,
+                                priority: 'medium',
+                                description: 'Update emergency supplies and secure items',
+                                season: 'spring',
+                                nextDue: null,
+                                lastCompleted: null,
+                                isCompleted: false,
+                                isTemplate: true
+                            },
+                            {
+                                id: id++,
+                                title: 'Fire Safety Check',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 0,
+                                priority: 'high',
+                                description: 'Review fire evacuation plan and emergency supplies',
+                                season: 'summer',
+                                nextDue: null,
+                                lastCompleted: null,
+                                isCompleted: false,
+                                isTemplate: true
+                            }
+                        ];
+
+                        if (hasExteriorResponsibility) {
+                            regionalTasks.push({
+                                id: id++,
+                                title: 'Wildfire Risk Assessment',
+                                category: 'Seasonal',
+                                frequency: 365,
+                                cost: 0,
+                                priority: 'high',
+                                description: 'Clear defensible space, check emergency supplies',
+                                season: 'spring',
+                                nextDue: null,
+                                lastCompleted: null,
+                                isCompleted: false,
+                                isTemplate: true
+                            });
+                        }
+                    }
+                    break;
+
+                default:
+                    regionalTasks = [
+                        {
+                            id: id++,
+                            title: 'Spring System Check',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Check HVAC and prepare for warmer weather',
+                            season: 'spring',
+                            nextDue: null,
+                            lastCompleted: null,
+                            isCompleted: false,
+                            isTemplate: true
+                        },
+                        {
+                            id: id++,
+                            title: 'Fall Weather Prep',
+                            category: 'Seasonal',
+                            frequency: 365,
+                            cost: 0,
+                            priority: 'medium',
+                            description: 'Prepare heating system for cooler weather',
+                            season: 'fall',
+                            nextDue: null,
+                            lastCompleted: null,
+                            isCompleted: false,
+                            isTemplate: true
+                        }
+                    ];
+            }
+
+            return regionalTasks;
         }
 
         // Show task setup screen
         function showTaskSetup() {
             console.log('📋 Showing task setup screen...');
             
-            // Update the property summary in task setup
-            const taskSetupSummary = document.getElementById('task-setup-summary');
-            const features = [];
+            // Update property summary
+            updatePropertySummary();
             
-            // Organize features for display
+            // Render task categories
+            renderTaskCategories();
+        }
+
+        // Update property summary
+        function updatePropertySummary() {
+            const taskSetupSummary = document.getElementById('task-setup-summary');
+            
             const heatingCooling = [];
-            if (homeData.features?.centralAC) heatingCooling.push('Central AC/Heat');
-            if (homeData.features?.miniSplits) heatingCooling.push('Mini-Splits');
-            if (homeData.features?.wallAC) heatingCooling.push('Wall AC');
-            if (homeData.features?.electricBaseboard) heatingCooling.push('Electric Baseboard');
-            if (homeData.features?.boiler) heatingCooling.push('Boiler');
+            if (homeData.features.centralAC) heatingCooling.push('Central AC/Heat');
+            if (homeData.features.miniSplits) heatingCooling.push('Mini-Splits');
+            if (homeData.features.wallAC) heatingCooling.push('Wall AC');
+            if (homeData.features.electricBaseboard) heatingCooling.push('Electric Baseboard');
+            if (homeData.features.boiler) heatingCooling.push('Boiler');
 
             const waterSewer = [];
-            if (homeData.features?.municipalWater) waterSewer.push('Municipal Water');
-            if (homeData.features?.wellWater) {
+            if (homeData.features.municipalWater) waterSewer.push('Municipal Water');
+            if (homeData.features.wellWater) {
                 let wellWaterText = 'Well Water';
                 const wellWaterSubs = [];
-                if (homeData.features?.sedimentFilter) wellWaterSubs.push('Sediment Filter');
-                if (homeData.features?.uvFilter) wellWaterSubs.push('UV Filter');
-                if (homeData.features?.waterSoftener) wellWaterSubs.push('Water Softener');
-                if (homeData.features?.wholeHouseFilter) wellWaterSubs.push('Whole House Filter');
+                if (homeData.features.sedimentFilter) wellWaterSubs.push('Sediment Filter');
+                if (homeData.features.uvFilter) wellWaterSubs.push('UV Filter');
+                if (homeData.features.waterSoftener) wellWaterSubs.push('Water Softener');
+                if (homeData.features.wholeHouseFilter) wellWaterSubs.push('Whole House Filter');
                 if (wellWaterSubs.length > 0) {
                     wellWaterText += ` (${wellWaterSubs.join(', ')})`;
                 }
                 waterSewer.push(wellWaterText);
             }
-            if (homeData.features?.municipalSewer) waterSewer.push('Municipal Sewer');
-            if (homeData.features?.septic) waterSewer.push('Septic System');
+            if (homeData.features.municipalSewer) waterSewer.push('Municipal Sewer');
+            if (homeData.features.septic) waterSewer.push('Septic System');
 
             const otherFeatures = [];
-            if (homeData.features?.fireplace) otherFeatures.push('Fireplace');
-            if (homeData.features?.pool) otherFeatures.push('Pool/Spa');
-            if (homeData.features?.deck) otherFeatures.push('Deck/Patio');
-            if (homeData.features?.garage) otherFeatures.push('Garage');
-            if (homeData.features?.basement) otherFeatures.push('Basement');
-            if (homeData.features?.otherFeatures) otherFeatures.push(homeData.features.otherFeatures);
+            if (homeData.features.fireplace) otherFeatures.push('Fireplace');
+            if (homeData.features.pool) otherFeatures.push('Pool/Spa');
+            if (homeData.features.deck) otherFeatures.push('Deck/Patio');
+            if (homeData.features.garage) otherFeatures.push('Garage');
+            if (homeData.features.basement) otherFeatures.push('Basement');
+            if (homeData.features.otherFeatures) otherFeatures.push(homeData.features.otherFeatures);
 
-            // Get climate region for display
             const climateRegion = getClimateRegion(homeData.state);
             const regionDisplayNames = {
                 'NORTHEAST_COLD': 'Northeast (Cold Climate)',
@@ -2275,18 +1231,15 @@
                     <div><strong>🌍 Climate Region:</strong> ${regionDisplayNames[climateRegion]} (includes regional seasonal tasks)</div>
                 </div>
             `;
-            
-            // Render the task setup list organized by categories
-            renderTaskSetupByCategories();
         }
 
-        // Render task setup organized by categories and seasons
-        function renderTaskSetupByCategories() {
-            const taskCategoriesContainer = document.getElementById('task-setup-categories');
+        // Render task categories
+        function renderTaskCategories() {
+            const taskCategoriesContainer = document.getElementById('task-categories');
             const taskSummaryStats = document.getElementById('task-summary-stats');
             
             if (!taskCategoriesContainer || !taskSummaryStats) {
-                console.error('❌ Task setup containers not found!');
+                console.error('❌ Task containers not found!');
                 return;
             }
             
@@ -2301,7 +1254,7 @@
             
             tasks.forEach(task => {
                 if (task.category === 'Seasonal') {
-                    const season = task.season || 'fall'; // Default to fall if no season specified
+                    const season = task.season || 'fall';
                     seasonalTasks[season].push(task);
                 } else {
                     if (!tasksByCategory[task.category]) {
@@ -2323,7 +1276,7 @@
                     <div class="text-xs text-gray-600">Total Tasks</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-lg font-bold text-green-600">${Math.round(totalCost)}</div>
+                    <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
                     <div class="text-xs text-gray-600">Annual Cost</div>
                 </div>
                 <div class="text-center">
@@ -2336,7 +1289,7 @@
                 </div>
             `;
 
-            // Category icons and colors
+            // Category configuration
             const categoryConfig = {
                 'HVAC': { icon: '🌡️', color: 'blue' },
                 'Water Systems': { icon: '💧', color: 'cyan' },
@@ -2346,10 +1299,10 @@
             };
 
             const seasonConfig = {
-                'spring': { icon: '🌸', color: 'green', name: 'Spring' },
-                'summer': { icon: '☀️', color: 'yellow', name: 'Summer' },
-                'fall': { icon: '🍂', color: 'orange', name: 'Fall' },
-                'winter': { icon: '❄️', color: 'blue', name: 'Winter' }
+                'spring': { icon: '🌸', name: 'Spring' },
+                'summer': { icon: '☀️', name: 'Summer' },
+                'fall': { icon: '🍂', name: 'Fall' },
+                'winter': { icon: '❄️', name: 'Winter' }
             };
 
             let categoriesHTML = '';
@@ -2359,32 +1312,32 @@
                 const config = categoryConfig[category] || { icon: '📋', color: 'gray' };
                 
                 categoriesHTML += `
-                    <div class="task-category-section">
-                        <div class="task-category-header">
+                    <div class="task-category">
+                        <div class="bg-gray-50 p-4 border-b border-gray-100">
                             <div class="flex items-center justify-between">
                                 <h4 class="font-semibold text-gray-900 flex items-center gap-2">
                                     <span class="text-lg">${config.icon}</span>
                                     ${category} (${categoryTasks.length} tasks)
                                 </h4>
                                 <span class="bg-${config.color}-100 text-${config.color}-700 px-2 py-1 rounded text-xs">
-                                    ${Math.round(categoryTasks.reduce((sum, task) => sum + (task.cost * (365 / task.frequency)), 0))} annual
+                                    $${Math.round(categoryTasks.reduce((sum, task) => sum + (task.cost * (365 / task.frequency)), 0))} annual
                                 </span>
                             </div>
                         </div>
-                        <div class="space-y-3 p-4">
+                        <div class="p-4 space-y-3">
                             ${categoryTasks.map(task => renderTaskCard(task)).join('')}
                         </div>
                     </div>
                 `;
             });
 
-            // Render seasonal tasks by season
+            // Render seasonal tasks
             const hasSeasonalTasks = Object.values(seasonalTasks).some(arr => arr.length > 0);
             
             if (hasSeasonalTasks) {
                 categoriesHTML += `
-                    <div class="task-category-section">
-                        <div class="task-category-header bg-gradient-to-r from-purple-100 to-pink-100">
+                    <div class="task-category">
+                        <div class="bg-gradient-to-r from-purple-100 to-pink-100 p-4 border-b border-gray-100">
                             <div class="flex items-center justify-between">
                                 <h4 class="font-semibold text-gray-900 flex items-center gap-2">
                                     <span class="text-lg">🌍</span>
@@ -2402,7 +1355,7 @@
                     if (seasonTasks.length > 0) {
                         const config = seasonConfig[season];
                         categoriesHTML += `
-                            <div class="seasonal-section ${season} rounded-lg p-4">
+                            <div class="seasonal-${season} rounded-lg p-4">
                                 <h5 class="font-semibold text-gray-900 flex items-center gap-2 mb-3">
                                     <span class="text-lg">${config.icon}</span>
                                     ${config.name} Tasks (${seasonTasks.length})
@@ -2444,12 +1397,12 @@
                             <div class="flex items-center gap-3 mt-2 text-sm">
                                 ${regionalBadge}
                                 <span class="text-gray-600">Every ${task.frequency} days</span>
-                                <span class="text-gray-600">${task.cost}</span>
+                                <span class="text-gray-600">$${task.cost}</span>
                                 <span class="px-2 py-1 rounded text-xs ${priorityClass}">${task.priority} priority</span>
                             </div>
                         </div>
                         <div class="flex flex-col gap-2">
-                            <button onclick="editTaskFromSetup(${task.id})" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 text-sm touch-btn" data-task-edit="${task.id}">
+                            <button onclick="editTaskFromSetup(${task.id})" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 text-sm touch-btn">
                                 ✏️ Edit
                             </button>
                             <button onclick="deleteTaskDirect(${task.id})" class="bg-red-100 text-red-700 px-3 py-1 rounded-lg hover:bg-red-200 text-sm touch-btn" title="Delete task">
@@ -2475,43 +1428,32 @@
             `;
         }
 
-        // Helper functions for task setup
+        // Helper functions
         function getSuggestedStartDate(task) {
             const today = new Date();
             
-            // Smart seasonal defaults based on task season
             if (task.season) {
-                const currentMonth = today.getMonth(); // 0-11
+                const currentMonth = today.getMonth();
                 let targetMonth;
                 
                 switch(task.season) {
-                    case 'spring':
-                        targetMonth = 2; // March (0-indexed)
-                        break;
-                    case 'summer':
-                        targetMonth = 5; // June
-                        break;
-                    case 'fall':
-                        targetMonth = 8; // September
-                        break;
-                    case 'winter':
-                        targetMonth = 10; // November
-                        break;
-                    default:
-                        targetMonth = currentMonth;
+                    case 'spring': targetMonth = 2; break; // March
+                    case 'summer': targetMonth = 5; break; // June
+                    case 'fall': targetMonth = 8; break; // September
+                    case 'winter': targetMonth = 10; break; // November
+                    default: targetMonth = currentMonth;
                 }
                 
                 let targetYear = today.getFullYear();
-                // If the target month has passed this year, default to next year
                 if (targetMonth < currentMonth || (targetMonth === currentMonth && today.getDate() > 15)) {
                     targetYear++;
                 }
                 
-                const seasonalDate = new Date(targetYear, targetMonth, 15); // 15th of target month
+                const seasonalDate = new Date(targetYear, targetMonth, 15);
                 return seasonalDate.toISOString().split('T')[0];
             }
             
-            // Regular task defaults based on priority
+            // Regular task defaults
             if (task.priority === 'high') {
                 const startDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
                 return startDate.toISOString().split('T')[0];
@@ -2531,13 +1473,9 @@
             return nextDue.toLocaleDateString();
         }
 
-        // Update task start date
         function updateTaskStartDate(taskId, startDateStr) {
-            console.log(`📅 Updating start date for task ${taskId} to ${startDateStr}`);
-            
             const task = tasks.find(t => t.id === taskId);
             if (task && startDateStr) {
-                // Update the "Next Due" field to show when this task will be due
                 const nextDueElement = document.getElementById(`next-due-${taskId}`);
                 if (nextDueElement) {
                     nextDueElement.value = getNextDueFromStart(startDateStr, task.frequency);
@@ -2545,36 +1483,12 @@
             }
         }
 
-        // Add task from setup - now fully functional
-        function addTaskFromSetup() {
-            console.log('➕ Adding custom task from setup...');
-            
-            // Open the edit modal in "add" mode
-            currentEditingTask = null;
-            document.getElementById('task-edit-title').textContent = 'Add Custom Task';
-            document.getElementById('edit-task-name').value = '';
-            document.getElementById('edit-task-cost').value = '0';
-            document.getElementById('edit-task-frequency').value = '365';
-            document.getElementById('edit-task-priority').value = 'medium';
-            document.getElementById('edit-task-description').value = '';
-            document.getElementById('task-edit-modal').classList.remove('hidden');
-        }
-
-        // Edit property from task setup
-        function editPropertyFromTaskSetup() {
-            console.log('✏️ Editing property from task setup...');
-            goBackToHomeSetup();
-        }
-
-        // Go back to home setup
+        // Navigation functions
         function goBackToHomeSetup() {
-            console.log('⬅️ Going back to home setup...');
-            
-            // Hide task setup and show setup form
             document.getElementById('task-setup').classList.add('hidden');
             document.getElementById('setup-form').style.display = 'block';
             
-            // Pre-populate the form with current data
+            // Pre-populate form with current data
             if (homeData.address) document.getElementById('address').value = homeData.address;
             if (homeData.city) document.getElementById('city').value = homeData.city;
             if (homeData.state) document.getElementById('state').value = homeData.state;
@@ -2583,29 +1497,21 @@
             if (homeData.yearBuilt) document.getElementById('year-built').value = homeData.yearBuilt;
             if (homeData.sqft) document.getElementById('sqft').value = homeData.sqft;
             
-            // Set checkboxes
+            // Set all checkboxes and options
             if (homeData.features) {
-                document.getElementById('central-ac').checked = homeData.features.centralAC || false;
-                document.getElementById('mini-splits').checked = homeData.features.miniSplits || false;
-                document.getElementById('wall-ac').checked = homeData.features.wallAC || false;
-                document.getElementById('electric-baseboard').checked = homeData.features.electricBaseboard || false;
-                document.getElementById('boiler').checked = homeData.features.boiler || false;
-                document.getElementById('municipal-water').checked = homeData.features.municipalWater || false;
-                document.getElementById('well-water').checked = homeData.features.wellWater || false;
-                document.getElementById('sediment-filter').checked = homeData.features.sedimentFilter || false;
-                document.getElementById('uv-filter').checked = homeData.features.uvFilter || false;
-                document.getElementById('water-softener').checked = homeData.features.waterSoftener || false;
-                document.getElementById('whole-house-filter').checked = homeData.features.wholeHouseFilter || false;
-                document.getElementById('municipal-sewer').checked = homeData.features.municipalSewer || false;
-                document.getElementById('septic').checked = homeData.features.septic || false;
-                document.getElementById('fireplace').checked = homeData.features.fireplace || false;
-                document.getElementById('pool').checked = homeData.features.pool || false;
-                document.getElementById('deck').checked = homeData.features.deck || false;
-                document.getElementById('garage').checked = homeData.features.garage || false;
-                document.getElementById('basement').checked = homeData.features.basement || false;
-                document.getElementById('other-features').value = homeData.features.otherFeatures || '';
+                Object.entries(homeData.features).forEach(([key, value]) => {
+                    const element = document.getElementById(key.replace(/([A-Z])/g, '-$1').toLowerCase());
+                    if (element && element.type === 'checkbox') {
+                        element.checked = value;
+                    }
+                });
                 
-                // Show/hide well water options
+                // Handle text inputs
+                if (homeData.features.otherFeatures) {
+                    document.getElementById('other-features').value = homeData.features.otherFeatures;
+                }
+                
+                // Show well water options if needed
                 toggleWellWaterOptions();
             }
             
@@ -2618,36 +1524,26 @@
             }
         }
 
-        // Finish task setup
         function finishTaskSetup() {
             console.log('🚀 Finishing task setup...');
             
-            // Convert all task templates to actual scheduled tasks
+            // Convert templates to actual scheduled tasks
             tasks.forEach(task => {
                 if (task.isTemplate) {
-                    // Get the start date from the input field
                     const startDateElement = document.getElementById(`start-date-${task.id}`);
                     if (startDateElement && startDateElement.value) {
                         const startDate = new Date(startDateElement.value);
                         task.nextDue = new Date(startDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
                     } else {
-                        // Default to suggested date if no custom date set
                         const suggestedDate = getSuggestedStartDate(task);
                         const startDate = new Date(suggestedDate);
                         task.nextDue = new Date(startDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
                     }
-                    
-                    // Remove the template flag
                     delete task.isTemplate;
                 }
             });
             
-            console.log('✅ Task setup complete! Tasks with dates:', tasks.filter(t => t.nextDue).length);
-            
-            // Generate default appliances based on features
-            generateDefaultAppliances();
-            
-            // Save all data
+            // Save data
             saveData();
             
             // Show main app
@@ -2663,10 +1559,19 @@
             console.log('🎉 Setup complete! Welcome to Casa Care!');
         }
 
-        // Edit task from setup - now uses proper modal
+        // Task editing functions
+        function addTaskFromSetup() {
+            currentEditingTask = null;
+            document.getElementById('task-edit-title').textContent = 'Add Custom Task';
+            document.getElementById('edit-task-name').value = '';
+            document.getElementById('edit-task-cost').value = '0';
+            document.getElementById('edit-task-frequency').value = '365';
+            document.getElementById('edit-task-priority').value = 'medium';
+            document.getElementById('edit-task-description').value = '';
+            document.getElementById('task-edit-modal').classList.remove('hidden');
+        }
+
         function editTaskFromSetup(taskId) {
-            console.log(`✏️ Editing task ${taskId} from setup screen...`);
-            
             const task = tasks.find(t => t.id === taskId);
             if (task) {
                 currentEditingTask = task;
@@ -2680,7 +1585,6 @@
             }
         }
 
-        // Task edit modal functions
         function closeTaskEditModal() {
             document.getElementById('task-edit-modal').classList.add('hidden');
             currentEditingTask = null;
@@ -2699,14 +1603,12 @@
             }
 
             if (currentEditingTask) {
-                // Update existing task
                 currentEditingTask.title = name;
                 currentEditingTask.cost = cost;
                 currentEditingTask.frequency = frequency;
                 currentEditingTask.priority = priority;
                 currentEditingTask.description = description;
             } else {
-                // Add new task
                 const newTask = {
                     id: Math.max(...tasks.map(t => t.id), 0) + 1,
                     title: name,
@@ -2724,156 +1626,29 @@
             }
 
             closeTaskEditModal();
-            
-            // Refresh display if we're in task setup
-            if (!document.getElementById('task-setup').classList.contains('hidden')) {
-                renderTaskSetupByCategories();
-            }
+            renderTaskCategories();
         }
 
         function deleteTaskFromEdit() {
             if (currentEditingTask && confirm(`Are you sure you want to delete "${currentEditingTask.title}"?`)) {
                 tasks = tasks.filter(t => t.id !== currentEditingTask.id);
                 closeTaskEditModal();
-                
-                // Refresh display if we're in task setup
-                if (!document.getElementById('task-setup').classList.contains('hidden')) {
-                    renderTaskSetupByCategories();
-                }
+                renderTaskCategories();
             }
         }
 
-        // Direct delete from task list
         function deleteTaskDirect(taskId) {
             const task = tasks.find(t => t.id === taskId);
             if (task && confirm(`Are you sure you want to delete "${task.title}"?`)) {
                 tasks = tasks.filter(t => t.id !== taskId);
-                
-                // Refresh display if we're in task setup
-                if (!document.getElementById('task-setup').classList.contains('hidden')) {
-                    renderTaskSetupByCategories();
-                }
+                renderTaskCategories();
             }
         }
 
-        // Generate default appliances
-        function generateDefaultAppliances() {
-            appliances = [];
-            let id = 1;
-
-            if (homeData.features?.centralAC) {
-                appliances.push({
-                    id: id++,
-                    name: 'Central HVAC System',
-                    type: 'HVAC',
-                    brand: 'Unknown',
-                    model: 'Unknown',
-                    installDate: '',
-                    warrantyExpires: '',
-                    notes: 'Auto-generated from home setup',
-                    filterType: '16x25x1 MERV 8',
-                    replacementParts: ['Air Filter', 'Thermostat Batteries']
-                });
-            }
-
-            // Always add common appliances
-            appliances.push(
-                {
-                    id: id++,
-                    name: 'Water Heater',
-                    type: 'Water Heater',
-                    brand: 'Unknown',
-                    model: 'Unknown',
-                    installDate: '',
-                    warrantyExpires: '',
-                    notes: 'Standard water heater',
-                    replacementParts: ['Anode Rod', 'Temperature Relief Valve']
-                }
-            );
-        }
-
-        // Show home info when top-right home icon is clicked
-        function showHomeInfo() {
-            const homeInfoDisplay = document.getElementById('home-info-display');
-            const features = [];
-            
-            if (homeData.features?.centralAC) features.push('Central AC/Heat');
-            if (homeData.features?.miniSplits) features.push('Mini-Splits');
-            if (homeData.features?.wellWater) features.push('Well Water');
-            if (homeData.features?.septic) features.push('Septic System');
-            if (homeData.features?.fireplace) features.push('Fireplace');
-            if (homeData.features?.pool) features.push('Pool/Spa');
-            if (homeData.features?.deck) features.push('Deck/Patio');
-
-            homeInfoDisplay.innerHTML = `
-                <div class="space-y-2 text-sm">
-                    <div><strong>📍 Address:</strong><br>
-                        <a href="https://maps.google.com/?q=${encodeURIComponent(homeData.fullAddress)}" target="_blank" class="text-blue-600 hover:underline">${homeData.fullAddress || 'Not set'}</a>
-                        <div class="text-xs text-gray-500 mt-1">Click to view on Google Maps</div>
-                    </div>
-                    <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
-                    <div><strong>🎯 Approach:</strong> ${homeData.approach || 'Standard'} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
-                    <div><strong>🏠 Features:</strong><br>${features.join(', ') || 'None selected'}</div>
-                </div>
-            `;
-            
-            document.getElementById('home-info-modal').classList.remove('hidden');
-        }
-
-        function closeHomeInfoModal() {
-            document.getElementById('home-info-modal').classList.add('hidden');
-        }
-
-        function editFromHomeInfo() {
-            closeHomeInfoModal();
-            editPropertySettings();
-        }
-
-        // Tab navigation
-        function showTab(tabName) {
-            // Hide all tab contents
-            const tabContents = document.querySelectorAll('.tab-content');
-            tabContents.forEach(content => {
-                content.classList.add('hidden');
-            });
-
-            // Show selected tab content
-            document.getElementById(tabName + '-content').classList.remove('hidden');
-
-            // Update tab button styles
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            tabBtns.forEach(btn => {
-                btn.classList.remove('bg-blue-100', 'text-blue-700');
-                btn.classList.add('text-gray-600');
-            });
-
-            // Highlight active tab
-            document.getElementById('tab-' + tabName).classList.remove('text-gray-600');
-            document.getElementById('tab-' + tabName).classList.add('bg-blue-100', 'text-blue-700');
-
-            // Update content based on tab
-            if (tabName === 'dashboard') {
-                updateDashboard();
-            } else if (tabName === 'tasks') {
-                renderAllTasks();
-            } else if (tabName === 'calendar') {
-                renderCalendar();
-            } else if (tabName === 'appliances') {
-                renderAppliances();
-            } else if (tabName === 'documents') {
-                renderDocuments();
-            } else if (tabName === 'settings') {
-                updateSettings();
-                renderContractors(); // Also render contractors since they're in settings now
-            }
-        }
-
-        // Update dashboard
+        // Dashboard functions
         function updateDashboard() {
-            // Update home address
             document.getElementById('home-address').textContent = `Managing maintenance for ${homeData.fullAddress}`;
 
-            // Calculate stats
             const now = new Date();
             const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
             
@@ -2891,23 +1666,20 @@
                 totalCost += task.cost * (365 / task.frequency);
             });
 
-            // Update stats
             document.getElementById('overdue-count').textContent = overdueCount;
             document.getElementById('week-count').textContent = weekCount;
-            document.getElementById('total-count').textContent = tasks.filter(t => !t.isCompleted).length;
-            document.getElementById('annual-cost').textContent = ' + Math.round(totalCost);
+            document.getElementById('total-count').textContent = tasks.filter(t => !t.isCompleted && t.nextDue).length;
+            document.getElementById('annual-cost').textContent = '$' + Math.round(totalCost);
 
-            // Render upcoming tasks
             renderTasks();
         }
 
-        // Render tasks for dashboard (mobile optimized)
         function renderTasks() {
             const tasksList = document.getElementById('tasks-list');
             const upcomingTasks = tasks
                 .filter(task => !task.isCompleted && task.nextDue)
                 .sort((a, b) => a.nextDue - b.nextDue)
-                .slice(0, 8); // Show fewer on mobile
+                .slice(0, 8);
 
             if (upcomingTasks.length === 0) {
                 tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All tasks complete!</div>';
@@ -2917,7 +1689,8 @@
             tasksList.innerHTML = upcomingTasks.map(task => {
                 const daysUntilDue = Math.ceil((task.nextDue - new Date()) / (24 * 60 * 60 * 1000));
                 const overdue = daysUntilDue < 0;
-                const statusClass = overdue ? 'bg-red-50 border-l-4 border-red-400' : daysUntilDue <= 7 ? 'bg-orange-50 border-l-4 border-orange-400' : 'bg-white';
+                const statusClass = overdue ? 'bg-red-50 border-l-4 border-red-400' : 
+                                   daysUntilDue <= 7 ? 'bg-orange-50 border-l-4 border-orange-400' : 'bg-white';
                 
                 return `
                     <div class="p-4 border-b ${statusClass}">
@@ -2930,7 +1703,7 @@
                                     <span class="${overdue ? 'text-red-600' : daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600'}">
                                         ${overdue ? `${Math.abs(daysUntilDue)}d overdue` : daysUntilDue <= 0 ? 'Due today' : `${daysUntilDue}d`}
                                     </span>
-                                    <span class="text-gray-600">${task.cost}</span>
+                                    <span class="text-gray-600">$${task.cost}</span>
                                 </div>
                             </div>
                             <button onclick="completeTask(${task.id})" class="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 text-xs touch-btn">
@@ -2942,7 +1715,6 @@
             }).join('');
         }
 
-        // Complete task
         function completeTask(taskId) {
             const task = tasks.find(t => t.id === taskId);
             if (task) {
@@ -2951,797 +1723,46 @@
                 task.isCompleted = false; // Will be due again in the future
                 
                 updateDashboard();
-                renderCalendar(); // Update calendar if visible
                 saveData();
                 
-                // Show completion message
                 alert(`✅ Task "${task.title}" completed! Next due: ${task.nextDue.toLocaleDateString()}`);
             }
         }
 
-        // Render all tasks
-        function renderAllTasks() {
-            const tasksList = document.getElementById('all-tasks-list');
-            const sortedTasks = tasks.filter(t => !t.isCompleted && t.nextDue).sort((a, b) => a.nextDue - b.nextDue);
-
-            if (sortedTasks.length === 0) {
-                tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All tasks complete!</div>';
-                return;
-            }
-
-            tasksList.innerHTML = sortedTasks.map(task => {
-                const daysUntilDue = Math.ceil((task.nextDue - new Date()) / (24 * 60 * 60 * 1000));
-                const overdue = daysUntilDue < 0;
-                
-                return `
-                    <div class="p-4 border-b hover:bg-gray-50">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1 pr-3">
-                                <h4 class="font-semibold text-gray-900 text-sm">${task.title}</h4>
-                                <p class="text-xs text-gray-600 mt-1">${task.description}</p>
-                                <div class="flex items-center gap-3 mt-2 text-xs">
-                                    <span class="bg-gray-100 px-2 py-1 rounded">${task.category}</span>
-                                    <span class="text-gray-600">Every ${task.frequency}d</span>
-                                    <span class="${overdue ? 'text-red-600' : daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600'}">
-                                        ${overdue ? `${Math.abs(daysUntilDue)}d overdue` : daysUntilDue <= 0 ? 'Due today' : `${daysUntilDue}d`}
-                                    </span>
-                                    <span class="text-gray-600">${task.cost}</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <button onclick="editTask(${task.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs touch-btn">
-                                    ✏️
-                                </button>
-                                <button onclick="completeTask(${task.id})" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs touch-btn">
-                                    ✅
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Calendar functions
-        function changeMonth(direction) {
-            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
-            renderCalendar();
-        }
-
-        function renderCalendar() {
-            const calendarView = document.getElementById('calendar-view');
-            const monthYear = document.getElementById('current-month-year');
-            
-            // Update month/year display
-            monthYear.textContent = currentCalendarDate.toLocaleDateString('en-US', { 
-                month: 'long', 
-                year: 'numeric' 
-            });
-
-            // Get first day of month and days in month
-            const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
-            const lastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0);
-            const startDate = new Date(firstDay);
-            startDate.setDate(startDate.getDate() - firstDay.getDay()); // Start from Sunday
-
-            // Generate calendar grid
-            let calendarHTML = '<div class="calendar-grid">';
-            
-            // Day headers
-            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            dayHeaders.forEach(day => {
-                calendarHTML += `<div class="bg-gray-100 p-2 font-semibold text-center text-xs">${day}</div>`;
-            });
-
-            // Calendar days
-            const today = new Date();
-            const currentDate = new Date(startDate);
-            
-            for (let i = 0; i < 42; i++) { // 6 weeks * 7 days
-                const isCurrentMonth = currentDate.getMonth() === currentCalendarDate.getMonth();
-                const isToday = currentDate.toDateString() === today.toDateString();
-                
-                // Find tasks for this date
-                const dayTasks = tasks.filter(task => {
-                    if (!task.nextDue || task.isCompleted) return false;
-                    const taskDate = new Date(task.nextDue);
-                    return taskDate.toDateString() === currentDate.toDateString();
-                });
-
-                let cellClass = 'calendar-cell';
-                if (!isCurrentMonth) cellClass += ' text-gray-400 bg-gray-50';
-                if (isToday) cellClass += ' bg-blue-50 border border-blue-200';
-
-                const taskElements = dayTasks.slice(0, 2).map(task => {
-                    const daysUntilDue = Math.ceil((task.nextDue - today) / (24 * 60 * 60 * 1000));
-                    const overdue = daysUntilDue < 0;
-                    const colorClass = overdue ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-blue-100 text-blue-700 hover:bg-blue-200';
-                    const taskTitle = task.title.substring(0, 10) + (task.title.length > 10 ? '...' : '');
-                    
-                    return `<div class="${colorClass} text-xs p-1 rounded truncate cursor-pointer transition-colors" 
-                                onclick="showTaskDetail(${task.id})"
-                                title="Click for details: ${task.title}">
-                                ${taskTitle}
-                            </div>`;
-                }).join('');
-
-                const moreTasksElement = dayTasks.length > 2 ? 
-                    `<div class="text-xs text-gray-500 cursor-pointer" onclick="showDayTasks('${currentDate.toDateString()}')">+${dayTasks.length - 2} more</div>` : '';
-
-                calendarHTML += `
-                    <div class="${cellClass}">
-                        <div class="font-medium text-xs ${isToday ? 'text-blue-600' : ''}">${currentDate.getDate()}</div>
-                        <div class="mt-1 space-y-1">
-                            ${taskElements}
-                            ${moreTasksElement}
-                        </div>
-                    </div>
-                `;
-
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-
-            calendarHTML += '</div>';
-            calendarView.innerHTML = calendarHTML;
-        }
-
-        // Open Realtor.com for property details (most reliable URL structure)
-        function openRedfin(event) {
-            // Prevent any default browser behavior
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            
+        // Utility functions
+        function showHomeInfo() {
             if (homeData.fullAddress) {
-                const cleanAddress = homeData.fullAddress.trim();
-                
-                // Use Realtor.com - they have the most reliable search URLs
-                const addressParam = encodeURIComponent(cleanAddress);
-                const realtorUrl = `https://www.realtor.com/search/properties?searchText=${addressParam}`;
-                
-                console.log('Opening Realtor.com for:', cleanAddress);
-                
-                // Clean, direct experience
-                window.open(realtorUrl, '_blank');
-                
+                alert(`🏠 Home Info\n\n${homeData.fullAddress}\nBuilt: ${homeData.yearBuilt} • ${homeData.sqft?.toLocaleString()} sq ft\nApproach: ${homeData.approach} • Pets: ${homeData.hasPets ? 'Yes' : 'No'}`);
             } else {
-                // Fallback - open Realtor.com homepage
-                window.open('https://www.realtor.com', '_blank');
+                alert('🏠 No home information set yet. Complete the setup to add your home details.');
             }
         }
 
-        // Task functions
-        function addTask() {
-            currentEditingTask = null;
-            document.getElementById('modal-title').textContent = 'Add Task';
-            document.getElementById('task-title').value = '';
-            document.getElementById('task-category').value = 'General';
-            document.getElementById('task-cost').value = '';
-            document.getElementById('task-frequency').value = '365';
-            document.getElementById('task-notes').value = '';
-            document.getElementById('task-modal').classList.remove('hidden');
-        }
-
-        function editTask(taskId) {
-            const task = tasks.find(t => t.id === taskId);
-            if (task) {
-                currentEditingTask = task;
-                document.getElementById('modal-title').textContent = 'Edit Task';
-                document.getElementById('task-title').value = task.title;
-                document.getElementById('task-category').value = task.category;
-                document.getElementById('task-cost').value = task.cost;
-                document.getElementById('task-frequency').value = task.frequency;
-                document.getElementById('task-notes').value = task.description;
-                document.getElementById('task-modal').classList.remove('hidden');
-            }
-        }
-
-        function saveTask() {
-            const title = document.getElementById('task-title').value;
-            const category = document.getElementById('task-category').value;
-            const cost = parseInt(document.getElementById('task-cost').value) || 0;
-            const frequency = parseInt(document.getElementById('task-frequency').value) || 365;
-            const notes = document.getElementById('task-notes').value;
-
-            if (!title.trim()) {
-                alert('Please enter a task title');
-                return;
-            }
-
-            if (currentEditingTask) {
-                // Update existing task
-                currentEditingTask.title = title;
-                currentEditingTask.category = category;
-                currentEditingTask.cost = cost;
-                currentEditingTask.frequency = frequency;
-                currentEditingTask.description = notes;
-            } else {
-                // Add new task
-                const newTask = {
-                    id: Math.max(...tasks.map(t => t.id), 0) + 1,
-                    title: title,
-                    category: category,
-                    frequency: frequency,
-                    cost: cost,
-                    priority: 'medium',
-                    description: notes,
-                    nextDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-                    lastCompleted: null,
-                    isCompleted: false
-                };
-                tasks.push(newTask);
-            }
-
-            closeModal();
+        function showTab(tabName) {
+            // Basic tab functionality - for this working version, we only have dashboard
             updateDashboard();
-            saveData();
         }
 
-        function closeModal() {
-            document.getElementById('task-modal').classList.add('hidden');
-            currentEditingTask = null;
-        }
-
-        // Seasonal tasks
-        function addSeasonalTasks() {
-            document.getElementById('seasonal-modal').classList.remove('hidden');
-        }
-
-        function closeSeasonalModal() {
-            document.getElementById('seasonal-modal').classList.add('hidden');
-        }
-
-        function saveSeasonalTasks() {
-            const seasonalTasks = [
-                { id: 'fall-gutters', title: 'Clean Gutters & Downspouts', category: 'Exterior', cost: 150, season: 'fall' },
-                { id: 'fall-furnace', title: 'Schedule Furnace Inspection', category: 'HVAC', cost: 100, season: 'fall' },
-                { id: 'fall-chimney', title: 'Chimney Cleaning', category: 'Safety', cost: 300, season: 'fall' },
-                { id: 'fall-weatherstrip', title: 'Check Weatherstripping', category: 'General', cost: 50, season: 'fall' },
-                { id: 'spring-ac', title: 'AC System Tune-up', category: 'HVAC', cost: 120, season: 'spring' },
-                { id: 'spring-deck', title: 'Deck Inspection & Cleaning', category: 'Exterior', cost: 100, season: 'spring' },
-                { id: 'spring-exterior', title: 'Exterior Pressure Washing', category: 'Exterior', cost: 200, season: 'spring' },
-                { id: 'spring-irrigation', title: 'Irrigation System Check', category: 'General', cost: 75, season: 'spring' }
-            ];
-
-            let addedCount = 0;
-            let nextId = Math.max(...tasks.map(t => t.id), 0) + 1;
-
-            seasonalTasks.forEach(seasonalTask => {
-                const checkbox = document.getElementById(seasonalTask.id);
-                if (checkbox && checkbox.checked) {
-                    let dueDate = new Date();
-                    if (seasonalTask.season === 'fall') {
-                        dueDate.setMonth(9, 15); // October 15
-                    } else if (seasonalTask.season === 'spring') {
-                        dueDate.setMonth(3, 15); // April 15
-                    }
-
-                    if (dueDate < new Date()) {
-                        dueDate.setFullYear(dueDate.getFullYear() + 1);
-                    }
-
-                    const newTask = {
-                        id: nextId++,
-                        title: seasonalTask.title,
-                        category: seasonalTask.category,
-                        frequency: 365,
-                        cost: seasonalTask.cost,
-                        priority: 'medium',
-                        description: `Seasonal ${seasonalTask.season} maintenance task`,
-                        nextDue: dueDate,
-                        lastCompleted: null,
-                        isCompleted: false
-                    };
-
-                    tasks.push(newTask);
-                    addedCount++;
-                }
-            });
-
-            closeSeasonalModal();
-            
-            if (addedCount > 0) {
-                updateDashboard();
-                saveData();
-                alert(`✅ Added ${addedCount} seasonal task${addedCount === 1 ? '' : 's'}!`);
-            }
-        }
-
-        // Property settings functions
-        function editPropertySettings() {
-            // Populate the edit modal with current data
-            document.getElementById('edit-address').value = homeData.address || '';
-            document.getElementById('edit-city').value = homeData.city || '';
-            document.getElementById('edit-state').value = homeData.state || '';
-            document.getElementById('edit-zipcode').value = homeData.zipcode || '';
-            document.getElementById('edit-year-built').value = homeData.yearBuilt || '';
-            document.getElementById('edit-sqft').value = homeData.sqft || '';
-            
-            // Set checkboxes
-            document.getElementById('edit-central-ac').checked = homeData.features?.centralAC || false;
-            document.getElementById('edit-mini-splits').checked = homeData.features?.miniSplits || false;
-            document.getElementById('edit-well-water').checked = homeData.features?.wellWater || false;
-            document.getElementById('edit-septic').checked = homeData.features?.septic || false;
-            document.getElementById('edit-fireplace').checked = homeData.features?.fireplace || false;
-            document.getElementById('edit-pool').checked = homeData.features?.pool || false;
-            document.getElementById('edit-deck').checked = homeData.features?.deck || false;
-            
-            // Set dropdowns
-            document.getElementById('edit-pets').value = homeData.hasPets ? 'yes' : 'no';
-            document.getElementById('edit-approach').value = homeData.approach || 'standard';
-            
-            document.getElementById('property-modal').classList.remove('hidden');
-        }
-
-        function closePropertyModal() {
-            document.getElementById('property-modal').classList.add('hidden');
-        }
-
-        function savePropertySettings() {
-            // Get updated values
-            const newHomeData = {
-                address: document.getElementById('edit-address').value,
-                city: document.getElementById('edit-city').value,
-                state: document.getElementById('edit-state').value,
-                zipcode: document.getElementById('edit-zipcode').value,
-                propertyType: homeData.propertyType, // Keep existing property type
-                yearBuilt: parseInt(document.getElementById('edit-year-built').value),
-                sqft: parseInt(document.getElementById('edit-sqft').value),
-                hasPets: document.getElementById('edit-pets').value === 'yes',
-                approach: document.getElementById('edit-approach').value,
-                features: {
-                    centralAC: document.getElementById('edit-central-ac').checked,
-                    miniSplits: document.getElementById('edit-mini-splits').checked,
-                    wellWater: document.getElementById('edit-well-water').checked,
-                    septic: document.getElementById('edit-septic').checked,
-                    fireplace: document.getElementById('edit-fireplace').checked,
-                    pool: document.getElementById('edit-pool').checked,
-                    deck: document.getElementById('edit-deck').checked,
-                    // Keep other features from original setup
-                    ...homeData.features
-                }
-            };
-
-            // Create full address for display
-            newHomeData.fullAddress = `${newHomeData.address}, ${newHomeData.city}, ${newHomeData.state} ${newHomeData.zipcode}`;
-            
-            // Update global homeData
-            homeData = newHomeData;
-            
-            // Update header
-            document.getElementById('header-subtitle').textContent = homeData.fullAddress;
-            
-            closePropertyModal();
-            updateDashboard();
-            updateSettings();
-            saveData();
-            
-            alert('✅ Property settings updated successfully!');
-        }
-
-        // Update settings
-        function updateSettings() {
-            const propertySummary = document.getElementById('property-summary');
-            const features = [];
-            
-            if (homeData.features?.centralAC) features.push('Central AC/Heat');
-            if (homeData.features?.miniSplits) features.push('Mini-Splits');
-            if (homeData.features?.wellWater) features.push('Well Water');
-            if (homeData.features?.septic) features.push('Septic System');
-            if (homeData.features?.fireplace) features.push('Fireplace');
-            if (homeData.features?.pool) features.push('Pool/Spa');
-            if (homeData.features?.deck) features.push('Deck/Patio');
-
-            propertySummary.innerHTML = `
-                <div class="space-y-2 text-sm">
-                    <div><strong>📍 Address:</strong><br>
-                        <a href="https://maps.google.com/?q=${encodeURIComponent(homeData.fullAddress)}" target="_blank" class="text-blue-600 hover:underline">${homeData.fullAddress || 'Not set'}</a>
-                        <div class="text-xs text-gray-500">Click to view on Google Maps</div>
-                    </div>
-                    <div><strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Unknown'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Unknown'} sq ft</div>
-                    <div><strong>🎯 Approach:</strong> ${homeData.approach || 'Standard'} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
-                    <div><strong>🏠 Features:</strong><br>${features.join(', ') || 'None selected'}</div>
-                </div>
-            `;
-        }
-
-        // Document management functions
-        function addDocument() {
-            currentEditingDocument = null;
-            document.getElementById('document-modal-title').textContent = 'Add Document';
-            document.getElementById('document-name').value = '';
-            document.getElementById('document-type').value = 'Insurance';
-            document.getElementById('document-issue-date').value = '';
-            document.getElementById('document-expiry-date').value = '';
-            document.getElementById('document-provider').value = '';
-            document.getElementById('document-reference').value = '';
-            document.getElementById('document-notes').value = '';
-            document.getElementById('document-modal').classList.remove('hidden');
-        }
-
-        function closeDocumentModal() {
-            document.getElementById('document-modal').classList.add('hidden');
-            currentEditingDocument = null;
-        }
-
-        function saveDocument() {
-            const name = document.getElementById('document-name').value;
-            const type = document.getElementById('document-type').value;
-            const issueDate = document.getElementById('document-issue-date').value;
-            const expiryDate = document.getElementById('document-expiry-date').value;
-            const provider = document.getElementById('document-provider').value;
-            const reference = document.getElementById('document-reference').value;
-            const notes = document.getElementById('document-notes').value;
-
-            if (!name.trim()) {
-                alert('Please enter a document name');
-                return;
-            }
-
-            if (currentEditingDocument) {
-                // Update existing document
-                currentEditingDocument.name = name;
-                currentEditingDocument.type = type;
-                currentEditingDocument.issueDate = issueDate;
-                currentEditingDocument.expiryDate = expiryDate;
-                currentEditingDocument.provider = provider;
-                currentEditingDocument.reference = reference;
-                currentEditingDocument.notes = notes;
-            } else {
-                // Add new document
-                const newDocument = {
-                    id: Math.max(...documents.map(d => d.id), 0) + 1,
-                    name: name,
-                    type: type,
-                    issueDate: issueDate,
-                    expiryDate: expiryDate,
-                    provider: provider,
-                    reference: reference,
-                    notes: notes,
-                    dateAdded: new Date().toISOString().split('T')[0]
-                };
-                documents.push(newDocument);
-            }
-
-            closeDocumentModal();
-            renderDocuments();
-            saveData();
-        }
-
-        function renderDocuments() {
-            const documentsList = document.getElementById('documents-list');
-            
-            if (documents.length === 0) {
-                documentsList.innerHTML = '<div class="p-6 text-center text-gray-500">No documents added yet. Add insurance policies, warranties, and important home documents.</div>';
-                return;
-            }
-
-            documentsList.innerHTML = documents.map(doc => {
-                const isExpiring = doc.expiryDate && new Date(doc.expiryDate) < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // Expires in 30 days
-                const isExpired = doc.expiryDate && new Date(doc.expiryDate) < new Date();
+        function clearData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                homeData = {};
+                tasks = [];
                 
-                let statusBadge = '';
-                if (isExpired) {
-                    statusBadge = '<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">Expired</span>';
-                } else if (isExpiring) {
-                    statusBadge = '<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs">Expiring Soon</span>';
-                } else if (doc.expiryDate) {
-                    statusBadge = '<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Active</span>';
-                }
-
-                return `
-                    <div class="p-4 border-b hover:bg-gray-50">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1 pr-3">
-                                <h4 class="font-semibold text-gray-900 text-sm">${doc.name}</h4>
-                                <div class="text-xs text-gray-600 mt-1">
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">${doc.type}</span>
-                                        ${statusBadge}
-                                    </div>
-                                    ${doc.provider ? `<div><strong>Provider:</strong> ${doc.provider}</div>` : ''}
-                                    ${doc.reference ? `<div><strong>Reference:</strong> ${doc.reference}</div>` : ''}
-                                    ${doc.expiryDate ? `<div><strong>Expires:</strong> ${new Date(doc.expiryDate).toLocaleDateString()}</div>` : ''}
-                                    ${doc.notes ? `<div class="mt-2">${doc.notes}</div>` : ''}
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <button onclick="editDocument(${doc.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs touch-btn">
-                                    ✏️
-                                </button>
-                                <button onclick="viewDocument(${doc.id})" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs touch-btn">
-                                    👁️
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function editDocument(docId) {
-            const doc = documents.find(d => d.id === docId);
-            if (doc) {
-                currentEditingDocument = doc;
-                document.getElementById('document-modal-title').textContent = 'Edit Document';
-                document.getElementById('document-name').value = doc.name;
-                document.getElementById('document-type').value = doc.type;
-                document.getElementById('document-issue-date').value = doc.issueDate || '';
-                document.getElementById('document-expiry-date').value = doc.expiryDate || '';
-                document.getElementById('document-provider').value = doc.provider || '';
-                document.getElementById('document-reference').value = doc.reference || '';
-                document.getElementById('document-notes').value = doc.notes || '';
-                document.getElementById('document-modal').classList.remove('hidden');
+                localStorage.removeItem('casaCareData');
+                
+                document.getElementById('setup-form').style.display = 'block';
+                document.getElementById('task-setup').classList.add('hidden');
+                document.getElementById('main-app').classList.add('hidden');
+                document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
+                
+                alert('✅ All data cleared. Starting fresh!');
             }
         }
 
-        function viewDocument(docId) {
-            const doc = documents.find(d => d.id === docId);
-            if (doc) {
-                alert(`📄 ${doc.name}\n\nIn a full app, this would:\n• Display the uploaded document/image\n• Allow sharing or printing\n• Show full document details\n• Enable document annotations`);
-            }
-        }
-
-        // Appliance management
-        function addAppliance() {
-            currentEditingAppliance = null;
-            document.getElementById('appliance-modal-title').textContent = 'Add Appliance';
-            document.getElementById('appliance-name').value = '';
-            document.getElementById('appliance-type').value = 'HVAC';
-            document.getElementById('appliance-brand').value = '';
-            document.getElementById('appliance-model').value = '';
-            document.getElementById('appliance-install-date').value = '';
-            document.getElementById('appliance-warranty').value = '';
-            document.getElementById('appliance-notes').value = '';
-            document.getElementById('appliance-modal').classList.remove('hidden');
-        }
-
-        function closeApplianceModal() {
-            document.getElementById('appliance-modal').classList.add('hidden');
-            currentEditingAppliance = null;
-        }
-
-        function saveAppliance() {
-            const name = document.getElementById('appliance-name').value;
-            const type = document.getElementById('appliance-type').value;
-            const brand = document.getElementById('appliance-brand').value;
-            const model = document.getElementById('appliance-model').value;
-            const installDate = document.getElementById('appliance-install-date').value;
-            const warranty = document.getElementById('appliance-warranty').value;
-            const notes = document.getElementById('appliance-notes').value;
-
-            if (!name.trim()) {
-                alert('Please enter an appliance name');
-                return;
-            }
-
-            if (currentEditingAppliance) {
-                currentEditingAppliance.name = name;
-                currentEditingAppliance.type = type;
-                currentEditingAppliance.brand = brand;
-                currentEditingAppliance.model = model;
-                currentEditingAppliance.installDate = installDate;
-                currentEditingAppliance.warrantyExpires = warranty;
-                currentEditingAppliance.notes = notes;
-            } else {
-                const newAppliance = {
-                    id: Math.max(...appliances.map(a => a.id), 0) + 1,
-                    name: name,
-                    type: type,
-                    brand: brand,
-                    model: model,
-                    installDate: installDate,
-                    warrantyExpires: warranty,
-                    notes: notes,
-                    replacementParts: getReplacementParts(type)
-                };
-                appliances.push(newAppliance);
-            }
-
-            closeApplianceModal();
-            renderAppliances();
-            saveData();
-        }
-
-        function getReplacementParts(type) {
-            const partsByType = {
-                'HVAC': ['Air Filter', 'Thermostat Batteries', 'Blower Motor'],
-                'Water Heater': ['Anode Rod', 'Temperature Relief Valve', 'Heating Element'],
-                'Washer': ['Water Inlet Valve', 'Drive Belt', 'Door Seal'],
-                'Dryer': ['Lint Filter', 'Drive Belt', 'Thermal Fuse'],
-                'Refrigerator': ['Water Filter', 'Door Seal', 'Thermostat'],
-                'Dishwasher': ['Water Filter', 'Door Seal', 'Spray Arm'],
-                'Range/Oven': ['Heating Element', 'Igniter', 'Door Seal']
-            };
-            return partsByType[type] || ['General maintenance parts'];
-        }
-
-        function renderAppliances() {
-            const appliancesList = document.getElementById('appliances-list');
-            
-            if (appliances.length === 0) {
-                appliancesList.innerHTML = '<div class="p-6 text-center text-gray-500">No appliances added yet.</div>';
-                return;
-            }
-
-            appliancesList.innerHTML = appliances.map(appliance => {
-                const warrantyStatus = appliance.warrantyExpires && new Date(appliance.warrantyExpires) > new Date() ? 
-                    `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Under Warranty</span>` :
-                    '';
-
-                return `
-                    <div class="p-4 border-b hover:bg-gray-50">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1 pr-3">
-                                <h4 class="font-semibold text-gray-900 text-sm">${appliance.name}</h4>
-                                <div class="text-xs text-gray-600 mt-1">
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">${appliance.type}</span>
-                                        ${warrantyStatus}
-                                    </div>
-                                    <div class="space-y-1">
-                                        <div><strong>Brand:</strong> ${appliance.brand || 'Unknown'}</div>
-                                        <div><strong>Model:</strong> ${appliance.model || 'Unknown'}</div>
-                                        ${appliance.installDate ? `<div><strong>Installed:</strong> ${new Date(appliance.installDate).toLocaleDateString()}</div>` : ''}
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <button onclick="editAppliance(${appliance.id})" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs touch-btn">
-                                    ✏️
-                                </button>
-                                <button onclick="findParts(${appliance.id})" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs touch-btn">
-                                    🔧
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function editAppliance(applianceId) {
-            const appliance = appliances.find(a => a.id === applianceId);
-            if (appliance) {
-                currentEditingAppliance = appliance;
-                document.getElementById('appliance-modal-title').textContent = 'Edit Appliance';
-                document.getElementById('appliance-name').value = appliance.name;
-                document.getElementById('appliance-type').value = appliance.type;
-                document.getElementById('appliance-brand').value = appliance.brand || '';
-                document.getElementById('appliance-model').value = appliance.model || '';
-                document.getElementById('appliance-install-date').value = appliance.installDate || '';
-                document.getElementById('appliance-warranty').value = appliance.warrantyExpires || '';
-                document.getElementById('appliance-notes').value = appliance.notes || '';
-                document.getElementById('appliance-modal').classList.remove('hidden');
-            }
-        }
-
-        function findParts(applianceId) {
-            const appliance = appliances.find(a => a.id === applianceId);
-            if (appliance) {
-                alert(`🔧 Finding parts for ${appliance.name}\n\nCommon parts:\n• ${appliance.replacementParts?.join('\n• ') || 'None listed'}\n\nIn a full app, this would link to parts suppliers!`);
-            }
-        }
-
-        // Contractor management
-        function renderContractors() {
-            renderRepairRecords();
-            renderContractorDirectory();
-        }
-
-        function addRepairRecord() {
-            const description = prompt('Enter repair description:');
-            const contractor = prompt('Contractor name:');
-            const cost = prompt('Total cost (numbers only):');
-            
-            if (description && contractor) {
-                const newRecord = {
-                    id: Math.max(...repairRecords.map(r => r.id), 0) + 1,
-                    date: new Date().toISOString().split('T')[0],
-                    description: description,
-                    contractor: contractor,
-                    cost: parseInt(cost) || 0,
-                    notes: ''
-                };
-                repairRecords.push(newRecord);
-                renderRepairRecords();
-                saveData();
-            }
-        }
-
-        function addContractor() {
-            const name = prompt('Contractor/Company name:');
-            const specialty = prompt('Specialty (e.g., HVAC, Plumbing):');
-            const phone = prompt('Phone number:');
-            
-            if (name) {
-                const newContractor = {
-                    id: Math.max(...contractors.map(c => c.id), 0) + 1,
-                    name: name,
-                    specialty: specialty || 'General',
-                    phone: phone || '',
-                    email: '',
-                    rating: 0,
-                    notes: ''
-                };
-                contractors.push(newContractor);
-                renderContractorDirectory();
-                saveData();
-            }
-        }
-
-        function renderRepairRecords() {
-            const recordsList = document.getElementById('repair-records-list');
-            
-            if (repairRecords.length === 0) {
-                recordsList.innerHTML = '<div class="p-4 text-center text-gray-500 text-sm">No repair records yet. Build your home\'s history!</div>';
-                return;
-            }
-
-            recordsList.innerHTML = repairRecords.map(record => `
-                <div class="p-4 border-b hover:bg-gray-50">
-                    <div class="font-medium text-gray-900 text-sm">${record.description}</div>
-                    <div class="text-xs text-gray-600 mt-1">
-                        <div>${new Date(record.date).toLocaleDateString()} • ${record.contractor}</div>
-                        ${record.cost > 0 ? `<div class="text-green-600 font-medium">${record.cost}</div>` : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderContractorDirectory() {
-            const contractorsList = document.getElementById('contractors-list');
-            
-            if (contractors.length === 0) {
-                contractorsList.innerHTML = '<div class="p-4 text-center text-gray-500 text-sm">No contractors added yet.</div>';
-                return;
-            }
-
-            contractorsList.innerHTML = contractors.map(contractor => `
-                <div class="p-4 border-b hover:bg-gray-50">
-                    <div class="font-medium text-gray-900 text-sm">${contractor.name}</div>
-                    <div class="text-xs text-gray-600 mt-1">
-                        <div class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs inline-block mb-1">${contractor.specialty}</div>
-                        ${contractor.phone ? `<div class="mt-1">📞 ${contractor.phone}</div>` : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Export calendar
-        function exportCalendar() {
-            const calendarData = tasks.filter(t => !t.isCompleted && t.nextDue).map(task => {
-                return {
-                    title: task.title,
-                    description: task.description,
-                    date: task.nextDue.toISOString().split('T')[0],
-                    category: task.category,
-                    cost: task.cost
-                };
-            });
-
-            const csvContent = "data:text/csv;charset=utf-8," + 
-                "Title,Description,Date,Category,Cost\n" +
-                calendarData.map(e => `"${e.title}","${e.description}","${e.date}","${e.category}","${e.cost}"`).join("\n");
-
-            const link = document.createElement("a");
-            link.setAttribute("href", encodeURI(csvContent));
-            link.setAttribute("download", "casa_care_calendar.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // Export data
         function exportData() {
             const data = {
                 homeData: homeData,
                 tasks: tasks,
-                appliances: appliances,
-                documents: documents,
-                repairRecords: repairRecords,
-                contractors: contractors,
                 exportDate: new Date().toISOString(),
                 version: '2.0'
             };
@@ -3754,43 +1775,13 @@
             link.click();
             document.body.removeChild(link);
             
-            alert('📄 Data exported! Your data is also automatically saved in your browser.');
+            alert('📄 Data exported successfully!');
         }
 
-        // Clear data
-        function clearData() {
-            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
-                // Clear variables
-                homeData = {};
-                tasks = [];
-                appliances = [];
-                documents = [];
-                repairRecords = [];
-                contractors = [];
-                
-                // Clear localStorage
-                localStorage.removeItem('casaCareData');
-                
-                // Show setup form and hide others
-                document.getElementById('setup-form').style.display = 'block';
-                document.getElementById('task-setup').classList.add('hidden');
-                document.getElementById('main-app').classList.add('hidden');
-                document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
-                
-                alert('✅ All data cleared. Starting fresh!');
-                console.log('🗑️ All data cleared');
-            }
-        }
-
-        // Save data to localStorage
         function saveData() {
             const data = { 
                 homeData: homeData, 
-                tasks: tasks, 
-                appliances: appliances,
-                documents: documents,
-                repairRecords: repairRecords,
-                contractors: contractors,
+                tasks: tasks,
                 version: '2.0'
             };
             
@@ -3802,22 +1793,16 @@
             }
         }
 
-        // Load data from localStorage
         function loadData() {
             try {
                 const savedData = localStorage.getItem('casaCareData');
                 if (savedData) {
                     const data = JSON.parse(savedData);
                     
-                    // Restore all data
                     homeData = data.homeData || {};
                     tasks = data.tasks || [];
-                    appliances = data.appliances || [];
-                    documents = data.documents || [];
-                    repairRecords = data.repairRecords || [];
-                    contractors = data.contractors || [];
                     
-                    // Restore dates (they get stringified in JSON)
+                    // Restore dates
                     tasks.forEach(task => {
                         if (task.nextDue) task.nextDue = new Date(task.nextDue);
                         if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
@@ -3832,31 +1817,23 @@
             return false;
         }
 
-        // Check if user has existing data
         function hasExistingData() {
             return loadData() && homeData.fullAddress;
         }
 
-        // Initialize app
         function initializeApp() {
-            console.log('🏠 Casa Care merged app loaded');
+            console.log('🏠 Casa Care working version loaded');
             
-            // Try to load existing data
             if (hasExistingData()) {
-                // User has existing data - show main app
                 document.getElementById('setup-form').style.display = 'none';
                 document.getElementById('task-setup').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 
-                // Update header
                 document.getElementById('header-subtitle').textContent = homeData.fullAddress;
-                
-                // Initialize dashboard
                 updateDashboard();
                 
                 console.log('👋 Welcome back! Loaded existing home data');
             } else {
-                // New user - show setup form
                 document.getElementById('setup-form').style.display = 'block';
                 document.getElementById('task-setup').classList.add('hidden');
                 document.getElementById('main-app').classList.add('hidden');
@@ -3864,15 +1841,13 @@
             }
         }
 
-        // Start the app when page loads
+        // Initialize app
         document.addEventListener('DOMContentLoaded', initializeApp);
-        
-        // Also initialize immediately in case DOM is already loaded
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeApp);
-        } else {
+        if (document.readyState !== 'loading') {
             initializeApp();
         }
+
+        console.log('🏠 Casa Care working version script loaded successfully!');
     </script>
 </body>
 </html>
