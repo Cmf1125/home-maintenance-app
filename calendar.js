@@ -416,32 +416,9 @@ class CasaCareCalendar {
 
 // Function to reschedule a task (called from calendar)
 function rescheduleTask(taskId) {
-    const task = window.tasks.find(t => t.id === taskId);
-    if (!task) return;
-
-    const currentDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
-    const newDateStr = prompt(`Reschedule "${task.title}" to (YYYY-MM-DD):`, 
-                             currentDate.toISOString().split('T')[0]);
-    
-    if (newDateStr) {
-        const newDate = new Date(newDateStr + 'T12:00:00');
-        if (!isNaN(newDate.getTime())) {
-            task.nextDue = newDate;
-            saveData(); // Use existing saveData function
-            
-            // Refresh calendar and dashboard
-            if (window.casaCareCalendar) {
-                window.casaCareCalendar.refresh();
-            }
-            updateDashboard(); // Use existing updateDashboard function
-            
-            alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
-        } else {
-            alert('❌ Invalid date format. Please use YYYY-MM-DD format.');
-        }
-    }
+    // Use the same beautiful date picker modal as dashboard
+    rescheduleTaskFromDashboard(taskId);
 }
-
 // Initialize calendar - but wait for tasks to be loaded
 function initializeCalendar() {
     // Only initialize if calendar view exists and we have tasks
