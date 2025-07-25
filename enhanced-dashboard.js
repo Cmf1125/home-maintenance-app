@@ -1,13 +1,15 @@
-// Enhanced Dashboard functionality
+// Enhanced Dashboard functionality for Casa Care
 class EnhancedDashboard {
     constructor() {
-        this.currentFilter = 'all'; // 'all', 'overdue', 'week', 'total'
+        this.currentFilter = 'all'; // 'all', 'overdue', 'week', 'total', 'cost'
+        console.log('🎯 Enhanced Dashboard initializing...');
         this.init();
     }
 
     init() {
         this.bindEvents();
         this.render();
+        console.log('✅ Enhanced Dashboard initialized');
     }
 
     bindEvents() {
@@ -27,6 +29,8 @@ class EnhancedDashboard {
         document.getElementById('cost-card')?.addEventListener('click', () => {
             this.setFilter('cost');
         });
+
+        console.log('🎯 Dashboard events bound to stat cards');
     }
 
     setFilter(filterType) {
@@ -50,11 +54,11 @@ class EnhancedDashboard {
 
         // Update filter title
         const filterTitles = {
-            'all': 'All Tasks',
-            'overdue': 'Overdue Tasks',
-            'week': 'This Week\'s Tasks',
-            'total': 'All Active Tasks',
-            'cost': 'Tasks by Cost'
+            'all': 'Upcoming Tasks',
+            'overdue': 'Overdue Tasks ⚠️',
+            'week': 'This Week\'s Tasks 📅',
+            'total': 'All Active Tasks 📋',
+            'cost': 'Tasks by Cost 💰'
         };
 
         const titleElement = document.getElementById('tasks-list-title');
@@ -64,7 +68,10 @@ class EnhancedDashboard {
     }
 
     getFilteredTasks() {
-        if (!window.tasks) return [];
+        if (!window.tasks) {
+            console.warn('⚠️ No tasks data available');
+            return [];
+        }
 
         const now = new Date();
         const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -108,16 +115,20 @@ class EnhancedDashboard {
 
     renderFilteredTasks() {
         const tasksList = document.getElementById('tasks-list');
-        if (!tasksList) return;
+        if (!tasksList) {
+            console.error('❌ Tasks list container not found');
+            return;
+        }
 
         const filteredTasks = this.getFilteredTasks();
+        console.log(`📋 Rendering ${filteredTasks.length} filtered tasks`);
 
         if (filteredTasks.length === 0) {
             const emptyMessages = {
                 'overdue': '🎉 No overdue tasks!',
                 'week': '📅 No tasks due this week!',
                 'total': '✅ All tasks complete!',
-                'cost': '💰 No tasks with costs!',
+                'cost': '💰 No tasks found!',
                 'all': '🎉 All tasks complete!'
             };
             
@@ -156,13 +167,13 @@ class EnhancedDashboard {
             const lastDate = new Date(task.lastCompleted);
             const daysSince = Math.floor((now - lastDate) / (24 * 60 * 60 * 1000));
             lastCompletedDisplay = `<div class="text-xs text-gray-500 mt-1">
-                Last done: ${daysSince}d ago (${lastDate.toLocaleDateString()})
+                ✅ Last done: ${daysSince}d ago (${lastDate.toLocaleDateString()})
             </div>`;
         } else {
-            lastCompletedDisplay = `<div class="text-xs text-gray-500 mt-1">Never completed</div>`;
+            lastCompletedDisplay = `<div class="text-xs text-gray-500 mt-1">❌ Never completed</div>`;
         }
 
-        // Priority badge
+        // Priority badge colors
         const priorityColors = {
             'high': 'bg-red-100 text-red-700',
             'medium': 'bg-yellow-100 text-yellow-700',
@@ -170,7 +181,7 @@ class EnhancedDashboard {
         };
 
         return `
-            <div class="p-4 border-b ${statusClass}">
+            <div class="p-4 border-b ${statusClass} enhanced-task-card">
                 <div class="flex justify-between items-start">
                     <div class="flex-1 pr-3">
                         <div class="flex items-start justify-between mb-2">
@@ -179,28 +190,28 @@ class EnhancedDashboard {
                                 <p class="text-xs text-gray-600 mt-1">${task.description}</p>
                             </div>
                             <div class="ml-3 text-right text-xs">
-                                <div class="font-semibold">${taskDate.toLocaleDateString()}</div>
-                                ${dueDateDisplay}
+                                <div class="font-semibold due-date">${taskDate.toLocaleDateString()}</div>
+                                <div class="days-until">${dueDateDisplay}</div>
                             </div>
                         </div>
                         
-                        <div class="flex items-center gap-3 text-xs">
-                            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded">${task.category}</span>
-                            <span class="px-2 py-1 rounded ${priorityColors[task.priority]}">${task.priority}</span>
-                            <span class="text-green-600 font-medium">$${task.cost}</span>
-                            <span class="text-gray-500">Every ${task.frequency}d</span>
+                        <div class="task-meta-row">
+                            <span class="category-badge">${task.category}</span>
+                            <span class="priority-badge px-2 py-1 rounded ${priorityColors[task.priority]}">${task.priority}</span>
+                            <span class="text-green-600 font-medium text-xs">$${task.cost}</span>
+                            <span class="text-gray-500 text-xs">Every ${task.frequency}d</span>
                         </div>
                         
                         ${lastCompletedDisplay}
                     </div>
                     
-                    <div class="flex flex-col gap-1">
+                    <div class="task-actions">
                         <button onclick="completeTask(${task.id})" 
-                                class="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 text-xs touch-btn">
+                                class="task-action-btn task-action-complete">
                             ✅ Complete
                         </button>
                         <button onclick="rescheduleTaskFromDashboard(${task.id})" 
-                                class="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-200 text-xs touch-btn">
+                                class="task-action-btn task-action-reschedule">
                             📅 Reschedule
                         </button>
                     </div>
@@ -245,13 +256,18 @@ class EnhancedDashboard {
         document.getElementById('week-count').textContent = weekCount;
         document.getElementById('total-count').textContent = totalTasks;
         document.getElementById('annual-cost').textContent = '$' + Math.round(totalCost);
+
+        console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
     }
 }
 
 // Function to reschedule task from dashboard
 function rescheduleTaskFromDashboard(taskId) {
     const task = window.tasks.find(t => t.id === taskId);
-    if (!task) return;
+    if (!task) {
+        console.error('❌ Task not found:', taskId);
+        return;
+    }
 
     const currentDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
     const newDateStr = prompt(`Reschedule "${task.title}" to (YYYY-MM-DD):`, 
@@ -273,6 +289,7 @@ function rescheduleTaskFromDashboard(taskId) {
                 window.casaCareCalendar.refresh();
             }
             
+            console.log(`✅ Task ${task.title} rescheduled to ${newDate.toLocaleDateString()}`);
             alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
         } else {
             alert('❌ Invalid date format. Please use YYYY-MM-DD format.');
@@ -287,10 +304,38 @@ function showAllTasks() {
     }
 }
 
-// Initialize enhanced dashboard
-function initializeEnhancedDashboard() {
-    if (window.tasks && document.getElementById('tasks-list')) {
-        window.enhancedDashboard = new EnhancedDashboard();
-        console.log('✅ Enhanced dashboard initialized');
+// Function to export task list
+function exportTaskList() {
+    if (!window.tasks) {
+        alert('❌ No tasks to export');
+        return;
     }
+    
+    const filteredTasks = window.enhancedDashboard ? 
+        window.enhancedDashboard.getFilteredTasks() : 
+        window.tasks.filter(t => !t.isCompleted && t.nextDue);
+    
+    let csvContent = "Task,Description,Category,Priority,Due Date,Cost,Frequency,Last Completed\n";
+    
+    filteredTasks.forEach(task => {
+        const dueDate = task.nextDue ? new Date(task.nextDue).toLocaleDateString() : 'Not set';
+        const lastCompleted = task.lastCompleted ? new Date(task.lastCompleted).toLocaleDateString() : 'Never';
+        
+        csvContent += `"${task.title}","${task.description}","${task.category}","${task.priority}","${dueDate}","$${task.cost}","${task.frequency} days","${lastCompleted}"\n`;
+    });
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `casa_care_tasks_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    
+    console.log('📋 Task list exported');
+    alert('📋 Task list exported successfully!');
 }
+
+console.log('📋 Enhanced Dashboard script loaded');
