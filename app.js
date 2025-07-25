@@ -1118,9 +1118,50 @@ function finishTaskSetup() {
     document.getElementById('header-subtitle').textContent = homeData.fullAddress;
     
     // Initialize dashboard
-    updateDashboard();
+    showTab('dashboard');
     
     console.log('🎉 Setup complete! Welcome to Casa Care!');
+}
+
+// Tab switching functionality
+function showTab(tabName) {
+    // Hide all views
+    document.getElementById('dashboard-view').classList.add('hidden');
+    document.getElementById('calendar-view').classList.add('hidden');
+    
+    // Update tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-blue-100', 'text-blue-700');
+        btn.classList.add('text-gray-600');
+    });
+    
+    // Show selected view and update tab
+    if (tabName === 'dashboard') {
+        document.getElementById('dashboard-view').classList.remove('hidden');
+        document.getElementById('tab-dashboard').classList.add('bg-blue-100', 'text-blue-700');
+        document.getElementById('tab-dashboard').classList.remove('text-gray-600');
+        updateDashboard();
+    } else if (tabName === 'calendar') {
+        document.getElementById('calendar-view').classList.remove('hidden');
+        document.getElementById('tab-calendar').classList.add('bg-blue-100', 'text-blue-700');
+        document.getElementById('tab-calendar').classList.remove('text-gray-600');
+        
+        // Initialize calendar if not already done
+        if (!window.casaCareCalendar) {
+            // Add calendar HTML structure if not present
+            const calendarView = document.getElementById('calendar-view');
+            if (calendarView && !calendarView.hasChildNodes()) {
+                calendarView.innerHTML = '<div class="calendar-container"></div>';
+                // Calendar will be initialized by calendar.js
+                if (window.CasaCareCalendar) {
+                    window.casaCareCalendar = new CasaCareCalendar();
+                }
+            }
+        } else {
+            // Refresh calendar to show latest task data
+            window.casaCareCalendar.refresh();
+        }
+    }
 }
 
 // Task editing functions
@@ -1287,6 +1328,12 @@ function completeTask(taskId) {
         task.isCompleted = false; // Will be due again in the future
         
         updateDashboard();
+        
+        // Refresh calendar if it exists
+        if (window.casaCareCalendar) {
+            window.casaCareCalendar.refresh();
+        }
+        
         saveData();
         
         alert(`✅ Task "${task.title}" completed! Next due: ${task.nextDue.toLocaleDateString()}`);
@@ -1300,11 +1347,6 @@ function showHomeInfo() {
     } else {
         alert('🏠 No home information set yet. Complete the setup to add your home details.');
     }
-}
-
-function showTab(tabName) {
-    // Basic tab functionality - for this working version, we only have dashboard
-    updateDashboard();
 }
 
 function clearData() {
@@ -1388,13 +1430,22 @@ function hasExistingData() {
 function initializeApp() {
     console.log('🏠 Casa Care working version loaded');
     
+    // Make tasks and homeData available globally for calendar
+    window.tasks = tasks;
+    window.homeData = homeData;
+    
     if (hasExistingData()) {
         document.getElementById('setup-form').style.display = 'none';
         document.getElementById('task-setup').classList.add('hidden');
         document.getElementById('main-app').classList.remove('hidden');
         
         document.getElementById('header-subtitle').textContent = homeData.fullAddress;
-        updateDashboard();
+        
+        // Update global references
+        window.tasks = tasks;
+        window.homeData = homeData;
+        
+        showTab('dashboard');
         
         console.log('👋 Welcome back! Loaded existing home data');
     } else {
