@@ -1140,7 +1140,18 @@ function showTab(tabName) {
         document.getElementById('dashboard-view').classList.remove('hidden');
         document.getElementById('tab-dashboard').classList.add('bg-blue-100', 'text-blue-700');
         document.getElementById('tab-dashboard').classList.remove('text-gray-600');
-        updateDashboard();
+        if (tabName === 'dashboard') {
+    document.getElementById('dashboard-view').classList.remove('hidden');
+    document.getElementById('tab-dashboard').classList.add('bg-blue-100', 'text-blue-700');
+    document.getElementById('tab-dashboard').classList.remove('text-gray-600');
+    
+    // Initialize enhanced dashboard
+    if (!window.enhancedDashboard) {
+        window.enhancedDashboard = new EnhancedDashboard();
+    } else {
+        window.enhancedDashboard.render();
+    }
+}
     } else if (tabName === 'calendar') {
         document.getElementById('calendar-view').classList.remove('hidden');
         document.getElementById('tab-calendar').classList.add('bg-blue-100', 'text-blue-700');
