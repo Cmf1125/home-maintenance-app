@@ -338,4 +338,180 @@ function exportTaskList() {
     alert('📋 Task list exported successfully!');
 }
 
-console.log('📋 Enhanced Dashboard script loaded');
+console.log('📋 Enhanced Dashboard script loaded');// Date Picker Modal Functionality
+let currentRescheduleTask = null;
+
+// Enhanced reschedule function with date picker modal
+function rescheduleTaskFromDashboard(taskId) {
+    const task = window.tasks.find(t => t.id === taskId);
+    if (!task) {
+        console.error('❌ Task not found:', taskId);
+        return;
+    }
+
+    // Store the task for later use
+    currentRescheduleTask = task;
+    
+    // Show the modal with task info
+    showDatePickerModal(task);
+}
+
+function showDatePickerModal(task) {
+    const modal = document.getElementById('date-picker-modal');
+    const taskNameElement = document.getElementById('reschedule-task-name');
+    const currentDueDateElement = document.getElementById('current-due-date');
+    const newDueDateInput = document.getElementById('new-due-date');
+    
+    if (!modal || !taskNameElement || !currentDueDateElement || !newDueDateInput) {
+        console.error('❌ Date picker modal elements not found');
+        return;
+    }
+
+    // Set task info
+    taskNameElement.textContent = `"${task.title}"`;
+    
+    // Set current due date
+    const currentDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
+    currentDueDateElement.textContent = currentDate.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    // Set default new date to current due date
+    newDueDateInput.value = currentDate.toISOString().split('T')[0];
+    
+    // Show modal
+    modal.classList.remove('hidden');
+    
+    // Focus on date input
+    setTimeout(() => newDueDateInput.focus(), 100);
+    
+    console.log(`📅 Date picker opened for task: ${task.title}`);
+}
+
+function closeDatePickerModal() {
+    const modal = document.getElementById('date-picker-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    currentRescheduleTask = null;
+    console.log('📅 Date picker modal closed');
+}
+
+function setQuickDate(daysFromNow) {
+    const newDueDateInput = document.getElementById('new-due-date');
+    if (!newDueDateInput) return;
+    
+    const newDate = new Date();
+    newDate.setDate(newDate.getDate() + daysFromNow);
+    
+    newDueDateInput.value = newDate.toISOString().split('T')[0];
+    
+    // Add visual feedback
+    newDueDateInput.style.backgroundColor = '#dbeafe';
+    setTimeout(() => {
+        newDueDateInput.style.backgroundColor = '';
+    }, 300);
+    
+    console.log(`📅 Quick date set to ${daysFromNow} days from now`);
+}
+
+function confirmReschedule() {
+    if (!currentRescheduleTask) {
+        console.error('❌ No task selected for rescheduling');
+        return;
+    }
+    
+    const newDueDateInput = document.getElementById('new-due-date');
+    if (!newDueDateInput || !newDueDateInput.value) {
+        alert('❌ Please select a new due date');
+        return;
+    }
+    
+    const newDate = new Date(newDueDateInput.value + 'T12:00:00');
+    if (isNaN(newDate.getTime())) {
+        alert('❌ Invalid date selected');
+        return;
+    }
+    
+    // Check if it's in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (newDate < today) {
+        const confirmPast = confirm('⚠️ The selected date is in the past. Are you sure you want to schedule this task for a past date?');
+        if (!confirmPast) {
+            return;
+        }
+    }
+    
+    // Update the task
+    const oldDate = currentRescheduleTask.nextDue instanceof Date ? 
+        currentRescheduleTask.nextDue : new Date(currentRescheduleTask.nextDue);
+    
+    currentRescheduleTask.nextDue = newDate;
+    saveData();
+    
+    // Refresh dashboard
+    if (window.enhancedDashboard) {
+        window.enhancedDashboard.render();
+    }
+    
+    // Refresh calendar if it exists
+    if (window.casaCareCalendar) {
+        window.casaCareCalendar.refresh();
+    }
+    
+    // Close modal
+    closeDatePickerModal();
+    
+    // Show success message
+    const message = `✅ "${currentRescheduleTask.title}" rescheduled from ${oldDate.toLocaleDateString()} to ${newDate.toLocaleDateString()}`;
+    console.log(message);
+    
+    // Show a nice success notification
+    showSuccessNotification(`Task rescheduled to ${newDate.toLocaleDateString()}`);
+}
+
+function showSuccessNotification(message) {
+    // Create a temporary notification
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Slide in
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Slide out and remove after 3 seconds
+    setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', (event) => {
+    const modal = document.getElementById('date-picker-modal');
+    if (modal && event.target === modal) {
+        closeDatePickerModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        const modal = document.getElementById('date-picker-modal');
+        if (modal && !modal.classList.contains('hidden')) {
+            closeDatePickerModal();
+        }
+    }
+});
+
+console.log('📅 Date picker functionality loaded');
