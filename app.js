@@ -785,7 +785,7 @@ function updatePropertySummary() {
         <div class="space-y-1 text-sm">
             <div><strong>🏠 Address:</strong> ${homeData.fullAddress}</div>
             <div><strong>🏢 Type:</strong> ${propertyTypeDisplay[homeData.propertyType]} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString()} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt}</div>
-            <div><strong>🎯 Approach:</strong> ${homeData.approach} • <strong>🐕 Pets:</strong> ${homeData.hasPets ? 'Yes' : 'No'}</div>
+            // Removed approach and pets info
             ${heatingCooling.length > 0 ? `<div><strong>🌡️ Heating/Cooling:</strong> ${heatingCooling.join(', ')}</div>` : ''}
             ${waterSewer.length > 0 ? `<div><strong>💧 Water/Sewer:</strong> ${waterSewer.join(', ')}</div>` : ''}
             ${otherFeatures.length > 0 ? `<div><strong>⚙️ Other Features:</strong> ${otherFeatures.join(', ')}</div>` : ''}
@@ -1077,13 +1077,7 @@ function goBackToHomeSetup() {
     }
     
     // Set radio buttons and select
-    if (homeData.hasPets !== undefined) {
-        document.querySelector(`input[name="pets"][value="${homeData.hasPets ? 'yes' : 'no'}"]`).checked = true;
-    }
-    if (homeData.approach) {
-        document.getElementById('approach').value = homeData.approach;
-    }
-}
+   // Radio buttons and approach dropdown removed - no longer needed}
 
 function finishTaskSetup() {
     console.log('🚀 Finishing task setup...');
