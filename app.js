@@ -1478,7 +1478,248 @@ function initializeApp() {
     console.log('✅ Casa Care SIMPLIFIED VERSION initialized successfully!');
 }
 
-// Make critical functions globally available
+// FIXED: Add missing functions for task setup and proper modals
+
+// Missing function: Edit task from setup
+function editTaskFromSetup(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) {
+        console.error('❌ Task not found:', taskId);
+        return;
+    }
+    
+    // Open the task edit modal
+    openTaskEditModal(task);
+}
+
+// Missing function: Delete task directly
+function deleteTaskDirect(taskId) {
+    if (confirm('Are you sure you want to delete this task?')) {
+        const taskIndex = tasks.findIndex(t => t.id === taskId);
+        if (taskIndex > -1) {
+            const deletedTask = tasks.splice(taskIndex, 1)[0];
+            console.log(`🗑️ Deleted task: ${deletedTask.title}`);
+            
+            // Update global reference
+            window.tasks = tasks;
+            
+            // Re-render task categories
+            renderTaskCategories();
+            
+            alert(`✅ Task "${deletedTask.title}" deleted successfully!`);
+        }
+    }
+}
+
+// NEW: Open task edit modal (UPDATED with category support)
+function openTaskEditModal(task, isNewTask = false) {
+    const modal = document.getElementById('task-edit-modal');
+    if (!modal) {
+        console.error('❌ Task edit modal not found');
+        return;
+    }
+    
+    // Store current editing task
+    currentEditingTask = task;
+    
+    // Update modal title
+    const modalTitle = document.getElementById('task-edit-title');
+    if (modalTitle) {
+        modalTitle.textContent = isNewTask ? 'Add New Task' : 'Edit Task';
+    }
+    
+    // Fill form fields
+    document.getElementById('edit-task-name').value = task.title || '';
+    document.getElementById('edit-task-description').value = task.description || '';
+    document.getElementById('edit-task-cost').value = task.cost || 0;
+    document.getElementById('edit-task-frequency').value = task.frequency || 365;
+    document.getElementById('edit-task-priority').value = task.priority || 'medium';
+    
+    // Handle category if field exists
+    const categoryField = document.getElementById('edit-task-category');
+    if (categoryField) {
+        categoryField.value = task.category || 'General';
+    }
+    
+    // Handle due date
+    const dueDateInput = document.getElementById('edit-task-due-date');
+    if (dueDateInput) {
+        if (task.dueDate) {
+            const dueDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+            dueDateInput.value = dueDate.toISOString().split('T')[0];
+        } else {
+            dueDateInput.value = new Date().toISOString().split('T')[0];
+        }
+    }
+    
+    // Show/hide delete button
+    const deleteButton = modal.querySelector('[onclick="deleteTaskFromEdit()"]');
+    if (deleteButton) {
+        deleteButton.style.display = isNewTask ? 'none' : 'block';
+    }
+    
+    // Show modal
+    modal.classList.remove('hidden');
+    
+    // Focus on task name
+    setTimeout(() => document.getElementById('edit-task-name').focus(), 100);
+}
+
+// NEW: Close task edit modal
+function closeTaskEditModal() {
+    const modal = document.getElementById('task-edit-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    currentEditingTask = null;
+}
+
+// NEW: Save task from edit modal (UPDATED with category support)
+function saveTaskFromEdit() {
+    if (!currentEditingTask) {
+        console.error('❌ No task being edited');
+        return;
+    }
+    
+    // Get form values
+    const title = document.getElementById('edit-task-name').value.trim();
+    const description = document.getElementById('edit-task-description').value.trim();
+    const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
+    const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
+    const priority = document.getElementById('edit-task-priority').value;
+    const category = document.getElementById('edit-task-category')?.value || 'General';
+    const dueDateInput = document.getElementById('edit-task-due-date');
+    
+    // Validate inputs
+    if (!title) {
+        alert('❌ Task name is required');
+        document.getElementById('edit-task-name').focus();
+        return;
+    }
+    
+    if (!description) {
+        alert('❌ Task description is required');
+        document.getElementById('edit-task-description').focus();
+        return;
+    }
+    
+    if (frequency <= 0) {
+        alert('❌ Frequency must be greater than 0');
+        document.getElementById('edit-task-frequency').focus();
+        return;
+    }
+    
+    if (!['high', 'medium', 'low'].includes(priority)) {
+        alert('❌ Invalid priority');
+        return;
+    }
+    
+    // Handle due date
+    let dueDate;
+    if (dueDateInput && dueDateInput.value) {
+        dueDate = new Date(dueDateInput.value + 'T12:00:00');
+        if (isNaN(dueDate.getTime())) {
+            alert('❌ Invalid due date');
+            dueDateInput.focus();
+            return;
+        }
+    } else {
+        alert('❌ Due date is required');
+        if (dueDateInput) dueDateInput.focus();
+        return;
+    }
+    
+    // Update task
+    const isNewTask = !tasks.find(t => t.id === currentEditingTask.id);
+    
+    currentEditingTask.title = title;
+    currentEditingTask.description = description;
+    currentEditingTask.cost = cost;
+    currentEditingTask.frequency = frequency;
+    currentEditingTask.priority = priority;
+    currentEditingTask.category = category;
+    currentEditingTask.dueDate = dueDate;
+    
+    if (isNewTask) {
+        // Add to tasks array
+        tasks.push(currentEditingTask);
+        console.log('✅ New task added:', currentEditingTask);
+    } else {
+        console.log('✅ Task updated:', currentEditingTask);
+    }
+    
+    // Update global reference
+    window.tasks = tasks;
+    
+    // Save data if we're in the main app
+    if (!document.getElementById('main-app').classList.contains('hidden')) {
+        saveData();
+        
+        // Refresh dashboard
+        if (window.enhancedDashboard) {
+            window.enhancedDashboard.render();
+        } else {
+            updateDashboard();
+        }
+        
+        // Refresh calendar
+        if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+            window.casaCareCalendar.refresh();
+        }
+    } else {
+        // We're in task setup, re-render categories
+        renderTaskCategories();
+    }
+    
+    // Close modal
+    closeTaskEditModal();
+    
+    alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
+}
+
+// NEW: Delete task from edit modal
+function deleteTaskFromEdit() {
+    if (!currentEditingTask) {
+        console.error('❌ No task being edited');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to delete "${currentEditingTask.title}"?`)) {
+        const taskIndex = tasks.findIndex(t => t.id === currentEditingTask.id);
+        if (taskIndex > -1) {
+            const deletedTask = tasks.splice(taskIndex, 1)[0];
+            console.log(`🗑️ Deleted task: ${deletedTask.title}`);
+            
+            // Update global reference
+            window.tasks = tasks;
+            
+            // Save data if we're in the main app
+            if (!document.getElementById('main-app').classList.contains('hidden')) {
+                saveData();
+                
+                // Refresh dashboard
+                if (window.enhancedDashboard) {
+                    window.enhancedDashboard.render();
+                } else {
+                    updateDashboard();
+                }
+                
+                // Refresh calendar
+                if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+                    window.casaCareCalendar.refresh();
+                }
+            } else {
+                // We're in task setup, re-render categories
+                renderTaskCategories();
+            }
+            
+            // Close modal
+            closeTaskEditModal();
+            
+            alert(`✅ Task "${deletedTask.title}" deleted successfully!`);
+        }
+    }
+}
 window.createMaintenancePlan = createMaintenancePlan;
 window.finishTaskSetup = finishTaskSetup;
 window.goBackToHomeSetup = goBackToHomeSetup;
