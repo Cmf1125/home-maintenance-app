@@ -758,6 +758,478 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 1000); // Wait 1 second for all scripts to load completely
 });
 </script>
+    <!-- MODAL FUNCTION OVERRIDE SCRIPT - Add this LAST, after ALL other scripts -->
+<script>
+// DEFINITIVE MODAL FUNCTION OVERRIDE
+// This script FORCES the modal-based functions to be used instead of prompt-based ones
+
+console.log('🔧 MODAL OVERRIDE: Force loading modal-based functions...');
+
+// FORCE OVERRIDE: Dashboard Add Task (NO PROMPTS!)
+window.addTaskFromDashboard = function() {
+    console.log('➕ MODAL VERSION: Adding new task from dashboard...');
+    
+    // Find next available ID
+    const maxId = Math.max(...window.tasks.map(t => t.id), 0);
+    
+    // Create new task object
+    const newTask = {
+        id: maxId + 1,
+        title: '',
+        description: '',
+        category: 'General',
+        frequency: 365,
+        cost: 0,
+        priority: 'medium',
+        dueDate: new Date(),
+        lastCompleted: null,
+        isCompleted: false
+    };
+    
+    // CRITICAL: Set as current editing task
+    window.currentEditingTask = newTask;
+    console.log('✅ Current editing task set:', newTask);
+    
+    // Open modal directly
+    const modal = document.getElementById('task-edit-modal');
+    if (modal) {
+        console.log('✅ Opening task modal for dashboard add');
+        
+        // Fill modal fields for new task
+        document.getElementById('edit-task-name').value = '';
+        document.getElementById('edit-task-description').value = '';
+        document.getElementById('edit-task-cost').value = 0;
+        document.getElementById('edit-task-frequency').value = 365;
+        document.getElementById('edit-task-priority').value = 'medium';
+        
+        // Handle category if field exists
+        const categoryField = document.getElementById('edit-task-category');
+        if (categoryField) {
+            categoryField.value = 'General';
+        }
+        
+        // Handle due date
+        const dueDateInput = document.getElementById('edit-task-due-date');
+        if (dueDateInput) {
+            dueDateInput.value = new Date().toISOString().split('T')[0];
+        }
+        
+        // Update modal title
+        const modalTitle = document.getElementById('task-edit-title');
+        if (modalTitle) {
+            modalTitle.textContent = 'Add New Task';
+        }
+        
+        // Hide delete button for new task
+        const deleteButton = modal.querySelector('[onclick="deleteTaskFromEdit()"]');
+        if (deleteButton) {
+            deleteButton.style.display = 'none';
+        }
+        
+        // Show modal
+        modal.classList.remove('hidden');
+        
+        // Focus on task name
+        setTimeout(() => document.getElementById('edit-task-name').focus(), 100);
+        
+        console.log('✅ MODAL VERSION: Add task modal opened');
+    } else {
+        console.error('❌ Task edit modal not found');
+        alert('❌ Task edit modal not found. Please check your HTML.');
+    }
+};
+
+// FORCE OVERRIDE: Dashboard Edit Task (NO PROMPTS!)
+window.editTaskFromDashboard = function(taskId) {
+    console.log('✏️ MODAL VERSION: Editing task from dashboard:', taskId);
+    
+    const task = window.tasks.find(t => t.id === taskId);
+    if (!task) {
+        console.error('❌ Task not found:', taskId);
+        alert('❌ Task not found');
+        return;
+    }
+
+    // CRITICAL: Set as current editing task
+    window.currentEditingTask = task;
+    console.log('✅ Current editing task set:', task);
+
+    // Open modal directly
+    const modal = document.getElementById('task-edit-modal');
+    if (modal) {
+        console.log('✅ Opening task modal for dashboard edit');
+        
+        // Fill modal fields
+        document.getElementById('edit-task-name').value = task.title || '';
+        document.getElementById('edit-task-description').value = task.description || '';
+        document.getElementById('edit-task-cost').value = task.cost || 0;
+        document.getElementById('edit-task-frequency').value = task.frequency || 365;
+        document.getElementById('edit-task-priority').value = task.priority || 'medium';
+        
+        // Handle category if field exists
+        const categoryField = document.getElementById('edit-task-category');
+        if (categoryField) {
+            categoryField.value = task.category || 'General';
+        }
+        
+        // Handle due date
+        const dueDateInput = document.getElementById('edit-task-due-date');
+        if (dueDateInput) {
+            if (task.dueDate) {
+                const dueDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+                dueDateInput.value = dueDate.toISOString().split('T')[0];
+            } else {
+                dueDateInput.value = new Date().toISOString().split('T')[0];
+            }
+        }
+        
+        // Update modal title
+        const modalTitle = document.getElementById('task-edit-title');
+        if (modalTitle) {
+            modalTitle.textContent = 'Edit Task';
+        }
+        
+        // Show delete button
+        const deleteButton = modal.querySelector('[onclick="deleteTaskFromEdit()"]');
+        if (deleteButton) {
+            deleteButton.style.display = 'block';
+        }
+        
+        // Show modal
+        modal.classList.remove('hidden');
+        
+        // Focus on task name
+        setTimeout(() => document.getElementById('edit-task-name').focus(), 100);
+        
+        console.log('✅ MODAL VERSION: Edit task modal opened');
+    } else {
+        console.error('❌ Task edit modal not found');
+        alert('❌ Task edit modal not found. Please check your HTML.');
+    }
+};
+
+// FORCE OVERRIDE: Save Task Function
+window.saveTaskFromEdit = function() {
+    console.log('💾 MODAL VERSION: Saving task from edit modal...');
+    
+    if (!window.currentEditingTask) {
+        console.error('❌ No task being edited');
+        alert('❌ No task selected for editing');
+        return;
+    }
+    
+    // Get form values
+    const title = document.getElementById('edit-task-name').value.trim();
+    const description = document.getElementById('edit-task-description').value.trim();
+    const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
+    const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
+    const priority = document.getElementById('edit-task-priority').value;
+    const category = document.getElementById('edit-task-category')?.value || 'General';
+    const dueDateInput = document.getElementById('edit-task-due-date');
+    
+    console.log('📝 Form values:', { title, description, cost, frequency, priority, category });
+    
+    // Validate inputs
+    if (!title) {
+        alert('❌ Task name is required');
+        document.getElementById('edit-task-name').focus();
+        return;
+    }
+    
+    if (!description) {
+        alert('❌ Task description is required');
+        document.getElementById('edit-task-description').focus();
+        return;
+    }
+    
+    if (frequency <= 0) {
+        alert('❌ Frequency must be greater than 0');
+        document.getElementById('edit-task-frequency').focus();
+        return;
+    }
+    
+    // Handle due date
+    let dueDate;
+    if (dueDateInput && dueDateInput.value) {
+        dueDate = new Date(dueDateInput.value + 'T12:00:00');
+        if (isNaN(dueDate.getTime())) {
+            alert('❌ Invalid due date');
+            dueDateInput.focus();
+            return;
+        }
+    } else {
+        dueDate = new Date();
+    }
+    
+    // Check if this is a new task
+    const isNewTask = !window.tasks.find(t => t.id === window.currentEditingTask.id);
+    console.log('🆕 Is new task:', isNewTask);
+    
+    // Update task properties
+    window.currentEditingTask.title = title;
+    window.currentEditingTask.description = description;
+    window.currentEditingTask.cost = cost;
+    window.currentEditingTask.frequency = frequency;
+    window.currentEditingTask.priority = priority;
+    window.currentEditingTask.category = category;
+    window.currentEditingTask.dueDate = dueDate;
+    window.currentEditingTask.nextDue = dueDate; // Calendar compatibility
+    
+    if (isNewTask) {
+        // Add to tasks array
+        window.tasks.push(window.currentEditingTask);
+        console.log('✅ New task added to global array');
+    } else {
+        console.log('✅ Existing task updated');
+    }
+    
+    // Save and refresh
+    try {
+        // Save data
+        if (typeof window.saveData === 'function') {
+            window.saveData();
+        } else if (typeof saveData === 'function') {
+            saveData();
+        }
+        console.log('💾 Data saved');
+        
+        // Refresh dashboard
+        if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
+            window.enhancedDashboard.render();
+            console.log('🔄 Enhanced dashboard refreshed');
+        } else if (typeof updateDashboard === 'function') {
+            updateDashboard();
+            console.log('🔄 Basic dashboard updated');
+        }
+        
+        // Refresh calendar if available
+        if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+            window.casaCareCalendar.refresh();
+            console.log('📅 Calendar refreshed');
+        }
+        
+        // Also try to refresh task categories if in setup
+        if (typeof renderTaskCategories === 'function') {
+            const taskSetup = document.getElementById('task-setup');
+            if (taskSetup && !taskSetup.classList.contains('hidden')) {
+                renderTaskCategories();
+                console.log('📋 Task categories re-rendered');
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Error during save/refresh:', error);
+    }
+    
+    // Close modal
+    window.closeTaskEditModal();
+    
+    alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
+};
+
+// FORCE OVERRIDE: Close Modal Function
+window.closeTaskEditModal = function() {
+    const modal = document.getElementById('task-edit-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    window.currentEditingTask = null;
+    console.log('✅ MODAL VERSION: Task edit modal closed');
+};
+
+// FORCE OVERRIDE: Delete Task Function
+window.deleteTaskFromEdit = function() {
+    if (!window.currentEditingTask) {
+        console.error('❌ No task being edited');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to delete "${window.currentEditingTask.title}"?`)) {
+        const taskIndex = window.tasks.findIndex(t => t.id === window.currentEditingTask.id);
+        if (taskIndex > -1) {
+            const deletedTask = window.tasks.splice(taskIndex, 1)[0];
+            console.log(`🗑️ Deleted task: ${deletedTask.title}`);
+            
+            // Save data
+            if (typeof window.saveData === 'function') {
+                window.saveData();
+            } else if (typeof saveData === 'function') {
+                saveData();
+            }
+            
+            // Refresh dashboard
+            if (window.enhancedDashboard) {
+                window.enhancedDashboard.render();
+            }
+            
+            // Refresh calendar if it exists
+            if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+                window.casaCareCalendar.refresh();
+            }
+            
+            // Also refresh task categories if in setup
+            if (typeof renderTaskCategories === 'function') {
+                const taskSetup = document.getElementById('task-setup');
+                if (taskSetup && !taskSetup.classList.contains('hidden')) {
+                    renderTaskCategories();
+                }
+            }
+            
+            // Close modal
+            window.closeTaskEditModal();
+            
+            alert(`✅ Task "${deletedTask.title}" deleted successfully!`);
+        }
+    }
+};
+
+// FORCE OVERRIDE: Reschedule function to use date picker modal
+window.rescheduleTaskFromDashboard = function(taskId) {
+    console.log('📅 MODAL VERSION: Rescheduling task:', taskId);
+    
+    const task = window.tasks.find(t => t.id === taskId);
+    if (!task) {
+        console.error('❌ Task not found:', taskId);
+        return;
+    }
+
+    // Store the task for the date picker modal
+    window.currentRescheduleTask = task;
+    
+    // Try to use the date picker modal
+    const datePickerModal = document.getElementById('date-picker-modal');
+    const taskNameElement = document.getElementById('reschedule-task-name');
+    const currentDueDateElement = document.getElementById('current-due-date');
+    const newDueDateInput = document.getElementById('new-due-date');
+    
+    if (datePickerModal && taskNameElement && currentDueDateElement && newDueDateInput) {
+        console.log('✅ Using date picker modal');
+        
+        // Set task info
+        taskNameElement.textContent = `"${task.title}"`;
+        
+        // Set current due date
+        const currentDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+        currentDueDateElement.textContent = currentDate.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        // Set default new date to current due date
+        newDueDateInput.value = currentDate.toISOString().split('T')[0];
+        
+        // Show modal
+        datePickerModal.classList.remove('hidden');
+        
+        // Focus on date input
+        setTimeout(() => newDueDateInput.focus(), 100);
+        
+        console.log(`📅 MODAL VERSION: Date picker opened for task: ${task.title}`);
+    } else {
+        console.warn('⚠️ Date picker modal elements not found');
+        alert('❌ Date picker modal not available. Please check your HTML.');
+    }
+};
+
+// Override confirmReschedule to work with our system
+window.confirmReschedule = function() {
+    if (!window.currentRescheduleTask) {
+        console.error('❌ No task selected for rescheduling');
+        return;
+    }
+    
+    const newDueDateInput = document.getElementById('new-due-date');
+    if (!newDueDateInput || !newDueDateInput.value) {
+        alert('❌ Please select a new due date');
+        return;
+    }
+    
+    const newDate = new Date(newDueDateInput.value + 'T12:00:00');
+    if (isNaN(newDate.getTime())) {
+        alert('❌ Invalid date selected');
+        return;
+    }
+    
+    // Update the task
+    const oldDate = window.currentRescheduleTask.dueDate instanceof Date ? 
+        window.currentRescheduleTask.dueDate : new Date(window.currentRescheduleTask.dueDate);
+    
+    window.currentRescheduleTask.dueDate = newDate;
+    window.currentRescheduleTask.nextDue = newDate;
+    
+    // Save data
+    if (typeof window.saveData === 'function') {
+        window.saveData();
+    } else if (typeof saveData === 'function') {
+        saveData();
+    }
+    
+    // Refresh everything
+    if (window.enhancedDashboard) {
+        window.enhancedDashboard.render();
+    }
+    
+    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+        window.casaCareCalendar.refresh();
+    }
+    
+    // Close modal
+    window.closeDatePickerModal();
+    
+    console.log(`✅ Task rescheduled from ${oldDate.toLocaleDateString()} to ${newDate.toLocaleDateString()}`);
+    alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
+};
+
+// Override closeDatePickerModal
+window.closeDatePickerModal = function() {
+    const modal = document.getElementById('date-picker-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    window.currentRescheduleTask = null;
+    console.log('📅 Date picker modal closed');
+};
+
+// Override setQuickDate
+window.setQuickDate = function(daysFromNow) {
+    const newDueDateInput = document.getElementById('new-due-date');
+    if (!newDueDateInput) return;
+    
+    const newDate = new Date();
+    newDate.setDate(newDate.getDate() + daysFromNow);
+    
+    newDueDateInput.value = newDate.toISOString().split('T')[0];
+    
+    // Add visual feedback
+    newDueDateInput.style.backgroundColor = '#dbeafe';
+    setTimeout(() => {
+        newDueDateInput.style.backgroundColor = '';
+    }, 300);
+    
+    console.log(`📅 Quick date set to ${daysFromNow} days from now`);
+};
+
+console.log('✅ MODAL OVERRIDE: All functions have been force-overridden to use modals!');
+
+// Test function to verify override
+window.testModalOverride = function() {
+    console.log('🧪 TESTING MODAL OVERRIDE:');
+    const functions = ['addTaskFromDashboard', 'editTaskFromDashboard', 'rescheduleTaskFromDashboard'];
+    functions.forEach(funcName => {
+        const func = window[funcName];
+        if (func) {
+            const funcStr = func.toString();
+            const usesPrompt = funcStr.includes('prompt(');
+            const usesModal = funcStr.includes('task-edit-modal') || funcStr.includes('modal.classList');
+            console.log(`  ${funcName}: ${usesModal ? '✅ MODAL' : usesPrompt ? '❌ PROMPT' : '❓ UNKNOWN'}`);
+        }
+    });
+};
+
+console.log('💡 Run testModalOverride() to verify all functions use modals now');
+</script>
    
 </body>
 </html>
