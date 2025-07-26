@@ -344,30 +344,39 @@ function rescheduleTaskFromDashboard(taskId) {
         return;
     }
 
-    const currentDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
-    const newDateStr = prompt(`Reschedule "${task.title}" to (YYYY-MM-DD):`, 
-                             currentDate.toISOString().split('T')[0]);
+    // Store the task for the date picker modal
+    window.currentRescheduleTask = task;
     
-    if (newDateStr) {
-        const newDate = new Date(newDateStr + 'T12:00:00');
-        if (!isNaN(newDate.getTime())) {
-            task.dueDate = newDate;
-            saveData();
-            
-            // Refresh dashboard
-            if (window.enhancedDashboard) {
-                window.enhancedDashboard.render();
+    // Show the date picker modal if available, otherwise use prompt
+    if (typeof showDatePickerModal === 'function') {
+        showDatePickerModal(task);
+    } else {
+        // Fallback to simple prompt
+        const currentDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+        const newDateStr = prompt(`Reschedule "${task.title}" to (YYYY-MM-DD):`, 
+                                 currentDate.toISOString().split('T')[0]);
+        
+        if (newDateStr) {
+            const newDate = new Date(newDateStr + 'T12:00:00');
+            if (!isNaN(newDate.getTime())) {
+                task.dueDate = newDate;
+                saveData();
+                
+                // Refresh dashboard
+                if (window.enhancedDashboard) {
+                    window.enhancedDashboard.render();
+                }
+                
+                // Refresh calendar if it exists
+                if (window.casaCareCalendar) {
+                    window.casaCareCalendar.refresh();
+                }
+                
+                console.log(`✅ Task ${task.title} rescheduled to ${newDate.toLocaleDateString()}`);
+                alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
+            } else {
+                alert('❌ Invalid date format. Please use YYYY-MM-DD format.');
             }
-            
-            // Refresh calendar if it exists
-            if (window.casaCareCalendar) {
-                window.casaCareCalendar.refresh();
-            }
-            
-            console.log(`✅ Task ${task.title} rescheduled to ${newDate.toLocaleDateString()}`);
-            alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
-        } else {
-            alert('❌ Invalid date format. Please use YYYY-MM-DD format.');
         }
     }
 }
@@ -474,10 +483,120 @@ function exportTaskList() {
     alert('📋 Task list exported successfully!');
 }
 
+// FIXED: Date picker modal functions for new date system
+function closeDatePickerModal() {
+    const modal = document.getElementById('date-picker-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    window.currentRescheduleTask = null;
+    console.log('📅 Date picker modal closed');
+}
+
+function setQuickDate(daysFromNow) {
+    const newDueDateInput = document.getElementById('new-due-date');
+    if (!newDueDateInput) return;
+    
+    const newDate = new Date();
+    newDate.setDate(newDate.getDate() + daysFromNow);
+    
+    newDueDateInput.value = newDate.toISOString().split('T')[0];
+    
+    // Add visual feedback
+    newDueDateInput.style.backgroundColor = '#dbeafe';
+    setTimeout(() => {
+        newDueDateInput.style.backgroundColor = '';
+    }, 300);
+    
+    console.log(`📅 Quick date set to ${daysFromNow} days from now`);
+}
+
+function confirmReschedule() {
+    if (!window.currentRescheduleTask) {
+        console.error('❌ No task selected for rescheduling');
+        return;
+    }
+    
+    const newDueDateInput = document.getElementById('new-due-date');
+    if (!newDueDateInput || !newDueDateInput.value) {
+        alert('❌ Please select a new due date');
+        return;
+    }
+    
+    const newDate = new Date(newDueDateInput.value + 'T12:00:00');
+    if (isNaN(newDate.getTime())) {
+        alert('❌ Invalid date selected');
+        return;
+    }
+    
+    // Check if it's in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (newDate < today) {
+        const confirmPast = confirm('⚠️ The selected date is in the past. Are you sure you want to schedule this task for a past date?');
+        if (!confirmPast) {
+            return;
+        }
+    }
+    
+    // Update the task
+    const oldDate = window.currentRescheduleTask.dueDate instanceof Date ? 
+        window.currentRescheduleTask.dueDate : new Date(window.currentRescheduleTask.dueDate);
+    
+    window.currentRescheduleTask.dueDate = newDate;
+    saveData();
+    
+    // Refresh dashboard
+    if (window.enhancedDashboard) {
+        window.enhancedDashboard.render();
+    }
+    
+    // Refresh calendar if it exists
+    if (window.casaCareCalendar) {
+        window.casaCareCalendar.refresh();
+    }
+    
+    // Close modal
+    closeDatePickerModal();
+    
+    // Show success message
+    const message = `✅ "${window.currentRescheduleTask.title}" rescheduled from ${oldDate.toLocaleDateString()} to ${newDate.toLocaleDateString()}`;
+    console.log(message);
+    
+    // Show a nice success notification
+    showSuccessNotification(`Task rescheduled to ${newDate.toLocaleDateString()}`);
+}
+
+function showSuccessNotification(message) {
+    // Create a temporary notification
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Slide in
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Slide out and remove after 3 seconds
+    setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
 // Make functions globally available
 window.editTaskFromDashboard = editTaskFromDashboard;
 window.rescheduleTaskFromDashboard = rescheduleTaskFromDashboard;
 window.addTaskFromDashboard = addTaskFromDashboard;
 window.exportTaskList = exportTaskList;
+window.closeDatePickerModal = closeDatePickerModal;
+window.setQuickDate = setQuickDate;
+window.confirmReschedule = confirmReschedule;
+window.showSuccessNotification = showSuccessNotification;
 
 console.log('📋 Enhanced Dashboard script loaded with simplified date system');
