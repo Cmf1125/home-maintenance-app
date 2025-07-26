@@ -939,18 +939,25 @@ function getSuggestedStartDate(task) {
 
 function getNextDueFromStart(startDateStr, frequency) {
     if (!startDateStr) return '';
+    // The first due date IS the start date, not start date + frequency
     const startDate = new Date(startDateStr);
-    const nextDue = new Date(startDate.getTime() + frequency * 24 * 60 * 60 * 1000);
-    return nextDue.toLocaleDateString();
+    return startDate.toLocaleDateString();
 }
 
 function updateTaskStartDate(taskId, startDateStr) {
+    console.log(`🔄 Updating start date for task ${taskId} to: ${startDateStr}`);
+    
     const task = tasks.find(t => t.id === taskId);
     if (task && startDateStr) {
         const nextDueElement = document.getElementById(`next-due-${taskId}`);
         if (nextDueElement) {
-            nextDueElement.value = getNextDueFromStart(startDateStr, task.frequency);
+            // For preview purposes, the "next due" should show the start date (since that's when it's first due)
+            const startDate = new Date(startDateStr);
+            nextDueElement.value = startDate.toLocaleDateString();
+            console.log(`  📅 Preview updated to show: ${startDate.toLocaleDateString()}`);
         }
+    } else {
+        console.warn(`  ⚠️ Could not update task ${taskId}: task=${!!task}, startDate="${startDateStr}"`);
     }
 }
 
@@ -1003,19 +1010,23 @@ function finishTaskSetup() {
             try {
                 console.log(`⚙️ Processing task: ${task.title}`);
                 
-                // Get the start date input
+                // Get the start date input with enhanced debugging
                 const startDateInput = document.getElementById(`start-date-${task.id}`);
+                console.log(`  🔍 Input element found: ${!!startDateInput}, Value: "${startDateInput?.value}"`);
+                
                 let startDate;
                 
                 if (startDateInput && startDateInput.value) {
                     // Use the user-selected date
                     startDate = new Date(startDateInput.value + 'T12:00:00');
-                    console.log(`  📅 Custom start date: ${startDate.toLocaleDateString()}`);
+                    console.log(`  📅 Using CUSTOM start date: ${startDate.toLocaleDateString()}`);
+                    console.log(`  📅 Raw input value: "${startDateInput.value}"`);
                 } else {
                     // Use suggested default date
                     const suggestedDate = getSuggestedStartDate(task);
                     startDate = new Date(suggestedDate + 'T12:00:00');
-                    console.log(`  📅 Default start date: ${startDate.toLocaleDateString()}`);
+                    console.log(`  📅 Using DEFAULT start date: ${startDate.toLocaleDateString()}`);
+                    console.log(`  ⚠️ No custom date found, using suggested: ${suggestedDate}`);
                 }
                 
                 // Validate the date
@@ -1023,15 +1034,16 @@ function finishTaskSetup() {
                     throw new Error(`Invalid start date for task ${task.title}`);
                 }
                 
-                // Calculate next due date by adding frequency days
-                task.nextDue = new Date(startDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
+                // CRITICAL FIX: The start date IS the due date, not start date + frequency
+                task.nextDue = new Date(startDate.getTime());
                 
                 // Clean up template flag
                 delete task.isTemplate;
                 task.isCompleted = false;
                 task.lastCompleted = null;
                 
-                console.log(`  ✅ Due date set: ${task.nextDue.toLocaleDateString()}`);
+                console.log(`  ✅ FINAL: Task "${task.title}" due: ${task.nextDue.toLocaleDateString()}`);
+                console.log(`  ⏰ Next occurrence will be: ${new Date(task.nextDue.getTime() + task.frequency * 24 * 60 * 60 * 1000).toLocaleDateString()}`);
                 successCount++;
                 
             } catch (error) {
@@ -1045,6 +1057,12 @@ function finishTaskSetup() {
     
     // Verify we have tasks with due dates
     const tasksWithDates = tasks.filter(t => t.nextDue);
+    
+    // Detailed verification logging
+    console.log('\n📋 FINAL TASK VERIFICATION:');
+    tasksWithDates.forEach(task => {
+        console.log(`  • "${task.title}" → Due: ${task.nextDue.toLocaleDateString()}`);
+    });
     console.log(`📊 Final verification: ${tasksWithDates.length} tasks have due dates`);
     
     if (tasksWithDates.length === 0) {
@@ -1239,11 +1257,18 @@ function completeTask(taskId) {
     
     const task = tasks.find(t => t.id === taskId);
     if (task) {
+        const oldDueDate = task.nextDue ? new Date(task.nextDue) : new Date();
+        
         task.lastCompleted = new Date();
+        
+        // Calculate next due date from today + frequency (not from old due date)
         task.nextDue = new Date(Date.now() + task.frequency * 24 * 60 * 60 * 1000);
         task.isCompleted = false; // Will be due again in the future
         
-        console.log(`📅 Task "${task.title}" completed! Next due: ${task.nextDue.toLocaleDateString()}`);
+        console.log(`📅 Task "${task.title}" completed!`);
+        console.log(`  Old due date: ${oldDueDate.toLocaleDateString()}`);
+        console.log(`  Next due date: ${task.nextDue.toLocaleDateString()}`);
+        console.log(`  Frequency: ${task.frequency} days`);
         
         // Save data
         saveData();
@@ -1263,7 +1288,7 @@ function completeTask(taskId) {
             window.casaCareCalendar.refresh();
         }
         
-        alert(`✅ Task "${task.title}" completed! Next due: ${task.nextDue.toLocaleDateString()}`);
+        alert(`✅ Task "${task.title}" completed!\nNext due: ${task.nextDue.toLocaleDateString()}`);
     } else {
         console.error('❌ Task not found:', taskId);
     }
@@ -1406,6 +1431,64 @@ window.completeTask = completeTask;
 window.showHomeInfo = showHomeInfo;
 window.clearData = clearData;
 window.exportData = exportData;
+
+// DEBUGGING FUNCTION - Call from console: debugTaskDates()
+window.debugTaskDates = function() {
+    console.log('🔍 DEBUGGING TASK DATES:');
+    console.log(`Total tasks: ${window.tasks ? window.tasks.length : 'No tasks'}`);
+    
+    if (window.tasks) {
+        window.tasks.forEach(task => {
+            const dueDateStr = task.nextDue ? new Date(task.nextDue).toLocaleDateString() : 'No due date';
+            const isOverdue = task.nextDue ? new Date(task.nextDue) < new Date() : false;
+            console.log(`  • "${task.title}": ${dueDateStr} ${isOverdue ? '(OVERDUE)' : ''}`);
+        });
+    }
+    
+    // Check if start date inputs still exist
+    console.log('\n🔍 CHECKING START DATE INPUTS:');
+    if (window.tasks) {
+        window.tasks.forEach(task => {
+            const input = document.getElementById(`start-date-${task.id}`);
+            if (input) {
+                console.log(`  • Task ${task.id} input: "${input.value}"`);
+            }
+        });
+    }
+};
+
+// DEBUGGING FUNCTION - Call to test current input values: testDateCapture()
+window.testDateCapture = function() {
+    console.log('🧪 TESTING DATE CAPTURE FROM INPUTS:');
+    
+    if (!window.tasks) {
+        console.log('❌ No tasks available for testing');
+        return;
+    }
+    
+    window.tasks.forEach(task => {
+        if (task.isTemplate) {
+            const input = document.getElementById(`start-date-${task.id}`);
+            if (input) {
+                console.log(`📝 Task: "${task.title}"`);
+                console.log(`  Input ID: start-date-${task.id}`);
+                console.log(`  Input Value: "${input.value}"`);
+                console.log(`  Input Type: ${input.type}`);
+                
+                if (input.value) {
+                    const testDate = new Date(input.value + 'T12:00:00');
+                    console.log(`  Parsed Date: ${testDate.toLocaleDateString()}`);
+                    console.log(`  Is Valid: ${!isNaN(testDate.getTime())}`);
+                } else {
+                    console.log(`  ⚠️ No value in input!`);
+                }
+                console.log('---');
+            } else {
+                console.log(`❌ No input found for task ${task.id}: "${task.title}"`);
+            }
+        }
+    });
+};
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', initializeApp);
