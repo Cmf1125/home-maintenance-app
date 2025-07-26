@@ -3,7 +3,7 @@ let homeData = {};
 let tasks = [];
 let currentEditingTask = null;
 
-// Toggle well water sub-options
+// Well water dropdown fix - add this to TOP of app.js
 function toggleWellWaterOptions() {
     console.log('🔧 Toggling well water options...');
     const wellWaterCheckbox = document.getElementById('well-water');
@@ -25,6 +25,9 @@ function toggleWellWaterOptions() {
         }
     }
 }
+
+// Make it globally available immediately
+window.toggleWellWaterOptions = toggleWellWaterOptions;
 
 // Climate region detection
 function getClimateRegion(state) {
