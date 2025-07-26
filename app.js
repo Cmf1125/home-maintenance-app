@@ -1164,7 +1164,7 @@ function finishTaskSetup() {
     // Initialize enhanced dashboard
     showTab('dashboard');
     console.log('🎉 Setup complete with enhanced dashboard!');
-}
+
 
 function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
