@@ -1230,6 +1230,123 @@ window.testModalOverride = function() {
 
 console.log('💡 Run testModalOverride() to verify all functions use modals now');
 </script>
+    <!-- MODAL DIAGNOSTIC SCRIPT - Add temporarily to test what's happening -->
+<script>
+// DIAGNOSTIC: Test modal functionality step by step
+window.testModalStep = function(step) {
+    console.log(`🧪 TESTING STEP ${step}:`);
+    
+    switch(step) {
+        case 1:
+            console.log('Step 1: Testing modal element existence');
+            const modal = document.getElementById('task-edit-modal');
+            console.log('Modal element:', modal ? '✅ Found' : '❌ Not Found');
+            if (modal) {
+                console.log('Modal classes:', modal.className);
+                console.log('Modal style display:', modal.style.display);
+                console.log('Modal hidden class:', modal.classList.contains('hidden'));
+            }
+            break;
+            
+        case 2:
+            console.log('Step 2: Testing modal form fields');
+            const fields = [
+                'edit-task-name',
+                'edit-task-description', 
+                'edit-task-cost',
+                'edit-task-frequency',
+                'edit-task-priority',
+                'edit-task-due-date',
+                'edit-task-category'
+            ];
+            
+            fields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                console.log(`  ${fieldId}: ${field ? '✅' : '❌'}`);
+                if (field) {
+                    console.log(`    Type: ${field.type || field.tagName}`);
+                }
+            });
+            break;
+            
+        case 3:
+            console.log('Step 3: Testing Add Task function manually');
+            try {
+                // Test the function directly
+                if (typeof window.addTaskFromDashboard === 'function') {
+                    console.log('✅ Function exists, calling it...');
+                    window.addTaskFromDashboard();
+                    console.log('✅ Function completed without errors');
+                } else {
+                    console.log('❌ Function does not exist');
+                }
+            } catch (error) {
+                console.error('❌ Function threw error:', error);
+            }
+            break;
+            
+        case 4:
+            console.log('Step 4: Testing manual modal opening');
+            const modal4 = document.getElementById('task-edit-modal');
+            if (modal4) {
+                console.log('✅ Opening modal manually...');
+                modal4.classList.remove('hidden');
+                console.log('Modal should now be visible');
+                
+                // Test if fields can be filled
+                setTimeout(() => {
+                    try {
+                        document.getElementById('edit-task-name').value = 'Test Task';
+                        document.getElementById('edit-task-description').value = 'Test Description';
+                        console.log('✅ Fields filled successfully');
+                    } catch (error) {
+                        console.error('❌ Error filling fields:', error);
+                    }
+                }, 100);
+            }
+            break;
+            
+        case 5:
+            console.log('Step 5: Testing button click events');
+            // Find Add Task button
+            const addButton = document.querySelector('[onclick="addTaskFromDashboard()"]');
+            console.log('Add Task button found:', addButton ? '✅' : '❌');
+            if (addButton) {
+                console.log('Button onclick:', addButton.getAttribute('onclick'));
+                console.log('Button text:', addButton.textContent.trim());
+            }
+            
+            // Find Edit buttons
+            const editButtons = document.querySelectorAll('[onclick^="editTaskFromDashboard("]');
+            console.log('Edit Task buttons found:', editButtons.length);
+            editButtons.forEach((btn, i) => {
+                console.log(`  Edit button ${i+1}:`, btn.getAttribute('onclick'));
+            });
+            break;
+            
+        case 6:
+            console.log('Step 6: Testing currentEditingTask variable');
+            console.log('window.currentEditingTask:', window.currentEditingTask);
+            console.log('Setting test task...');
+            window.currentEditingTask = { id: 999, title: 'Test', description: 'Test' };
+            console.log('Test task set:', window.currentEditingTask);
+            break;
+    }
+};
+
+// Run all tests automatically
+window.runAllModalTests = function() {
+    console.log('🧪 RUNNING ALL MODAL DIAGNOSTIC TESTS...');
+    for (let i = 1; i <= 6; i++) {
+        window.testModalStep(i);
+        console.log(''); // Empty line for readability
+    }
+};
+
+console.log('🧪 Modal diagnostic loaded. Run:');
+console.log('  testModalStep(1) through testModalStep(6) for individual tests');
+console.log('  runAllModalTests() for all tests at once');
+</script>
    
 </body>
 </html>
