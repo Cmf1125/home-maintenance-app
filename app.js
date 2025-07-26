@@ -1112,6 +1112,8 @@ function finishTaskSetup() {
 }
 
 // Tab switching functionality
+// Replace your showTab function with this corrected version:
+
 function showTab(tabName) {
     // Hide all views
     document.getElementById('dashboard-view').classList.add('hidden');
@@ -1129,16 +1131,26 @@ function showTab(tabName) {
         document.getElementById('tab-dashboard').classList.add('bg-blue-100', 'text-blue-700');
         document.getElementById('tab-dashboard').classList.remove('text-gray-600');
         
-        // Initialize enhanced dashboard
-        if (!window.enhancedDashboard) {
-            window.enhancedDashboard = new EnhancedDashboard();
-        } else {
-            window.enhancedDashboard.render();
+        // Update dashboard with current task data
+        updateDashboard();
+        
+        // Also try enhanced dashboard if it exists
+        if (window.enhancedDashboard) {
+            try {
+                window.enhancedDashboard.render();
+            } catch (error) {
+                console.log('Enhanced dashboard not available, using basic dashboard');
+            }
         }
+        
     } else if (tabName === 'calendar') {
         document.getElementById('calendar-view').classList.remove('hidden');
         document.getElementById('tab-calendar').classList.add('bg-blue-100', 'text-blue-700');
         document.getElementById('tab-calendar').classList.remove('text-gray-600');
+        
+        // Update global task reference for calendar
+        window.tasks = tasks;
+        window.homeData = homeData;
         
         // Initialize calendar if not already done
         if (!window.casaCareCalendar) {
