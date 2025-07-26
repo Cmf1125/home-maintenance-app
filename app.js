@@ -1238,6 +1238,17 @@ function updateDashboard() {
     console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
 }
 
+// NEW: Close task edit modal (available for both setup and dashboard)
+function closeTaskEditModal() {
+    const modal = document.getElementById('task-edit-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    currentEditingTask = null;
+    window.currentEditingTask = null;
+    console.log('✅ Task edit modal closed (from app.js)');
+}
+
 // FIXED: Add missing function for task setup Add Task button
 function addTaskFromSetup() {
     console.log('➕ Adding custom task from setup...');
@@ -1618,12 +1629,18 @@ function closeTaskEditModal() {
     currentEditingTask = null;
 }
 
-// NEW: Save task from edit modal (UPDATED with category support)
+// NEW: Save task from edit modal (UPDATED to handle setup vs dashboard context)
 function saveTaskFromEdit() {
-    if (!currentEditingTask) {
+    console.log('💾 Saving task from edit modal...');
+    
+    if (!currentEditingTask && !window.currentEditingTask) {
         console.error('❌ No task being edited');
+        alert('❌ No task selected for editing');
         return;
     }
+    
+    // Use either local or global currentEditingTask
+    const editingTask = currentEditingTask || window.currentEditingTask;
     
     // Get form values
     const title = document.getElementById('edit-task-name').value.trim();
@@ -1633,6 +1650,8 @@ function saveTaskFromEdit() {
     const priority = document.getElementById('edit-task-priority').value;
     const category = document.getElementById('edit-task-category')?.value || 'General';
     const dueDateInput = document.getElementById('edit-task-due-date');
+    
+    console.log('📝 Form values collected:', { title, description, cost, frequency, priority, category });
     
     // Validate inputs
     if (!title) {
@@ -1668,38 +1687,51 @@ function saveTaskFromEdit() {
             return;
         }
     } else {
-        alert('❌ Due date is required');
-        if (dueDateInput) dueDateInput.focus();
-        return;
+        // Use current date if no date provided
+        dueDate = new Date();
     }
     
-    // Update task
-    const isNewTask = !tasks.find(t => t.id === currentEditingTask.id);
+    console.log('📅 Due date processed:', dueDate.toLocaleDateString());
     
-    currentEditingTask.title = title;
-    currentEditingTask.description = description;
-    currentEditingTask.cost = cost;
-    currentEditingTask.frequency = frequency;
-    currentEditingTask.priority = priority;
-    currentEditingTask.category = category;
-    currentEditingTask.dueDate = dueDate;
+    // Check if this is a new task
+    const isNewTask = !tasks.find(t => t.id === editingTask.id);
+    console.log('🆕 Is new task:', isNewTask);
     
-    // CRITICAL: Set nextDue for calendar compatibility
-    currentEditingTask.nextDue = dueDate;
+    // Update task properties
+    editingTask.title = title;
+    editingTask.description = description;
+    editingTask.cost = cost;
+    editingTask.frequency = frequency;
+    editingTask.priority = priority;
+    editingTask.category = category;
+    editingTask.dueDate = dueDate;
+    editingTask.nextDue = dueDate; // Calendar compatibility
     
     if (isNewTask) {
         // Add to tasks array
-        tasks.push(currentEditingTask);
-        console.log('✅ New task added:', currentEditingTask);
+        tasks.push(editingTask);
+        // Update global reference
+        window.tasks = tasks;
+        console.log('✅ New task added to array:', editingTask);
     } else {
-        console.log('✅ Task updated:', currentEditingTask);
+        console.log('✅ Existing task updated:', editingTask);
     }
     
-    // Update global reference
-    window.tasks = tasks;
+    // Determine if we're in setup or main app by checking which screen is visible
+    const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
+    const mainAppVisible = !document.getElementById('main-app').classList.contains('hidden');
     
-    // Save data if we're in the main app
-    if (!document.getElementById('main-app').classList.contains('hidden')) {
+    console.log('🔍 Context check - Task setup visible:', taskSetupVisible, 'Main app visible:', mainAppVisible);
+    
+    if (taskSetupVisible) {
+        // We're in task setup, re-render categories
+        console.log('🔄 Re-rendering task categories for setup');
+        renderTaskCategories();
+    } else if (mainAppVisible) {
+        // We're in main app, save and refresh
+        console.log('💾 Saving data and refreshing dashboard');
+        
+        // Save data
         saveData();
         
         // Refresh dashboard
@@ -1714,8 +1746,14 @@ function saveTaskFromEdit() {
             window.casaCareCalendar.refresh();
         }
     } else {
-        // We're in task setup, re-render categories
-        renderTaskCategories();
+        console.log('⚠️ Unknown context - assuming main app and saving');
+        // Default behavior if we can't determine context
+        saveData();
+        if (window.enhancedDashboard) {
+            window.enhancedDashboard.render();
+        } else {
+            updateDashboard();
+        }
     }
     
     // Close modal
