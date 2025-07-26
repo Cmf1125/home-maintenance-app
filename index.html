@@ -635,6 +635,87 @@ window.getTasksForCalendar = getTasksForCalendar;
 window.ensureCalendarCompatibility = ensureCalendarCompatibility;
 
 console.log('📅 Enhanced calendar compatibility fix loaded'); </script>
+    <!-- Add this script AFTER all your other scripts to ensure functions are loaded -->
+<script>
+// Function Loader and Debug Script for Casa Care
+// This ensures all dashboard functions are properly available
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait for all scripts to load
+    setTimeout(function() {
+        console.log('🔍 Checking function availability...');
+        
+        // Check critical functions
+        const requiredFunctions = [
+            'editTaskFromDashboard',
+            'addTaskFromDashboard',
+            'rescheduleTaskFromDashboard',
+            'closeTaskEditModal',
+            'saveTaskFromEdit',
+            'deleteTaskFromEdit',
+            'closeDatePickerModal',
+            'setQuickDate',
+            'confirmReschedule'
+        ];
+        
+        let missingFunctions = [];
+        requiredFunctions.forEach(funcName => {
+            if (typeof window[funcName] !== 'function') {
+                missingFunctions.push(funcName);
+            }
+        });
+        
+        if (missingFunctions.length > 0) {
+            console.error('❌ Missing functions:', missingFunctions);
+            console.log('🔧 Attempting to load functions...');
+            
+            // Try to reload enhanced dashboard if available
+            if (typeof EnhancedDashboard !== 'undefined' && !window.enhancedDashboard) {
+                try {
+                    window.enhancedDashboard = new EnhancedDashboard();
+                    console.log('✅ Enhanced dashboard reloaded');
+                } catch (error) {
+                    console.error('❌ Failed to reload enhanced dashboard:', error);
+                }
+            }
+        } else {
+            console.log('✅ All dashboard functions loaded successfully');
+        }
+        
+        // Check modal elements
+        const requiredModals = ['task-edit-modal', 'date-picker-modal'];
+        let missingModals = [];
+        requiredModals.forEach(modalId => {
+            if (!document.getElementById(modalId)) {
+                missingModals.push(modalId);
+            }
+        });
+        
+        if (missingModals.length > 0) {
+            console.error('❌ Missing modal elements:', missingModals);
+            console.log('💡 Make sure you have updated your HTML with the new task edit modal');
+        } else {
+            console.log('✅ All modal elements found');
+        }
+        
+        // Add debug function to window
+        window.debugCasaCare = function() {
+            console.log('=== CASA CARE DEBUG ===');
+            console.log('Functions available:', requiredFunctions.filter(f => typeof window[f] === 'function').length + '/' + requiredFunctions.length);
+            console.log('Modal elements found:', requiredModals.filter(m => document.getElementById(m)).length + '/' + requiredModals.length);
+            console.log('Enhanced dashboard:', window.enhancedDashboard ? '✅' : '❌');
+            console.log('Tasks loaded:', window.tasks ? window.tasks.length : 'none');
+            
+            if (typeof window.debugDashboardFunctions === 'function') {
+                window.debugDashboardFunctions();
+            }
+        };
+        
+        console.log('🎯 Casa Care function loader complete. Run debugCasaCare() for detailed info.');
+        
+    }, 500); // Wait 500ms for all scripts to load
+});
+</script>
    
 </body>
 </html>
