@@ -1,4 +1,4 @@
-// Casa Care App - Fixed Version
+// Casa Care App - Simplified Date System
 // App data
 let homeData = {};
 let tasks = [];
@@ -100,7 +100,7 @@ function createMaintenancePlan() {
         generateTaskTemplates();
         console.log('📋 Tasks generated:', tasks.length);
 
-        // CRITICAL FIX: Update global references immediately
+        // Update global references immediately
         window.homeData = homeData;
         window.tasks = tasks;
 
@@ -134,7 +134,7 @@ function generateTaskTemplates() {
             cost: 0,
             priority: 'high',
             description: 'Test all smoke and carbon monoxide detectors',
-            nextDue: null,
+            dueDate: null,
             lastCompleted: null,
             isCompleted: false,
             isTemplate: true
@@ -147,7 +147,7 @@ function generateTaskTemplates() {
             cost: 100,
             priority: 'medium',
             description: 'Clean dryer vent to prevent fire hazard',
-            nextDue: null,
+            dueDate: null,
             lastCompleted: null,
             isCompleted: false,
             isTemplate: true
@@ -167,7 +167,7 @@ function generateTaskTemplates() {
                 cost: 150,
                 priority: 'medium',
                 description: 'Clean gutters and downspouts',
-                nextDue: null,
+                dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
                 isTemplate: true
@@ -180,7 +180,7 @@ function generateTaskTemplates() {
                 cost: 50,
                 priority: 'low',
                 description: 'Check and replace caulking around windows and doors',
-                nextDue: null,
+                dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
                 isTemplate: true
@@ -195,7 +195,7 @@ function generateTaskTemplates() {
             cost: 0,
             priority: 'low',
             description: 'Check window and door seals for air leaks',
-            nextDue: null,
+            dueDate: null,
             lastCompleted: null,
             isCompleted: false,
             isTemplate: true
@@ -215,7 +215,7 @@ function generateTaskTemplates() {
                 cost: 25,
                 priority: 'high',
                 description: 'Replace central air system filter',
-                nextDue: null,
+                dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
                 isTemplate: true
@@ -228,7 +228,7 @@ function generateTaskTemplates() {
                 cost: 150,
                 priority: 'medium',
                 description: 'Annual professional HVAC maintenance',
-                nextDue: null,
+                dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
                 isTemplate: true
@@ -245,7 +245,7 @@ function generateTaskTemplates() {
             cost: 0,
             priority: 'medium',
             description: 'Clean mini-split unit filters',
-            nextDue: null,
+            dueDate: null,
             lastCompleted: null,
             isCompleted: false,
             isTemplate: true
@@ -261,7 +261,7 @@ function generateTaskTemplates() {
             cost: 0,
             priority: 'medium',
             description: 'Clean wall air conditioner filters',
-            nextDue: null,
+            dueDate: null,
             lastCompleted: null,
             isCompleted: false,
             isTemplate: true
@@ -277,7 +277,7 @@ function generateTaskTemplates() {
             cost: 0,
             priority: 'medium',
             description: 'Clean dust from electric baseboard heating elements',
-            nextDue: null,
+            dueDate: null,
             lastCompleted: null,
             isCompleted: false,
             isTemplate: true
@@ -293,7 +293,7 @@ function generateTaskTemplates() {
             cost: 200,
             priority: 'high',
             description: 'Professional boiler inspection and maintenance',
-            nextDue: null,
+            dueDate: null,
             lastCompleted: null,
             isCompleted: false,
             isTemplate: true
@@ -310,7 +310,7 @@ function generateTaskTemplates() {
             cost: 75,
             priority: 'high',
             description: 'Annual water quality testing',
-            nextDue: null,
+            dueDate: null,
             lastCompleted: null,
             isCompleted: false,
             isTemplate: true
@@ -325,7 +325,7 @@ function generateTaskTemplates() {
                 cost: 25,
                 priority: 'medium',
                 description: 'Replace sediment filter for well water system',
-                nextDue: null,
+                dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
                 isTemplate: true
@@ -341,7 +341,7 @@ function generateTaskTemplates() {
                 cost: 150,
                 priority: 'medium',
                 description: 'Replace UV filter for water treatment',
-                nextDue: null,
+                dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
                 isTemplate: true
@@ -357,7 +357,7 @@ function generateTaskTemplates() {
                 cost: 30,
                 priority: 'medium',
                 description: 'Check and refill water softener salt',
-                nextDue: null,
+                dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
                 isTemplate: true
@@ -373,7 +373,7 @@ function generateTaskTemplates() {
                 cost: 50,
                 priority: 'medium',
                 description: 'Replace whole house water filter',
-                nextDue: null,
+                dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
                 isTemplate: true
@@ -390,7 +390,7 @@ function generateTaskTemplates() {
             cost: 400,
             priority: 'high',
             description: 'Professional septic pumping',
-            nextDue: null,
+            dueDate: null,
             lastCompleted: null,
             isCompleted: false,
             isTemplate: true
@@ -407,7 +407,7 @@ function generateTaskTemplates() {
             cost: 300,
             priority: 'high',
             description: 'Professional chimney cleaning and inspection',
-            nextDue: null,
+            dueDate: null,
             lastCompleted: null,
             isCompleted: false,
             isTemplate: true
@@ -423,7 +423,7 @@ function generateTaskTemplates() {
             cost: 200,
             priority: 'medium',
             description: 'Stain or seal deck to protect from weather',
-            nextDue: null,
+            dueDate: null,
             lastCompleted: null,
             isCompleted: false,
             isTemplate: true
@@ -439,7 +439,7 @@ function generateTaskTemplates() {
             cost: 300,
             priority: 'high',
             description: 'Seasonal pool opening and closing',
-            nextDue: null,
+            dueDate: null,
             lastCompleted: null,
             isCompleted: false,
             isTemplate: true
@@ -455,7 +455,7 @@ function generateTaskTemplates() {
             cost: 50,
             priority: 'medium',
             description: 'Lubricate garage door hardware and test safety features',
-            nextDue: null,
+            dueDate: null,
             lastCompleted: null,
             isCompleted: false,
             isTemplate: true
@@ -471,7 +471,7 @@ function generateTaskTemplates() {
             cost: 0,
             priority: 'medium',
             description: 'Inspect basement for signs of moisture, leaks, or mold',
-            nextDue: null,
+            dueDate: null,
             lastCompleted: null,
             isCompleted: false,
             isTemplate: true
@@ -506,7 +506,7 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     priority: 'medium',
                     description: 'Test air conditioning system before hot weather arrives',
                     season: 'spring',
-                    nextDue: null,
+                    dueDate: null,
                     lastCompleted: null,
                     isCompleted: false,
                     isTemplate: true
@@ -520,7 +520,7 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     priority: 'high',
                     description: 'Test heating system operation before cold weather',
                     season: 'fall',
-                    nextDue: null,
+                    dueDate: null,
                     lastCompleted: null,
                     isCompleted: false,
                     isTemplate: true
@@ -537,7 +537,7 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     priority: 'high',
                     description: 'Shut off and drain outdoor water lines before first freeze',
                     season: 'fall',
-                    nextDue: null,
+                    dueDate: null,
                     lastCompleted: null,
                     isCompleted: false,
                     isTemplate: true
@@ -556,7 +556,7 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     priority: 'high',
                     description: 'Professional AC maintenance before summer heat',
                     season: 'spring',
-                    nextDue: null,
+                    dueDate: null,
                     lastCompleted: null,
                     isCompleted: false,
                     isTemplate: true
@@ -570,7 +570,7 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     priority: 'high',
                     description: 'Update emergency supplies for hurricane season',
                     season: 'spring',
-                    nextDue: null,
+                    dueDate: null,
                     lastCompleted: null,
                     isCompleted: false,
                     isTemplate: true
@@ -590,7 +590,7 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                         priority: 'medium',
                         description: 'Update emergency supplies and secure items',
                         season: 'spring',
-                        nextDue: null,
+                        dueDate: null,
                         lastCompleted: null,
                         isCompleted: false,
                         isTemplate: true
@@ -610,7 +610,7 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     priority: 'medium',
                     description: 'Check HVAC and prepare for warmer weather',
                     season: 'spring',
-                    nextDue: null,
+                    dueDate: null,
                     lastCompleted: null,
                     isCompleted: false,
                     isTemplate: true
@@ -848,9 +848,9 @@ function renderTaskCategories() {
     taskCategoriesContainer.innerHTML = categoriesHTML;
 }
 
-// Render individual task card
+// SIMPLIFIED: Render individual task card with only Due Date
 function renderTaskCard(task) {
-    const suggestedDate = getSuggestedStartDate(task);
+    const suggestedDate = getSuggestedDueDate(task);
     const priorityClass = task.priority === 'high' ? 'bg-red-100 text-red-700' : 
                         task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' : 
                         'bg-gray-100 text-gray-700';
@@ -882,25 +882,18 @@ function renderTaskCard(task) {
                 </div>
             </div>
             
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                    <input type="date" id="start-date-${task.id}" value="${suggestedDate}" 
-                           class="w-full p-2 border rounded text-sm"
-                           onchange="updateTaskStartDate(${task.id}, this.value)">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Next Due</label>
-                    <input type="text" id="next-due-${task.id}" value="${getNextDueFromStart(suggestedDate, task.frequency)}" 
-                           class="w-full p-2 border rounded text-sm bg-gray-50" readonly>
-                </div>
+            <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                <input type="date" id="due-date-${task.id}" value="${suggestedDate}" 
+                       class="w-full p-2 border rounded text-sm"
+                       onchange="updateTaskDueDate(${task.id}, this.value)">
             </div>
         </div>
     `;
 }
 
-// Helper functions
-function getSuggestedStartDate(task) {
+// SIMPLIFIED: Get suggested due date for a task
+function getSuggestedDueDate(task) {
     const today = new Date();
     
     if (task.season) {
@@ -937,27 +930,17 @@ function getSuggestedStartDate(task) {
     }
 }
 
-function getNextDueFromStart(startDateStr, frequency) {
-    if (!startDateStr) return '';
-    // The first due date IS the start date, not start date + frequency
-    const startDate = new Date(startDateStr);
-    return startDate.toLocaleDateString();
-}
-
-function updateTaskStartDate(taskId, startDateStr) {
-    console.log(`🔄 Updating start date for task ${taskId} to: ${startDateStr}`);
+// SIMPLIFIED: Update task due date
+function updateTaskDueDate(taskId, dueDateStr) {
+    console.log(`🔄 Updating due date for task ${taskId} to: ${dueDateStr}`);
     
     const task = tasks.find(t => t.id === taskId);
-    if (task && startDateStr) {
-        const nextDueElement = document.getElementById(`next-due-${taskId}`);
-        if (nextDueElement) {
-            // For preview purposes, the "next due" should show the start date (since that's when it's first due)
-            const startDate = new Date(startDateStr);
-            nextDueElement.value = startDate.toLocaleDateString();
-            console.log(`  📅 Preview updated to show: ${startDate.toLocaleDateString()}`);
-        }
+    if (task && dueDateStr) {
+        // Just store the date string for now, will be converted to Date object in finishTaskSetup
+        task.tempDueDate = dueDateStr;
+        console.log(`  📅 Temp due date stored: ${dueDateStr}`);
     } else {
-        console.warn(`  ⚠️ Could not update task ${taskId}: task=${!!task}, startDate="${startDateStr}"`);
+        console.warn(`  ⚠️ Could not update task ${taskId}: task=${!!task}, dueDate="${dueDateStr}"`);
     }
 }
 
@@ -996,9 +979,9 @@ function goBackToHomeSetup() {
     }
 }
 
-// CRITICAL FIX 2: Completely rewritten finishTaskSetup function
+// SIMPLIFIED: Complete task setup
 function finishTaskSetup() {
-    console.log('🚀 Starting task setup completion...');
+    console.log('🚀 Starting simplified task setup completion...');
     console.log(`📊 Processing ${tasks.length} tasks...`);
     
     let successCount = 0;
@@ -1010,40 +993,40 @@ function finishTaskSetup() {
             try {
                 console.log(`⚙️ Processing task: ${task.title}`);
                 
-                // Get the start date input with enhanced debugging
-                const startDateInput = document.getElementById(`start-date-${task.id}`);
-                console.log(`  🔍 Input element found: ${!!startDateInput}, Value: "${startDateInput?.value}"`);
+                // Get the due date input
+                const dueDateInput = document.getElementById(`due-date-${task.id}`);
+                let dueDate;
                 
-                let startDate;
-                
-                if (startDateInput && startDateInput.value) {
+                if (dueDateInput && dueDateInput.value) {
                     // Use the user-selected date
-                    startDate = new Date(startDateInput.value + 'T12:00:00');
-                    console.log(`  📅 Using CUSTOM start date: ${startDate.toLocaleDateString()}`);
-                    console.log(`  📅 Raw input value: "${startDateInput.value}"`);
+                    dueDate = new Date(dueDateInput.value + 'T12:00:00');
+                    console.log(`  📅 Using CUSTOM due date: ${dueDate.toLocaleDateString()}`);
+                } else if (task.tempDueDate) {
+                    // Use stored temp date
+                    dueDate = new Date(task.tempDueDate + 'T12:00:00');
+                    console.log(`  📅 Using TEMP due date: ${dueDate.toLocaleDateString()}`);
                 } else {
                     // Use suggested default date
-                    const suggestedDate = getSuggestedStartDate(task);
-                    startDate = new Date(suggestedDate + 'T12:00:00');
-                    console.log(`  📅 Using DEFAULT start date: ${startDate.toLocaleDateString()}`);
-                    console.log(`  ⚠️ No custom date found, using suggested: ${suggestedDate}`);
+                    const suggestedDate = getSuggestedDueDate(task);
+                    dueDate = new Date(suggestedDate + 'T12:00:00');
+                    console.log(`  📅 Using DEFAULT due date: ${dueDate.toLocaleDateString()}`);
                 }
                 
                 // Validate the date
-                if (isNaN(startDate.getTime())) {
-                    throw new Error(`Invalid start date for task ${task.title}`);
+                if (isNaN(dueDate.getTime())) {
+                    throw new Error(`Invalid due date for task ${task.title}`);
                 }
                 
-                // CRITICAL FIX: The start date IS the due date, not start date + frequency
-                task.nextDue = new Date(startDate.getTime());
+                // Set the due date
+                task.dueDate = dueDate;
                 
-                // Clean up template flag
+                // Clean up template flag and temp date
                 delete task.isTemplate;
+                delete task.tempDueDate;
                 task.isCompleted = false;
                 task.lastCompleted = null;
                 
-                console.log(`  ✅ FINAL: Task "${task.title}" due: ${task.nextDue.toLocaleDateString()}`);
-                console.log(`  ⏰ Next occurrence will be: ${new Date(task.nextDue.getTime() + task.frequency * 24 * 60 * 60 * 1000).toLocaleDateString()}`);
+                console.log(`  ✅ FINAL: Task "${task.title}" due: ${task.dueDate.toLocaleDateString()}`);
                 successCount++;
                 
             } catch (error) {
@@ -1056,13 +1039,14 @@ function finishTaskSetup() {
     console.log(`✅ Task processing complete: ${successCount} successful, ${errorCount} errors`);
     
     // Verify we have tasks with due dates
-    const tasksWithDates = tasks.filter(t => t.nextDue);
+    const tasksWithDates = tasks.filter(t => t.dueDate);
     
     // Detailed verification logging
     console.log('\n📋 FINAL TASK VERIFICATION:');
     tasksWithDates.forEach(task => {
-        console.log(`  • "${task.title}" → Due: ${task.nextDue.toLocaleDateString()}`);
+        console.log(`  • "${task.title}" → Due: ${task.dueDate.toLocaleDateString()}`);
     });
+    
     console.log(`📊 Final verification: ${tasksWithDates.length} tasks have due dates`);
     
     if (tasksWithDates.length === 0) {
@@ -1081,7 +1065,7 @@ function finishTaskSetup() {
         return;
     }
     
-    // CRITICAL FIX 3: Update global references BEFORE switching views
+    // Update global references BEFORE switching views
     window.homeData = homeData;
     window.tasks = tasks;
     console.log('🌐 Global references updated');
@@ -1091,7 +1075,7 @@ function finishTaskSetup() {
     document.getElementById('main-app').classList.remove('hidden');
     document.getElementById('header-subtitle').textContent = homeData.fullAddress;
     
-    // CRITICAL FIX 4: Initialize dashboard with error handling
+    // Initialize dashboard with error handling
     try {
         console.log('🏠 Initializing dashboard...');
         showTab('dashboard');
@@ -1108,7 +1092,7 @@ function finishTaskSetup() {
     console.log('🎉 TASK SETUP COMPLETION SUCCESSFUL!');
 }
 
-// CRITICAL FIX 5: Enhanced showTab function with better error handling
+// Enhanced showTab function with better error handling
 function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
     
@@ -1144,9 +1128,9 @@ function showTab(tabName) {
         
         console.log('🏠 Initializing enhanced dashboard...');
         console.log(`📊 Tasks available: ${window.tasks ? window.tasks.length : 'undefined'}`);
-        console.log(`📊 Tasks with due dates: ${window.tasks ? window.tasks.filter(t => t.nextDue).length : 'undefined'}`);
+        console.log(`📊 Tasks with due dates: ${window.tasks ? window.tasks.filter(t => t.dueDate).length : 'undefined'}`);
         
-        // CRITICAL FIX 6: Enhanced dashboard initialization with fallback
+        // Enhanced dashboard initialization with fallback
         try {
             // Try to initialize enhanced dashboard
             if (typeof EnhancedDashboard !== 'undefined') {
@@ -1195,7 +1179,7 @@ function showTab(tabName) {
     }
 }
 
-// CRITICAL FIX 7: Basic dashboard fallback function
+// Basic dashboard fallback function
 function updateDashboard() {
     console.log('🔄 Running basic dashboard update...');
     
@@ -1213,8 +1197,8 @@ function updateDashboard() {
     let totalCost = 0;
     
     window.tasks.forEach(task => {
-        if (!task.isCompleted && task.nextDue) {
-            const taskDate = new Date(task.nextDue);
+        if (!task.isCompleted && task.dueDate) {
+            const taskDate = new Date(task.dueDate);
             if (taskDate < now) {
                 overdueCount++;
             }
@@ -1225,7 +1209,7 @@ function updateDashboard() {
         totalCost += task.cost * (365 / task.frequency);
     });
     
-    const totalTasks = window.tasks.filter(t => !t.isCompleted && t.nextDue).length;
+    const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
     
     // Update DOM elements safely
     const elements = {
@@ -1251,23 +1235,23 @@ function updateDashboard() {
     console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
 }
 
-// Enhanced complete task function
+// FIXED: Complete task function
 function completeTask(taskId) {
     console.log(`✅ Completing task ${taskId}...`);
     
     const task = tasks.find(t => t.id === taskId);
     if (task) {
-        const oldDueDate = task.nextDue ? new Date(task.nextDue) : new Date();
+        const oldDueDate = task.dueDate ? new Date(task.dueDate) : new Date();
         
         task.lastCompleted = new Date();
         
-        // Calculate next due date from today + frequency (not from old due date)
-        task.nextDue = new Date(Date.now() + task.frequency * 24 * 60 * 60 * 1000);
+        // Calculate next due date from current due date + frequency
+        task.dueDate = new Date(oldDueDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
         task.isCompleted = false; // Will be due again in the future
         
         console.log(`📅 Task "${task.title}" completed!`);
         console.log(`  Old due date: ${oldDueDate.toLocaleDateString()}`);
-        console.log(`  Next due date: ${task.nextDue.toLocaleDateString()}`);
+        console.log(`  Next due date: ${task.dueDate.toLocaleDateString()}`);
         console.log(`  Frequency: ${task.frequency} days`);
         
         // Save data
@@ -1288,10 +1272,77 @@ function completeTask(taskId) {
             window.casaCareCalendar.refresh();
         }
         
-        alert(`✅ Task "${task.title}" completed!\nNext due: ${task.nextDue.toLocaleDateString()}`);
+        alert(`✅ Task "${task.title}" completed!\nNext due: ${task.dueDate.toLocaleDateString()}`);
     } else {
         console.error('❌ Task not found:', taskId);
     }
+}
+
+// NEW: Add Task functionality for dashboard
+function addTaskFromDashboard() {
+    const title = prompt('Task Title:');
+    if (!title) return;
+    
+    const description = prompt('Task Description:');
+    if (!description) return;
+    
+    const frequency = parseInt(prompt('How often (in days):', '365'));
+    if (!frequency || frequency <= 0) return;
+    
+    const cost = parseFloat(prompt('Estimated cost ($):', '0'));
+    if (isNaN(cost)) return;
+    
+    const priority = prompt('Priority (high, medium, low):', 'medium');
+    if (!['high', 'medium', 'low'].includes(priority)) {
+        alert('Invalid priority. Please use: high, medium, or low');
+        return;
+    }
+    
+    const dueDateStr = prompt('Due date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+    if (!dueDateStr) return;
+    
+    const dueDate = new Date(dueDateStr + 'T12:00:00');
+    if (isNaN(dueDate.getTime())) {
+        alert('Invalid date format');
+        return;
+    }
+    
+    // Find next available ID
+    const maxId = Math.max(...tasks.map(t => t.id), 0);
+    
+    const newTask = {
+        id: maxId + 1,
+        title: title,
+        description: description,
+        category: 'General',
+        frequency: frequency,
+        cost: cost,
+        priority: priority,
+        dueDate: dueDate,
+        lastCompleted: null,
+        isCompleted: false
+    };
+    
+    tasks.push(newTask);
+    window.tasks = tasks;
+    
+    // Save data
+    saveData();
+    
+    // Refresh dashboard
+    if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
+        window.enhancedDashboard.render();
+    } else {
+        updateDashboard();
+    }
+    
+    // Refresh calendar if it exists
+    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+        window.casaCareCalendar.refresh();
+    }
+    
+    console.log('✅ New task added:', newTask);
+    alert(`✅ Task "${title}" added successfully!`);
 }
 
 // Utility functions
@@ -1324,7 +1375,7 @@ function exportData() {
         homeData: homeData,
         tasks: tasks,
         exportDate: new Date().toISOString(),
-        version: '2.0'
+        version: '2.1'
     };
 
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
@@ -1342,7 +1393,7 @@ function saveData() {
     const data = { 
         homeData: homeData, 
         tasks: tasks,
-        version: '2.0'
+        version: '2.1'
     };
     
     try {
@@ -1363,9 +1414,14 @@ function loadData() {
             homeData = data.homeData || {};
             tasks = data.tasks || [];
             
-            // Restore dates
+            // Restore dates - handle both old nextDue and new dueDate formats
             tasks.forEach(task => {
-                if (task.nextDue) task.nextDue = new Date(task.nextDue);
+                if (task.nextDue) {
+                    task.dueDate = new Date(task.nextDue);
+                    delete task.nextDue; // Remove old property
+                } else if (task.dueDate) {
+                    task.dueDate = new Date(task.dueDate);
+                }
                 if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
             });
             
@@ -1382,9 +1438,9 @@ function hasExistingData() {
     return loadData() && homeData.fullAddress;
 }
 
-// CRITICAL FIX 8: Enhanced initialization
+// Enhanced initialization
 function initializeApp() {
-    console.log('🏠 Casa Care FIXED VERSION initializing...');
+    console.log('🏠 Casa Care SIMPLIFIED VERSION initializing...');
     
     // Make well water function available globally ASAP
     window.toggleWellWaterOptions = toggleWellWaterOptions;
@@ -1419,7 +1475,7 @@ function initializeApp() {
         document.getElementById('main-app').classList.add('hidden');
     }
     
-    console.log('✅ Casa Care FIXED VERSION initialized successfully!');
+    console.log('✅ Casa Care SIMPLIFIED VERSION initialized successfully!');
 }
 
 // Make critical functions globally available
@@ -1428,67 +1484,10 @@ window.finishTaskSetup = finishTaskSetup;
 window.goBackToHomeSetup = goBackToHomeSetup;
 window.showTab = showTab;
 window.completeTask = completeTask;
+window.addTaskFromDashboard = addTaskFromDashboard;
 window.showHomeInfo = showHomeInfo;
 window.clearData = clearData;
 window.exportData = exportData;
-
-// DEBUGGING FUNCTION - Call from console: debugTaskDates()
-window.debugTaskDates = function() {
-    console.log('🔍 DEBUGGING TASK DATES:');
-    console.log(`Total tasks: ${window.tasks ? window.tasks.length : 'No tasks'}`);
-    
-    if (window.tasks) {
-        window.tasks.forEach(task => {
-            const dueDateStr = task.nextDue ? new Date(task.nextDue).toLocaleDateString() : 'No due date';
-            const isOverdue = task.nextDue ? new Date(task.nextDue) < new Date() : false;
-            console.log(`  • "${task.title}": ${dueDateStr} ${isOverdue ? '(OVERDUE)' : ''}`);
-        });
-    }
-    
-    // Check if start date inputs still exist
-    console.log('\n🔍 CHECKING START DATE INPUTS:');
-    if (window.tasks) {
-        window.tasks.forEach(task => {
-            const input = document.getElementById(`start-date-${task.id}`);
-            if (input) {
-                console.log(`  • Task ${task.id} input: "${input.value}"`);
-            }
-        });
-    }
-};
-
-// DEBUGGING FUNCTION - Call to test current input values: testDateCapture()
-window.testDateCapture = function() {
-    console.log('🧪 TESTING DATE CAPTURE FROM INPUTS:');
-    
-    if (!window.tasks) {
-        console.log('❌ No tasks available for testing');
-        return;
-    }
-    
-    window.tasks.forEach(task => {
-        if (task.isTemplate) {
-            const input = document.getElementById(`start-date-${task.id}`);
-            if (input) {
-                console.log(`📝 Task: "${task.title}"`);
-                console.log(`  Input ID: start-date-${task.id}`);
-                console.log(`  Input Value: "${input.value}"`);
-                console.log(`  Input Type: ${input.type}`);
-                
-                if (input.value) {
-                    const testDate = new Date(input.value + 'T12:00:00');
-                    console.log(`  Parsed Date: ${testDate.toLocaleDateString()}`);
-                    console.log(`  Is Valid: ${!isNaN(testDate.getTime())}`);
-                } else {
-                    console.log(`  ⚠️ No value in input!`);
-                }
-                console.log('---');
-            } else {
-                console.log(`❌ No input found for task ${task.id}: "${task.title}"`);
-            }
-        }
-    });
-};
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', initializeApp);
@@ -1496,4 +1495,4 @@ if (document.readyState !== 'loading') {
     initializeApp();
 }
 
-console.log('🏠 Casa Care FIXED VERSION script loaded successfully!');
+console.log('🏠 Casa Care SIMPLIFIED VERSION script loaded successfully!');
