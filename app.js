@@ -1293,8 +1293,20 @@ function deleteTaskDirect(taskId) {
 }
 
 // Dashboard functions
+// Replace your updateDashboard function with this debugged version:
+
 function updateDashboard() {
-    document.getElementById('home-address').textContent = `Managing maintenance for ${homeData.fullAddress}`;
+    console.log('🏠 Updating dashboard...');
+    console.log('Dashboard called with', tasks.length, 'total tasks');
+    
+    // Update home address
+    const homeAddressElement = document.getElementById('home-address');
+    if (homeAddressElement && homeData.fullAddress) {
+        homeAddressElement.textContent = `Managing maintenance for ${homeData.fullAddress}`;
+        console.log('✅ Home address updated');
+    } else {
+        console.log('❌ Home address element not found or no address data');
+    }
 
     const now = new Date();
     const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -1302,42 +1314,80 @@ function updateDashboard() {
     let overdueCount = 0;
     let weekCount = 0;
     let totalCost = 0;
+    let activeTasks = 0;
 
-    tasks.forEach(task => {
-        if (!task.isCompleted && task.nextDue && task.nextDue < now) {
+    // Filter and count tasks
+    const activeTasksList = tasks.filter(task => !task.isCompleted && task.nextDue);
+    activeTasks = activeTasksList.length;
+    console.log('Active tasks with due dates:', activeTasks);
+
+    activeTasksList.forEach(task => {
+        if (task.nextDue < now) {
             overdueCount++;
         }
-        if (!task.isCompleted && task.nextDue && task.nextDue <= oneWeek) {
+        if (task.nextDue <= oneWeek) {
             weekCount++;
         }
         totalCost += task.cost * (365 / task.frequency);
     });
 
-    document.getElementById('overdue-count').textContent = overdueCount;
-    document.getElementById('week-count').textContent = weekCount;
-    document.getElementById('total-count').textContent = tasks.filter(t => !t.isCompleted && t.nextDue).length;
-    document.getElementById('annual-cost').textContent = '$' + Math.round(totalCost);
+    console.log('Dashboard stats:', { overdueCount, weekCount, activeTasks, totalCost });
 
+    // Update dashboard stats
+    const elements = {
+        'overdue-count': overdueCount,
+        'week-count': weekCount,
+        'total-count': activeTasks,
+        'annual-cost': '$' + Math.round(totalCost)
+    };
+
+    Object.entries(elements).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+            console.log(`✅ Updated ${id}: ${value}`);
+        } else {
+            console.log(`❌ Element ${id} not found`);
+        }
+    });
+
+    // Render tasks list
     renderTasks();
+    console.log('✅ Dashboard update complete');
 }
 
+// Also fix renderTasks to be more robust:
 function renderTasks() {
+    console.log('📋 Rendering tasks...');
+    
     const tasksList = document.getElementById('tasks-list');
-    const upcomingTasks = tasks
-        .filter(task => !task.isCompleted && task.nextDue)
-        .sort((a, b) => a.nextDue - b.nextDue)
-        .slice(0, 8);
-
-    if (upcomingTasks.length === 0) {
-        tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All tasks complete!</div>';
+    if (!tasksList) {
+        console.error('❌ tasks-list element not found');
         return;
     }
 
+    const upcomingTasks = tasks
+        .filter(task => !task.isCompleted && task.nextDue)
+        .sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue))
+        .slice(0, 8);
+
+    console.log('Upcoming tasks to display:', upcomingTasks.length);
+
+    if (upcomingTasks.length === 0) {
+        tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All tasks complete!</div>';
+        console.log('No upcoming tasks to display');
+        return;
+    }
+
+    const now = new Date();
     tasksList.innerHTML = upcomingTasks.map(task => {
-        const daysUntilDue = Math.ceil((task.nextDue - new Date()) / (24 * 60 * 60 * 1000));
+        const taskDue = new Date(task.nextDue);
+        const daysUntilDue = Math.ceil((taskDue - now) / (24 * 60 * 60 * 1000));
         const overdue = daysUntilDue < 0;
         const statusClass = overdue ? 'bg-red-50 border-l-4 border-red-400' : 
                            daysUntilDue <= 7 ? 'bg-orange-50 border-l-4 border-orange-400' : 'bg-white';
+        
+        console.log(`Task: ${task.title}, Due: ${taskDue.toLocaleDateString()}, Days: ${daysUntilDue}`);
         
         return `
             <div class="p-4 border-b ${statusClass}">
@@ -1351,6 +1401,7 @@ function renderTasks() {
                                 ${overdue ? `${Math.abs(daysUntilDue)}d overdue` : daysUntilDue <= 0 ? 'Due today' : `${daysUntilDue}d`}
                             </span>
                             <span class="text-gray-600">$${task.cost}</span>
+                            <span class="text-xs text-gray-500">Due: ${taskDue.toLocaleDateString()}</span>
                         </div>
                     </div>
                     <button onclick="completeTask(${task.id})" class="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 text-xs touch-btn">
@@ -1360,6 +1411,8 @@ function renderTasks() {
             </div>
         `;
     }).join('');
+
+    console.log('✅ Tasks rendered successfully');
 }
 
 function completeTask(taskId) {
