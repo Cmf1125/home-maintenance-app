@@ -1693,7 +1693,290 @@ console.log('  testSave() - Full save test');
 console.log('  testSaveButton() - Test save button click');
 console.log('  testValidation() - Test form validation');
 </script>
-   
+   <!-- CRITICAL FIX SCRIPT - Add this to your HTML file AFTER all other scripts -->
+<script>
+// COMPREHENSIVE FIX: Ensure addTaskFromSetup works with modal system
+console.log('🔧 CRITICAL FIX: Loading addTaskFromSetup modal integration...');
+
+// FORCE OVERRIDE: Replace addTaskFromSetup to work with modal system
+window.addTaskFromSetup = function() {
+    console.log('➕ FIXED: Adding custom task from setup with modal...');
+    
+    // Find next available ID
+    const maxId = Math.max(...window.tasks.map(t => t.id), 0);
+    
+    // Create new task object
+    const newTask = {
+        id: maxId + 1,
+        title: '',
+        description: '',
+        category: 'General',
+        frequency: 365,
+        cost: 0,
+        priority: 'medium',
+        dueDate: new Date(),
+        lastCompleted: null,
+        isCompleted: false,
+        isTemplate: true // Important for setup processing
+    };
+    
+    // CRITICAL: Set BOTH variables to ensure compatibility
+    window.currentEditingTask = newTask;
+    window.persistentCurrentTask = newTask; // For the enhanced dashboard script
+    
+    console.log('✅ FIXED: Current editing task set for setup:', newTask);
+    console.log('✅ FIXED: Persistent task set for setup:', newTask);
+    
+    // Open the modal
+    const modal = document.getElementById('task-edit-modal');
+    if (modal) {
+        console.log('✅ FIXED: Opening task modal for setup add');
+        
+        // Fill modal fields for new task
+        document.getElementById('edit-task-name').value = '';
+        document.getElementById('edit-task-description').value = '';
+        document.getElementById('edit-task-cost').value = 0;
+        document.getElementById('edit-task-frequency').value = 365;
+        document.getElementById('edit-task-priority').value = 'medium';
+        
+        // Handle category if field exists
+        const categoryField = document.getElementById('edit-task-category');
+        if (categoryField) {
+            categoryField.value = 'General';
+        }
+        
+        // Handle due date
+        const dueDateInput = document.getElementById('edit-task-due-date');
+        if (dueDateInput) {
+            dueDateInput.value = new Date().toISOString().split('T')[0];
+        }
+        
+        // Update modal title
+        const modalTitle = document.getElementById('task-edit-title');
+        if (modalTitle) {
+            modalTitle.textContent = 'Add Custom Task';
+        }
+        
+        // Hide delete button for new task
+        const deleteButton = modal.querySelector('[onclick="deleteTaskFromEdit()"]');
+        if (deleteButton) {
+            deleteButton.style.display = 'none';
+        }
+        
+        // Show modal
+        modal.classList.remove('hidden');
+        
+        // Focus on task name
+        setTimeout(() => document.getElementById('edit-task-name').focus(), 100);
+        
+        console.log('✅ FIXED: Add task modal opened from setup');
+    } else {
+        console.error('❌ FIXED: Task edit modal not found');
+        alert('❌ Task edit modal not found. Please check your HTML.');
+    }
+};
+
+// FORCE OVERRIDE: Enhanced saveTaskFromEdit specifically for setup context
+window.saveTaskFromEditFixed = function() {
+    console.log('💾 FIXED: Enhanced save with setup/dashboard context detection...');
+    
+    // Use persistent task if main one is missing (enhanced dashboard script compatibility)
+    let editingTask = window.currentEditingTask || window.persistentCurrentTask;
+    
+    if (!editingTask) {
+        console.error('❌ FIXED: No task being edited (both sources empty)');
+        console.log('🔍 FIXED: Debugging - window.currentEditingTask:', window.currentEditingTask);
+        console.log('🔍 FIXED: Debugging - window.persistentCurrentTask:', window.persistentCurrentTask);
+        alert('❌ No task selected for editing. Please try opening the modal again.');
+        return;
+    }
+    
+    console.log('✅ FIXED: Using task for save:', editingTask);
+    
+    // Get form values
+    const title = document.getElementById('edit-task-name').value.trim();
+    const description = document.getElementById('edit-task-description').value.trim();
+    const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
+    const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
+    const priority = document.getElementById('edit-task-priority').value;
+    const category = document.getElementById('edit-task-category')?.value || 'General';
+    const dueDateInput = document.getElementById('edit-task-due-date');
+    
+    console.log('📝 FIXED: Form values:', { title, description, cost, frequency, priority, category });
+    
+    // Validate inputs
+    if (!title) {
+        alert('❌ Task name is required');
+        document.getElementById('edit-task-name').focus();
+        return;
+    }
+    
+    if (!description) {
+        alert('❌ Task description is required');
+        document.getElementById('edit-task-description').focus();
+        return;
+    }
+    
+    if (frequency <= 0) {
+        alert('❌ Frequency must be greater than 0');
+        return;
+    }
+    
+    // Handle due date
+    let dueDate;
+    if (dueDateInput && dueDateInput.value) {
+        dueDate = new Date(dueDateInput.value + 'T12:00:00');
+        if (isNaN(dueDate.getTime())) {
+            alert('❌ Invalid due date');
+            return;
+        }
+    } else {
+        dueDate = new Date();
+    }
+    
+    // Check context: are we in setup or main app?
+    const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
+    const mainAppVisible = !document.getElementById('main-app').classList.contains('hidden');
+    
+    console.log('🔍 FIXED: Context - Setup visible:', taskSetupVisible, 'Main app visible:', mainAppVisible);
+    
+    // Check if new task
+    const isNewTask = !window.tasks.find(t => t.id === editingTask.id);
+    console.log('🆕 FIXED: Is new task:', isNewTask);
+    
+    // Update task properties
+    editingTask.title = title;
+    editingTask.description = description;
+    editingTask.cost = cost;
+    editingTask.frequency = frequency;
+    editingTask.priority = priority;
+    editingTask.category = category;
+    editingTask.dueDate = dueDate;
+    editingTask.nextDue = dueDate; // Calendar compatibility
+    
+    if (isNewTask) {
+        window.tasks.push(editingTask);
+        console.log('✅ FIXED: New task added to global array');
+    } else {
+        console.log('✅ FIXED: Existing task updated');
+    }
+    
+    // Context-specific actions
+    if (taskSetupVisible) {
+        console.log('🔄 FIXED: In setup context - re-rendering task categories');
+        
+        // Re-render task categories for setup
+        if (typeof renderTaskCategories === 'function') {
+            renderTaskCategories();
+        } else {
+            console.warn('⚠️ FIXED: renderTaskCategories function not available');
+        }
+        
+    } else {
+        console.log('💾 FIXED: In main app context - saving and refreshing');
+        
+        // Save data
+        if (typeof window.saveData === 'function') {
+            window.saveData();
+        } else if (typeof saveData === 'function') {
+            saveData();
+        }
+        
+        // Refresh dashboard
+        if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
+            window.enhancedDashboard.render();
+        } else if (typeof updateDashboard === 'function') {
+            updateDashboard();
+        }
+        
+        // Refresh calendar
+        if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+            window.casaCareCalendar.refresh();
+        }
+    }
+    
+    // Close modal and cleanup
+    const modal = document.getElementById('task-edit-modal');
+    if (modal) modal.classList.add('hidden');
+    
+    window.currentEditingTask = null;
+    window.persistentCurrentTask = null;
+    
+    console.log('✅ FIXED: Save completed successfully');
+    alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
+};
+
+// OVERRIDE the saveTaskFromEdit function to use our fixed version
+window.saveTaskFromEdit = window.saveTaskFromEditFixed;
+
+// Also ensure other modal functions are available
+if (typeof window.closeTaskEditModal !== 'function') {
+    window.closeTaskEditModal = function() {
+        const modal = document.getElementById('task-edit-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+        window.currentEditingTask = null;
+        window.persistentCurrentTask = null;
+        console.log('✅ FIXED: Task edit modal closed');
+    };
+}
+
+if (typeof window.deleteTaskFromEdit !== 'function') {
+    window.deleteTaskFromEdit = function() {
+        const editingTask = window.currentEditingTask || window.persistentCurrentTask;
+        
+        if (!editingTask) {
+            console.error('❌ FIXED: No task being edited');
+            return;
+        }
+        
+        if (confirm(`Are you sure you want to delete "${editingTask.title}"?`)) {
+            const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
+            if (taskIndex > -1) {
+                const deletedTask = window.tasks.splice(taskIndex, 1)[0];
+                console.log(`🗑️ FIXED: Deleted task: ${deletedTask.title}`);
+                
+                // Context-specific refresh
+                const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
+                
+                if (taskSetupVisible) {
+                    if (typeof renderTaskCategories === 'function') {
+                        renderTaskCategories();
+                    }
+                } else {
+                    if (typeof window.saveData === 'function') {
+                        window.saveData();
+                    } else if (typeof saveData === 'function') {
+                        saveData();
+                    }
+                    
+                    if (window.enhancedDashboard) {
+                        window.enhancedDashboard.render();
+                    }
+                }
+                
+                window.closeTaskEditModal();
+                alert(`✅ Task "${deletedTask.title}" deleted successfully!`);
+            }
+        }
+    };
+}
+
+// Test function to verify the fix
+window.testAddTaskFix = function() {
+    console.log('🧪 TESTING ADD TASK FIX:');
+    console.log('  addTaskFromSetup function:', typeof window.addTaskFromSetup === 'function' ? '✅' : '❌');
+    console.log('  saveTaskFromEdit function:', typeof window.saveTaskFromEdit === 'function' ? '✅' : '❌');
+    console.log('  closeTaskEditModal function:', typeof window.closeTaskEditModal === 'function' ? '✅' : '❌');
+    console.log('  deleteTaskFromEdit function:', typeof window.deleteTaskFromEdit === 'function' ? '✅' : '❌');
+    console.log('  Modal element:', document.getElementById('task-edit-modal') ? '✅' : '❌');
+    console.log('  Tasks array:', Array.isArray(window.tasks) ? `✅ (${window.tasks.length} tasks)` : '❌');
+};
+
+console.log('✅ CRITICAL FIX: Add task setup integration complete!');
+console.log('💡 Run testAddTaskFix() to verify all functions are working');
+</script>
 </body>
 </html>
 </body>
