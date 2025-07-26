@@ -635,7 +635,7 @@ window.getTasksForCalendar = getTasksForCalendar;
 window.ensureCalendarCompatibility = ensureCalendarCompatibility;
 
 console.log('📅 Enhanced calendar compatibility fix loaded'); </script>
-    <!-- Add this script AFTER all your other scripts to ensure functions are loaded -->
+  <!-- Add this script AFTER all your other scripts to ensure functions are loaded -->
 <script>
 // Function Loader and Debug Script for Casa Care
 // This ensures all dashboard functions are properly available
@@ -644,6 +644,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Wait for all scripts to load
     setTimeout(function() {
         console.log('🔍 Checking function availability...');
+        
+        // FORCE CHECK: Look for prompt-based functions and warn
+        const dashboardFunctions = ['addTaskFromDashboard', 'editTaskFromDashboard'];
+        dashboardFunctions.forEach(funcName => {
+            if (typeof window[funcName] === 'function') {
+                const funcStr = window[funcName].toString();
+                if (funcStr.includes('prompt(')) {
+                    console.warn(`⚠️ ${funcName} still uses prompts! This should use modal instead.`);
+                    console.log('🔧 Function source:', funcStr.substring(0, 200) + '...');
+                }
+            }
+        });
         
         // Check critical functions
         const requiredFunctions = [
@@ -698,6 +710,14 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('✅ All modal elements found');
         }
         
+        // CRITICAL: Test actual button clicks
+        console.log('🧪 Testing button functionality...');
+        const addButton = document.querySelector('[onclick="addTaskFromDashboard()"]');
+        const editButtons = document.querySelectorAll('[onclick^="editTaskFromDashboard("]');
+        
+        console.log(`📊 Found ${addButton ? 1 : 0} Add Task button(s)`);
+        console.log(`📊 Found ${editButtons.length} Edit Task button(s)`);
+        
         // Add debug function to window
         window.debugCasaCare = function() {
             console.log('=== CASA CARE DEBUG ===');
@@ -705,15 +725,37 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Modal elements found:', requiredModals.filter(m => document.getElementById(m)).length + '/' + requiredModals.length);
             console.log('Enhanced dashboard:', window.enhancedDashboard ? '✅' : '❌');
             console.log('Tasks loaded:', window.tasks ? window.tasks.length : 'none');
+            console.log('Current editing task:', window.currentEditingTask ? '✅' : '❌');
+            
+            // Test function sources
+            console.log('\n🔍 FUNCTION SOURCES:');
+            dashboardFunctions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    const funcStr = window[funcName].toString();
+                    const usesPrompt = funcStr.includes('prompt(');
+                    const usesModal = funcStr.includes('task-edit-modal') || funcStr.includes('modal.classList');
+                    console.log(`  ${funcName}: ${usesModal ? '✅ MODAL' : usesPrompt ? '❌ PROMPT' : '❓ UNKNOWN'}`);
+                }
+            });
             
             if (typeof window.debugDashboardFunctions === 'function') {
                 window.debugDashboardFunctions();
             }
         };
         
+        // FORCE REFRESH: If enhanced dashboard exists, make sure it's initialized
+        if (typeof EnhancedDashboard !== 'undefined' && !window.enhancedDashboard) {
+            console.log('🔄 Force initializing enhanced dashboard...');
+            try {
+                window.enhancedDashboard = new EnhancedDashboard();
+            } catch (error) {
+                console.error('❌ Failed to force init enhanced dashboard:', error);
+            }
+        }
+        
         console.log('🎯 Casa Care function loader complete. Run debugCasaCare() for detailed info.');
         
-    }, 500); // Wait 500ms for all scripts to load
+    }, 1000); // Wait 1 second for all scripts to load completely
 });
 </script>
    
