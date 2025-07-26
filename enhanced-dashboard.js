@@ -516,8 +516,6 @@ function exportTaskList() {
     alert('📋 Task list exported successfully!');
 }
 
-// ADDED: Missing modal functions for enhanced dashboard
-
 // Close task edit modal
 function closeTaskEditModal() {
     const modal = document.getElementById('task-edit-modal');
@@ -528,8 +526,56 @@ function closeTaskEditModal() {
     console.log('✅ Task edit modal closed');
 }
 
-// Save task from edit modal
+// Delete task from edit modal
+function deleteTaskFromEdit() {
+    if (!window.currentEditingTask) {
+        console.error('❌ No task being edited');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to delete "${window.currentEditingTask.title}"?`)) {
+        const taskIndex = window.tasks.findIndex(t => t.id === window.currentEditingTask.id);
+        if (taskIndex > -1) {
+            const deletedTask = window.tasks.splice(taskIndex, 1)[0];
+            console.log(`🗑️ Deleted task: ${deletedTask.title}`);
+            
+            // Save data
+            if (typeof window.saveData === 'function') {
+                window.saveData();
+            } else if (typeof saveData === 'function') {
+                saveData();
+            }
+            
+            // Refresh dashboard
+            if (window.enhancedDashboard) {
+                window.enhancedDashboard.render();
+            }
+            
+            // Refresh calendar if it exists
+            if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+                window.casaCareCalendar.refresh();
+            }
+            
+            // Also refresh task categories if in setup
+            if (typeof renderTaskCategories === 'function') {
+                const taskSetup = document.getElementById('task-setup');
+                if (taskSetup && !taskSetup.classList.contains('hidden')) {
+                    renderTaskCategories();
+                }
+            }
+            
+            // Close modal
+            closeTaskEditModal();
+            
+            alert(`✅ Task "${deletedTask.title}" deleted successfully!`);
+        }
+    }
+}
+
+// ENHANCED: Save task from edit modal (works in both setup and dashboard)
 function saveTaskFromEdit() {
+    console.log('💾 Saving task from edit modal (enhanced dashboard version)...');
+    
     if (!window.currentEditingTask) {
         console.error('❌ No task being edited');
         alert('❌ No task selected for editing');
@@ -544,6 +590,8 @@ function saveTaskFromEdit() {
     const priority = document.getElementById('edit-task-priority').value;
     const category = document.getElementById('edit-task-category')?.value || 'General';
     const dueDateInput = document.getElementById('edit-task-due-date');
+    
+    console.log('📝 Form values:', { title, description, cost, frequency, priority, category });
     
     // Validate inputs
     if (!title) {
@@ -579,14 +627,16 @@ function saveTaskFromEdit() {
             return;
         }
     } else {
-        alert('❌ Due date is required');
-        if (dueDateInput) dueDateInput.focus();
-        return;
+        dueDate = new Date();
     }
     
-    // Update task
-    const isNewTask = !window.tasks.find(t => t.id === window.currentEditingTask.id);
+    console.log('📅 Due date:', dueDate.toLocaleDateString());
     
+    // Check if this is a new task
+    const isNewTask = !window.tasks.find(t => t.id === window.currentEditingTask.id);
+    console.log('🆕 Is new task:', isNewTask);
+    
+    // Update task properties
     window.currentEditingTask.title = title;
     window.currentEditingTask.description = description;
     window.currentEditingTask.cost = cost;
@@ -599,26 +649,47 @@ function saveTaskFromEdit() {
     if (isNewTask) {
         // Add to tasks array
         window.tasks.push(window.currentEditingTask);
-        console.log('✅ New task added:', window.currentEditingTask);
+        console.log('✅ New task added to global array');
     } else {
-        console.log('✅ Task updated:', window.currentEditingTask);
+        console.log('✅ Existing task updated');
     }
     
-    // Save data
-    if (typeof window.saveData === 'function') {
-        window.saveData();
-    } else if (typeof saveData === 'function') {
-        saveData();
-    }
-    
-    // Refresh dashboard
-    if (window.enhancedDashboard) {
-        window.enhancedDashboard.render();
-    }
-    
-    // Refresh calendar if it exists
-    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-        window.casaCareCalendar.refresh();
+    // Always save data and refresh
+    try {
+        // Save data
+        if (typeof window.saveData === 'function') {
+            window.saveData();
+        } else if (typeof saveData === 'function') {
+            saveData();
+        }
+        console.log('💾 Data saved');
+        
+        // Refresh dashboard
+        if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
+            window.enhancedDashboard.render();
+            console.log('🔄 Enhanced dashboard refreshed');
+        } else if (typeof updateDashboard === 'function') {
+            updateDashboard();
+            console.log('🔄 Basic dashboard updated');
+        }
+        
+        // Refresh calendar if available
+        if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+            window.casaCareCalendar.refresh();
+            console.log('📅 Calendar refreshed');
+        }
+        
+        // Also try to refresh task categories if in setup
+        if (typeof renderTaskCategories === 'function') {
+            const taskSetup = document.getElementById('task-setup');
+            if (taskSetup && !taskSetup.classList.contains('hidden')) {
+                renderTaskCategories();
+                console.log('📋 Task categories re-rendered');
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Error during save/refresh:', error);
     }
     
     // Close modal
@@ -781,18 +852,18 @@ function showSuccessNotification(message) {
     }, 3000);
 }
 
-// Make ALL functions globally available
+// FORCE OVERRIDE: Make ALL functions globally available and override any existing ones
+window.addTaskFromDashboard = addTaskFromDashboard;
 window.editTaskFromDashboard = editTaskFromDashboard;
 window.rescheduleTaskFromDashboard = rescheduleTaskFromDashboard;
-window.addTaskFromDashboard = addTaskFromDashboard;
 window.exportTaskList = exportTaskList;
 
-// Modal functions
+// Modal functions - FORCE OVERRIDE
 window.closeTaskEditModal = closeTaskEditModal;
 window.saveTaskFromEdit = saveTaskFromEdit;
 window.deleteTaskFromEdit = deleteTaskFromEdit;
 
-// Date picker functions
+// Date picker functions - FORCE OVERRIDE
 window.closeDatePickerModal = closeDatePickerModal;
 window.setQuickDate = setQuickDate;
 window.confirmReschedule = confirmReschedule;
@@ -801,12 +872,26 @@ window.showSuccessNotification = showSuccessNotification;
 // Ensure enhanced dashboard is available globally
 window.EnhancedDashboard = EnhancedDashboard;
 
-// Debug function
+// FORCE OVERRIDE any existing functions
+console.log('🔄 Enhanced Dashboard: FORCE OVERRIDING existing functions...');
+
+// Override any prompt-based functions that might exist
+if (typeof window.addTaskFromDashboard !== 'function' || window.addTaskFromDashboard.toString().includes('prompt')) {
+    console.log('⚠️ Overriding prompt-based addTaskFromDashboard');
+    window.addTaskFromDashboard = addTaskFromDashboard;
+}
+
+if (typeof window.editTaskFromDashboard !== 'function' || window.editTaskFromDashboard.toString().includes('prompt')) {
+    console.log('⚠️ Overriding prompt-based editTaskFromDashboard');
+    window.editTaskFromDashboard = editTaskFromDashboard;
+}
+
+// Debug function to check function status
 window.debugDashboardFunctions = function() {
-    console.log('🔍 DASHBOARD FUNCTIONS DEBUG:');
+    console.log('🔍 ENHANCED DASHBOARD FUNCTIONS DEBUG:');
     const functions = [
-        'editTaskFromDashboard',
-        'addTaskFromDashboard', 
+        'addTaskFromDashboard',
+        'editTaskFromDashboard', 
         'rescheduleTaskFromDashboard',
         'closeTaskEditModal',
         'saveTaskFromEdit',
@@ -818,7 +903,8 @@ window.debugDashboardFunctions = function() {
     
     functions.forEach(funcName => {
         const exists = typeof window[funcName] === 'function';
-        console.log(`  ${funcName}: ${exists ? '✅' : '❌'}`);
+        const hasPrompt = exists && window[funcName].toString().includes('prompt');
+        console.log(`  ${funcName}: ${exists ? '✅' : '❌'}${hasPrompt ? ' (⚠️ STILL USES PROMPTS!)' : ''}`);
     });
     
     // Check modal elements
@@ -828,6 +914,8 @@ window.debugDashboardFunctions = function() {
         const element = document.getElementById(modalId);
         console.log(`  ${modalId}: ${element ? '✅' : '❌'}`);
     });
+    
+    console.log('\n🔍 CURRENT EDITING TASK:', window.currentEditingTask ? '✅' : '❌');
 };
 
 console.log('📋 Enhanced Dashboard script loaded with simplified date system');
