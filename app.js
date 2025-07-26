@@ -1078,79 +1078,56 @@ function goBackToHomeSetup() {
 
 // Replace your finishTaskSetup function with this debugged version:
 
+// Replace your finishTaskSetup and showTab functions with these fixed versions:
+
 function finishTaskSetup() {
-    console.log('🚀 Finishing task setup...');
-    console.log('📋 Tasks before processing:', tasks.length);
+    console.log('🚀 Finishing task setup with enhanced dashboard support...');
     
-    let tasksProcessed = 0;
-    let tasksWithDates = 0;
-    
-    // Convert templates to actual scheduled tasks
+    // Simple approach: just set due dates for all template tasks
     tasks.forEach(task => {
-        console.log(`Processing task ${task.id}: ${task.title}`);
-        
         if (task.isTemplate) {
-            const startDateElement = document.getElementById(`start-date-${task.id}`);
-            console.log(`Looking for start-date-${task.id}:`, startDateElement);
-            
+            // Try to get custom start date, otherwise use today + some days
+            const startDateInput = document.getElementById(`start-date-${task.id}`);
             let startDate;
-            if (startDateElement && startDateElement.value) {
-                console.log(`Found start date value: ${startDateElement.value}`);
-                startDate = new Date(startDateElement.value);
-                tasksWithDates++;
+            
+            if (startDateInput && startDateInput.value) {
+                startDate = new Date(startDateInput.value);
+                console.log(`✅ Using custom date for ${task.title}: ${startDate.toLocaleDateString()}`);
             } else {
-                console.log(`No start date found, using suggested date`);
-                const suggestedDate = getSuggestedStartDate(task);
-                startDate = new Date(suggestedDate);
+                // Default: high priority = 7 days, others = 30 days
+                const daysFromNow = task.priority === 'high' ? 7 : 30;
+                startDate = new Date(Date.now() + daysFromNow * 24 * 60 * 60 * 1000);
+                console.log(`🤖 Using generated date for ${task.title}: ${startDate.toLocaleDateString()}`);
             }
             
-            // Calculate nextDue date
+            // Set due date = start date + frequency
             task.nextDue = new Date(startDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
-            console.log(`Task ${task.id} nextDue set to:`, task.nextDue);
-            
-            // Remove template flag
             delete task.isTemplate;
-            tasksProcessed++;
-        } else {
-            console.log(`Task ${task.id} is not a template, skipping`);
+            task.isCompleted = false; // Make sure it's not marked as completed
+            console.log(`📅 ${task.title} due: ${task.nextDue.toLocaleDateString()}`);
         }
     });
     
-    console.log(`✅ Processed ${tasksProcessed} tasks, ${tasksWithDates} had custom start dates`);
-    console.log('📋 Tasks after processing:', tasks.filter(t => t.nextDue).length, 'have due dates');
+    console.log(`✅ Processed ${tasks.filter(t => t.nextDue).length} tasks with due dates`);
     
-    // Save data
+    // Save and update global references
     saveData();
-    console.log('💾 Data saved');
-    
-    // Update global references immediately
     window.tasks = tasks;
     window.homeData = homeData;
-    console.log('🌐 Global references updated');
     
     // Show main app
     document.getElementById('task-setup').classList.add('hidden');
     document.getElementById('main-app').classList.remove('hidden');
-    
-    // Update header
     document.getElementById('header-subtitle').textContent = homeData.fullAddress;
     
-    // Initialize dashboard with proper data
-    console.log('🏠 Initializing dashboard...');
+    // Initialize enhanced dashboard
     showTab('dashboard');
-    
-    console.log('🎉 Setup complete! Welcome to Casa Care!');
-    
-    // Debug final state
-    console.log('=== FINAL DEBUG INFO ===');
-    console.log('Total tasks:', tasks.length);
-    console.log('Tasks with nextDue:', tasks.filter(t => t.nextDue).length);
-    console.log('Sample task with due date:', tasks.find(t => t.nextDue));
+    console.log('🎉 Setup complete with enhanced dashboard!');
 }
-// Tab switching functionality
-// Replace your showTab function with this corrected version:
 
 function showTab(tabName) {
+    console.log(`🔄 Switching to tab: ${tabName}`);
+    
     // Hide all views
     document.getElementById('dashboard-view').classList.add('hidden');
     document.getElementById('calendar-view').classList.add('hidden');
@@ -1167,16 +1144,26 @@ function showTab(tabName) {
         document.getElementById('tab-dashboard').classList.add('bg-blue-100', 'text-blue-700');
         document.getElementById('tab-dashboard').classList.remove('text-gray-600');
         
-        // Update dashboard with current task data
-        updateDashboard();
+        // Make sure global references are up to date
+        window.tasks = tasks;
+        window.homeData = homeData;
         
-        // Also try enhanced dashboard if it exists
-        if (window.enhancedDashboard) {
-            try {
-                window.enhancedDashboard.render();
-            } catch (error) {
-                console.log('Enhanced dashboard not available, using basic dashboard');
-            }
+        console.log('🏠 Initializing enhanced dashboard...');
+        console.log('📊 Available tasks for dashboard:', window.tasks ? window.tasks.length : 'undefined');
+        console.log('📊 Tasks with due dates:', window.tasks ? window.tasks.filter(t => t.nextDue).length : 'undefined');
+        
+        // Initialize or refresh enhanced dashboard
+        if (!window.enhancedDashboard) {
+            console.log('🆕 Creating new enhanced dashboard instance...');
+            window.enhancedDashboard = new EnhancedDashboard();
+        } else {
+            console.log('🔄 Refreshing existing enhanced dashboard...');
+            window.enhancedDashboard.render();
+        }
+        
+        // Also call the basic updateDashboard as fallback
+        if (typeof updateDashboard === 'function') {
+            updateDashboard();
         }
         
     } else if (tabName === 'calendar') {
@@ -1187,6 +1174,8 @@ function showTab(tabName) {
         // Update global task reference for calendar
         window.tasks = tasks;
         window.homeData = homeData;
+        
+        console.log('📅 Initializing calendar...');
         
         // Initialize calendar if not already done
         if (!window.casaCareCalendar) {
@@ -1206,235 +1195,72 @@ function showTab(tabName) {
     }
 }
 
-// Task editing functions
-function addTaskFromSetup() {
-    currentEditingTask = null;
-    document.getElementById('task-edit-title').textContent = 'Add Custom Task';
-    document.getElementById('edit-task-name').value = '';
-    document.getElementById('edit-task-cost').value = '0';
-    document.getElementById('edit-task-frequency').value = '365';
-    document.getElementById('edit-task-priority').value = 'medium';
-    document.getElementById('edit-task-description').value = '';
-    document.getElementById('task-edit-modal').classList.remove('hidden');
-}
-
-function editTaskFromSetup(taskId) {
-    const task = tasks.find(t => t.id === taskId);
-    if (task) {
-        currentEditingTask = task;
-        document.getElementById('task-edit-title').textContent = 'Edit Task';
-        document.getElementById('edit-task-name').value = task.title;
-        document.getElementById('edit-task-cost').value = task.cost;
-        document.getElementById('edit-task-frequency').value = task.frequency;
-        document.getElementById('edit-task-priority').value = task.priority;
-        document.getElementById('edit-task-description').value = task.description;
-        document.getElementById('task-edit-modal').classList.remove('hidden');
-    }
-}
-
-function closeTaskEditModal() {
-    document.getElementById('task-edit-modal').classList.add('hidden');
-    currentEditingTask = null;
-}
-
-function saveTaskFromEdit() {
-    const name = document.getElementById('edit-task-name').value;
-    const cost = parseInt(document.getElementById('edit-task-cost').value) || 0;
-    const frequency = parseInt(document.getElementById('edit-task-frequency').value);
-    const priority = document.getElementById('edit-task-priority').value;
-    const description = document.getElementById('edit-task-description').value;
-
-    if (!name.trim()) {
-        alert('Please enter a task name');
-        return;
-    }
-
-    if (currentEditingTask) {
-        currentEditingTask.title = name;
-        currentEditingTask.cost = cost;
-        currentEditingTask.frequency = frequency;
-        currentEditingTask.priority = priority;
-        currentEditingTask.description = description;
-    } else {
-        const newTask = {
-            id: Math.max(...tasks.map(t => t.id), 0) + 1,
-            title: name,
-            category: 'General',
-            frequency: frequency,
-            cost: cost,
-            priority: priority,
-            description: description,
-            nextDue: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        };
-        tasks.push(newTask);
-    }
-
-    closeTaskEditModal();
-    renderTaskCategories();
-}
-
-function deleteTaskFromEdit() {
-    if (currentEditingTask && confirm(`Are you sure you want to delete "${currentEditingTask.title}"?`)) {
-        tasks = tasks.filter(t => t.id !== currentEditingTask.id);
-        closeTaskEditModal();
-        renderTaskCategories();
-    }
-}
-
-function deleteTaskDirect(taskId) {
-    const task = tasks.find(t => t.id === taskId);
-    if (task && confirm(`Are you sure you want to delete "${task.title}"?`)) {
-        tasks = tasks.filter(t => t.id !== taskId);
-        renderTaskCategories();
-    }
-}
-
-// Dashboard functions
-// Replace your updateDashboard function with this debugged version:
-
-function updateDashboard() {
-    console.log('🏠 Updating dashboard...');
-    console.log('Dashboard called with', tasks.length, 'total tasks');
-    
-    // Update home address
-    const homeAddressElement = document.getElementById('home-address');
-    if (homeAddressElement && homeData.fullAddress) {
-        homeAddressElement.textContent = `Managing maintenance for ${homeData.fullAddress}`;
-        console.log('✅ Home address updated');
-    } else {
-        console.log('❌ Home address element not found or no address data');
-    }
-
-    const now = new Date();
-    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    
-    let overdueCount = 0;
-    let weekCount = 0;
-    let totalCost = 0;
-    let activeTasks = 0;
-
-    // Filter and count tasks
-    const activeTasksList = tasks.filter(task => !task.isCompleted && task.nextDue);
-    activeTasks = activeTasksList.length;
-    console.log('Active tasks with due dates:', activeTasks);
-
-    activeTasksList.forEach(task => {
-        if (task.nextDue < now) {
-            overdueCount++;
-        }
-        if (task.nextDue <= oneWeek) {
-            weekCount++;
-        }
-        totalCost += task.cost * (365 / task.frequency);
-    });
-
-    console.log('Dashboard stats:', { overdueCount, weekCount, activeTasks, totalCost });
-
-    // Update dashboard stats
-    const elements = {
-        'overdue-count': overdueCount,
-        'week-count': weekCount,
-        'total-count': activeTasks,
-        'annual-cost': '$' + Math.round(totalCost)
-    };
-
-    Object.entries(elements).forEach(([id, value]) => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.textContent = value;
-            console.log(`✅ Updated ${id}: ${value}`);
-        } else {
-            console.log(`❌ Element ${id} not found`);
-        }
-    });
-
-    // Render tasks list
-    renderTasks();
-    console.log('✅ Dashboard update complete');
-}
-
-// Also fix renderTasks to be more robust:
-function renderTasks() {
-    console.log('📋 Rendering tasks...');
-    
-    const tasksList = document.getElementById('tasks-list');
-    if (!tasksList) {
-        console.error('❌ tasks-list element not found');
-        return;
-    }
-
-    const upcomingTasks = tasks
-        .filter(task => !task.isCompleted && task.nextDue)
-        .sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue))
-        .slice(0, 8);
-
-    console.log('Upcoming tasks to display:', upcomingTasks.length);
-
-    if (upcomingTasks.length === 0) {
-        tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All tasks complete!</div>';
-        console.log('No upcoming tasks to display');
-        return;
-    }
-
-    const now = new Date();
-    tasksList.innerHTML = upcomingTasks.map(task => {
-        const taskDue = new Date(task.nextDue);
-        const daysUntilDue = Math.ceil((taskDue - now) / (24 * 60 * 60 * 1000));
-        const overdue = daysUntilDue < 0;
-        const statusClass = overdue ? 'bg-red-50 border-l-4 border-red-400' : 
-                           daysUntilDue <= 7 ? 'bg-orange-50 border-l-4 border-orange-400' : 'bg-white';
-        
-        console.log(`Task: ${task.title}, Due: ${taskDue.toLocaleDateString()}, Days: ${daysUntilDue}`);
-        
-        return `
-            <div class="p-4 border-b ${statusClass}">
-                <div class="flex justify-between items-start">
-                    <div class="flex-1 pr-3">
-                        <h4 class="font-semibold text-gray-900 text-sm">${task.title}</h4>
-                        <p class="text-xs text-gray-600 mt-1">${task.description}</p>
-                        <div class="flex items-center gap-3 mt-2 text-xs">
-                            <span class="bg-gray-100 px-2 py-1 rounded">${task.category}</span>
-                            <span class="${overdue ? 'text-red-600' : daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600'}">
-                                ${overdue ? `${Math.abs(daysUntilDue)}d overdue` : daysUntilDue <= 0 ? 'Due today' : `${daysUntilDue}d`}
-                            </span>
-                            <span class="text-gray-600">$${task.cost}</span>
-                            <span class="text-xs text-gray-500">Due: ${taskDue.toLocaleDateString()}</span>
-                        </div>
-                    </div>
-                    <button onclick="completeTask(${task.id})" class="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 text-xs touch-btn">
-                        ✅
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    console.log('✅ Tasks rendered successfully');
-}
-
+// Enhanced complete task function that works with enhanced dashboard
 function completeTask(taskId) {
+    console.log(`✅ Completing task ${taskId}...`);
+    
     const task = tasks.find(t => t.id === taskId);
     if (task) {
         task.lastCompleted = new Date();
         task.nextDue = new Date(Date.now() + task.frequency * 24 * 60 * 60 * 1000);
         task.isCompleted = false; // Will be due again in the future
         
-        updateDashboard();
+        console.log(`📅 Task "${task.title}" completed! Next due: ${task.nextDue.toLocaleDateString()}`);
+        
+        // Save data
+        saveData();
+        
+        // Update global references
+        window.tasks = tasks;
+        
+        // Refresh enhanced dashboard
+        if (window.enhancedDashboard) {
+            console.log('🔄 Refreshing enhanced dashboard after task completion...');
+            window.enhancedDashboard.render();
+        } else {
+            // Fallback to basic dashboard
+            updateDashboard();
+        }
         
         // Refresh calendar if it exists
         if (window.casaCareCalendar) {
             window.casaCareCalendar.refresh();
         }
         
-        saveData();
-        
         alert(`✅ Task "${task.title}" completed! Next due: ${task.nextDue.toLocaleDateString()}`);
+    } else {
+        console.error('❌ Task not found:', taskId);
     }
 }
 
+// Add this debugging function to check enhanced dashboard status
+function debugEnhancedDashboard() {
+    console.log('=== ENHANCED DASHBOARD DEBUG ===');
+    console.log('Enhanced dashboard exists:', !!window.enhancedDashboard);
+    console.log('EnhancedDashboard class available:', typeof EnhancedDashboard);
+    console.log('Tasks available:', window.tasks ? window.tasks.length : 'undefined');
+    console.log('Tasks with due dates:', window.tasks ? window.tasks.filter(t => t.nextDue).length : 'undefined');
+    
+    // Check for required HTML elements
+    const requiredElements = [
+        'dashboard-view', 'tasks-list', 'overdue-card', 'week-card', 
+        'total-card', 'cost-card', 'overdue-count', 'week-count', 
+        'total-count', 'annual-cost', 'tasks-list-title'
+    ];
+    
+    console.log('Required HTML elements:');
+    requiredElements.forEach(id => {
+        const element = document.getElementById(id);
+        console.log(`  ${id}: ${element ? '✅' : '❌'}`);
+    });
+    
+    return {
+        dashboardExists: !!window.enhancedDashboard,
+        classAvailable: typeof EnhancedDashboard !== 'undefined',
+        tasksCount: window.tasks ? window.tasks.length : 0,
+        tasksWithDates: window.tasks ? window.tasks.filter(t => t.nextDue).length : 0
+    };
+}
 // Utility functions
 function showHomeInfo() {
     if (homeData.fullAddress) {
