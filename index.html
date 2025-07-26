@@ -1392,6 +1392,137 @@ window.runAllModalTests = function() {
 console.log('🧪 Modal diagnostic loaded. Run:');
 console.log('  testModalStep(1) through testModalStep(6) for individual tests');
 console.log('  runAllModalTests() for all tests at once');
+</script> <!-- SAVE DIAGNOSTIC SCRIPT - Add temporarily to test save functionality -->
+<script>
+// DIAGNOSTIC: Test save functionality step by step
+window.testSave = function() {
+    console.log('🧪 TESTING SAVE FUNCTIONALITY...');
+    
+    // Step 1: Check if modal is open and has a task
+    console.log('Step 1: Current editing task');
+    console.log('window.currentEditingTask:', window.currentEditingTask);
+    
+    if (!window.currentEditingTask) {
+        console.log('❌ No current editing task! Opening Add Task modal first...');
+        window.addTaskFromDashboard();
+        setTimeout(() => {
+            console.log('✅ Modal opened, currentEditingTask:', window.currentEditingTask);
+        }, 100);
+        return;
+    }
+    
+    // Step 2: Check form fields
+    console.log('\nStep 2: Form field values');
+    const fields = {
+        'edit-task-name': document.getElementById('edit-task-name')?.value,
+        'edit-task-description': document.getElementById('edit-task-description')?.value,
+        'edit-task-cost': document.getElementById('edit-task-cost')?.value,
+        'edit-task-frequency': document.getElementById('edit-task-frequency')?.value,
+        'edit-task-priority': document.getElementById('edit-task-priority')?.value,
+        'edit-task-due-date': document.getElementById('edit-task-due-date')?.value,
+        'edit-task-category': document.getElementById('edit-task-category')?.value
+    };
+    
+    Object.entries(fields).forEach(([fieldId, value]) => {
+        const element = document.getElementById(fieldId);
+        console.log(`  ${fieldId}: ${element ? '✅' : '❌'} Value: "${value}"`);
+    });
+    
+    // Step 3: Test save button
+    console.log('\nStep 3: Save button');
+    const saveButton = document.querySelector('[onclick="saveTaskFromEdit()"]');
+    console.log('Save button found:', saveButton ? '✅' : '❌');
+    if (saveButton) {
+        console.log('Save button onclick:', saveButton.getAttribute('onclick'));
+        console.log('Save button text:', saveButton.textContent.trim());
+    }
+    
+    // Step 4: Check if saveTaskFromEdit function exists
+    console.log('\nStep 4: Save function');
+    console.log('saveTaskFromEdit function exists:', typeof window.saveTaskFromEdit === 'function' ? '✅' : '❌');
+    
+    // Step 5: Fill test data and try to save
+    console.log('\nStep 5: Filling test data...');
+    try {
+        document.getElementById('edit-task-name').value = 'Test Task ' + Date.now();
+        document.getElementById('edit-task-description').value = 'Test description for diagnostic';
+        document.getElementById('edit-task-cost').value = '50';
+        document.getElementById('edit-task-frequency').value = '30';
+        document.getElementById('edit-task-priority').value = 'medium';
+        document.getElementById('edit-task-due-date').value = new Date().toISOString().split('T')[0];
+        
+        const categoryField = document.getElementById('edit-task-category');
+        if (categoryField) {
+            categoryField.value = 'General';
+        }
+        
+        console.log('✅ Test data filled');
+        
+        // Step 6: Try to call save function
+        console.log('\nStep 6: Calling save function...');
+        if (typeof window.saveTaskFromEdit === 'function') {
+            window.saveTaskFromEdit();
+        } else {
+            console.log('❌ Save function not available');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error during test:', error);
+    }
+};
+
+// Test save button click directly
+window.testSaveButton = function() {
+    console.log('🧪 TESTING SAVE BUTTON CLICK...');
+    
+    const saveButton = document.querySelector('[onclick="saveTaskFromEdit()"]');
+    if (saveButton) {
+        console.log('✅ Save button found, simulating click...');
+        try {
+            saveButton.click();
+            console.log('✅ Button click completed');
+        } catch (error) {
+            console.error('❌ Error clicking button:', error);
+        }
+    } else {
+        console.log('❌ Save button not found');
+        
+        // Look for alternative save buttons
+        const allButtons = document.querySelectorAll('#task-edit-modal button');
+        console.log('All buttons in modal:');
+        allButtons.forEach((btn, i) => {
+            console.log(`  Button ${i+1}: "${btn.textContent.trim()}" onclick="${btn.getAttribute('onclick')}"`);
+        });
+    }
+};
+
+// Test validation specifically
+window.testValidation = function() {
+    console.log('🧪 TESTING FORM VALIDATION...');
+    
+    // Open modal first
+    window.addTaskFromDashboard();
+    
+    setTimeout(() => {
+        console.log('Testing validation with empty fields...');
+        
+        // Clear all fields
+        document.getElementById('edit-task-name').value = '';
+        document.getElementById('edit-task-description').value = '';
+        
+        // Try to save
+        try {
+            window.saveTaskFromEdit();
+        } catch (error) {
+            console.error('Error during validation test:', error);
+        }
+    }, 200);
+};
+
+console.log('🧪 Save diagnostic loaded. Run:');
+console.log('  testSave() - Full save test');
+console.log('  testSaveButton() - Test save button click');
+console.log('  testValidation() - Test form validation');
 </script>
    
 </body>
