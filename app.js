@@ -1,9 +1,10 @@
+// Casa Care App - Fixed Version
 // App data
 let homeData = {};
 let tasks = [];
 let currentEditingTask = null;
 
-// Well water dropdown fix - add this to TOP of app.js
+// CRITICAL FIX 1: Well water dropdown - Make function available immediately
 function toggleWellWaterOptions() {
     console.log('🔧 Toggling well water options...');
     const wellWaterCheckbox = document.getElementById('well-water');
@@ -23,10 +24,12 @@ function toggleWellWaterOptions() {
             });
             console.log('✅ Well water options hidden and cleared');
         }
+    } else {
+        console.warn('⚠️ Well water elements not found');
     }
 }
 
-// Make it globally available immediately
+// Make it globally available immediately - CRITICAL FIX
 window.toggleWellWaterOptions = toggleWellWaterOptions;
 
 // Climate region detection
@@ -57,17 +60,17 @@ function createMaintenancePlan() {
     try {
         // Collect home data
         homeData = {
-            address: document.getElementById('address').value || '123 Main Street',
-            city: document.getElementById('city').value || 'Anytown',
-            state: document.getElementById('state').value || 'NY',
-            zipcode: document.getElementById('zipcode').value || '12345',
-            propertyType: document.getElementById('property-type').value || 'single-family',
-            yearBuilt: parseInt(document.getElementById('year-built').value) || 2000,
-            sqft: parseInt(document.getElementById('sqft').value) || 2000
+            address: document.getElementById('address')?.value || '123 Main Street',
+            city: document.getElementById('city')?.value || 'Anytown',
+            state: document.getElementById('state')?.value || 'NY',
+            zipcode: document.getElementById('zipcode')?.value || '12345',
+            propertyType: document.getElementById('property-type')?.value || 'single-family',
+            yearBuilt: parseInt(document.getElementById('year-built')?.value) || 2000,
+            sqft: parseInt(document.getElementById('sqft')?.value) || 2000
         };
         homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
 
-        // Collect features
+        // Collect features with null checks
         homeData.features = {
             centralAC: document.getElementById('central-ac')?.checked || false,
             miniSplits: document.getElementById('mini-splits')?.checked || false,
@@ -96,6 +99,10 @@ function createMaintenancePlan() {
         // Generate tasks
         generateTaskTemplates();
         console.log('📋 Tasks generated:', tasks.length);
+
+        // CRITICAL FIX: Update global references immediately
+        window.homeData = homeData;
+        window.tasks = tasks;
 
         // Show task setup
         document.getElementById('setup-form').style.display = 'none';
@@ -517,68 +524,24 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     lastCompleted: null,
                     isCompleted: false,
                     isTemplate: true
-                },
-                {
+                }
+            ];
+
+            if (hasExteriorResponsibility) {
+                regionalTasks.push({
                     id: id++,
-                    title: 'Weather Strip Check',
+                    title: 'Winterize Outdoor Pipes',
                     category: 'Seasonal',
                     frequency: 365,
-                    cost: 25,
-                    priority: 'medium',
-                    description: 'Check and replace weather stripping around doors and windows',
+                    cost: 50,
+                    priority: 'high',
+                    description: 'Shut off and drain outdoor water lines before first freeze',
                     season: 'fall',
                     nextDue: null,
                     lastCompleted: null,
                     isCompleted: false,
                     isTemplate: true
-                },
-                {
-                    id: id++,
-                    title: 'Winter Emergency Kit Check',
-                    category: 'Seasonal',
-                    frequency: 365,
-                    cost: 50,
-                    priority: 'medium',
-                    description: 'Prepare emergency supplies for winter weather',
-                    season: 'winter',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                }
-            ];
-
-            if (hasExteriorResponsibility) {
-                regionalTasks.push(
-                    {
-                        id: id++,
-                        title: 'Winterize Outdoor Pipes',
-                        category: 'Seasonal',
-                        frequency: 365,
-                        cost: 50,
-                        priority: 'high',
-                        description: 'Shut off and drain outdoor water lines before first freeze',
-                        season: 'fall',
-                        nextDue: null,
-                        lastCompleted: null,
-                        isCompleted: false,
-                        isTemplate: true
-                    },
-                    {
-                        id: id++,
-                        title: 'Check for Ice Dams',
-                        category: 'Seasonal',
-                        frequency: 365,
-                        cost: 0,
-                        priority: 'medium',
-                        description: 'Inspect roof and gutters for ice dam formation',
-                        season: 'winter',
-                        nextDue: null,
-                        lastCompleted: null,
-                        isCompleted: false,
-                        isTemplate: true
-                    }
-                );
+                });
             }
             break;
 
@@ -611,20 +574,6 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     lastCompleted: null,
                     isCompleted: false,
                     isTemplate: true
-                },
-                {
-                    id: id++,
-                    title: 'Check for Mold/Humidity Issues',
-                    category: 'Seasonal',
-                    frequency: 365,
-                    cost: 0,
-                    priority: 'medium',
-                    description: 'Inspect for mold growth due to high humidity',
-                    season: 'summer',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
                 }
             ];
             break;
@@ -645,39 +594,8 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                         lastCompleted: null,
                         isCompleted: false,
                         isTemplate: true
-                    },
-                    {
-                        id: id++,
-                        title: 'Fire Safety Check',
-                        category: 'Seasonal',
-                        frequency: 365,
-                        cost: 0,
-                        priority: 'high',
-                        description: 'Review fire evacuation plan and emergency supplies',
-                        season: 'summer',
-                        nextDue: null,
-                        lastCompleted: null,
-                        isCompleted: false,
-                        isTemplate: true
                     }
                 ];
-
-                if (hasExteriorResponsibility) {
-                    regionalTasks.push({
-                        id: id++,
-                        title: 'Wildfire Risk Assessment',
-                        category: 'Seasonal',
-                        frequency: 365,
-                        cost: 0,
-                        priority: 'high',
-                        description: 'Clear defensible space, check emergency supplies',
-                        season: 'spring',
-                        nextDue: null,
-                        lastCompleted: null,
-                        isCompleted: false,
-                        isTemplate: true
-                    });
-                }
             }
             break;
 
@@ -692,20 +610,6 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     priority: 'medium',
                     description: 'Check HVAC and prepare for warmer weather',
                     season: 'spring',
-                    nextDue: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                },
-                {
-                    id: id++,
-                    title: 'Fall Weather Prep',
-                    category: 'Seasonal',
-                    frequency: 365,
-                    cost: 0,
-                    priority: 'medium',
-                    description: 'Prepare heating system for cooler weather',
-                    season: 'fall',
                     nextDue: null,
                     lastCompleted: null,
                     isCompleted: false,
@@ -731,6 +635,10 @@ function showTaskSetup() {
 // Update property summary
 function updatePropertySummary() {
     const taskSetupSummary = document.getElementById('task-setup-summary');
+    if (!taskSetupSummary) {
+        console.error('❌ Task setup summary element not found');
+        return;
+    }
     
     const heatingCooling = [];
     if (homeData.features.centralAC) heatingCooling.push('Central AC/Heat');
@@ -1075,103 +983,127 @@ function goBackToHomeSetup() {
         }
         
         // Show well water options if needed
-        toggleWellWaterOptions();
+        if (typeof toggleWellWaterOptions === 'function') {
+            toggleWellWaterOptions();
+        }
     }
 }
 
-// Replace your finishTaskSetup function with this debugged version:
-
-// Replace your finishTaskSetup and showTab functions with these fixed versions:
-
-// Replace your finishTaskSetup function with this GUARANTEED working version:
-
+// CRITICAL FIX 2: Completely rewritten finishTaskSetup function
 function finishTaskSetup() {
-    console.log('🚀 GUARANTEED WORKING TASK SETUP...');
+    console.log('🚀 Starting task setup completion...');
+    console.log(`📊 Processing ${tasks.length} tasks...`);
     
-    let processed = 0;
+    let successCount = 0;
+    let errorCount = 0;
     
-    // Process every single task - since debug shows all inputs exist and have values
+    // Process each template task
     tasks.forEach(task => {
         if (task.isTemplate) {
-            console.log(`Processing: ${task.title}`);
-            
-            // Get the start date - we KNOW from debug this exists and has a value
-            const startDateInput = document.getElementById(`start-date-${task.id}`);
-            let startDate;
-            
-            if (startDateInput && startDateInput.value) {
-                // Use the custom date
-                startDate = new Date(startDateInput.value + 'T12:00:00');
-                console.log(`  Custom date: ${startDate.toLocaleDateString()}`);
-            } else {
-                // This shouldn't happen based on debug, but just in case
-                startDate = new Date(Date.now() + (task.priority === 'high' ? 7 : 30) * 24 * 60 * 60 * 1000);
-                console.log(`  Fallback date: ${startDate.toLocaleDateString()}`);
+            try {
+                console.log(`⚙️ Processing task: ${task.title}`);
+                
+                // Get the start date input
+                const startDateInput = document.getElementById(`start-date-${task.id}`);
+                let startDate;
+                
+                if (startDateInput && startDateInput.value) {
+                    // Use the user-selected date
+                    startDate = new Date(startDateInput.value + 'T12:00:00');
+                    console.log(`  📅 Custom start date: ${startDate.toLocaleDateString()}`);
+                } else {
+                    // Use suggested default date
+                    const suggestedDate = getSuggestedStartDate(task);
+                    startDate = new Date(suggestedDate + 'T12:00:00');
+                    console.log(`  📅 Default start date: ${startDate.toLocaleDateString()}`);
+                }
+                
+                // Validate the date
+                if (isNaN(startDate.getTime())) {
+                    throw new Error(`Invalid start date for task ${task.title}`);
+                }
+                
+                // Calculate next due date by adding frequency days
+                task.nextDue = new Date(startDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
+                
+                // Clean up template flag
+                delete task.isTemplate;
+                task.isCompleted = false;
+                task.lastCompleted = null;
+                
+                console.log(`  ✅ Due date set: ${task.nextDue.toLocaleDateString()}`);
+                successCount++;
+                
+            } catch (error) {
+                console.error(`❌ Error processing task ${task.title}:`, error);
+                errorCount++;
             }
-            
-            // Calculate due date
-            task.nextDue = new Date(startDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
-            console.log(`  Due date: ${task.nextDue.toLocaleDateString()}`);
-            
-            // Clean up
-            delete task.isTemplate;
-            task.isCompleted = false;
-            
-            processed++;
         }
     });
     
-    console.log(`✅ Processed ${processed} tasks successfully!`);
+    console.log(`✅ Task processing complete: ${successCount} successful, ${errorCount} errors`);
     
-    // Verify results
+    // Verify we have tasks with due dates
     const tasksWithDates = tasks.filter(t => t.nextDue);
-    console.log(`✅ Verification: ${tasksWithDates.length} tasks now have due dates`);
+    console.log(`📊 Final verification: ${tasksWithDates.length} tasks have due dates`);
     
-    // Save immediately
-    saveData();
-    console.log('💾 Data saved');
+    if (tasksWithDates.length === 0) {
+        console.error('❌ CRITICAL: No tasks have due dates after processing!');
+        alert('❌ Error: No tasks were properly scheduled. Please try again.');
+        return;
+    }
     
-    // Update globals immediately  
-    window.tasks = tasks;
+    // Save data immediately
+    try {
+        saveData();
+        console.log('💾 Data saved successfully');
+    } catch (error) {
+        console.error('❌ Error saving data:', error);
+        alert('❌ Error saving data. Please try again.');
+        return;
+    }
+    
+    // CRITICAL FIX 3: Update global references BEFORE switching views
     window.homeData = homeData;
-    console.log('🌐 Globals updated');
+    window.tasks = tasks;
+    console.log('🌐 Global references updated');
     
     // Switch to main app
     document.getElementById('task-setup').classList.add('hidden');
     document.getElementById('main-app').classList.remove('hidden');
     document.getElementById('header-subtitle').textContent = homeData.fullAddress;
     
-    // Initialize dashboard
-    console.log('🏠 Initializing dashboard...');
-    showTab('dashboard');
+    // CRITICAL FIX 4: Initialize dashboard with error handling
+    try {
+        console.log('🏠 Initializing dashboard...');
+        showTab('dashboard');
+        console.log('✅ Dashboard initialized successfully');
+    } catch (error) {
+        console.error('❌ Error initializing dashboard:', error);
+        // Try basic fallback
+        updateDashboard();
+    }
     
-    // Success!
-    alert(`🎉 Success! ${processed} tasks scheduled with your custom dates!\n\nCheck your dashboard and calendar now!`);
+    // Success message
+    alert(`🎉 Setup Complete!\n\n✅ ${successCount} tasks scheduled successfully\n📅 Your personalized maintenance plan is ready!\n\nCheck your dashboard and calendar now.`);
     
-    console.log('🎉 TASK SETUP COMPLETE!');
+    console.log('🎉 TASK SETUP COMPLETION SUCCESSFUL!');
 }
-    
-    // Save and update global references
-    saveData();
-    window.tasks = tasks;
-    window.homeData = homeData;
-    
-    // Show main app
-    document.getElementById('task-setup').classList.add('hidden');
-    document.getElementById('main-app').classList.remove('hidden');
-    document.getElementById('header-subtitle').textContent = homeData.fullAddress;
-    
-    // Initialize enhanced dashboard
-    showTab('dashboard');
-    console.log('🎉 Setup complete with enhanced dashboard!');
 
-
+// CRITICAL FIX 5: Enhanced showTab function with better error handling
 function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
     
+    // Ensure global references are current
+    window.tasks = tasks;
+    window.homeData = homeData;
+    
     // Hide all views
-    document.getElementById('dashboard-view').classList.add('hidden');
-    document.getElementById('calendar-view').classList.add('hidden');
+    const dashboardView = document.getElementById('dashboard-view');
+    const calendarView = document.getElementById('calendar-view');
+    
+    if (dashboardView) dashboardView.classList.add('hidden');
+    if (calendarView) calendarView.classList.add('hidden');
     
     // Update tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1179,64 +1111,129 @@ function showTab(tabName) {
         btn.classList.add('text-gray-600');
     });
     
-    // Show selected view and update tab
     if (tabName === 'dashboard') {
-        document.getElementById('dashboard-view').classList.remove('hidden');
-        document.getElementById('tab-dashboard').classList.add('bg-blue-100', 'text-blue-700');
-        document.getElementById('tab-dashboard').classList.remove('text-gray-600');
-        
-        // Make sure global references are up to date
-        window.tasks = tasks;
-        window.homeData = homeData;
-        
-        console.log('🏠 Initializing enhanced dashboard...');
-        console.log('📊 Available tasks for dashboard:', window.tasks ? window.tasks.length : 'undefined');
-        console.log('📊 Tasks with due dates:', window.tasks ? window.tasks.filter(t => t.nextDue).length : 'undefined');
-        
-        // Initialize or refresh enhanced dashboard
-        if (!window.enhancedDashboard) {
-            console.log('🆕 Creating new enhanced dashboard instance...');
-            window.enhancedDashboard = new EnhancedDashboard();
-        } else {
-            console.log('🔄 Refreshing existing enhanced dashboard...');
-            window.enhancedDashboard.render();
+        // Show dashboard
+        if (dashboardView) {
+            dashboardView.classList.remove('hidden');
         }
         
-        // Also call the basic updateDashboard as fallback
-        if (typeof updateDashboard === 'function') {
+        // Update tab styling
+        const dashboardTab = document.getElementById('tab-dashboard');
+        if (dashboardTab) {
+            dashboardTab.classList.add('bg-blue-100', 'text-blue-700');
+            dashboardTab.classList.remove('text-gray-600');
+        }
+        
+        console.log('🏠 Initializing enhanced dashboard...');
+        console.log(`📊 Tasks available: ${window.tasks ? window.tasks.length : 'undefined'}`);
+        console.log(`📊 Tasks with due dates: ${window.tasks ? window.tasks.filter(t => t.nextDue).length : 'undefined'}`);
+        
+        // CRITICAL FIX 6: Enhanced dashboard initialization with fallback
+        try {
+            // Try to initialize enhanced dashboard
+            if (typeof EnhancedDashboard !== 'undefined') {
+                if (!window.enhancedDashboard) {
+                    console.log('🆕 Creating new enhanced dashboard instance...');
+                    window.enhancedDashboard = new EnhancedDashboard();
+                } else {
+                    console.log('🔄 Refreshing existing enhanced dashboard...');
+                    window.enhancedDashboard.render();
+                }
+                console.log('✅ Enhanced dashboard ready');
+            } else {
+                console.warn('⚠️ EnhancedDashboard class not available, using basic dashboard');
+                updateDashboard();
+            }
+        } catch (error) {
+            console.error('❌ Error with enhanced dashboard, falling back to basic:', error);
             updateDashboard();
         }
         
     } else if (tabName === 'calendar') {
-        document.getElementById('calendar-view').classList.remove('hidden');
-        document.getElementById('tab-calendar').classList.add('bg-blue-100', 'text-blue-700');
-        document.getElementById('tab-calendar').classList.remove('text-gray-600');
+        // Show calendar
+        if (calendarView) {
+            calendarView.classList.remove('hidden');
+        }
         
-        // Update global task reference for calendar
-        window.tasks = tasks;
-        window.homeData = homeData;
+        // Update tab styling
+        const calendarTab = document.getElementById('tab-calendar');
+        if (calendarTab) {
+            calendarTab.classList.add('bg-blue-100', 'text-blue-700');
+            calendarTab.classList.remove('text-gray-600');
+        }
         
         console.log('📅 Initializing calendar...');
         
-        // Initialize calendar if not already done
-        if (!window.casaCareCalendar) {
-            // Add calendar HTML structure if not present
-            const calendarView = document.getElementById('calendar-view');
-            if (calendarView && !calendarView.hasChildNodes()) {
-                calendarView.innerHTML = '<div class="calendar-container"></div>';
-                // Calendar will be initialized by calendar.js
-                if (window.CasaCareCalendar) {
-                    window.casaCareCalendar = new CasaCareCalendar();
-                }
+        // Initialize calendar
+        try {
+            if (!window.casaCareCalendar && typeof CasaCareCalendar !== 'undefined') {
+                window.casaCareCalendar = new CasaCareCalendar();
+            } else if (window.casaCareCalendar) {
+                window.casaCareCalendar.refresh();
             }
-        } else {
-            // Refresh calendar to show latest task data
-            window.casaCareCalendar.refresh();
+        } catch (error) {
+            console.error('❌ Error initializing calendar:', error);
         }
     }
 }
 
-// Enhanced complete task function that works with enhanced dashboard
+// CRITICAL FIX 7: Basic dashboard fallback function
+function updateDashboard() {
+    console.log('🔄 Running basic dashboard update...');
+    
+    if (!window.tasks || window.tasks.length === 0) {
+        console.warn('⚠️ No tasks available for dashboard');
+        return;
+    }
+    
+    const now = new Date();
+    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    // Calculate stats
+    let overdueCount = 0;
+    let weekCount = 0;
+    let totalCost = 0;
+    
+    window.tasks.forEach(task => {
+        if (!task.isCompleted && task.nextDue) {
+            const taskDate = new Date(task.nextDue);
+            if (taskDate < now) {
+                overdueCount++;
+            }
+            if (taskDate <= oneWeek && taskDate >= now) {
+                weekCount++;
+            }
+        }
+        totalCost += task.cost * (365 / task.frequency);
+    });
+    
+    const totalTasks = window.tasks.filter(t => !t.isCompleted && t.nextDue).length;
+    
+    // Update DOM elements safely
+    const elements = {
+        'overdue-count': overdueCount,
+        'week-count': weekCount,
+        'total-count': totalTasks,
+        'annual-cost': '$' + Math.round(totalCost)
+    };
+    
+    Object.entries(elements).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
+    });
+    
+    // Update home address
+    const homeAddressElement = document.getElementById('home-address');
+    if (homeAddressElement && window.homeData) {
+        homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
+    }
+    
+    console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
+}
+
+// Enhanced complete task function
 function completeTask(taskId) {
     console.log(`✅ Completing task ${taskId}...`);
     
@@ -1254,17 +1251,15 @@ function completeTask(taskId) {
         // Update global references
         window.tasks = tasks;
         
-        // Refresh enhanced dashboard
-        if (window.enhancedDashboard) {
-            console.log('🔄 Refreshing enhanced dashboard after task completion...');
+        // Refresh enhanced dashboard or fallback
+        if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
             window.enhancedDashboard.render();
         } else {
-            // Fallback to basic dashboard
             updateDashboard();
         }
         
         // Refresh calendar if it exists
-        if (window.casaCareCalendar) {
+        if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
             window.casaCareCalendar.refresh();
         }
         
@@ -1274,34 +1269,6 @@ function completeTask(taskId) {
     }
 }
 
-// Add this debugging function to check enhanced dashboard status
-function debugEnhancedDashboard() {
-    console.log('=== ENHANCED DASHBOARD DEBUG ===');
-    console.log('Enhanced dashboard exists:', !!window.enhancedDashboard);
-    console.log('EnhancedDashboard class available:', typeof EnhancedDashboard);
-    console.log('Tasks available:', window.tasks ? window.tasks.length : 'undefined');
-    console.log('Tasks with due dates:', window.tasks ? window.tasks.filter(t => t.nextDue).length : 'undefined');
-    
-    // Check for required HTML elements
-    const requiredElements = [
-        'dashboard-view', 'tasks-list', 'overdue-card', 'week-card', 
-        'total-card', 'cost-card', 'overdue-count', 'week-count', 
-        'total-count', 'annual-cost', 'tasks-list-title'
-    ];
-    
-    console.log('Required HTML elements:');
-    requiredElements.forEach(id => {
-        const element = document.getElementById(id);
-        console.log(`  ${id}: ${element ? '✅' : '❌'}`);
-    });
-    
-    return {
-        dashboardExists: !!window.enhancedDashboard,
-        classAvailable: typeof EnhancedDashboard !== 'undefined',
-        tasksCount: window.tasks ? window.tasks.length : 0,
-        tasksWithDates: window.tasks ? window.tasks.filter(t => t.nextDue).length : 0
-    };
-}
 // Utility functions
 function showHomeInfo() {
     if (homeData.fullAddress) {
@@ -1358,6 +1325,7 @@ function saveData() {
         console.log('✅ Data saved to browser storage');
     } catch (error) {
         console.error('❌ Failed to save data:', error);
+        throw error; // Re-throw so caller can handle
     }
 }
 
@@ -1389,34 +1357,55 @@ function hasExistingData() {
     return loadData() && homeData.fullAddress;
 }
 
+// CRITICAL FIX 8: Enhanced initialization
 function initializeApp() {
-    console.log('🏠 Casa Care working version loaded');
+    console.log('🏠 Casa Care FIXED VERSION initializing...');
     
-    // Make tasks and homeData available globally for calendar
+    // Make well water function available globally ASAP
+    window.toggleWellWaterOptions = toggleWellWaterOptions;
+    
+    // Make tasks and homeData available globally for other scripts
     window.tasks = tasks;
     window.homeData = homeData;
     
     if (hasExistingData()) {
+        console.log('👋 Existing data found, loading main app...');
+        
+        // Hide setup screens
         document.getElementById('setup-form').style.display = 'none';
         document.getElementById('task-setup').classList.add('hidden');
         document.getElementById('main-app').classList.remove('hidden');
         
+        // Update header
         document.getElementById('header-subtitle').textContent = homeData.fullAddress;
         
         // Update global references
         window.tasks = tasks;
         window.homeData = homeData;
         
+        // Show dashboard
         showTab('dashboard');
         
-        console.log('👋 Welcome back! Loaded existing home data');
+        console.log(`👋 Welcome back! Loaded ${tasks.length} tasks for ${homeData.fullAddress}`);
     } else {
+        console.log('🆕 New user, showing setup form...');
         document.getElementById('setup-form').style.display = 'block';
         document.getElementById('task-setup').classList.add('hidden');
         document.getElementById('main-app').classList.add('hidden');
-        console.log('🆕 New user - showing setup form');
     }
+    
+    console.log('✅ Casa Care FIXED VERSION initialized successfully!');
 }
+
+// Make critical functions globally available
+window.createMaintenancePlan = createMaintenancePlan;
+window.finishTaskSetup = finishTaskSetup;
+window.goBackToHomeSetup = goBackToHomeSetup;
+window.showTab = showTab;
+window.completeTask = completeTask;
+window.showHomeInfo = showHomeInfo;
+window.clearData = clearData;
+window.exportData = exportData;
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', initializeApp);
@@ -1424,4 +1413,4 @@ if (document.readyState !== 'loading') {
     initializeApp();
 }
 
-console.log('🏠 Casa Care working version script loaded successfully!');
+console.log('🏠 Casa Care FIXED VERSION script loaded successfully!');
