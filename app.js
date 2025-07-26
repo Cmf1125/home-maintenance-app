@@ -1077,7 +1077,7 @@ function goBackToHomeSetup() {
     }
     
     // Set radio buttons and select
-   // Radio buttons and approach dropdown removed - no longer needed}
+   // Radio buttons and approach dropdown removed - no longer needed
 
 function finishTaskSetup() {
     console.log('🚀 Finishing task setup...');
