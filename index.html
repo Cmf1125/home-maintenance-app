@@ -534,83 +534,55 @@
     <script src="app.js"></script>
     <script src="calendar.js"></script>
     <script src="enhanced-dashboard.js"></script>
-    // Calendar Compatibility Fix for Casa Care
-// This ensures calendar integration works with the new dueDate field
-
-// Add this script AFTER your main app.js loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait a moment for other scripts to load
-    setTimeout(function() {
-        // Ensure calendar uses dueDate instead of nextDue
-        if (window.tasks) {
-            window.tasks.forEach(task => {
-                // For backward compatibility, provide nextDue as alias to dueDate
-                if (task.dueDate && !task.nextDue) {
-                    Object.defineProperty(task, 'nextDue', {
-                        get: function() { return this.dueDate; },
-                        set: function(value) { this.dueDate = value; },
-                        enumerable: true,
-                        configurable: true
-                    });
-                }
-            });
-        }
-        
-        console.log('📅 Calendar compatibility layer initialized');
-    }, 100);
-});
-
-// Enhanced task getter for calendar integration
-function getTasksForCalendar() {
-    if (!window.tasks) return [];
+ <script src="app.js"></script>
+    <script src="calendar.js"></script>
+    <script src="enhanced-dashboard.js"></script>
     
-    // Return tasks with both dueDate and nextDue for compatibility
-    return window.tasks.map(task => ({
-        ...task,
-        nextDue: task.dueDate // Ensure calendar gets the due date
-    }));
-}
+    <!-- Calendar Compatibility Fix -->
+    <script>
+    // Calendar Compatibility Fix for Casa Care
+    // This ensures calendar integration works with the new dueDate field
 
-// Enhanced task completion for calendar sync
-function completeTaskWithCalendarSync(taskId) {
-    const task = window.tasks.find(t => t.id === taskId);
-    if (task) {
-        const oldDueDate = task.dueDate ? new Date(task.dueDate) : new Date();
+    // Add this script AFTER your main app.js loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Wait a moment for other scripts to load
+        setTimeout(function() {
+            // Ensure calendar uses dueDate instead of nextDue
+            if (window.tasks) {
+                window.tasks.forEach(task => {
+                    // For backward compatibility, provide nextDue as alias to dueDate
+                    if (task.dueDate && !task.nextDue) {
+                        Object.defineProperty(task, 'nextDue', {
+                            get: function() { return this.dueDate; },
+                            set: function(value) { this.dueDate = value; },
+                            enumerable: true,
+                            configurable: true
+                        });
+                    }
+                });
+            }
+            
+            console.log('📅 Calendar compatibility layer initialized');
+        }, 100);
+    });
+
+    // Enhanced task getter for calendar integration
+    function getTasksForCalendar() {
+        if (!window.tasks) return [];
         
-        task.lastCompleted = new Date();
-        task.dueDate = new Date(oldDueDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
-        task.isCompleted = false;
-        
-        // Update nextDue alias for calendar compatibility
-        task.nextDue = task.dueDate;
-        
-        // Save data
-        if (typeof saveData === 'function') {
-            saveData();
-        }
-        
-        // Update global reference
-        window.tasks = window.tasks;
-        
-        // Refresh all components
-        if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-            window.enhancedDashboard.render();
-        }
-        
-        if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-            window.casaCareCalendar.refresh();
-        }
-        
-        console.log(`✅ Task completed with calendar sync: ${task.title}`);
-        return true;
+        // Return tasks with both dueDate and nextDue for compatibility
+        return window.tasks.map(task => ({
+            ...task,
+            nextDue: task.dueDate // Ensure calendar gets the due date
+        }));
     }
-    return false;
-}
 
-// Make functions globally available
-window.getTasksForCalendar = getTasksForCalendar;
-window.completeTaskWithCalendarSync = completeTaskWithCalendarSync;
+    // Make functions globally available
+    window.getTasksForCalendar = getTasksForCalendar;
 
-console.log('📅 Calendar compatibility fix loaded');
+    console.log('📅 Calendar compatibility fix loaded');
+    </script>
+</body>
+</html>
 </body>
 </html>
