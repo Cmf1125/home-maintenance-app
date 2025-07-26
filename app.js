@@ -53,15 +53,15 @@ function createMaintenancePlan() {
     
     try {
         // Collect home data
-       homeData = {
-    address: document.getElementById('address').value || '123 Main Street',
-    city: document.getElementById('city').value || 'Anytown',
-    state: document.getElementById('state').value || 'NY',
-    zipcode: document.getElementById('zipcode').value || '12345',
-    propertyType: document.getElementById('property-type').value || 'single-family',
-    yearBuilt: parseInt(document.getElementById('year-built').value) || 2000,
-    sqft: parseInt(document.getElementById('sqft').value) || 2000
-};
+        homeData = {
+            address: document.getElementById('address').value || '123 Main Street',
+            city: document.getElementById('city').value || 'Anytown',
+            state: document.getElementById('state').value || 'NY',
+            zipcode: document.getElementById('zipcode').value || '12345',
+            propertyType: document.getElementById('property-type').value || 'single-family',
+            yearBuilt: parseInt(document.getElementById('year-built').value) || 2000,
+            sqft: parseInt(document.getElementById('sqft').value) || 2000
+        };
         homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
 
         // Collect features
@@ -785,7 +785,6 @@ function updatePropertySummary() {
         <div class="space-y-1 text-sm">
             <div><strong>🏠 Address:</strong> ${homeData.fullAddress}</div>
             <div><strong>🏢 Type:</strong> ${propertyTypeDisplay[homeData.propertyType]} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString()} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt}</div>
-            // Removed approach and pets info
             ${heatingCooling.length > 0 ? `<div><strong>🌡️ Heating/Cooling:</strong> ${heatingCooling.join(', ')}</div>` : ''}
             ${waterSewer.length > 0 ? `<div><strong>💧 Water/Sewer:</strong> ${waterSewer.join(', ')}</div>` : ''}
             ${otherFeatures.length > 0 ? `<div><strong>⚙️ Other Features:</strong> ${otherFeatures.join(', ')}</div>` : ''}
@@ -1075,11 +1074,7 @@ function goBackToHomeSetup() {
         // Show well water options if needed
         toggleWellWaterOptions();
     }
-    
-    // Set radio buttons and select
-   // Radio buttons and approach dropdown removed - no longer needed
-
-// Add this function to your app.js file (place it after the goBackToHomeSetup function):
+}
 
 function finishTaskSetup() {
     console.log('🚀 Finishing task setup...');
@@ -1115,23 +1110,8 @@ function finishTaskSetup() {
     
     console.log('🎉 Setup complete! Welcome to Casa Care!');
 }
-}
 
 // Tab switching functionality
-function showTab(tabName) {
-    // Hide all views
-    document.getElementById('dashboard-view').classList.add('hidden');
-    document.getElementById('calendar-view').classList.add('hidden');
-    
-    // Update tab buttons
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-blue-100', 'text-blue-700');
-        btn.classList.add('text-gray-600');
-    });
-    
-    // Show selected view and update tab
-   // Replace your showTab function with this corrected version:
-
 function showTab(tabName) {
     // Hide all views
     document.getElementById('dashboard-view').classList.add('hidden');
@@ -1156,27 +1136,6 @@ function showTab(tabName) {
             window.enhancedDashboard.render();
         }
     } else if (tabName === 'calendar') {
-        document.getElementById('calendar-view').classList.remove('hidden');
-        document.getElementById('tab-calendar').classList.add('bg-blue-100', 'text-blue-700');
-        document.getElementById('tab-calendar').classList.remove('text-gray-600');
-        
-        // Initialize calendar if not already done
-        if (!window.casaCareCalendar) {
-            // Add calendar HTML structure if not present
-            const calendarView = document.getElementById('calendar-view');
-            if (calendarView && !calendarView.hasChildNodes()) {
-                calendarView.innerHTML = '<div class="calendar-container"></div>';
-                // Calendar will be initialized by calendar.js
-                if (window.CasaCareCalendar) {
-                    window.casaCareCalendar = new CasaCareCalendar();
-                }
-            }
-        } else {
-            // Refresh calendar to show latest task data
-            window.casaCareCalendar.refresh();
-        }
-    }
-}
         document.getElementById('calendar-view').classList.remove('hidden');
         document.getElementById('tab-calendar').classList.add('bg-blue-100', 'text-blue-700');
         document.getElementById('tab-calendar').classList.remove('text-gray-600');
@@ -1378,7 +1337,7 @@ function completeTask(taskId) {
 // Utility functions
 function showHomeInfo() {
     if (homeData.fullAddress) {
-        alert(`🏠 Home Info\n\n${homeData.fullAddress}\nBuilt: ${homeData.yearBuilt} • ${homeData.sqft?.toLocaleString()} sq ft\nApproach: ${homeData.approach} • Pets: ${homeData.hasPets ? 'Yes' : 'No'}`);
+        alert(`🏠 Home Info\n\n${homeData.fullAddress}\nBuilt: ${homeData.yearBuilt} • ${homeData.sqft?.toLocaleString()} sq ft`);
     } else {
         alert('🏠 No home information set yet. Complete the setup to add your home details.');
     }
