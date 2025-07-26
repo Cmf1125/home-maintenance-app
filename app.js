@@ -1127,23 +1127,53 @@ function showTab(tabName) {
     });
     
     // Show selected view and update tab
+   // Replace your showTab function with this corrected version:
+
+function showTab(tabName) {
+    // Hide all views
+    document.getElementById('dashboard-view').classList.add('hidden');
+    document.getElementById('calendar-view').classList.add('hidden');
+    
+    // Update tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-blue-100', 'text-blue-700');
+        btn.classList.add('text-gray-600');
+    });
+    
+    // Show selected view and update tab
     if (tabName === 'dashboard') {
         document.getElementById('dashboard-view').classList.remove('hidden');
         document.getElementById('tab-dashboard').classList.add('bg-blue-100', 'text-blue-700');
         document.getElementById('tab-dashboard').classList.remove('text-gray-600');
-        if (tabName === 'dashboard') {
-    document.getElementById('dashboard-view').classList.remove('hidden');
-    document.getElementById('tab-dashboard').classList.add('bg-blue-100', 'text-blue-700');
-    document.getElementById('tab-dashboard').classList.remove('text-gray-600');
-    
-    // Initialize enhanced dashboard
-    if (!window.enhancedDashboard) {
-        window.enhancedDashboard = new EnhancedDashboard();
-    } else {
-        window.enhancedDashboard.render();
+        
+        // Initialize enhanced dashboard
+        if (!window.enhancedDashboard) {
+            window.enhancedDashboard = new EnhancedDashboard();
+        } else {
+            window.enhancedDashboard.render();
+        }
+    } else if (tabName === 'calendar') {
+        document.getElementById('calendar-view').classList.remove('hidden');
+        document.getElementById('tab-calendar').classList.add('bg-blue-100', 'text-blue-700');
+        document.getElementById('tab-calendar').classList.remove('text-gray-600');
+        
+        // Initialize calendar if not already done
+        if (!window.casaCareCalendar) {
+            // Add calendar HTML structure if not present
+            const calendarView = document.getElementById('calendar-view');
+            if (calendarView && !calendarView.hasChildNodes()) {
+                calendarView.innerHTML = '<div class="calendar-container"></div>';
+                // Calendar will be initialized by calendar.js
+                if (window.CasaCareCalendar) {
+                    window.casaCareCalendar = new CasaCareCalendar();
+                }
+            }
+        } else {
+            // Refresh calendar to show latest task data
+            window.casaCareCalendar.refresh();
+        }
     }
 }
-    } else if (tabName === 'calendar') {
         document.getElementById('calendar-view').classList.remove('hidden');
         document.getElementById('tab-calendar').classList.add('bg-blue-100', 'text-blue-700');
         document.getElementById('tab-calendar').classList.remove('text-gray-600');
