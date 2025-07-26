@@ -1276,6 +1276,175 @@ window.testModalOverride = function() {
 
 console.log('💡 Run testModalOverride() to verify all functions use modals now');
 </script>
+    <!-- Current Task Persistence Fix -->
+<script>
+// ENHANCED: Ensure currentEditingTask persists properly
+let persistentCurrentTask = null;
+
+// Override the Add Task function to ensure task persistence
+const originalAddTask = window.addTaskFromDashboard;
+window.addTaskFromDashboard = function() {
+    console.log('🔄 ENHANCED: Add Task with persistent tracking...');
+    
+    // Find next available ID
+    const maxId = Math.max(...window.tasks.map(t => t.id), 0);
+    
+    // Create new task object
+    const newTask = {
+        id: maxId + 1,
+        title: '',
+        description: '',
+        category: 'General',
+        frequency: 365,
+        cost: 0,
+        priority: 'medium',
+        dueDate: new Date(),
+        lastCompleted: null,
+        isCompleted: false
+    };
+    
+    // CRITICAL: Set BOTH variables
+    window.currentEditingTask = newTask;
+    persistentCurrentTask = newTask;
+    
+    console.log('✅ ENHANCED: Current editing task set:', newTask);
+    console.log('✅ ENHANCED: Persistent task set:', persistentCurrentTask);
+    
+    // Open modal
+    const modal = document.getElementById('task-edit-modal');
+    if (modal) {
+        // Fill fields
+        document.getElementById('edit-task-name').value = '';
+        document.getElementById('edit-task-description').value = '';
+        document.getElementById('edit-task-cost').value = 0;
+        document.getElementById('edit-task-frequency').value = 365;
+        document.getElementById('edit-task-priority').value = 'medium';
+        
+        const categoryField = document.getElementById('edit-task-category');
+        if (categoryField) categoryField.value = 'General';
+        
+        const dueDateInput = document.getElementById('edit-task-due-date');
+        if (dueDateInput) dueDateInput.value = new Date().toISOString().split('T')[0];
+        
+        // Update modal
+        const modalTitle = document.getElementById('task-edit-title');
+        if (modalTitle) modalTitle.textContent = 'Add New Task';
+        
+        const deleteButton = modal.querySelector('[onclick="deleteTaskFromEdit()"]');
+        if (deleteButton) deleteButton.style.display = 'none';
+        
+        // Show modal
+        modal.classList.remove('hidden');
+        setTimeout(() => document.getElementById('edit-task-name').focus(), 100);
+        
+        console.log('✅ ENHANCED: Add task modal opened');
+    }
+};
+
+// Override the Save function to use persistent task
+const originalSave = window.saveTaskFromEdit;
+window.saveTaskFromEdit = function() {
+    console.log('💾 ENHANCED: Saving with persistent task tracking...');
+    
+    // Use persistent task if main one is missing
+    let editingTask = window.currentEditingTask || persistentCurrentTask;
+    
+    if (!editingTask) {
+        console.error('❌ ENHANCED: No task being edited (both sources empty)');
+        alert('❌ No task selected for editing. Please try opening the modal again.');
+        return;
+    }
+    
+    console.log('✅ ENHANCED: Using task for save:', editingTask);
+    
+    // Rest of save logic...
+    const title = document.getElementById('edit-task-name').value.trim();
+    const description = document.getElementById('edit-task-description').value.trim();
+    const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
+    const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
+    const priority = document.getElementById('edit-task-priority').value;
+    const category = document.getElementById('edit-task-category')?.value || 'General';
+    const dueDateInput = document.getElementById('edit-task-due-date');
+    
+    console.log('📝 ENHANCED: Form values:', { title, description, cost, frequency, priority, category });
+    
+    // Validate
+    if (!title) {
+        alert('❌ Task name is required');
+        document.getElementById('edit-task-name').focus();
+        return;
+    }
+    
+    if (!description) {
+        alert('❌ Task description is required');
+        document.getElementById('edit-task-description').focus();
+        return;
+    }
+    
+    if (frequency <= 0) {
+        alert('❌ Frequency must be greater than 0');
+        return;
+    }
+    
+    // Handle due date
+    let dueDate;
+    if (dueDateInput && dueDateInput.value) {
+        dueDate = new Date(dueDateInput.value + 'T12:00:00');
+        if (isNaN(dueDate.getTime())) {
+            alert('❌ Invalid due date');
+            return;
+        }
+    } else {
+        dueDate = new Date();
+    }
+    
+    // Check if new task
+    const isNewTask = !window.tasks.find(t => t.id === editingTask.id);
+    console.log('🆕 ENHANCED: Is new task:', isNewTask);
+    
+    // Update task
+    editingTask.title = title;
+    editingTask.description = description;
+    editingTask.cost = cost;
+    editingTask.frequency = frequency;
+    editingTask.priority = priority;
+    editingTask.category = category;
+    editingTask.dueDate = dueDate;
+    editingTask.nextDue = dueDate;
+    
+    if (isNewTask) {
+        window.tasks.push(editingTask);
+        console.log('✅ ENHANCED: New task added');
+    } else {
+        console.log('✅ ENHANCED: Existing task updated');
+    }
+    
+    // Save and refresh
+    if (typeof window.saveData === 'function') {
+        window.saveData();
+    }
+    
+    if (window.enhancedDashboard) {
+        window.enhancedDashboard.render();
+    }
+    
+    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+        window.casaCareCalendar.refresh();
+    }
+    
+    // Close modal and cleanup
+    const modal = document.getElementById('task-edit-modal');
+    if (modal) modal.classList.add('hidden');
+    
+    window.currentEditingTask = null;
+    persistentCurrentTask = null;
+    
+    console.log('✅ ENHANCED: Save completed successfully');
+    alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
+};
+
+console.log('🔄 ENHANCED: Current task persistence fix loaded');
+</script>
     <!-- MODAL DIAGNOSTIC SCRIPT - Add temporarily to test what's happening -->
 <script>
 // DIAGNOSTIC: Test modal functionality step by step
