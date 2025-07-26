@@ -1020,6 +1020,9 @@ function finishTaskSetup() {
                 // Set the due date
                 task.dueDate = dueDate;
                 
+                // CRITICAL: Set nextDue for calendar compatibility
+                task.nextDue = dueDate;
+                
                 // Clean up template flag and temp date
                 delete task.isTemplate;
                 delete task.tempDueDate;
@@ -1235,7 +1238,33 @@ function updateDashboard() {
     console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
 }
 
-// FIXED: Complete task function
+// FIXED: Add missing function for task setup Add Task button
+function addTaskFromSetup() {
+    console.log('➕ Adding custom task from setup...');
+    
+    // Find next available ID
+    const maxId = Math.max(...tasks.map(t => t.id), 0);
+    
+    // Create new task object
+    const newTask = {
+        id: maxId + 1,
+        title: '',
+        description: '',
+        category: 'General',
+        frequency: 365,
+        cost: 0,
+        priority: 'medium',
+        dueDate: new Date(),
+        lastCompleted: null,
+        isCompleted: false,
+        isTemplate: true // Important: mark as template so it gets processed correctly
+    };
+    
+    // Open modal for new task
+    openTaskEditModal(newTask, true);
+}
+
+// FIXED: Calendar sync - update complete task to ensure proper sync
 function completeTask(taskId) {
     console.log(`✅ Completing task ${taskId}...`);
     
@@ -1248,6 +1277,9 @@ function completeTask(taskId) {
         // Calculate next due date from current due date + frequency
         task.dueDate = new Date(oldDueDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
         task.isCompleted = false; // Will be due again in the future
+        
+        // CRITICAL: Update nextDue for calendar compatibility
+        task.nextDue = task.dueDate;
         
         console.log(`📅 Task "${task.title}" completed!`);
         console.log(`  Old due date: ${oldDueDate.toLocaleDateString()}`);
@@ -1390,6 +1422,15 @@ function exportData() {
 }
 
 function saveData() {
+    // Ensure calendar compatibility before saving
+    if (window.tasks) {
+        window.tasks.forEach(task => {
+            if (task.dueDate && !task.nextDue) {
+                task.nextDue = task.dueDate;
+            }
+        });
+    }
+    
     const data = { 
         homeData: homeData, 
         tasks: tasks,
@@ -1398,7 +1439,7 @@ function saveData() {
     
     try {
         localStorage.setItem('casaCareData', JSON.stringify(data));
-        console.log('✅ Data saved to browser storage');
+        console.log('✅ Data saved to browser storage with calendar compatibility');
     } catch (error) {
         console.error('❌ Failed to save data:', error);
         throw error; // Re-throw so caller can handle
@@ -1418,14 +1459,17 @@ function loadData() {
             tasks.forEach(task => {
                 if (task.nextDue) {
                     task.dueDate = new Date(task.nextDue);
-                    delete task.nextDue; // Remove old property
+                    // Keep nextDue for calendar compatibility
+                    task.nextDue = new Date(task.nextDue);
                 } else if (task.dueDate) {
                     task.dueDate = new Date(task.dueDate);
+                    // Set nextDue for calendar compatibility
+                    task.nextDue = new Date(task.dueDate);
                 }
                 if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
             });
             
-            console.log('✅ Data loaded from browser storage');
+            console.log('✅ Data loaded from browser storage with calendar compatibility');
             return true;
         }
     } catch (error) {
@@ -1639,6 +1683,9 @@ function saveTaskFromEdit() {
     currentEditingTask.priority = priority;
     currentEditingTask.category = category;
     currentEditingTask.dueDate = dueDate;
+    
+    // CRITICAL: Set nextDue for calendar compatibility
+    currentEditingTask.nextDue = dueDate;
     
     if (isNewTask) {
         // Add to tasks array
