@@ -1079,6 +1079,8 @@ function goBackToHomeSetup() {
     // Set radio buttons and select
    // Radio buttons and approach dropdown removed - no longer needed
 
+// Add this function to your app.js file (place it after the goBackToHomeSetup function):
+
 function finishTaskSetup() {
     console.log('🚀 Finishing task setup...');
     
@@ -1112,6 +1114,7 @@ function finishTaskSetup() {
     showTab('dashboard');
     
     console.log('🎉 Setup complete! Welcome to Casa Care!');
+}
 }
 
 // Tab switching functionality
