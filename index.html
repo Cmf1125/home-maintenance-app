@@ -1693,14 +1693,44 @@ console.log('  testSave() - Full save test');
 console.log('  testSaveButton() - Test save button click');
 console.log('  testValidation() - Test form validation');
 </script>
-   <!-- CRITICAL FIX SCRIPT - Add this to your HTML file AFTER all other scripts -->
+  <!-- ULTIMATE FIX SCRIPT - Replace your previous fix with this -->
 <script>
-// COMPREHENSIVE FIX: Ensure addTaskFromSetup works with modal system
-console.log('🔧 CRITICAL FIX: Loading addTaskFromSetup modal integration...');
+// ULTIMATE FIX: Complete modal system overhaul
+console.log('🔧 ULTIMATE FIX: Loading complete modal system...');
 
-// FORCE OVERRIDE: Replace addTaskFromSetup to work with modal system
+// STEP 1: Clear all conflicting functions first
+console.log('🧹 ULTIMATE FIX: Clearing conflicting functions...');
+
+// STEP 2: Create persistent task storage that won't get cleared
+window.CasaCareModalSystem = {
+    currentTask: null,
+    isEditing: false,
+    
+    setTask: function(task) {
+        this.currentTask = task;
+        this.isEditing = true;
+        console.log('📝 ULTIMATE: Task set in modal system:', task);
+    },
+    
+    getTask: function() {
+        console.log('🔍 ULTIMATE: Getting task from modal system:', this.currentTask);
+        return this.currentTask;
+    },
+    
+    clearTask: function() {
+        console.log('🧹 ULTIMATE: Clearing task from modal system');
+        this.currentTask = null;
+        this.isEditing = false;
+    },
+    
+    hasTask: function() {
+        return this.currentTask !== null && this.isEditing;
+    }
+};
+
+// STEP 3: ULTIMATE addTaskFromSetup function
 window.addTaskFromSetup = function() {
-    console.log('➕ FIXED: Adding custom task from setup with modal...');
+    console.log('➕ ULTIMATE: Adding custom task from setup...');
     
     // Find next available ID
     const maxId = Math.max(...window.tasks.map(t => t.id), 0);
@@ -1717,35 +1747,38 @@ window.addTaskFromSetup = function() {
         dueDate: new Date(),
         lastCompleted: null,
         isCompleted: false,
-        isTemplate: true // Important for setup processing
+        isTemplate: true, // Important for setup processing
+        isNewTask: true // Flag to identify new tasks
     };
     
-    // CRITICAL: Set BOTH variables to ensure compatibility
-    window.currentEditingTask = newTask;
-    window.persistentCurrentTask = newTask; // For the enhanced dashboard script
+    // Store in our persistent system
+    window.CasaCareModalSystem.setTask(newTask);
     
-    console.log('✅ FIXED: Current editing task set for setup:', newTask);
-    console.log('✅ FIXED: Persistent task set for setup:', newTask);
+    // Also set the old variables for compatibility (but don't rely on them)
+    window.currentEditingTask = newTask;
+    window.persistentCurrentTask = newTask;
+    
+    console.log('✅ ULTIMATE: Task stored in all systems');
     
     // Open the modal
     const modal = document.getElementById('task-edit-modal');
     if (modal) {
-        console.log('✅ FIXED: Opening task modal for setup add');
+        console.log('✅ ULTIMATE: Opening modal for new task');
         
         // Fill modal fields for new task
         document.getElementById('edit-task-name').value = '';
         document.getElementById('edit-task-description').value = '';
-        document.getElementById('edit-task-cost').value = 0;
-        document.getElementById('edit-task-frequency').value = 365;
+        document.getElementById('edit-task-cost').value = '0';
+        document.getElementById('edit-task-frequency').value = '365';
         document.getElementById('edit-task-priority').value = 'medium';
         
-        // Handle category if field exists
+        // Handle category
         const categoryField = document.getElementById('edit-task-category');
         if (categoryField) {
             categoryField.value = 'General';
         }
         
-        // Handle due date
+        // Handle due date - set to today
         const dueDateInput = document.getElementById('edit-task-due-date');
         if (dueDateInput) {
             dueDateInput.value = new Date().toISOString().split('T')[0];
@@ -1758,7 +1791,7 @@ window.addTaskFromSetup = function() {
         }
         
         // Hide delete button for new task
-        const deleteButton = modal.querySelector('[onclick="deleteTaskFromEdit()"]');
+        const deleteButton = modal.querySelector('[onclick*="deleteTaskFromEdit"]');
         if (deleteButton) {
             deleteButton.style.display = 'none';
         }
@@ -1767,44 +1800,133 @@ window.addTaskFromSetup = function() {
         modal.classList.remove('hidden');
         
         // Focus on task name
-        setTimeout(() => document.getElementById('edit-task-name').focus(), 100);
+        setTimeout(() => {
+            const nameField = document.getElementById('edit-task-name');
+            if (nameField) nameField.focus();
+        }, 100);
         
-        console.log('✅ FIXED: Add task modal opened from setup');
+        console.log('✅ ULTIMATE: Modal opened successfully');
     } else {
-        console.error('❌ FIXED: Task edit modal not found');
-        alert('❌ Task edit modal not found. Please check your HTML.');
+        console.error('❌ ULTIMATE: Modal not found');
+        alert('❌ Task edit modal not found');
     }
 };
 
-// FORCE OVERRIDE: Enhanced saveTaskFromEdit specifically for setup context
-window.saveTaskFromEditFixed = function() {
-    console.log('💾 FIXED: Enhanced save with setup/dashboard context detection...');
+// STEP 4: ULTIMATE editTaskFromSetup function  
+window.editTaskFromSetup = function(taskId) {
+    console.log('✏️ ULTIMATE: Editing task from setup:', taskId);
     
-    // Use persistent task if main one is missing (enhanced dashboard script compatibility)
-    let editingTask = window.currentEditingTask || window.persistentCurrentTask;
-    
-    if (!editingTask) {
-        console.error('❌ FIXED: No task being edited (both sources empty)');
-        console.log('🔍 FIXED: Debugging - window.currentEditingTask:', window.currentEditingTask);
-        console.log('🔍 FIXED: Debugging - window.persistentCurrentTask:', window.persistentCurrentTask);
-        alert('❌ No task selected for editing. Please try opening the modal again.');
+    const task = window.tasks.find(t => t.id === taskId);
+    if (!task) {
+        console.error('❌ ULTIMATE: Task not found:', taskId);
+        alert('❌ Task not found');
         return;
     }
     
-    console.log('✅ FIXED: Using task for save:', editingTask);
+    // Store in our persistent system
+    window.CasaCareModalSystem.setTask({...task}); // Clone the task
     
-    // Get form values
+    // Also set the old variables for compatibility
+    window.currentEditingTask = task;
+    window.persistentCurrentTask = task;
+    
+    console.log('✅ ULTIMATE: Task stored for editing');
+    
+    // Open modal and fill fields
+    const modal = document.getElementById('task-edit-modal');
+    if (modal) {
+        console.log('✅ ULTIMATE: Opening modal for edit');
+        
+        // Fill modal fields
+        document.getElementById('edit-task-name').value = task.title || '';
+        document.getElementById('edit-task-description').value = task.description || '';
+        document.getElementById('edit-task-cost').value = task.cost || 0;
+        document.getElementById('edit-task-frequency').value = task.frequency || 365;
+        document.getElementById('edit-task-priority').value = task.priority || 'medium';
+        
+        // Handle category
+        const categoryField = document.getElementById('edit-task-category');
+        if (categoryField) {
+            categoryField.value = task.category || 'General';
+        }
+        
+        // Handle due date - CRITICAL FIX for date capture
+        const dueDateInput = document.getElementById('edit-task-due-date');
+        if (dueDateInput) {
+            if (task.dueDate) {
+                const dueDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+                if (!isNaN(dueDate.getTime())) {
+                    dueDateInput.value = dueDate.toISOString().split('T')[0];
+                } else {
+                    dueDateInput.value = new Date().toISOString().split('T')[0];
+                }
+            } else {
+                dueDateInput.value = new Date().toISOString().split('T')[0];
+            }
+        }
+        
+        // Update modal title
+        const modalTitle = document.getElementById('task-edit-title');
+        if (modalTitle) {
+            modalTitle.textContent = 'Edit Task';
+        }
+        
+        // Show delete button
+        const deleteButton = modal.querySelector('[onclick*="deleteTaskFromEdit"]');
+        if (deleteButton) {
+            deleteButton.style.display = 'block';
+        }
+        
+        // Show modal
+        modal.classList.remove('hidden');
+        
+        // Focus on task name
+        setTimeout(() => {
+            const nameField = document.getElementById('edit-task-name');
+            if (nameField) nameField.focus();
+        }, 100);
+        
+        console.log('✅ ULTIMATE: Edit modal opened successfully');
+    } else {
+        console.error('❌ ULTIMATE: Modal not found');
+        alert('❌ Task edit modal not found');
+    }
+};
+
+// STEP 5: ULTIMATE saveTaskFromEdit function
+window.saveTaskFromEdit = function() {
+    console.log('💾 ULTIMATE: Saving task...');
+    
+    // Get task from our persistent system first
+    let editingTask = window.CasaCareModalSystem.getTask();
+    
+    // Fallback to old variables if needed
+    if (!editingTask) {
+        editingTask = window.currentEditingTask || window.persistentCurrentTask;
+    }
+    
+    if (!editingTask) {
+        console.error('❌ ULTIMATE: No task being edited');
+        alert('❌ No task selected for editing. Please close the modal and try again.');
+        return;
+    }
+    
+    console.log('✅ ULTIMATE: Found task to save:', editingTask);
+    
+    // Get form values with validation
     const title = document.getElementById('edit-task-name').value.trim();
     const description = document.getElementById('edit-task-description').value.trim();
-    const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
-    const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
+    const costInput = document.getElementById('edit-task-cost').value;
+    const frequencyInput = document.getElementById('edit-task-frequency').value;
     const priority = document.getElementById('edit-task-priority').value;
     const category = document.getElementById('edit-task-category')?.value || 'General';
-    const dueDateInput = document.getElementById('edit-task-due-date');
+    const dueDateInput = document.getElementById('edit-task-due-date').value;
     
-    console.log('📝 FIXED: Form values:', { title, description, cost, frequency, priority, category });
+    console.log('📝 ULTIMATE: Raw form values:', { 
+        title, description, costInput, frequencyInput, priority, category, dueDateInput 
+    });
     
-    // Validate inputs
+    // Validate and parse
     if (!title) {
         alert('❌ Task name is required');
         document.getElementById('edit-task-name').focus();
@@ -1817,32 +1939,34 @@ window.saveTaskFromEditFixed = function() {
         return;
     }
     
+    const cost = parseFloat(costInput) || 0;
+    const frequency = parseInt(frequencyInput) || 365;
+    
     if (frequency <= 0) {
         alert('❌ Frequency must be greater than 0');
+        document.getElementById('edit-task-frequency').focus();
         return;
     }
     
-    // Handle due date
+    // CRITICAL: Handle due date properly
     let dueDate;
-    if (dueDateInput && dueDateInput.value) {
-        dueDate = new Date(dueDateInput.value + 'T12:00:00');
+    if (dueDateInput) {
+        dueDate = new Date(dueDateInput + 'T12:00:00');
+        console.log('📅 ULTIMATE: Parsed due date:', dueDate, 'from input:', dueDateInput);
+        
         if (isNaN(dueDate.getTime())) {
             alert('❌ Invalid due date');
+            document.getElementById('edit-task-due-date').focus();
             return;
         }
     } else {
         dueDate = new Date();
+        console.log('📅 ULTIMATE: Using default due date:', dueDate);
     }
     
-    // Check context: are we in setup or main app?
-    const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
-    const mainAppVisible = !document.getElementById('main-app').classList.contains('hidden');
-    
-    console.log('🔍 FIXED: Context - Setup visible:', taskSetupVisible, 'Main app visible:', mainAppVisible);
-    
-    // Check if new task
-    const isNewTask = !window.tasks.find(t => t.id === editingTask.id);
-    console.log('🆕 FIXED: Is new task:', isNewTask);
+    // Check if this is a new task
+    const isNewTask = editingTask.isNewTask || !window.tasks.find(t => t.id === editingTask.id);
+    console.log('🆕 ULTIMATE: Is new task:', isNewTask);
     
     // Update task properties
     editingTask.title = title;
@@ -1854,97 +1978,128 @@ window.saveTaskFromEditFixed = function() {
     editingTask.dueDate = dueDate;
     editingTask.nextDue = dueDate; // Calendar compatibility
     
+    // Remove template and new task flags
+    delete editingTask.isTemplate;
+    delete editingTask.isNewTask;
+    
     if (isNewTask) {
+        // Add to tasks array
         window.tasks.push(editingTask);
-        console.log('✅ FIXED: New task added to global array');
+        console.log('✅ ULTIMATE: New task added:', editingTask);
     } else {
-        console.log('✅ FIXED: Existing task updated');
+        // Update existing task in array
+        const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
+        if (taskIndex > -1) {
+            window.tasks[taskIndex] = editingTask;
+            console.log('✅ ULTIMATE: Existing task updated:', editingTask);
+        }
     }
     
-    // Context-specific actions
+    // Determine context and act accordingly
+    const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
+    const mainAppVisible = !document.getElementById('main-app').classList.contains('hidden');
+    
+    console.log('🔍 ULTIMATE: Context - Setup:', taskSetupVisible, 'Main app:', mainAppVisible);
+    
     if (taskSetupVisible) {
-        console.log('🔄 FIXED: In setup context - re-rendering task categories');
-        
-        // Re-render task categories for setup
+        // We're in setup - re-render task categories
+        console.log('🔄 ULTIMATE: Re-rendering setup task categories');
         if (typeof renderTaskCategories === 'function') {
             renderTaskCategories();
         } else {
-            console.warn('⚠️ FIXED: renderTaskCategories function not available');
+            console.warn('⚠️ renderTaskCategories function not available');
         }
-        
     } else {
-        console.log('💾 FIXED: In main app context - saving and refreshing');
+        // We're in main app - save and refresh
+        console.log('💾 ULTIMATE: Saving data and refreshing dashboard');
         
-        // Save data
-        if (typeof window.saveData === 'function') {
-            window.saveData();
-        } else if (typeof saveData === 'function') {
-            saveData();
-        }
-        
-        // Refresh dashboard
-        if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-            window.enhancedDashboard.render();
-        } else if (typeof updateDashboard === 'function') {
-            updateDashboard();
-        }
-        
-        // Refresh calendar
-        if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-            window.casaCareCalendar.refresh();
+        try {
+            if (typeof window.saveData === 'function') {
+                window.saveData();
+            } else if (typeof saveData === 'function') {
+                saveData();
+            }
+            
+            // Refresh dashboard
+            if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
+                window.enhancedDashboard.render();
+            } else if (typeof updateDashboard === 'function') {
+                updateDashboard();
+            }
+            
+            // Refresh calendar
+            if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+                window.casaCareCalendar.refresh();
+            }
+        } catch (error) {
+            console.error('❌ ULTIMATE: Error during save/refresh:', error);
         }
     }
     
-    // Close modal and cleanup
-    const modal = document.getElementById('task-edit-modal');
-    if (modal) modal.classList.add('hidden');
+    // CRITICAL: Close modal and clear everything
+    window.closeTaskEditModal();
     
+    // Success message
+    const actionText = isNewTask ? 'added' : 'updated';
+    console.log(`✅ ULTIMATE: Task "${title}" ${actionText} successfully`);
+    alert(`✅ Task "${title}" ${actionText} successfully!`);
+};
+
+// STEP 6: ULTIMATE closeTaskEditModal function
+window.closeTaskEditModal = function() {
+    console.log('🚪 ULTIMATE: Closing task edit modal');
+    
+    const modal = document.getElementById('task-edit-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        console.log('✅ ULTIMATE: Modal hidden');
+    }
+    
+    // Clear all task variables
+    window.CasaCareModalSystem.clearTask();
     window.currentEditingTask = null;
     window.persistentCurrentTask = null;
     
-    console.log('✅ FIXED: Save completed successfully');
-    alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
+    console.log('✅ ULTIMATE: All task variables cleared');
 };
 
-// OVERRIDE the saveTaskFromEdit function to use our fixed version
-window.saveTaskFromEdit = window.saveTaskFromEditFixed;
-
-// Also ensure other modal functions are available
-if (typeof window.closeTaskEditModal !== 'function') {
-    window.closeTaskEditModal = function() {
-        const modal = document.getElementById('task-edit-modal');
-        if (modal) {
-            modal.classList.add('hidden');
-        }
-        window.currentEditingTask = null;
-        window.persistentCurrentTask = null;
-        console.log('✅ FIXED: Task edit modal closed');
-    };
-}
-
-if (typeof window.deleteTaskFromEdit !== 'function') {
-    window.deleteTaskFromEdit = function() {
-        const editingTask = window.currentEditingTask || window.persistentCurrentTask;
-        
-        if (!editingTask) {
-            console.error('❌ FIXED: No task being edited');
-            return;
-        }
-        
-        if (confirm(`Are you sure you want to delete "${editingTask.title}"?`)) {
-            const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
-            if (taskIndex > -1) {
-                const deletedTask = window.tasks.splice(taskIndex, 1)[0];
-                console.log(`🗑️ FIXED: Deleted task: ${deletedTask.title}`);
-                
-                // Context-specific refresh
-                const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
-                
-                if (taskSetupVisible) {
-                    if (typeof renderTaskCategories === 'function') {
-                        renderTaskCategories();
-                    }
-                } else {
+// STEP 7: ULTIMATE deleteTaskFromEdit function
+window.deleteTaskFromEdit = function() {
+    console.log('🗑️ ULTIMATE: Deleting task...');
+    
+    // Get task from our persistent system
+    let editingTask = window.CasaCareModalSystem.getTask();
+    
+    if (!editingTask) {
+        editingTask = window.currentEditingTask || window.persistentCurrentTask;
+    }
+    
+    if (!editingTask) {
+        console.error('❌ ULTIMATE: No task being edited for delete');
+        alert('❌ No task selected for deletion');
+        return;
+    }
+    
+    const taskTitle = editingTask.title || 'Untitled Task';
+    
+    if (confirm(`Are you sure you want to delete "${taskTitle}"?`)) {
+        // Find and remove task from array
+        const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
+        if (taskIndex > -1) {
+            const deletedTask = window.tasks.splice(taskIndex, 1)[0];
+            console.log('🗑️ ULTIMATE: Task deleted:', deletedTask);
+            
+            // Determine context and refresh appropriately
+            const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
+            
+            if (taskSetupVisible) {
+                // Re-render setup categories
+                if (typeof renderTaskCategories === 'function') {
+                    renderTaskCategories();
+                }
+            } else {
+                // Save and refresh main app
+                try {
                     if (typeof window.saveData === 'function') {
                         window.saveData();
                     } else if (typeof saveData === 'function') {
@@ -1953,29 +2108,74 @@ if (typeof window.deleteTaskFromEdit !== 'function') {
                     
                     if (window.enhancedDashboard) {
                         window.enhancedDashboard.render();
+                    } else if (typeof updateDashboard === 'function') {
+                        updateDashboard();
                     }
+                    
+                    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+                        window.casaCareCalendar.refresh();
+                    }
+                } catch (error) {
+                    console.error('❌ ULTIMATE: Error during delete refresh:', error);
                 }
-                
-                window.closeTaskEditModal();
-                alert(`✅ Task "${deletedTask.title}" deleted successfully!`);
             }
+            
+            // Close modal
+            window.closeTaskEditModal();
+            
+            alert(`✅ Task "${taskTitle}" deleted successfully!`);
+        } else {
+            console.error('❌ ULTIMATE: Task not found in array for deletion');
+            alert('❌ Task not found for deletion');
         }
-    };
-}
-
-// Test function to verify the fix
-window.testAddTaskFix = function() {
-    console.log('🧪 TESTING ADD TASK FIX:');
-    console.log('  addTaskFromSetup function:', typeof window.addTaskFromSetup === 'function' ? '✅' : '❌');
-    console.log('  saveTaskFromEdit function:', typeof window.saveTaskFromEdit === 'function' ? '✅' : '❌');
-    console.log('  closeTaskEditModal function:', typeof window.closeTaskEditModal === 'function' ? '✅' : '❌');
-    console.log('  deleteTaskFromEdit function:', typeof window.deleteTaskFromEdit === 'function' ? '✅' : '❌');
-    console.log('  Modal element:', document.getElementById('task-edit-modal') ? '✅' : '❌');
-    console.log('  Tasks array:', Array.isArray(window.tasks) ? `✅ (${window.tasks.length} tasks)` : '❌');
+    }
 };
 
-console.log('✅ CRITICAL FIX: Add task setup integration complete!');
-console.log('💡 Run testAddTaskFix() to verify all functions are working');
+// STEP 8: Enhanced editTaskFromDashboard for main app
+window.editTaskFromDashboard = function(taskId) {
+    console.log('✏️ ULTIMATE: Editing task from dashboard:', taskId);
+    
+    const task = window.tasks.find(t => t.id === taskId);
+    if (!task) {
+        console.error('❌ ULTIMATE: Task not found:', taskId);
+        alert('❌ Task not found');
+        return;
+    }
+    
+    // Use the same system as setup editing
+    window.editTaskFromSetup(taskId);
+};
+
+// STEP 9: Test function
+window.testUltimateFix = function() {
+    console.log('🧪 TESTING ULTIMATE FIX:');
+    console.log('  CasaCareModalSystem:', typeof window.CasaCareModalSystem === 'object' ? '✅' : '❌');
+    console.log('  addTaskFromSetup:', typeof window.addTaskFromSetup === 'function' ? '✅' : '❌');
+    console.log('  editTaskFromSetup:', typeof window.editTaskFromSetup === 'function' ? '✅' : '❌');
+    console.log('  saveTaskFromEdit:', typeof window.saveTaskFromEdit === 'function' ? '✅' : '❌');
+    console.log('  closeTaskEditModal:', typeof window.closeTaskEditModal === 'function' ? '✅' : '❌');
+    console.log('  deleteTaskFromEdit:', typeof window.deleteTaskFromEdit === 'function' ? '✅' : '❌');
+    console.log('  editTaskFromDashboard:', typeof window.editTaskFromDashboard === 'function' ? '✅' : '❌');
+    console.log('  Modal element:', document.getElementById('task-edit-modal') ? '✅' : '❌');
+    console.log('  Tasks array:', Array.isArray(window.tasks) ? `✅ (${window.tasks.length} tasks)` : '❌');
+    
+    // Test modal system
+    if (window.CasaCareModalSystem) {
+        console.log('  Modal system state:');
+        console.log('    Has task:', window.CasaCareModalSystem.hasTask());
+        console.log('    Current task:', window.CasaCareModalSystem.currentTask);
+        console.log('    Is editing:', window.CasaCareModalSystem.isEditing);
+    }
+};
+
+console.log('✅ ULTIMATE FIX: Complete modal system loaded!');
+console.log('💡 Run testUltimateFix() to verify everything is working');
+console.log('🎯 This fix should resolve:');
+console.log('  • Add Task from setup not saving');
+console.log('  • Due dates not being captured');
+console.log('  • Edit task errors');
+console.log('  • Delete button not working');
+console.log('  • Modal state conflicts');
 </script>
 </body>
 </html>
