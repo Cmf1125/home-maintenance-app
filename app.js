@@ -1076,27 +1076,57 @@ function goBackToHomeSetup() {
     }
 }
 
+// Replace your finishTaskSetup function with this debugged version:
+
 function finishTaskSetup() {
     console.log('🚀 Finishing task setup...');
+    console.log('📋 Tasks before processing:', tasks.length);
+    
+    let tasksProcessed = 0;
+    let tasksWithDates = 0;
     
     // Convert templates to actual scheduled tasks
     tasks.forEach(task => {
+        console.log(`Processing task ${task.id}: ${task.title}`);
+        
         if (task.isTemplate) {
             const startDateElement = document.getElementById(`start-date-${task.id}`);
+            console.log(`Looking for start-date-${task.id}:`, startDateElement);
+            
+            let startDate;
             if (startDateElement && startDateElement.value) {
-                const startDate = new Date(startDateElement.value);
-                task.nextDue = new Date(startDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
+                console.log(`Found start date value: ${startDateElement.value}`);
+                startDate = new Date(startDateElement.value);
+                tasksWithDates++;
             } else {
+                console.log(`No start date found, using suggested date`);
                 const suggestedDate = getSuggestedStartDate(task);
-                const startDate = new Date(suggestedDate);
-                task.nextDue = new Date(startDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
+                startDate = new Date(suggestedDate);
             }
+            
+            // Calculate nextDue date
+            task.nextDue = new Date(startDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
+            console.log(`Task ${task.id} nextDue set to:`, task.nextDue);
+            
+            // Remove template flag
             delete task.isTemplate;
+            tasksProcessed++;
+        } else {
+            console.log(`Task ${task.id} is not a template, skipping`);
         }
     });
     
+    console.log(`✅ Processed ${tasksProcessed} tasks, ${tasksWithDates} had custom start dates`);
+    console.log('📋 Tasks after processing:', tasks.filter(t => t.nextDue).length, 'have due dates');
+    
     // Save data
     saveData();
+    console.log('💾 Data saved');
+    
+    // Update global references immediately
+    window.tasks = tasks;
+    window.homeData = homeData;
+    console.log('🌐 Global references updated');
     
     // Show main app
     document.getElementById('task-setup').classList.add('hidden');
@@ -1105,12 +1135,18 @@ function finishTaskSetup() {
     // Update header
     document.getElementById('header-subtitle').textContent = homeData.fullAddress;
     
-    // Initialize dashboard
+    // Initialize dashboard with proper data
+    console.log('🏠 Initializing dashboard...');
     showTab('dashboard');
     
     console.log('🎉 Setup complete! Welcome to Casa Care!');
+    
+    // Debug final state
+    console.log('=== FINAL DEBUG INFO ===');
+    console.log('Total tasks:', tasks.length);
+    console.log('Tasks with nextDue:', tasks.filter(t => t.nextDue).length);
+    console.log('Sample task with due date:', tasks.find(t => t.nextDue));
 }
-
 // Tab switching functionality
 // Replace your showTab function with this corrected version:
 
