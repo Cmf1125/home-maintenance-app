@@ -360,6 +360,8 @@ function rescheduleTaskFromDashboard(taskId) {
             const newDate = new Date(newDateStr + 'T12:00:00');
             if (!isNaN(newDate.getTime())) {
                 task.dueDate = newDate;
+                // CRITICAL: Update nextDue for calendar compatibility
+                task.nextDue = newDate;
                 saveData();
                 
                 // Refresh dashboard
@@ -544,6 +546,10 @@ function confirmReschedule() {
         window.currentRescheduleTask.dueDate : new Date(window.currentRescheduleTask.dueDate);
     
     window.currentRescheduleTask.dueDate = newDate;
+    
+    // CRITICAL: Update nextDue for calendar compatibility
+    window.currentRescheduleTask.nextDue = newDate;
+    
     saveData();
     
     // Refresh dashboard
