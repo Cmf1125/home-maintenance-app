@@ -1,8 +1,8 @@
-// Enhanced Dashboard functionality for Casa Care
+// Enhanced Dashboard functionality for Casa Care - Updated for Simplified Date System
 class EnhancedDashboard {
     constructor() {
         this.currentFilter = 'all'; // 'all', 'overdue', 'week', 'total', 'cost'
-        console.log('🎯 Enhanced Dashboard initializing...');
+        console.log('🎯 Enhanced Dashboard initializing with simplified dates...');
         this.init();
     }
 
@@ -80,35 +80,35 @@ class EnhancedDashboard {
             case 'overdue':
                 return window.tasks.filter(task => 
                     !task.isCompleted && 
-                    task.nextDue && 
-                    new Date(task.nextDue) < now
-                ).sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue));
+                    task.dueDate && 
+                    new Date(task.dueDate) < now
+                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
             case 'week':
                 return window.tasks.filter(task => 
                     !task.isCompleted && 
-                    task.nextDue && 
-                    new Date(task.nextDue) <= oneWeek &&
-                    new Date(task.nextDue) >= now
-                ).sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue));
+                    task.dueDate && 
+                    new Date(task.dueDate) <= oneWeek &&
+                    new Date(task.dueDate) >= now
+                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
             case 'total':
                 return window.tasks.filter(task => 
                     !task.isCompleted && 
-                    task.nextDue
-                ).sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue));
+                    task.dueDate
+                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
             case 'cost':
                 return window.tasks.filter(task => 
                     !task.isCompleted && 
-                    task.nextDue
+                    task.dueDate
                 ).sort((a, b) => b.cost - a.cost);
 
             default:
                 return window.tasks.filter(task => 
                     !task.isCompleted && 
-                    task.nextDue
-                ).sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue))
+                    task.dueDate
+                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
                 .slice(0, 8);
         }
     }
@@ -141,7 +141,7 @@ class EnhancedDashboard {
 
     renderEnhancedTaskCard(task) {
         const now = new Date();
-        const taskDate = new Date(task.nextDue);
+        const taskDate = new Date(task.dueDate);
         const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
         const isOverdue = daysUntilDue < 0;
         
@@ -210,6 +210,10 @@ class EnhancedDashboard {
                                 class="task-action-btn task-action-complete">
                             ✅ Complete
                         </button>
+                        <button onclick="editTaskFromDashboard(${task.id})" 
+                                class="task-action-btn task-action-edit">
+                            ✏️ Edit
+                        </button>
                         <button onclick="rescheduleTaskFromDashboard(${task.id})" 
                                 class="task-action-btn task-action-reschedule">
                             📅 Reschedule
@@ -237,8 +241,8 @@ class EnhancedDashboard {
         let totalCost = 0;
 
         window.tasks.forEach(task => {
-            if (!task.isCompleted && task.nextDue) {
-                const taskDate = new Date(task.nextDue);
+            if (!task.isCompleted && task.dueDate) {
+                const taskDate = new Date(task.dueDate);
                 if (taskDate < now) {
                     overdueCount++;
                 }
@@ -249,7 +253,7 @@ class EnhancedDashboard {
             totalCost += task.cost * (365 / task.frequency);
         });
 
-        const totalTasks = window.tasks.filter(t => !t.isCompleted && t.nextDue).length;
+        const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
 
         // Update stat displays
         document.getElementById('overdue-count').textContent = overdueCount;
@@ -261,7 +265,78 @@ class EnhancedDashboard {
     }
 }
 
-// Function to reschedule task from dashboard
+// NEW: Edit task from dashboard
+function editTaskFromDashboard(taskId) {
+    const task = window.tasks.find(t => t.id === taskId);
+    if (!task) {
+        console.error('❌ Task not found:', taskId);
+        return;
+    }
+
+    // Create a simple edit dialog
+    const newTitle = prompt('Task Title:', task.title);
+    if (newTitle === null) return; // User cancelled
+    
+    const newDescription = prompt('Task Description:', task.description);
+    if (newDescription === null) return;
+    
+    const newFrequency = parseInt(prompt('Frequency (days):', task.frequency));
+    if (isNaN(newFrequency) || newFrequency <= 0) {
+        alert('Invalid frequency');
+        return;
+    }
+    
+    const newCost = parseFloat(prompt('Cost ($):', task.cost));
+    if (isNaN(newCost)) {
+        alert('Invalid cost');
+        return;
+    }
+    
+    const newPriority = prompt('Priority (high, medium, low):', task.priority);
+    if (!['high', 'medium', 'low'].includes(newPriority)) {
+        alert('Invalid priority');
+        return;
+    }
+    
+    const currentDueDateStr = task.dueDate instanceof Date ? 
+        task.dueDate.toISOString().split('T')[0] : 
+        new Date(task.dueDate).toISOString().split('T')[0];
+    
+    const newDueDateStr = prompt('Due Date (YYYY-MM-DD):', currentDueDateStr);
+    if (newDueDateStr === null) return;
+    
+    const newDueDate = new Date(newDueDateStr + 'T12:00:00');
+    if (isNaN(newDueDate.getTime())) {
+        alert('Invalid date format');
+        return;
+    }
+    
+    // Update task
+    task.title = newTitle;
+    task.description = newDescription;
+    task.frequency = newFrequency;
+    task.cost = newCost;
+    task.priority = newPriority;
+    task.dueDate = newDueDate;
+    
+    // Save data
+    saveData();
+    
+    // Refresh dashboard
+    if (window.enhancedDashboard) {
+        window.enhancedDashboard.render();
+    }
+    
+    // Refresh calendar if it exists
+    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+        window.casaCareCalendar.refresh();
+    }
+    
+    console.log('✅ Task updated:', task);
+    alert(`✅ Task "${newTitle}" updated successfully!`);
+}
+
+// Enhanced reschedule function
 function rescheduleTaskFromDashboard(taskId) {
     const task = window.tasks.find(t => t.id === taskId);
     if (!task) {
@@ -269,14 +344,14 @@ function rescheduleTaskFromDashboard(taskId) {
         return;
     }
 
-    const currentDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
-    const newDateStr = prompt(`Reschedule "${task.title}" to (MM-DD-YYYY):`, 
+    const currentDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+    const newDateStr = prompt(`Reschedule "${task.title}" to (YYYY-MM-DD):`, 
                              currentDate.toISOString().split('T')[0]);
     
     if (newDateStr) {
         const newDate = new Date(newDateStr + 'T12:00:00');
         if (!isNaN(newDate.getTime())) {
-            task.nextDue = newDate;
+            task.dueDate = newDate;
             saveData();
             
             // Refresh dashboard
@@ -292,16 +367,77 @@ function rescheduleTaskFromDashboard(taskId) {
             console.log(`✅ Task ${task.title} rescheduled to ${newDate.toLocaleDateString()}`);
             alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
         } else {
-            alert('❌ Invalid date format. Please use MM-DD-YYYY format.');
+            alert('❌ Invalid date format. Please use YYYY-MM-DD format.');
         }
     }
 }
 
-// Function to show all tasks (reset filter)
-function showAllTasks() {
-    if (window.enhancedDashboard) {
-        window.enhancedDashboard.setFilter('all');
+// UPDATED: Function to add task (replaces show all tasks)
+function addTaskFromDashboard() {
+    console.log('➕ Adding new task from dashboard...');
+    
+    const title = prompt('Task Title:');
+    if (!title) return;
+    
+    const description = prompt('Task Description:');
+    if (!description) return;
+    
+    const frequency = parseInt(prompt('How often (in days):', '365'));
+    if (!frequency || frequency <= 0) return;
+    
+    const cost = parseFloat(prompt('Estimated cost ($):', '0'));
+    if (isNaN(cost)) return;
+    
+    const priority = prompt('Priority (high, medium, low):', 'medium');
+    if (!['high', 'medium', 'low'].includes(priority)) {
+        alert('Invalid priority. Please use: high, medium, or low');
+        return;
     }
+    
+    const dueDateStr = prompt('Due date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+    if (!dueDateStr) return;
+    
+    const dueDate = new Date(dueDateStr + 'T12:00:00');
+    if (isNaN(dueDate.getTime())) {
+        alert('Invalid date format');
+        return;
+    }
+    
+    // Find next available ID
+    const maxId = Math.max(...window.tasks.map(t => t.id), 0);
+    
+    const newTask = {
+        id: maxId + 1,
+        title: title,
+        description: description,
+        category: 'General',
+        frequency: frequency,
+        cost: cost,
+        priority: priority,
+        dueDate: dueDate,
+        lastCompleted: null,
+        isCompleted: false
+    };
+    
+    window.tasks.push(newTask);
+    
+    // Save data
+    saveData();
+    
+    // Refresh dashboard
+    if (window.enhancedDashboard) {
+        window.enhancedDashboard.render();
+    } else {
+        updateDashboard();
+    }
+    
+    // Refresh calendar if it exists
+    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+        window.casaCareCalendar.refresh();
+    }
+    
+    console.log('✅ New task added:', newTask);
+    alert(`✅ Task "${title}" added successfully!`);
 }
 
 // Function to export task list
@@ -313,12 +449,12 @@ function exportTaskList() {
     
     const filteredTasks = window.enhancedDashboard ? 
         window.enhancedDashboard.getFilteredTasks() : 
-        window.tasks.filter(t => !t.isCompleted && t.nextDue);
+        window.tasks.filter(t => !t.isCompleted && t.dueDate);
     
     let csvContent = "Task,Description,Category,Priority,Due Date,Cost,Frequency,Last Completed\n";
     
     filteredTasks.forEach(task => {
-        const dueDate = task.nextDue ? new Date(task.nextDue).toLocaleDateString() : 'Not set';
+        const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'Not set';
         const lastCompleted = task.lastCompleted ? new Date(task.lastCompleted).toLocaleDateString() : 'Never';
         
         csvContent += `"${task.title}","${task.description}","${task.category}","${task.priority}","${dueDate}","$${task.cost}","${task.frequency} days","${lastCompleted}"\n`;
@@ -338,180 +474,10 @@ function exportTaskList() {
     alert('📋 Task list exported successfully!');
 }
 
-console.log('📋 Enhanced Dashboard script loaded');// Date Picker Modal Functionality
-let currentRescheduleTask = null;
+// Make functions globally available
+window.editTaskFromDashboard = editTaskFromDashboard;
+window.rescheduleTaskFromDashboard = rescheduleTaskFromDashboard;
+window.addTaskFromDashboard = addTaskFromDashboard;
+window.exportTaskList = exportTaskList;
 
-// Enhanced reschedule function with date picker modal
-function rescheduleTaskFromDashboard(taskId) {
-    const task = window.tasks.find(t => t.id === taskId);
-    if (!task) {
-        console.error('❌ Task not found:', taskId);
-        return;
-    }
-
-    // Store the task for later use
-    currentRescheduleTask = task;
-    
-    // Show the modal with task info
-    showDatePickerModal(task);
-}
-
-function showDatePickerModal(task) {
-    const modal = document.getElementById('date-picker-modal');
-    const taskNameElement = document.getElementById('reschedule-task-name');
-    const currentDueDateElement = document.getElementById('current-due-date');
-    const newDueDateInput = document.getElementById('new-due-date');
-    
-    if (!modal || !taskNameElement || !currentDueDateElement || !newDueDateInput) {
-        console.error('❌ Date picker modal elements not found');
-        return;
-    }
-
-    // Set task info
-    taskNameElement.textContent = `"${task.title}"`;
-    
-    // Set current due date
-    const currentDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
-    currentDueDateElement.textContent = currentDate.toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    
-    // Set default new date to current due date
-    newDueDateInput.value = currentDate.toISOString().split('T')[0];
-    
-    // Show modal
-    modal.classList.remove('hidden');
-    
-    // Focus on date input
-    setTimeout(() => newDueDateInput.focus(), 100);
-    
-    console.log(`📅 Date picker opened for task: ${task.title}`);
-}
-
-function closeDatePickerModal() {
-    const modal = document.getElementById('date-picker-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-    }
-    currentRescheduleTask = null;
-    console.log('📅 Date picker modal closed');
-}
-
-function setQuickDate(daysFromNow) {
-    const newDueDateInput = document.getElementById('new-due-date');
-    if (!newDueDateInput) return;
-    
-    const newDate = new Date();
-    newDate.setDate(newDate.getDate() + daysFromNow);
-    
-    newDueDateInput.value = newDate.toISOString().split('T')[0];
-    
-    // Add visual feedback
-    newDueDateInput.style.backgroundColor = '#dbeafe';
-    setTimeout(() => {
-        newDueDateInput.style.backgroundColor = '';
-    }, 300);
-    
-    console.log(`📅 Quick date set to ${daysFromNow} days from now`);
-}
-
-function confirmReschedule() {
-    if (!currentRescheduleTask) {
-        console.error('❌ No task selected for rescheduling');
-        return;
-    }
-    
-    const newDueDateInput = document.getElementById('new-due-date');
-    if (!newDueDateInput || !newDueDateInput.value) {
-        alert('❌ Please select a new due date');
-        return;
-    }
-    
-    const newDate = new Date(newDueDateInput.value + 'T12:00:00');
-    if (isNaN(newDate.getTime())) {
-        alert('❌ Invalid date selected');
-        return;
-    }
-    
-    // Check if it's in the past
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (newDate < today) {
-        const confirmPast = confirm('⚠️ The selected date is in the past. Are you sure you want to schedule this task for a past date?');
-        if (!confirmPast) {
-            return;
-        }
-    }
-    
-    // Update the task
-    const oldDate = currentRescheduleTask.nextDue instanceof Date ? 
-        currentRescheduleTask.nextDue : new Date(currentRescheduleTask.nextDue);
-    
-    currentRescheduleTask.nextDue = newDate;
-    saveData();
-    
-    // Refresh dashboard
-    if (window.enhancedDashboard) {
-        window.enhancedDashboard.render();
-    }
-    
-    // Refresh calendar if it exists
-    if (window.casaCareCalendar) {
-        window.casaCareCalendar.refresh();
-    }
-    
-    // Close modal
-    closeDatePickerModal();
-    
-    // Show success message
-    const message = `✅ "${currentRescheduleTask.title}" rescheduled from ${oldDate.toLocaleDateString()} to ${newDate.toLocaleDateString()}`;
-    console.log(message);
-    
-    // Show a nice success notification
-    showSuccessNotification(`Task rescheduled to ${newDate.toLocaleDateString()}`);
-}
-
-function showSuccessNotification(message) {
-    // Create a temporary notification
-    const notification = document.createElement('div');
-    notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    // Slide in
-    setTimeout(() => {
-        notification.classList.remove('translate-x-full');
-    }, 100);
-    
-    // Slide out and remove after 3 seconds
-    setTimeout(() => {
-        notification.classList.add('translate-x-full');
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 3000);
-}
-
-// Close modal when clicking outside
-document.addEventListener('click', (event) => {
-    const modal = document.getElementById('date-picker-modal');
-    if (modal && event.target === modal) {
-        closeDatePickerModal();
-    }
-});
-
-// Close modal with Escape key
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-        const modal = document.getElementById('date-picker-modal');
-        if (modal && !modal.classList.contains('hidden')) {
-            closeDatePickerModal();
-        }
-    }
-});
-
-console.log('📅 Date picker functionality loaded');
+console.log('📋 Enhanced Dashboard script loaded with simplified date system');
