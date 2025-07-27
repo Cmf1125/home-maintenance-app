@@ -850,7 +850,6 @@ function renderTaskCategories() {
 
 // SIMPLIFIED: Render individual task card with only Due Date
 function renderTaskCard(task) {
-    const suggestedDate = getSuggestedDueDate(task);
     const priorityClass = task.priority === 'high' ? 'bg-red-100 text-red-700' : 
                         task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' : 
                         'bg-gray-100 text-gray-700';
@@ -859,9 +858,11 @@ function renderTaskCard(task) {
     const regionalBadge = isRegionalTask ? 
         `<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">🌍 Regional</span>` : '';
     
+    const smartDueDate = getSmartDueDate(task);
+    
     return `
         <div class="border border-gray-200 rounded-lg p-4 ${isRegionalTask ? 'bg-purple-50' : ''}" data-task-id="${task.id}">
-            <div class="flex justify-between items-start mb-3">
+            <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <h4 class="font-semibold text-gray-900">${task.title}</h4>
                     <p class="text-sm text-gray-600 mt-1">${task.description}</p>
@@ -871,6 +872,7 @@ function renderTaskCard(task) {
                         <span class="text-gray-600">$${task.cost}</span>
                         <span class="px-2 py-1 rounded text-xs ${priorityClass}">${task.priority} priority</span>
                     </div>
+                    <div class="text-xs text-gray-500 mt-1">📅 Due: ${smartDueDate}</div>
                 </div>
                 <div class="flex flex-col gap-2">
                     <button onclick="editTaskFromSetup(${task.id})" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 text-sm touch-btn">
@@ -881,19 +883,12 @@ function renderTaskCard(task) {
                     </button>
                 </div>
             </div>
-            
-            <div class="w-full">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-                <input type="date" id="due-date-${task.id}" value="${suggestedDate}" 
-                       class="w-full p-2 border rounded text-sm"
-                       onchange="updateTaskDueDate(${task.id}, this.value)">
-            </div>
         </div>
     `;
 }
 
-// SIMPLIFIED: Get suggested due date for a task
-function getSuggestedDueDate(task) {
+// Smart due date calculation (renamed from getSuggestedDueDate)
+function getSmartDueDate(task) {
     const today = new Date();
     
     if (task.season) {
@@ -902,7 +897,7 @@ function getSuggestedDueDate(task) {
         
         switch(task.season) {
             case 'spring': targetMonth = 2; break; // March
-            case 'summer': targetMonth = 5; break; // June
+            case 'summer': targetMonth = 5; break; // June  
             case 'fall': targetMonth = 8; break; // September
             case 'winter': targetMonth = 10; break; // November
             default: targetMonth = currentMonth;
@@ -914,33 +909,19 @@ function getSuggestedDueDate(task) {
         }
         
         const seasonalDate = new Date(targetYear, targetMonth, 15);
-        return seasonalDate.toISOString().split('T')[0];
+        return seasonalDate.toLocaleDateString();
     }
     
     // Regular task defaults
     if (task.priority === 'high') {
         const startDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-        return startDate.toISOString().split('T')[0];
+        return startDate.toLocaleDateString();
     } else if (task.frequency <= 90) {
         const startDate = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
-        return startDate.toISOString().split('T')[0];
+        return startDate.toLocaleDateString();
     } else {
         const startDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
-        return startDate.toISOString().split('T')[0];
-    }
-}
-
-// SIMPLIFIED: Update task due date
-function updateTaskDueDate(taskId, dueDateStr) {
-    console.log(`🔄 Updating due date for task ${taskId} to: ${dueDateStr}`);
-    
-    const task = tasks.find(t => t.id === taskId);
-    if (task && dueDateStr) {
-        // Just store the date string for now, will be converted to Date object in finishTaskSetup
-        task.tempDueDate = dueDateStr;
-        console.log(`  📅 Temp due date stored: ${dueDateStr}`);
-    } else {
-        console.warn(`  ⚠️ Could not update task ${taskId}: task=${!!task}, dueDate="${dueDateStr}"`);
+        return startDate.toLocaleDateString();
     }
 }
 
@@ -987,58 +968,42 @@ function finishTaskSetup() {
     let successCount = 0;
     let errorCount = 0;
     
-    // Process each template task
-    tasks.forEach(task => {
-        if (task.isTemplate) {
-            try {
-                console.log(`⚙️ Processing task: ${task.title}`);
+   // Process each template task with smart due dates
+tasks.forEach(task => {
+    if (task.isTemplate) {
+        try {
+            console.log(`⚙️ Processing task: ${task.title}`);
+            
+            // Use smart due date calculation
+            let dueDate;
+            
+            if (task.season) {
+                // Seasonal tasks
+                const today = new Date();
+                const currentMonth = today.getMonth();
+                let targetMonth;
                 
-                // Get the due date input
-                const dueDateInput = document.getElementById(`due-date-${task.id}`);
-                let dueDate;
-                
-                if (dueDateInput && dueDateInput.value) {
-                    // Use the user-selected date
-                    dueDate = new Date(dueDateInput.value + 'T12:00:00');
-                    console.log(`  📅 Using CUSTOM due date: ${dueDate.toLocaleDateString()}`);
-                } else if (task.tempDueDate) {
-                    // Use stored temp date
-                    dueDate = new Date(task.tempDueDate + 'T12:00:00');
-                    console.log(`  📅 Using TEMP due date: ${dueDate.toLocaleDateString()}`);
-                } else {
-                    // Use suggested default date
-                    const suggestedDate = getSuggestedDueDate(task);
-                    dueDate = new Date(suggestedDate + 'T12:00:00');
-                    console.log(`  📅 Using DEFAULT due date: ${dueDate.toLocaleDateString()}`);
+                switch(task.season) {
+                    case 'spring': targetMonth = 2; break; // March
+                    case 'summer': targetMonth = 5; break; // June
+                    case 'fall': targetMonth = 8; break; // September
+                    case 'winter': targetMonth = 10; break; // November
+                    default: targetMonth = currentMonth;
                 }
                 
-                // Validate the date
-                if (isNaN(dueDate.getTime())) {
-                    throw new Error(`Invalid due date for task ${task.title}`);
+                let targetYear = today.getFullYear();
+                if (targetMonth < currentMonth || (targetMonth === currentMonth && today.getDate() > 15)) {
+                    targetYear++;
                 }
                 
-                // Set the due date
-                task.dueDate = dueDate;
-                
-                // CRITICAL: Set nextDue for calendar compatibility
-                task.nextDue = dueDate;
-                
-                // Clean up template flag and temp date
-                delete task.isTemplate;
-                delete task.tempDueDate;
-                task.isCompleted = false;
-                task.lastCompleted = null;
-                
-                console.log(`  ✅ FINAL: Task "${task.title}" due: ${task.dueDate.toLocaleDateString()}`);
-                successCount++;
-                
-            } catch (error) {
-                console.error(`❌ Error processing task ${task.title}:`, error);
-                errorCount++;
-            }
-        }
-    });
-    
+                dueDate = new Date(targetYear, targetMonth, 15, 12, 0, 0);
+            } else {
+                // Regular tasks with smart defaults
+                const today = new Date();
+                if (task.priority === 'high') {
+                    dueDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000); // 1 week
+                } else if (task.frequency <= 90) {
+                    dueDate = new Date(
     console.log(`✅ Task processing complete: ${successCount} successful, ${errorCount} errors`);
     
     // Verify we have tasks with due dates
