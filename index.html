@@ -7,17 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="calendar.css">
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Casa Care - Smart Home Maintenance</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="calendar.css">
     
-    <!-- ADD THIS CSS HERE -->
+    <!-- Modal Styling -->
     <style>
     /* Ensure task edit modal appears above everything */
     #task-edit-modal {
@@ -55,9 +46,6 @@
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <!-- Rest of your HTML continues here -->
-</head>
-<body class="bg-gray-50 min-h-screen">
     <div id="app">
         <!-- Header -->
         <div class="bg-white shadow-sm border-b sticky top-0 z-40">
@@ -73,185 +61,186 @@
         </div>
 
         <!-- Simplified Setup Form -->
-<div id="setup-form" class="p-4 main-content">
-    <div class="bg-white rounded-xl p-6 shadow-lg max-w-md mx-auto">
-        <div class="text-center mb-6">
-            <div class="text-4xl mb-4">🏠</div>
-            <h2 class="text-xl font-bold text-gray-900 mb-2">Tell us about your home</h2>
-            <p class="text-gray-600 text-sm">We'll create a personalized maintenance plan</p>
-        </div>
-        
-        <div class="space-y-6">
-            <!-- Address -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
-                <input type="text" id="address" placeholder="123 Main Street" 
-                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
-            </div>
-
-            <!-- City, State, Zip -->
-            <div class="grid grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
-                    <input type="text" id="city" placeholder="Anytown" 
-                           class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+        <div id="setup-form" class="p-4 main-content">
+            <div class="bg-white rounded-xl p-6 shadow-lg max-w-md mx-auto">
+                <div class="text-center mb-6">
+                    <div class="text-4xl mb-4">🏠</div>
+                    <h2 class="text-xl font-bold text-gray-900 mb-2">Tell us about your home</h2>
+                    <p class="text-gray-600 text-sm">We'll create a personalized maintenance plan</p>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
-                    <input type="text" id="state" placeholder="NY" maxlength="2"
-                           class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Zip Code</label>
-                    <input type="text" id="zipcode" placeholder="12345" 
-                           class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-                </div>
-            </div>
-
-            <!-- Property Info -->
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Property Type</label>
-                    <select id="property-type" class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-                        <option value="single-family">Single Family Home</option>
-                        <option value="townhouse">Townhouse</option>
-                        <option value="condo">Condo</option>
-                        <option value="apartment">Apartment</option>
-                        <option value="mobile-home">Mobile Home</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Year Built</label>
-                    <input type="number" id="year-built" value="1995" min="1900" max="2025"
-                           class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Square Feet</label>
-                <input type="number" id="sqft" value="2000" min="500" max="10000"
-                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-            </div>
-
-            <!-- Heating & Cooling Systems -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-3">Heating & Cooling Systems</label>
-                <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
-                    <label class="flex items-center space-x-3 touch-btn">
-                        <input type="checkbox" id="central-ac" class="w-5 h-5">
-                        <span>Central Air/Heat</span>
-                    </label>
-                    <label class="flex items-center space-x-3 touch-btn">
-                        <input type="checkbox" id="mini-splits" class="w-5 h-5">
-                        <span>Mini-Split Systems</span>
-                    </label>
-                    <label class="flex items-center space-x-3 touch-btn">
-                        <input type="checkbox" id="wall-ac" class="w-5 h-5">
-                        <span>Wall Air Conditioners</span>
-                    </label>
-                    <label class="flex items-center space-x-3 touch-btn">
-                        <input type="checkbox" id="electric-baseboard" class="w-5 h-5">
-                        <span>Electric Baseboard Heat</span>
-                    </label>
-                    <label class="flex items-center space-x-3 touch-btn">
-                        <input type="checkbox" id="boiler" class="w-5 h-5">
-                        <span>Boiler System</span>
-                    </label>
-                </div>
-            </div>
-
-           <!-- Water & Sewer Systems -->
-<div>
-    <label class="block text-sm font-medium text-gray-700 mb-3">Water & Sewer Systems</label>
-    <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="municipal-water" class="w-5 h-5">
-            <span>Municipal Water</span>
-        </label>
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="well-water" class="w-5 h-5" onchange="toggleWellWaterOptions()">
-            <span>Well Water</span>
-        </label>
-        <!-- Well Water Sub-options -->
-        <div id="well-water-options" class="ml-8 space-y-2 hidden">
-            <label class="flex items-center space-x-3 touch-btn">
-                <input type="checkbox" id="sediment-filter" class="w-4 h-4">
-                <span class="text-sm">Sediment Filtration</span>
-            </label>
-            <label class="flex items-center space-x-3 touch-btn">
-                <input type="checkbox" id="uv-filter" class="w-4 h-4">
-                <span class="text-sm">UV Filtration</span>
-            </label>
-            <label class="flex items-center space-x-3 touch-btn">
-                <input type="checkbox" id="water-softener" class="w-4 h-4">
-                <span class="text-sm">Water Softener</span>
-            </label>
-            <label class="flex items-center space-x-3 touch-btn">
-                <input type="checkbox" id="whole-house-filter" class="w-4 h-4">
-                <span class="text-sm">Whole House Filter</span>
-            </label>
-        </div>
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="municipal-sewer" class="w-5 h-5">
-            <span>Municipal Sewer</span>
-        </label>
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="septic" class="w-5 h-5">
-            <span>Septic System</span>
-        </label>
-    </div>
-</div>
-            <!-- Other Home Features -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-3">Other Home Features</label>
-                <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
-                    <label class="flex items-center space-x-3 touch-btn">
-                        <input type="checkbox" id="fireplace" class="w-5 h-5">
-                        <span>Fireplace</span>
-                    </label>
-                    <label class="flex items-center space-x-3 touch-btn">
-                        <input type="checkbox" id="pool" class="w-5 h-5">
-                        <span>Pool/Spa</span>
-                    </label>
-                    <label class="flex items-center space-x-3 touch-btn">
-                        <input type="checkbox" id="deck" class="w-5 h-5">
-                        <span>Deck/Patio</span>
-                    </label>
-                    <label class="flex items-center space-x-3 touch-btn">
-                        <input type="checkbox" id="garage" class="w-5 h-5">
-                        <span>Garage</span>
-                    </label>
-                    <label class="flex items-center space-x-3 touch-btn">
-                        <input type="checkbox" id="basement" class="w-5 h-5">
-                        <span>Basement</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Other Features -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Other Features</label>
-                <input type="text" id="other-features" placeholder="e.g., Hot tub, Generator, Solar panels..." 
-                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-                <p class="text-xs text-gray-500 mt-1">List any additional features not mentioned above</p>
-            </div>
-
-            <!-- Helpful Note -->
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div class="flex items-start gap-3">
-                    <div class="text-blue-600 text-lg">💡</div>
-                    <div class="text-sm text-blue-800">
-                        <strong>Good to know:</strong> Task frequencies can be adjusted later based on your specific needs (pets, usage patterns, manufacturer recommendations, etc.)
+                
+                <div class="space-y-6">
+                    <!-- Address -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
+                        <input type="text" id="address" placeholder="123 Main Street" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
                     </div>
+
+                    <!-- City, State, Zip -->
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                            <input type="text" id="city" placeholder="Anytown" 
+                                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
+                            <input type="text" id="state" placeholder="NY" maxlength="2"
+                                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Zip Code</label>
+                            <input type="text" id="zipcode" placeholder="12345" 
+                                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+                        </div>
+                    </div>
+
+                    <!-- Property Info -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Property Type</label>
+                            <select id="property-type" class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+                                <option value="single-family">Single Family Home</option>
+                                <option value="townhouse">Townhouse</option>
+                                <option value="condo">Condo</option>
+                                <option value="apartment">Apartment</option>
+                                <option value="mobile-home">Mobile Home</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Year Built</label>
+                            <input type="number" id="year-built" value="1995" min="1900" max="2025"
+                                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Square Feet</label>
+                        <input type="number" id="sqft" value="2000" min="500" max="10000"
+                               class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+                    </div>
+
+                    <!-- Heating & Cooling Systems -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Heating & Cooling Systems</label>
+                        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="central-ac" class="w-5 h-5">
+                                <span>Central Air/Heat</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="mini-splits" class="w-5 h-5">
+                                <span>Mini-Split Systems</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="wall-ac" class="w-5 h-5">
+                                <span>Wall Air Conditioners</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="electric-baseboard" class="w-5 h-5">
+                                <span>Electric Baseboard Heat</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="boiler" class="w-5 h-5">
+                                <span>Boiler System</span>
+                            </label>
+                        </div>
+                    </div>
+
+                   <!-- Water & Sewer Systems -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Water & Sewer Systems</label>
+                        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="municipal-water" class="w-5 h-5">
+                                <span>Municipal Water</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="well-water" class="w-5 h-5" onchange="toggleWellWaterOptions()">
+                                <span>Well Water</span>
+                            </label>
+                            <!-- Well Water Sub-options -->
+                            <div id="well-water-options" class="ml-8 space-y-2 hidden">
+                                <label class="flex items-center space-x-3 touch-btn">
+                                    <input type="checkbox" id="sediment-filter" class="w-4 h-4">
+                                    <span class="text-sm">Sediment Filtration</span>
+                                </label>
+                                <label class="flex items-center space-x-3 touch-btn">
+                                    <input type="checkbox" id="uv-filter" class="w-4 h-4">
+                                    <span class="text-sm">UV Filtration</span>
+                                </label>
+                                <label class="flex items-center space-x-3 touch-btn">
+                                    <input type="checkbox" id="water-softener" class="w-4 h-4">
+                                    <span class="text-sm">Water Softener</span>
+                                </label>
+                                <label class="flex items-center space-x-3 touch-btn">
+                                    <input type="checkbox" id="whole-house-filter" class="w-4 h-4">
+                                    <span class="text-sm">Whole House Filter</span>
+                                </label>
+                            </div>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="municipal-sewer" class="w-5 h-5">
+                                <span>Municipal Sewer</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="septic" class="w-5 h-5">
+                                <span>Septic System</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Other Home Features -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Other Home Features</label>
+                        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="fireplace" class="w-5 h-5">
+                                <span>Fireplace</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="pool" class="w-5 h-5">
+                                <span>Pool/Spa</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="deck" class="w-5 h-5">
+                                <span>Deck/Patio</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="garage" class="w-5 h-5">
+                                <span>Garage</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="basement" class="w-5 h-5">
+                                <span>Basement</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Other Features -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Other Features</label>
+                        <input type="text" id="other-features" placeholder="e.g., Hot tub, Generator, Solar panels..." 
+                               class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+                        <p class="text-xs text-gray-500 mt-1">List any additional features not mentioned above</p>
+                    </div>
+
+                    <!-- Helpful Note -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-start gap-3">
+                            <div class="text-blue-600 text-lg">💡</div>
+                            <div class="text-sm text-blue-800">
+                                <strong>Good to know:</strong> Task frequencies can be adjusted later based on your specific needs (pets, usage patterns, manufacturer recommendations, etc.)
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="createMaintenancePlan()" class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg touch-btn">
+                        🚀 Create My Plan
+                    </button>
                 </div>
             </div>
-
-            <button onclick="createMaintenancePlan()" class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg touch-btn">
-                🚀 Create My Plan
-            </button>
         </div>
-    </div>
-</div>
 
         <!-- Task Setup Screen -->
         <div id="task-setup" class="hidden p-4 main-content">
@@ -312,84 +301,80 @@
         <div id="main-app" class="hidden">
             <div class="main-content">
                <!-- Enhanced Dashboard View -->
-<div id="dashboard-view" class="p-4">
-    <!-- Welcome -->
-    <div class="gradient-bg text-white rounded-2xl p-6 shadow-2xl mb-6">
-        <h2 class="text-xl font-bold mb-2">Welcome to Casa Care! 👋</h2>
-        <p class="text-blue-100 text-sm" id="home-address">Managing maintenance for your home</p>
-    </div>
+                <div id="dashboard-view" class="p-4">
+                    <!-- Welcome -->
+                    <div class="gradient-bg text-white rounded-2xl p-6 shadow-2xl mb-6">
+                        <h2 class="text-xl font-bold mb-2">Welcome to Casa Care! 👋</h2>
+                        <p class="text-blue-100 text-sm" id="home-address">Managing maintenance for your home</p>
+                    </div>
 
-    <!-- Interactive Stats Grid -->
-    <div class="grid grid-cols-2 gap-4 mb-6">
-        <div id="overdue-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
-            <div class="flex items-center gap-3">
-                <div class="p-2 bg-red-100 rounded-lg text-lg">⚠️</div>
-                <div>
-                    <p class="text-xs text-gray-600">Overdue</p>
-                    <p id="overdue-count" class="text-xl font-bold text-gray-900">0</p>
-                </div>
-            </div>
-            <div class="text-xs text-gray-500 mt-2">Click to view overdue tasks</div>
-        </div>
-        
-        <div id="week-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
-            <div class="flex items-center gap-3">
-                <div class="p-2 bg-orange-100 rounded-lg text-lg">📅</div>
-                <div>
-                    <p class="text-xs text-gray-600">This Week</p>
-                    <p id="week-count" class="text-xl font-bold text-gray-900">0</p>
-                </div>
-            </div>
-            <div class="text-xs text-gray-500 mt-2">Click to view week's tasks</div>
-        </div>
-        
-        <div id="total-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
-            <div class="flex items-center gap-3">
-                <div class="p-2 bg-blue-100 rounded-lg text-lg">📋</div>
-                <div>
-                    <p class="text-xs text-gray-600">Total Tasks</p>
-                    <p id="total-count" class="text-xl font-bold text-gray-900">0</p>
-                </div>
-            </div>
-            <div class="text-xs text-gray-500 mt-2">Click to view all tasks</div>
-        </div>
-        
-        <div id="cost-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
-            <div class="flex items-center gap-3">
-                <div class="p-2 bg-green-100 rounded-lg text-lg">💰</div>
-                <div>
-                    <p class="text-xs text-gray-600">Annual Cost</p>
-                    <p id="annual-cost" class="text-xl font-bold text-gray-900">$0</p>
-                </div>
-            </div>
-            <div class="text-xs text-gray-500 mt-2">Click to sort by cost</div>
-        </div>
-    </div>
+                    <!-- Interactive Stats Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div id="overdue-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-red-100 rounded-lg text-lg">⚠️</div>
+                                <div>
+                                    <p class="text-xs text-gray-600">Overdue</p>
+                                    <p id="overdue-count" class="text-xl font-bold text-gray-900">0</p>
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-2">Click to view overdue tasks</div>
+                        </div>
+                        
+                        <div id="week-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-orange-100 rounded-lg text-lg">📅</div>
+                                <div>
+                                    <p class="text-xs text-gray-600">This Week</p>
+                                    <p id="week-count" class="text-xl font-bold text-gray-900">0</p>
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-2">Click to view week's tasks</div>
+                        </div>
+                        
+                        <div id="total-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-blue-100 rounded-lg text-lg">📋</div>
+                                <div>
+                                    <p class="text-xs text-gray-600">Total Tasks</p>
+                                    <p id="total-count" class="text-xl font-bold text-gray-900">0</p>
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-2">Click to view all tasks</div>
+                        </div>
+                        
+                        <div id="cost-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-green-100 rounded-lg text-lg">💰</div>
+                                <div>
+                                    <p class="text-xs text-gray-600">Annual Cost</p>
+                                    <p id="annual-cost" class="text-xl font-bold text-gray-900">$0</p>
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-2">Click to sort by cost</div>
+                        </div>
+                    </div>
 
-   <!-- Find this section in your HTML and replace the buttons: -->
-
-<!-- Enhanced Tasks Section -->
-<div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-    <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-        <h3 id="tasks-list-title" class="text-lg font-bold text-gray-900">Upcoming Tasks</h3>
-        <div class="flex gap-2">
-            <!-- REPLACE THIS BUTTON -->
-            <button onclick="addTaskFromDashboard()" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 text-sm touch-btn">
-                ➕ Add Task
-            </button>
-            <!-- KEEP THIS BUTTON -->
-            <button onclick="exportTaskList()" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 text-sm touch-btn">
-                📋 Export List
-            </button>
-        </div>
-    </div>
-    
-    <!-- Tasks List -->
-    <div id="tasks-list">
-        <!-- Enhanced tasks will be populated here -->
-    </div>
-</div>
-</div>
+                    <!-- Enhanced Tasks Section -->
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                            <h3 id="tasks-list-title" class="text-lg font-bold text-gray-900">Upcoming Tasks</h3>
+                            <div class="flex gap-2">
+                                <button onclick="addTaskFromDashboard()" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 text-sm touch-btn">
+                                    ➕ Add Task
+                                </button>
+                                <button onclick="exportTaskList()" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 text-sm touch-btn">
+                                    📋 Export List
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Tasks List -->
+                        <div id="tasks-list">
+                            <!-- Enhanced tasks will be populated here -->
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Calendar View -->
                 <div id="calendar-view" class="hidden">
@@ -420,1764 +405,643 @@
             </div>
         </div>
 
-        <!-- UPDATED Task Edit Modal - Replace the existing one in your HTML -->
-<div id="task-edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xl font-bold" id="task-edit-title">Edit Task</h3>
-            <button onclick="closeTaskEditModal()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
-        </div>
-        
-        <div class="space-y-4">
-            <!-- Task Name -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Task Name *</label>
-                <input type="text" id="edit-task-name" 
-                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
-                       placeholder="Enter task name" required>
-            </div>
-            
-            <!-- Description -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
-                <textarea id="edit-task-description" 
-                          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base" 
-                          rows="3" placeholder="Describe what needs to be done" required></textarea>
-            </div>
-            
-            <!-- Due Date -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Due Date *</label>
-                <input type="date" id="edit-task-due-date" 
-                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base" required>
-            </div>
-            
-            <!-- Frequency and Cost Row -->
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Frequency (days) *</label>
-                    <input type="number" id="edit-task-frequency" 
-                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
-                           min="1" placeholder="365" required>
-                    <p class="text-xs text-gray-500 mt-1">How often to repeat</p>
+        <!-- Task Edit Modal -->
+        <div id="task-edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold" id="task-edit-title">Edit Task</h3>
+                    <button onclick="closeTaskEditModal()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Cost ($)</label>
-                    <input type="number" id="edit-task-cost" 
-                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
-                           min="0" step="0.01" placeholder="0.00">
+                
+                <div class="space-y-4">
+                    <!-- Task Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Task Name *</label>
+                        <input type="text" id="edit-task-name" 
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
+                               placeholder="Enter task name" required>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                        <textarea id="edit-task-description" 
+                                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base" 
+                                  rows="3" placeholder="Describe what needs to be done" required></textarea>
+                    </div>
+                    
+                    <!-- Due Date -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Due Date *</label>
+                        <input type="date" id="edit-task-due-date" 
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base" required>
+                    </div>
+                    
+                    <!-- Frequency and Cost Row -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Frequency (days) *</label>
+                            <input type="number" id="edit-task-frequency" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
+                                   min="1" placeholder="365" required>
+                            <p class="text-xs text-gray-500 mt-1">How often to repeat</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cost ($)</label>
+                            <input type="number" id="edit-task-cost" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
+                                   min="0" step="0.01" placeholder="0.00">
+                        </div>
+                    </div>
+                    
+                    <!-- Priority -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Priority *</label>
+                        <select id="edit-task-priority" 
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base" required>
+                            <option value="high">🔴 High Priority</option>
+                            <option value="medium">🟡 Medium Priority</option>
+                            <option value="low">🟢 Low Priority</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Category -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select id="edit-task-category" 
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
+                            <option value="General">🔧 General</option>
+                            <option value="HVAC">🌡️ HVAC</option>
+                            <option value="Water Systems">💧 Water Systems</option>
+                            <option value="Exterior">🏠 Exterior</option>
+                            <option value="Safety">⚠️ Safety</option>
+                            <option value="Seasonal">🌍 Seasonal</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Priority -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Priority *</label>
-                <select id="edit-task-priority" 
-                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base" required>
-                    <option value="high">🔴 High Priority</option>
-                    <option value="medium">🟡 Medium Priority</option>
-                    <option value="low">🟢 Low Priority</option>
-                </select>
-            </div>
-            
-            <!-- Category (optional - could be added) -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                <select id="edit-task-category" 
-                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
-                    <option value="General">🔧 General</option>
-                    <option value="HVAC">🌡️ HVAC</option>
-                    <option value="Water Systems">💧 Water Systems</option>
-                    <option value="Exterior">🏠 Exterior</option>
-                    <option value="Safety">⚠️ Safety</option>
-                    <option value="Seasonal">🌍 Seasonal</option>
-                </select>
-            </div>
-        </div>
-        
-        <!-- Action Buttons -->
-        <div class="flex gap-3 mt-6">
-            <button onclick="deleteTaskFromEdit()" 
-                    class="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-colors touch-btn">
-                🗑️ Delete
-            </button>
-            <button onclick="closeTaskEditModal()" 
-                    class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition-colors touch-btn">
-                Cancel
-            </button>
-            <button onclick="saveTaskFromEdit()" 
-                    class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors touch-btn">
-                💾 Save Task
-            </button>
-        </div>
-        
-        <!-- Helper Text -->
-        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p class="text-xs text-blue-800">
-                <strong>💡 Tip:</strong> Frequency determines how often this task repeats after completion. 
-                For example, 90 days means the task will be due again 90 days after you mark it complete.
-            </p>
-        </div>
-    </div>
-</div>
-<div id="date-picker-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-xl w-full max-w-sm p-6 shadow-2xl">
-        <div class="text-center mb-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-2">📅 Reschedule Task</h3>
-            <p id="reschedule-task-name" class="text-gray-600 text-sm"></p>
-        </div>
-
-        <div class="space-y-4">
-            <!-- Current Due Date -->
-            <div class="bg-gray-50 rounded-lg p-3">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Current Due Date</label>
-                <p id="current-due-date" class="text-gray-900 font-semibold"></p>
-            </div>
-
-            <!-- New Due Date -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">New Due Date</label>
-                <input type="date" id="new-due-date" 
-                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
-            </div>
-
-            <!-- Quick Options -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Quick Options</label>
-                <div class="grid grid-cols-2 gap-2">
-                    <button type="button" onclick="setQuickDate(1)" 
-                            class="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-200 text-sm touch-btn">
-                        Tomorrow
+                
+                <!-- Action Buttons -->
+                <div class="flex gap-3 mt-6">
+                    <button onclick="deleteTaskFromEdit()" 
+                            class="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-colors touch-btn">
+                        🗑️ Delete
                     </button>
-                    <button type="button" onclick="setQuickDate(7)" 
-                            class="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 text-sm touch-btn">
-                        Next Week
+                    <button onclick="closeTaskEditModal()" 
+                            class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition-colors touch-btn">
+                        Cancel
                     </button>
-                    <button type="button" onclick="setQuickDate(30)" 
-                            class="bg-yellow-100 text-yellow-700 px-3 py-2 rounded-lg hover:bg-yellow-200 text-sm touch-btn">
-                        Next Month
+                    <button onclick="saveTaskFromEdit()" 
+                            class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors touch-btn">
+                        💾 Save Task
                     </button>
-                    <button type="button" onclick="setQuickDate(90)" 
-                            class="bg-purple-100 text-purple-700 px-3 py-2 rounded-lg hover:bg-purple-200 text-sm touch-btn">
-                        3 Months
-                    </button>
+                </div>
+                
+                <!-- Helper Text -->
+                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p class="text-xs text-blue-800">
+                        <strong>💡 Tip:</strong> Frequency determines how often this task repeats after completion. 
+                        For example, 90 days means the task will be due again 90 days after you mark it complete.
+                    </p>
                 </div>
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex gap-3 mt-6">
-            <button onclick="closeDatePickerModal()" 
-                    class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 touch-btn">
-                Cancel
-            </button>
-            <button onclick="confirmReschedule()" 
-                    class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 touch-btn">
-                📅 Reschedule
-            </button>
+        <!-- Date Picker Modal -->
+        <div id="date-picker-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl w-full max-w-sm p-6 shadow-2xl">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">📅 Reschedule Task</h3>
+                    <p id="reschedule-task-name" class="text-gray-600 text-sm"></p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Current Due Date -->
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Current Due Date</label>
+                        <p id="current-due-date" class="text-gray-900 font-semibold"></p>
+                    </div>
+
+                    <!-- New Due Date -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">New Due Date</label>
+                        <input type="date" id="new-due-date" 
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
+                    </div>
+
+                    <!-- Quick Options -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Quick Options</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="setQuickDate(1)" 
+                                    class="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-200 text-sm touch-btn">
+                                Tomorrow
+                            </button>
+                            <button type="button" onclick="setQuickDate(7)" 
+                                    class="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 text-sm touch-btn">
+                                Next Week
+                            </button>
+                            <button type="button" onclick="setQuickDate(30)" 
+                                    class="bg-yellow-100 text-yellow-700 px-3 py-2 rounded-lg hover:bg-yellow-200 text-sm touch-btn">
+                                Next Month
+                            </button>
+                            <button type="button" onclick="setQuickDate(90)" 
+                                    class="bg-purple-100 text-purple-700 px-3 py-2 rounded-lg hover:bg-purple-200 text-sm touch-btn">
+                                3 Months
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeDatePickerModal()" 
+                            class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 touch-btn">
+                        Cancel
+                    </button>
+                    <button onclick="confirmReschedule()" 
+                            class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 touch-btn">
+                        📅 Reschedule
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-    </div>
 
+    <!-- Load Original Scripts -->
     <script src="app.js"></script>
     <script src="calendar.js"></script>
     <script src="enhanced-dashboard.js"></script>
-    <!-- Calendar Compatibility Fix -->
-<script>
-   // Calendar Compatibility Fix for Casa Care
-// This ensures calendar integration works with the new dueDate field
 
-// ENHANCED: Ensure compatibility on all data operations
-function ensureCalendarCompatibility() {
-    if (!window.tasks) return;
-    
-    window.tasks.forEach(task => {
-        // Ensure dueDate exists and is a Date object
-        if (task.dueDate && !(task.dueDate instanceof Date)) {
-            task.dueDate = new Date(task.dueDate);
-        }
-        
-        // For backward compatibility, provide nextDue as alias to dueDate
-        if (task.dueDate && !task.hasOwnProperty('nextDue')) {
-            Object.defineProperty(task, 'nextDue', {
-                get: function() { return this.dueDate; },
-                set: function(value) { 
-                    this.dueDate = value instanceof Date ? value : new Date(value);
-                },
-                enumerable: true,
-                configurable: true
-            });
-        }
-        
-        // If we have old nextDue but no dueDate, migrate it
-        if (task.nextDue && !task.dueDate) {
-            task.dueDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
-        }
-    });
-    
-    console.log(`📅 Calendar compatibility ensured for ${window.tasks.length} tasks`);
-}
+    <!-- SINGLE COMPREHENSIVE FIX SCRIPT -->
+    <script>
+    // Casa Care - Comprehensive Modal & Date System Fix
+    // This single script replaces all the previous overlapping fixes
+    console.log('🧹 Casa Care: Loading comprehensive clean fix...');
 
-// Run compatibility check when DOM loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait for other scripts to load
-    setTimeout(function() {
-        ensureCalendarCompatibility();
-        console.log('📅 Calendar compatibility layer initialized');
-    }, 200);
-});
-
-// Also run when window loads (backup)
-window.addEventListener('load', function() {
-    setTimeout(ensureCalendarCompatibility, 100);
-});
-
-// Enhanced task getter for calendar integration
-function getTasksForCalendar() {
-    if (!window.tasks) return [];
-    
-    // Ensure compatibility before returning
-    ensureCalendarCompatibility();
-    
-    // Return tasks with both dueDate and nextDue for compatibility
-    return window.tasks.map(task => ({
-        ...task,
-        nextDue: task.dueDate, // Ensure calendar gets the due date
-        dueDate: task.dueDate  // Ensure both are available
-    }));
-}
-
-// Override the original saveData function to ensure compatibility
-const originalSaveData = window.saveData;
-if (originalSaveData) {
-    window.saveData = function() {
-        // Ensure compatibility before saving
-        ensureCalendarCompatibility();
-        
-        // Call original save function
-        return originalSaveData.apply(this, arguments);
-    };
-}
-
-// Override the original loadData function to ensure compatibility
-const originalLoadData = window.loadData;
-if (originalLoadData) {
-    window.loadData = function() {
-        // Call original load function
-        const result = originalLoadData.apply(this, arguments);
-        
-        // Ensure compatibility after loading
-        if (result) {
-            ensureCalendarCompatibility();
-        }
-        
-        return result;
-    };
-}
-
-// Make functions globally available
-window.getTasksForCalendar = getTasksForCalendar;
-window.ensureCalendarCompatibility = ensureCalendarCompatibility;
-
-console.log('📅 Enhanced calendar compatibility fix loaded'); </script>
-  <!-- Add this script AFTER all your other scripts to ensure functions are loaded -->
-<script>
-// Function Loader and Debug Script for Casa Care
-// This ensures all dashboard functions are properly available
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait for all scripts to load
-    setTimeout(function() {
-        console.log('🔍 Checking function availability...');
-        
-        // FORCE CHECK: Look for prompt-based functions and warn
-        const dashboardFunctions = ['addTaskFromDashboard', 'editTaskFromDashboard'];
-        dashboardFunctions.forEach(funcName => {
-            if (typeof window[funcName] === 'function') {
-                const funcStr = window[funcName].toString();
-                if (funcStr.includes('prompt(')) {
-                    console.warn(`⚠️ ${funcName} still uses prompts! This should use modal instead.`);
-                    console.log('🔧 Function source:', funcStr.substring(0, 200) + '...');
-                }
-            }
-        });
-        
-        // Check critical functions
-        const requiredFunctions = [
-            'editTaskFromDashboard',
-            'addTaskFromDashboard',
-            'rescheduleTaskFromDashboard',
-            'closeTaskEditModal',
-            'saveTaskFromEdit',
-            'deleteTaskFromEdit',
-            'closeDatePickerModal',
-            'setQuickDate',
-            'confirmReschedule'
-        ];
-        
-        let missingFunctions = [];
-        requiredFunctions.forEach(funcName => {
-            if (typeof window[funcName] !== 'function') {
-                missingFunctions.push(funcName);
-            }
-        });
-        
-        if (missingFunctions.length > 0) {
-            console.error('❌ Missing functions:', missingFunctions);
-            console.log('🔧 Attempting to load functions...');
+    // Wait for all original scripts to load
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            console.log('🔧 Casa Care: Initializing clean modal system...');
             
-            // Try to reload enhanced dashboard if available
-            if (typeof EnhancedDashboard !== 'undefined' && !window.enhancedDashboard) {
-                try {
-                    window.enhancedDashboard = new EnhancedDashboard();
-                    console.log('✅ Enhanced dashboard reloaded');
-                } catch (error) {
-                    console.error('❌ Failed to reload enhanced dashboard:', error);
-                }
-            }
-        } else {
-            console.log('✅ All dashboard functions loaded successfully');
-        }
-        
-        // Check modal elements
-        const requiredModals = ['task-edit-modal', 'date-picker-modal'];
-        let missingModals = [];
-        requiredModals.forEach(modalId => {
-            if (!document.getElementById(modalId)) {
-                missingModals.push(modalId);
-            }
-        });
-        
-        if (missingModals.length > 0) {
-            console.error('❌ Missing modal elements:', missingModals);
-            console.log('💡 Make sure you have updated your HTML with the new task edit modal');
-        } else {
-            console.log('✅ All modal elements found');
-        }
-        
-        // CRITICAL: Test actual button clicks
-        console.log('🧪 Testing button functionality...');
-        const addButton = document.querySelector('[onclick="addTaskFromDashboard()"]');
-        const editButtons = document.querySelectorAll('[onclick^="editTaskFromDashboard("]');
-        
-        console.log(`📊 Found ${addButton ? 1 : 0} Add Task button(s)`);
-        console.log(`📊 Found ${editButtons.length} Edit Task button(s)`);
-        
-        // Add debug function to window
-        window.debugCasaCare = function() {
-            console.log('=== CASA CARE DEBUG ===');
-            console.log('Functions available:', requiredFunctions.filter(f => typeof window[f] === 'function').length + '/' + requiredFunctions.length);
-            console.log('Modal elements found:', requiredModals.filter(m => document.getElementById(m)).length + '/' + requiredModals.length);
-            console.log('Enhanced dashboard:', window.enhancedDashboard ? '✅' : '❌');
-            console.log('Tasks loaded:', window.tasks ? window.tasks.length : 'none');
-            console.log('Current editing task:', window.currentEditingTask ? '✅' : '❌');
-            
-            // Test function sources
-            console.log('\n🔍 FUNCTION SOURCES:');
-            dashboardFunctions.forEach(funcName => {
-                if (typeof window[funcName] === 'function') {
-                    const funcStr = window[funcName].toString();
-                    const usesPrompt = funcStr.includes('prompt(');
-                    const usesModal = funcStr.includes('task-edit-modal') || funcStr.includes('modal.classList');
-                    console.log(`  ${funcName}: ${usesModal ? '✅ MODAL' : usesPrompt ? '❌ PROMPT' : '❓ UNKNOWN'}`);
-                }
-            });
-            
-            if (typeof window.debugDashboardFunctions === 'function') {
-                window.debugDashboardFunctions();
-            }
-        };
-        
-        // FORCE REFRESH: If enhanced dashboard exists, make sure it's initialized
-        if (typeof EnhancedDashboard !== 'undefined' && !window.enhancedDashboard) {
-            console.log('🔄 Force initializing enhanced dashboard...');
-            try {
-                window.enhancedDashboard = new EnhancedDashboard();
-            } catch (error) {
-                console.error('❌ Failed to force init enhanced dashboard:', error);
-            }
-        }
-        
-        console.log('🎯 Casa Care function loader complete. Run debugCasaCare() for detailed info.');
-        
-    }, 1000); // Wait 1 second for all scripts to load completely
-});
-</script>
-    <!-- MODAL FUNCTION OVERRIDE SCRIPT - Add this LAST, after ALL other scripts -->
-<script>
-// DEFINITIVE MODAL FUNCTION OVERRIDE
-// This script FORCES the modal-based functions to be used instead of prompt-based ones
-
-console.log('🔧 MODAL OVERRIDE: Force loading modal-based functions...');
-
-// FORCE OVERRIDE: Dashboard Add Task (NO PROMPTS!)
-window.addTaskFromDashboard = function() {
-    console.log('➕ MODAL VERSION: Adding new task from dashboard...');
-    
-    // Find next available ID
-    const maxId = Math.max(...window.tasks.map(t => t.id), 0);
-    
-    // Create new task object
-    const newTask = {
-        id: maxId + 1,
-        title: '',
-        description: '',
-        category: 'General',
-        frequency: 365,
-        cost: 0,
-        priority: 'medium',
-        dueDate: new Date(),
-        lastCompleted: null,
-        isCompleted: false
-    };
-    
-    // CRITICAL: Set as current editing task
-    window.currentEditingTask = newTask;
-    console.log('✅ Current editing task set:', newTask);
-    
-    // Open modal directly
-    const modal = document.getElementById('task-edit-modal');
-    if (modal) {
-        console.log('✅ Opening task modal for dashboard add');
-        
-        // Fill modal fields for new task
-        document.getElementById('edit-task-name').value = '';
-        document.getElementById('edit-task-description').value = '';
-        document.getElementById('edit-task-cost').value = 0;
-        document.getElementById('edit-task-frequency').value = 365;
-        document.getElementById('edit-task-priority').value = 'medium';
-        
-        // Handle category if field exists
-        const categoryField = document.getElementById('edit-task-category');
-        if (categoryField) {
-            categoryField.value = 'General';
-        }
-        
-        // Handle due date
-        const dueDateInput = document.getElementById('edit-task-due-date');
-        if (dueDateInput) {
-            dueDateInput.value = new Date().toISOString().split('T')[0];
-        }
-        
-        // Update modal title
-        const modalTitle = document.getElementById('task-edit-title');
-        if (modalTitle) {
-            modalTitle.textContent = 'Add New Task';
-        }
-        
-        // Hide delete button for new task
-        const deleteButton = modal.querySelector('[onclick="deleteTaskFromEdit()"]');
-        if (deleteButton) {
-            deleteButton.style.display = 'none';
-        }
-        
-        // Show modal
-        modal.classList.remove('hidden');
-        
-        // Focus on task name
-        setTimeout(() => document.getElementById('edit-task-name').focus(), 100);
-        
-        console.log('✅ MODAL VERSION: Add task modal opened');
-    } else {
-        console.error('❌ Task edit modal not found');
-        alert('❌ Task edit modal not found. Please check your HTML.');
-    }
-};
-
-// FORCE OVERRIDE: Dashboard Edit Task (NO PROMPTS!)
-window.editTaskFromDashboard = function(taskId) {
-    console.log('✏️ MODAL VERSION: Editing task from dashboard:', taskId);
-    
-    const task = window.tasks.find(t => t.id === taskId);
-    if (!task) {
-        console.error('❌ Task not found:', taskId);
-        alert('❌ Task not found');
-        return;
-    }
-
-    // CRITICAL: Set as current editing task
-    window.currentEditingTask = task;
-    console.log('✅ Current editing task set:', task);
-
-    // Open modal directly
-    const modal = document.getElementById('task-edit-modal');
-    if (modal) {
-        console.log('✅ Opening task modal for dashboard edit');
-        
-        // Fill modal fields
-        document.getElementById('edit-task-name').value = task.title || '';
-        document.getElementById('edit-task-description').value = task.description || '';
-        document.getElementById('edit-task-cost').value = task.cost || 0;
-        document.getElementById('edit-task-frequency').value = task.frequency || 365;
-        document.getElementById('edit-task-priority').value = task.priority || 'medium';
-        
-        // Handle category if field exists
-        const categoryField = document.getElementById('edit-task-category');
-        if (categoryField) {
-            categoryField.value = task.category || 'General';
-        }
-        
-        // Handle due date
-        const dueDateInput = document.getElementById('edit-task-due-date');
-        if (dueDateInput) {
-            if (task.dueDate) {
-                const dueDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
-                dueDateInput.value = dueDate.toISOString().split('T')[0];
-            } else {
-                dueDateInput.value = new Date().toISOString().split('T')[0];
-            }
-        }
-        
-        // Update modal title
-        const modalTitle = document.getElementById('task-edit-title');
-        if (modalTitle) {
-            modalTitle.textContent = 'Edit Task';
-        }
-        
-        // Show delete button
-        const deleteButton = modal.querySelector('[onclick="deleteTaskFromEdit()"]');
-        if (deleteButton) {
-            deleteButton.style.display = 'block';
-        }
-        
-        // Show modal
-        modal.classList.remove('hidden');
-        
-        // Focus on task name
-        setTimeout(() => document.getElementById('edit-task-name').focus(), 100);
-        
-        console.log('✅ MODAL VERSION: Edit task modal opened');
-    } else {
-        console.error('❌ Task edit modal not found');
-        alert('❌ Task edit modal not found. Please check your HTML.');
-    }
-};
-
-// FORCE OVERRIDE: Save Task Function
-window.saveTaskFromEdit = function() {
-    console.log('💾 MODAL VERSION: Saving task from edit modal...');
-    
-    if (!window.currentEditingTask) {
-        console.error('❌ No task being edited');
-        alert('❌ No task selected for editing');
-        return;
-    }
-    
-    // Get form values
-    const title = document.getElementById('edit-task-name').value.trim();
-    const description = document.getElementById('edit-task-description').value.trim();
-    const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
-    const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
-    const priority = document.getElementById('edit-task-priority').value;
-    const category = document.getElementById('edit-task-category')?.value || 'General';
-    const dueDateInput = document.getElementById('edit-task-due-date');
-    
-    console.log('📝 Form values:', { title, description, cost, frequency, priority, category });
-    
-    // Validate inputs
-    if (!title) {
-        alert('❌ Task name is required');
-        document.getElementById('edit-task-name').focus();
-        return;
-    }
-    
-    if (!description) {
-        alert('❌ Task description is required');
-        document.getElementById('edit-task-description').focus();
-        return;
-    }
-    
-    if (frequency <= 0) {
-        alert('❌ Frequency must be greater than 0');
-        document.getElementById('edit-task-frequency').focus();
-        return;
-    }
-    
-    // Handle due date
-    let dueDate;
-    if (dueDateInput && dueDateInput.value) {
-        dueDate = new Date(dueDateInput.value + 'T12:00:00');
-        if (isNaN(dueDate.getTime())) {
-            alert('❌ Invalid due date');
-            dueDateInput.focus();
-            return;
-        }
-    } else {
-        dueDate = new Date();
-    }
-    
-    // Check if this is a new task
-    const isNewTask = !window.tasks.find(t => t.id === window.currentEditingTask.id);
-    console.log('🆕 Is new task:', isNewTask);
-    
-    // Update task properties
-    window.currentEditingTask.title = title;
-    window.currentEditingTask.description = description;
-    window.currentEditingTask.cost = cost;
-    window.currentEditingTask.frequency = frequency;
-    window.currentEditingTask.priority = priority;
-    window.currentEditingTask.category = category;
-    window.currentEditingTask.dueDate = dueDate;
-    window.currentEditingTask.nextDue = dueDate; // Calendar compatibility
-    
-    if (isNewTask) {
-        // Add to tasks array
-        window.tasks.push(window.currentEditingTask);
-        console.log('✅ New task added to global array');
-    } else {
-        console.log('✅ Existing task updated');
-    }
-    
-    // Save and refresh
-    try {
-        // Save data
-        if (typeof window.saveData === 'function') {
-            window.saveData();
-        } else if (typeof saveData === 'function') {
-            saveData();
-        }
-        console.log('💾 Data saved');
-        
-        // Refresh dashboard
-        if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-            window.enhancedDashboard.render();
-            console.log('🔄 Enhanced dashboard refreshed');
-        } else if (typeof updateDashboard === 'function') {
-            updateDashboard();
-            console.log('🔄 Basic dashboard updated');
-        }
-        
-        // Refresh calendar if available
-        if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-            window.casaCareCalendar.refresh();
-            console.log('📅 Calendar refreshed');
-        }
-        
-        // Also try to refresh task categories if in setup
-        if (typeof renderTaskCategories === 'function') {
-            const taskSetup = document.getElementById('task-setup');
-            if (taskSetup && !taskSetup.classList.contains('hidden')) {
-                renderTaskCategories();
-                console.log('📋 Task categories re-rendered');
-            }
-        }
-        
-    } catch (error) {
-        console.error('❌ Error during save/refresh:', error);
-    }
-    
-    // Close modal
-    window.closeTaskEditModal();
-    
-    alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
-};
-
-// FORCE OVERRIDE: Close Modal Function
-window.closeTaskEditModal = function() {
-    const modal = document.getElementById('task-edit-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-    }
-    window.currentEditingTask = null;
-    console.log('✅ MODAL VERSION: Task edit modal closed');
-};
-
-// FORCE OVERRIDE: Delete Task Function
-window.deleteTaskFromEdit = function() {
-    if (!window.currentEditingTask) {
-        console.error('❌ No task being edited');
-        return;
-    }
-    
-    if (confirm(`Are you sure you want to delete "${window.currentEditingTask.title}"?`)) {
-        const taskIndex = window.tasks.findIndex(t => t.id === window.currentEditingTask.id);
-        if (taskIndex > -1) {
-            const deletedTask = window.tasks.splice(taskIndex, 1)[0];
-            console.log(`🗑️ Deleted task: ${deletedTask.title}`);
-            
-            // Save data
-            if (typeof window.saveData === 'function') {
-                window.saveData();
-            } else if (typeof saveData === 'function') {
-                saveData();
-            }
-            
-            // Refresh dashboard
-            if (window.enhancedDashboard) {
-                window.enhancedDashboard.render();
-            }
-            
-            // Refresh calendar if it exists
-            if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-                window.casaCareCalendar.refresh();
-            }
-            
-            // Also refresh task categories if in setup
-            if (typeof renderTaskCategories === 'function') {
-                const taskSetup = document.getElementById('task-setup');
-                if (taskSetup && !taskSetup.classList.contains('hidden')) {
-                    renderTaskCategories();
-                }
-            }
-            
-            // Close modal
-            window.closeTaskEditModal();
-            
-            alert(`✅ Task "${deletedTask.title}" deleted successfully!`);
-        }
-    }
-};
-
-// FORCE OVERRIDE: Reschedule function to use date picker modal
-window.rescheduleTaskFromDashboard = function(taskId) {
-    console.log('📅 MODAL VERSION: Rescheduling task:', taskId);
-    
-    const task = window.tasks.find(t => t.id === taskId);
-    if (!task) {
-        console.error('❌ Task not found:', taskId);
-        return;
-    }
-
-    // Store the task for the date picker modal
-    window.currentRescheduleTask = task;
-    
-    // Try to use the date picker modal
-    const datePickerModal = document.getElementById('date-picker-modal');
-    const taskNameElement = document.getElementById('reschedule-task-name');
-    const currentDueDateElement = document.getElementById('current-due-date');
-    const newDueDateInput = document.getElementById('new-due-date');
-    
-    if (datePickerModal && taskNameElement && currentDueDateElement && newDueDateInput) {
-        console.log('✅ Using date picker modal');
-        
-        // Set task info
-        taskNameElement.textContent = `"${task.title}"`;
-        
-        // Set current due date
-        const currentDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
-        currentDueDateElement.textContent = currentDate.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-        
-        // Set default new date to current due date
-        newDueDateInput.value = currentDate.toISOString().split('T')[0];
-        
-        // Show modal
-        datePickerModal.classList.remove('hidden');
-        
-        // Focus on date input
-        setTimeout(() => newDueDateInput.focus(), 100);
-        
-        console.log(`📅 MODAL VERSION: Date picker opened for task: ${task.title}`);
-    } else {
-        console.warn('⚠️ Date picker modal elements not found');
-        alert('❌ Date picker modal not available. Please check your HTML.');
-    }
-};
-
-// Override confirmReschedule to work with our system
-window.confirmReschedule = function() {
-    if (!window.currentRescheduleTask) {
-        console.error('❌ No task selected for rescheduling');
-        return;
-    }
-    
-    const newDueDateInput = document.getElementById('new-due-date');
-    if (!newDueDateInput || !newDueDateInput.value) {
-        alert('❌ Please select a new due date');
-        return;
-    }
-    
-    const newDate = new Date(newDueDateInput.value + 'T12:00:00');
-    if (isNaN(newDate.getTime())) {
-        alert('❌ Invalid date selected');
-        return;
-    }
-    
-    // Update the task
-    const oldDate = window.currentRescheduleTask.dueDate instanceof Date ? 
-        window.currentRescheduleTask.dueDate : new Date(window.currentRescheduleTask.dueDate);
-    
-    window.currentRescheduleTask.dueDate = newDate;
-    window.currentRescheduleTask.nextDue = newDate;
-    
-    // Save data
-    if (typeof window.saveData === 'function') {
-        window.saveData();
-    } else if (typeof saveData === 'function') {
-        saveData();
-    }
-    
-    // Refresh everything
-    if (window.enhancedDashboard) {
-        window.enhancedDashboard.render();
-    }
-    
-    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-        window.casaCareCalendar.refresh();
-    }
-    
-    // Close modal
-    window.closeDatePickerModal();
-    
-    console.log(`✅ Task rescheduled from ${oldDate.toLocaleDateString()} to ${newDate.toLocaleDateString()}`);
-    alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
-};
-
-// Override closeDatePickerModal
-window.closeDatePickerModal = function() {
-    const modal = document.getElementById('date-picker-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-    }
-    window.currentRescheduleTask = null;
-    console.log('📅 Date picker modal closed');
-};
-
-// Override setQuickDate
-window.setQuickDate = function(daysFromNow) {
-    const newDueDateInput = document.getElementById('new-due-date');
-    if (!newDueDateInput) return;
-    
-    const newDate = new Date();
-    newDate.setDate(newDate.getDate() + daysFromNow);
-    
-    newDueDateInput.value = newDate.toISOString().split('T')[0];
-    
-    // Add visual feedback
-    newDueDateInput.style.backgroundColor = '#dbeafe';
-    setTimeout(() => {
-        newDueDateInput.style.backgroundColor = '';
-    }, 300);
-    
-    console.log(`📅 Quick date set to ${daysFromNow} days from now`);
-};
-
-console.log('✅ MODAL OVERRIDE: All functions have been force-overridden to use modals!');
-
-// Test function to verify override
-window.testModalOverride = function() {
-    console.log('🧪 TESTING MODAL OVERRIDE:');
-    const functions = ['addTaskFromDashboard', 'editTaskFromDashboard', 'rescheduleTaskFromDashboard'];
-    functions.forEach(funcName => {
-        const func = window[funcName];
-        if (func) {
-            const funcStr = func.toString();
-            const usesPrompt = funcStr.includes('prompt(');
-            const usesModal = funcStr.includes('task-edit-modal') || funcStr.includes('modal.classList');
-            console.log(`  ${funcName}: ${usesModal ? '✅ MODAL' : usesPrompt ? '❌ PROMPT' : '❓ UNKNOWN'}`);
-        }
-    });
-};
-
-console.log('💡 Run testModalOverride() to verify all functions use modals now');
-</script>
-    <!-- Current Task Persistence Fix -->
-<script>
-// ENHANCED: Ensure currentEditingTask persists properly
-let persistentCurrentTask = null;
-
-// Override the Add Task function to ensure task persistence
-const originalAddTask = window.addTaskFromDashboard;
-window.addTaskFromDashboard = function() {
-    console.log('🔄 ENHANCED: Add Task with persistent tracking...');
-    
-    // Find next available ID
-    const maxId = Math.max(...window.tasks.map(t => t.id), 0);
-    
-    // Create new task object
-    const newTask = {
-        id: maxId + 1,
-        title: '',
-        description: '',
-        category: 'General',
-        frequency: 365,
-        cost: 0,
-        priority: 'medium',
-        dueDate: new Date(),
-        lastCompleted: null,
-        isCompleted: false
-    };
-    
-    // CRITICAL: Set BOTH variables
-    window.currentEditingTask = newTask;
-    persistentCurrentTask = newTask;
-    
-    console.log('✅ ENHANCED: Current editing task set:', newTask);
-    console.log('✅ ENHANCED: Persistent task set:', persistentCurrentTask);
-    
-    // Open modal
-    const modal = document.getElementById('task-edit-modal');
-    if (modal) {
-        // Fill fields
-        document.getElementById('edit-task-name').value = '';
-        document.getElementById('edit-task-description').value = '';
-        document.getElementById('edit-task-cost').value = 0;
-        document.getElementById('edit-task-frequency').value = 365;
-        document.getElementById('edit-task-priority').value = 'medium';
-        
-        const categoryField = document.getElementById('edit-task-category');
-        if (categoryField) categoryField.value = 'General';
-        
-        const dueDateInput = document.getElementById('edit-task-due-date');
-        if (dueDateInput) dueDateInput.value = new Date().toISOString().split('T')[0];
-        
-        // Update modal
-        const modalTitle = document.getElementById('task-edit-title');
-        if (modalTitle) modalTitle.textContent = 'Add New Task';
-        
-        const deleteButton = modal.querySelector('[onclick="deleteTaskFromEdit()"]');
-        if (deleteButton) deleteButton.style.display = 'none';
-        
-        // Show modal
-        modal.classList.remove('hidden');
-        setTimeout(() => document.getElementById('edit-task-name').focus(), 100);
-        
-        console.log('✅ ENHANCED: Add task modal opened');
-    }
-};
-
-// Override the Save function to use persistent task
-const originalSave = window.saveTaskFromEdit;
-window.saveTaskFromEdit = function() {
-    console.log('💾 ENHANCED: Saving with persistent task tracking...');
-    
-    // Use persistent task if main one is missing
-    let editingTask = window.currentEditingTask || persistentCurrentTask;
-    
-    if (!editingTask) {
-        console.error('❌ ENHANCED: No task being edited (both sources empty)');
-        alert('❌ No task selected for editing. Please try opening the modal again.');
-        return;
-    }
-    
-    console.log('✅ ENHANCED: Using task for save:', editingTask);
-    
-    // Rest of save logic...
-    const title = document.getElementById('edit-task-name').value.trim();
-    const description = document.getElementById('edit-task-description').value.trim();
-    const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
-    const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
-    const priority = document.getElementById('edit-task-priority').value;
-    const category = document.getElementById('edit-task-category')?.value || 'General';
-    const dueDateInput = document.getElementById('edit-task-due-date');
-    
-    console.log('📝 ENHANCED: Form values:', { title, description, cost, frequency, priority, category });
-    
-    // Validate
-    if (!title) {
-        alert('❌ Task name is required');
-        document.getElementById('edit-task-name').focus();
-        return;
-    }
-    
-    if (!description) {
-        alert('❌ Task description is required');
-        document.getElementById('edit-task-description').focus();
-        return;
-    }
-    
-    if (frequency <= 0) {
-        alert('❌ Frequency must be greater than 0');
-        return;
-    }
-    
-    // Handle due date
-    let dueDate;
-    if (dueDateInput && dueDateInput.value) {
-        dueDate = new Date(dueDateInput.value + 'T12:00:00');
-        if (isNaN(dueDate.getTime())) {
-            alert('❌ Invalid due date');
-            return;
-        }
-    } else {
-        dueDate = new Date();
-    }
-    
-    // Check if new task
-    const isNewTask = !window.tasks.find(t => t.id === editingTask.id);
-    console.log('🆕 ENHANCED: Is new task:', isNewTask);
-    
-    // Update task
-    editingTask.title = title;
-    editingTask.description = description;
-    editingTask.cost = cost;
-    editingTask.frequency = frequency;
-    editingTask.priority = priority;
-    editingTask.category = category;
-    editingTask.dueDate = dueDate;
-    editingTask.nextDue = dueDate;
-    
-    if (isNewTask) {
-        window.tasks.push(editingTask);
-        console.log('✅ ENHANCED: New task added');
-    } else {
-        console.log('✅ ENHANCED: Existing task updated');
-    }
-    
-    // Save and refresh
-    if (typeof window.saveData === 'function') {
-        window.saveData();
-    }
-    
-    if (window.enhancedDashboard) {
-        window.enhancedDashboard.render();
-    }
-    
-    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-        window.casaCareCalendar.refresh();
-    }
-    
-    // Close modal and cleanup
-    const modal = document.getElementById('task-edit-modal');
-    if (modal) modal.classList.add('hidden');
-    
-    window.currentEditingTask = null;
-    persistentCurrentTask = null;
-    
-    console.log('✅ ENHANCED: Save completed successfully');
-    alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
-};
-
-console.log('🔄 ENHANCED: Current task persistence fix loaded');
-</script>
-    <!-- MODAL DIAGNOSTIC SCRIPT - Add temporarily to test what's happening -->
-<script>
-// DIAGNOSTIC: Test modal functionality step by step
-window.testModalStep = function(step) {
-    console.log(`🧪 TESTING STEP ${step}:`);
-    
-    switch(step) {
-        case 1:
-            console.log('Step 1: Testing modal element existence');
-            const modal = document.getElementById('task-edit-modal');
-            console.log('Modal element:', modal ? '✅ Found' : '❌ Not Found');
-            if (modal) {
-                console.log('Modal classes:', modal.className);
-                console.log('Modal style display:', modal.style.display);
-                console.log('Modal hidden class:', modal.classList.contains('hidden'));
-            }
-            break;
-            
-        case 2:
-            console.log('Step 2: Testing modal form fields');
-            const fields = [
-                'edit-task-name',
-                'edit-task-description', 
-                'edit-task-cost',
-                'edit-task-frequency',
-                'edit-task-priority',
-                'edit-task-due-date',
-                'edit-task-category'
-            ];
-            
-            fields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                console.log(`  ${fieldId}: ${field ? '✅' : '❌'}`);
-                if (field) {
-                    console.log(`    Type: ${field.type || field.tagName}`);
-                }
-            });
-            break;
-            
-        case 3:
-            console.log('Step 3: Testing Add Task function manually');
-            try {
-                // Test the function directly
-                if (typeof window.addTaskFromDashboard === 'function') {
-                    console.log('✅ Function exists, calling it...');
-                    window.addTaskFromDashboard();
-                    console.log('✅ Function completed without errors');
-                } else {
-                    console.log('❌ Function does not exist');
-                }
-            } catch (error) {
-                console.error('❌ Function threw error:', error);
-            }
-            break;
-            
-        case 4:
-            console.log('Step 4: Testing manual modal opening');
-            const modal4 = document.getElementById('task-edit-modal');
-            if (modal4) {
-                console.log('✅ Opening modal manually...');
-                modal4.classList.remove('hidden');
-                console.log('Modal should now be visible');
-                
-                // Test if fields can be filled
-                setTimeout(() => {
-                    try {
-                        document.getElementById('edit-task-name').value = 'Test Task';
-                        document.getElementById('edit-task-description').value = 'Test Description';
-                        console.log('✅ Fields filled successfully');
-                    } catch (error) {
-                        console.error('❌ Error filling fields:', error);
+            // Create single source of truth for modal system
+            window.CasaCare = {
+                modalSystem: {
+                    currentTask: null,
+                    isEditing: false,
+                    context: 'none', // 'setup' or 'dashboard'
+                    
+                    setTask: function(task, context = 'dashboard') {
+                        this.currentTask = {...task}; // Always clone to avoid reference issues
+                        this.isEditing = true;
+                        this.context = context;
+                        console.log(`📝 CasaCare: Task set for ${context}:`, this.currentTask);
+                    },
+                    
+                    getTask: function() {
+                        return this.currentTask;
+                    },
+                    
+                    clearTask: function() {
+                        console.log('🧹 CasaCare: Clearing modal task');
+                        this.currentTask = null;
+                        this.isEditing = false;
+                        this.context = 'none';
+                    },
+                    
+                    hasTask: function() {
+                        return this.currentTask !== null && this.isEditing;
                     }
+                },
+                
+                dateUtils: {
+                    formatForInput: function(date) {
+                        if (!date) return new Date().toISOString().split('T')[0];
+                        const d = date instanceof Date ? date : new Date(date);
+                        return isNaN(d.getTime()) ? new Date().toISOString().split('T')[0] : d.toISOString().split('T')[0];
+                    },
+                    
+                    parseFromInput: function(dateString) {
+                        if (!dateString) return new Date();
+                        const date = new Date(dateString + 'T12:00:00');
+                        return isNaN(date.getTime()) ? new Date() : date;
+                    },
+                    
+                    formatForDisplay: function(date) {
+                        if (!date) return 'Not set';
+                        const d = date instanceof Date ? date : new Date(date);
+                        return isNaN(d.getTime()) ? 'Invalid date' : d.toLocaleDateString();
+                    }
+                }
+            };
+            
+            // Override addTaskFromSetup function
+            window.addTaskFromSetup = function() {
+                console.log('➕ CasaCare: Adding task from setup...');
+                
+                const maxId = Math.max(...window.tasks.map(t => t.id), 0);
+                const newTask = {
+                    id: maxId + 1,
+                    title: '',
+                    description: '',
+                    category: 'General',
+                    frequency: 365,
+                    cost: 0,
+                    priority: 'medium',
+                    dueDate: new Date(),
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isTemplate: true,
+                    isNewTask: true
+                };
+                
+                window.CasaCare.modalSystem.setTask(newTask, 'setup');
+                openTaskModal(newTask, true);
+            };
+            
+            // Override editTaskFromSetup function
+            window.editTaskFromSetup = function(taskId) {
+                console.log('✏️ CasaCare: Editing task from setup:', taskId);
+                
+                const task = window.tasks.find(t => t.id === taskId);
+                if (!task) {
+                    alert('❌ Task not found');
+                    return;
+                }
+                
+                window.CasaCare.modalSystem.setTask(task, 'setup');
+                openTaskModal(task, false);
+            };
+            
+            // Override addTaskFromDashboard function
+            window.addTaskFromDashboard = function() {
+                console.log('➕ CasaCare: Adding task from dashboard...');
+                
+                const maxId = Math.max(...window.tasks.map(t => t.id), 0);
+                const newTask = {
+                    id: maxId + 1,
+                    title: '',
+                    description: '',
+                    category: 'General',
+                    frequency: 365,
+                    cost: 0,
+                    priority: 'medium',
+                    dueDate: new Date(),
+                    lastCompleted: null,
+                    isCompleted: false,
+                    isNewTask: true
+                };
+                
+                window.CasaCare.modalSystem.setTask(newTask, 'dashboard');
+                openTaskModal(newTask, true);
+            };
+            
+            // Override editTaskFromDashboard function
+            window.editTaskFromDashboard = function(taskId) {
+                console.log('✏️ CasaCare: Editing task from dashboard:', taskId);
+                
+                const task = window.tasks.find(t => t.id === taskId);
+                if (!task) {
+                    alert('❌ Task not found');
+                    return;
+                }
+                
+                window.CasaCare.modalSystem.setTask(task, 'dashboard');
+                openTaskModal(task, false);
+            };
+            
+            // Central function to open task modal
+            function openTaskModal(task, isNewTask) {
+                const modal = document.getElementById('task-edit-modal');
+                if (!modal) {
+                    alert('❌ Task edit modal not found');
+                    return;
+                }
+                
+                console.log('📝 CasaCare: Opening modal for task:', task);
+                
+                // Fill form fields with proper date handling
+                document.getElementById('edit-task-name').value = task.title || '';
+                document.getElementById('edit-task-description').value = task.description || '';
+                document.getElementById('edit-task-cost').value = task.cost || 0;
+                document.getElementById('edit-task-frequency').value = task.frequency || 365;
+                document.getElementById('edit-task-priority').value = task.priority || 'medium';
+                
+                const categoryField = document.getElementById('edit-task-category');
+                if (categoryField) {
+                    categoryField.value = task.category || 'General';
+                }
+                
+                // CRITICAL: Proper date handling
+                const dueDateInput = document.getElementById('edit-task-due-date');
+                if (dueDateInput) {
+                    dueDateInput.value = window.CasaCare.dateUtils.formatForInput(task.dueDate);
+                    console.log('📅 CasaCare: Set due date input to:', dueDateInput.value);
+                }
+                
+                // Update modal title
+                const modalTitle = document.getElementById('task-edit-title');
+                if (modalTitle) {
+                    modalTitle.textContent = isNewTask ? 'Add New Task' : 'Edit Task';
+                }
+                
+                // Show/hide delete button
+                const deleteButton = modal.querySelector('[onclick*="deleteTaskFromEdit"]');
+                if (deleteButton) {
+                    deleteButton.style.display = isNewTask ? 'none' : 'block';
+                }
+                
+                // Show modal
+                modal.classList.remove('hidden');
+                
+                // Focus on first field
+                setTimeout(() => {
+                    const nameField = document.getElementById('edit-task-name');
+                    if (nameField) nameField.focus();
                 }, 100);
-            }
-            break;
-            
-        case 5:
-            console.log('Step 5: Testing button click events');
-            // Find Add Task button
-            const addButton = document.querySelector('[onclick="addTaskFromDashboard()"]');
-            console.log('Add Task button found:', addButton ? '✅' : '❌');
-            if (addButton) {
-                console.log('Button onclick:', addButton.getAttribute('onclick'));
-                console.log('Button text:', addButton.textContent.trim());
+                
+                console.log('✅ CasaCare: Modal opened successfully');
             }
             
-            // Find Edit buttons
-            const editButtons = document.querySelectorAll('[onclick^="editTaskFromDashboard("]');
-            console.log('Edit Task buttons found:', editButtons.length);
-            editButtons.forEach((btn, i) => {
-                console.log(`  Edit button ${i+1}:`, btn.getAttribute('onclick'));
-            });
-            break;
-            
-        case 6:
-            console.log('Step 6: Testing currentEditingTask variable');
-            console.log('window.currentEditingTask:', window.currentEditingTask);
-            console.log('Setting test task...');
-            window.currentEditingTask = { id: 999, title: 'Test', description: 'Test' };
-            console.log('Test task set:', window.currentEditingTask);
-            break;
-    }
-};
-
-// Run all tests automatically
-window.runAllModalTests = function() {
-    console.log('🧪 RUNNING ALL MODAL DIAGNOSTIC TESTS...');
-    for (let i = 1; i <= 6; i++) {
-        window.testModalStep(i);
-        console.log(''); // Empty line for readability
-    }
-};
-
-console.log('🧪 Modal diagnostic loaded. Run:');
-console.log('  testModalStep(1) through testModalStep(6) for individual tests');
-console.log('  runAllModalTests() for all tests at once');
-</script> <!-- SAVE DIAGNOSTIC SCRIPT - Add temporarily to test save functionality -->
-<script>
-// DIAGNOSTIC: Test save functionality step by step
-window.testSave = function() {
-    console.log('🧪 TESTING SAVE FUNCTIONALITY...');
-    
-    // Step 1: Check if modal is open and has a task
-    console.log('Step 1: Current editing task');
-    console.log('window.currentEditingTask:', window.currentEditingTask);
-    
-    if (!window.currentEditingTask) {
-        console.log('❌ No current editing task! Opening Add Task modal first...');
-        window.addTaskFromDashboard();
-        setTimeout(() => {
-            console.log('✅ Modal opened, currentEditingTask:', window.currentEditingTask);
-        }, 100);
-        return;
-    }
-    
-    // Step 2: Check form fields
-    console.log('\nStep 2: Form field values');
-    const fields = {
-        'edit-task-name': document.getElementById('edit-task-name')?.value,
-        'edit-task-description': document.getElementById('edit-task-description')?.value,
-        'edit-task-cost': document.getElementById('edit-task-cost')?.value,
-        'edit-task-frequency': document.getElementById('edit-task-frequency')?.value,
-        'edit-task-priority': document.getElementById('edit-task-priority')?.value,
-        'edit-task-due-date': document.getElementById('edit-task-due-date')?.value,
-        'edit-task-category': document.getElementById('edit-task-category')?.value
-    };
-    
-    Object.entries(fields).forEach(([fieldId, value]) => {
-        const element = document.getElementById(fieldId);
-        console.log(`  ${fieldId}: ${element ? '✅' : '❌'} Value: "${value}"`);
-    });
-    
-    // Step 3: Test save button
-    console.log('\nStep 3: Save button');
-    const saveButton = document.querySelector('[onclick="saveTaskFromEdit()"]');
-    console.log('Save button found:', saveButton ? '✅' : '❌');
-    if (saveButton) {
-        console.log('Save button onclick:', saveButton.getAttribute('onclick'));
-        console.log('Save button text:', saveButton.textContent.trim());
-    }
-    
-    // Step 4: Check if saveTaskFromEdit function exists
-    console.log('\nStep 4: Save function');
-    console.log('saveTaskFromEdit function exists:', typeof window.saveTaskFromEdit === 'function' ? '✅' : '❌');
-    
-    // Step 5: Fill test data and try to save
-    console.log('\nStep 5: Filling test data...');
-    try {
-        document.getElementById('edit-task-name').value = 'Test Task ' + Date.now();
-        document.getElementById('edit-task-description').value = 'Test description for diagnostic';
-        document.getElementById('edit-task-cost').value = '50';
-        document.getElementById('edit-task-frequency').value = '30';
-        document.getElementById('edit-task-priority').value = 'medium';
-        document.getElementById('edit-task-due-date').value = new Date().toISOString().split('T')[0];
-        
-        const categoryField = document.getElementById('edit-task-category');
-        if (categoryField) {
-            categoryField.value = 'General';
-        }
-        
-        console.log('✅ Test data filled');
-        
-        // Step 6: Try to call save function
-        console.log('\nStep 6: Calling save function...');
-        if (typeof window.saveTaskFromEdit === 'function') {
-            window.saveTaskFromEdit();
-        } else {
-            console.log('❌ Save function not available');
-        }
-        
-    } catch (error) {
-        console.error('❌ Error during test:', error);
-    }
-};
-
-// Test save button click directly
-window.testSaveButton = function() {
-    console.log('🧪 TESTING SAVE BUTTON CLICK...');
-    
-    const saveButton = document.querySelector('[onclick="saveTaskFromEdit()"]');
-    if (saveButton) {
-        console.log('✅ Save button found, simulating click...');
-        try {
-            saveButton.click();
-            console.log('✅ Button click completed');
-        } catch (error) {
-            console.error('❌ Error clicking button:', error);
-        }
-    } else {
-        console.log('❌ Save button not found');
-        
-        // Look for alternative save buttons
-        const allButtons = document.querySelectorAll('#task-edit-modal button');
-        console.log('All buttons in modal:');
-        allButtons.forEach((btn, i) => {
-            console.log(`  Button ${i+1}: "${btn.textContent.trim()}" onclick="${btn.getAttribute('onclick')}"`);
-        });
-    }
-};
-
-// Test validation specifically
-window.testValidation = function() {
-    console.log('🧪 TESTING FORM VALIDATION...');
-    
-    // Open modal first
-    window.addTaskFromDashboard();
-    
-    setTimeout(() => {
-        console.log('Testing validation with empty fields...');
-        
-        // Clear all fields
-        document.getElementById('edit-task-name').value = '';
-        document.getElementById('edit-task-description').value = '';
-        
-        // Try to save
-        try {
-            window.saveTaskFromEdit();
-        } catch (error) {
-            console.error('Error during validation test:', error);
-        }
-    }, 200);
-};
-
-console.log('🧪 Save diagnostic loaded. Run:');
-console.log('  testSave() - Full save test');
-console.log('  testSaveButton() - Test save button click');
-console.log('  testValidation() - Test form validation');
-</script>
-  <!-- ULTIMATE FIX SCRIPT - Replace your previous fix with this -->
-<script>
-// ULTIMATE FIX: Complete modal system overhaul
-console.log('🔧 ULTIMATE FIX: Loading complete modal system...');
-
-// STEP 1: Clear all conflicting functions first
-console.log('🧹 ULTIMATE FIX: Clearing conflicting functions...');
-
-// STEP 2: Create persistent task storage that won't get cleared
-window.CasaCareModalSystem = {
-    currentTask: null,
-    isEditing: false,
-    
-    setTask: function(task) {
-        this.currentTask = task;
-        this.isEditing = true;
-        console.log('📝 ULTIMATE: Task set in modal system:', task);
-    },
-    
-    getTask: function() {
-        console.log('🔍 ULTIMATE: Getting task from modal system:', this.currentTask);
-        return this.currentTask;
-    },
-    
-    clearTask: function() {
-        console.log('🧹 ULTIMATE: Clearing task from modal system');
-        this.currentTask = null;
-        this.isEditing = false;
-    },
-    
-    hasTask: function() {
-        return this.currentTask !== null && this.isEditing;
-    }
-};
-
-// STEP 3: ULTIMATE addTaskFromSetup function
-window.addTaskFromSetup = function() {
-    console.log('➕ ULTIMATE: Adding custom task from setup...');
-    
-    // Find next available ID
-    const maxId = Math.max(...window.tasks.map(t => t.id), 0);
-    
-    // Create new task object
-    const newTask = {
-        id: maxId + 1,
-        title: '',
-        description: '',
-        category: 'General',
-        frequency: 365,
-        cost: 0,
-        priority: 'medium',
-        dueDate: new Date(),
-        lastCompleted: null,
-        isCompleted: false,
-        isTemplate: true, // Important for setup processing
-        isNewTask: true // Flag to identify new tasks
-    };
-    
-    // Store in our persistent system
-    window.CasaCareModalSystem.setTask(newTask);
-    
-    // Also set the old variables for compatibility (but don't rely on them)
-    window.currentEditingTask = newTask;
-    window.persistentCurrentTask = newTask;
-    
-    console.log('✅ ULTIMATE: Task stored in all systems');
-    
-    // Open the modal
-    const modal = document.getElementById('task-edit-modal');
-    if (modal) {
-        console.log('✅ ULTIMATE: Opening modal for new task');
-        
-        // Fill modal fields for new task
-        document.getElementById('edit-task-name').value = '';
-        document.getElementById('edit-task-description').value = '';
-        document.getElementById('edit-task-cost').value = '0';
-        document.getElementById('edit-task-frequency').value = '365';
-        document.getElementById('edit-task-priority').value = 'medium';
-        
-        // Handle category
-        const categoryField = document.getElementById('edit-task-category');
-        if (categoryField) {
-            categoryField.value = 'General';
-        }
-        
-        // Handle due date - set to today
-        const dueDateInput = document.getElementById('edit-task-due-date');
-        if (dueDateInput) {
-            dueDateInput.value = new Date().toISOString().split('T')[0];
-        }
-        
-        // Update modal title
-        const modalTitle = document.getElementById('task-edit-title');
-        if (modalTitle) {
-            modalTitle.textContent = 'Add Custom Task';
-        }
-        
-        // Hide delete button for new task
-        const deleteButton = modal.querySelector('[onclick*="deleteTaskFromEdit"]');
-        if (deleteButton) {
-            deleteButton.style.display = 'none';
-        }
-        
-        // Show modal
-        modal.classList.remove('hidden');
-        
-        // Focus on task name
-        setTimeout(() => {
-            const nameField = document.getElementById('edit-task-name');
-            if (nameField) nameField.focus();
-        }, 100);
-        
-        console.log('✅ ULTIMATE: Modal opened successfully');
-    } else {
-        console.error('❌ ULTIMATE: Modal not found');
-        alert('❌ Task edit modal not found');
-    }
-};
-
-// STEP 4: ULTIMATE editTaskFromSetup function  
-window.editTaskFromSetup = function(taskId) {
-    console.log('✏️ ULTIMATE: Editing task from setup:', taskId);
-    
-    const task = window.tasks.find(t => t.id === taskId);
-    if (!task) {
-        console.error('❌ ULTIMATE: Task not found:', taskId);
-        alert('❌ Task not found');
-        return;
-    }
-    
-    // Store in our persistent system
-    window.CasaCareModalSystem.setTask({...task}); // Clone the task
-    
-    // Also set the old variables for compatibility
-    window.currentEditingTask = task;
-    window.persistentCurrentTask = task;
-    
-    console.log('✅ ULTIMATE: Task stored for editing');
-    
-    // Open modal and fill fields
-    const modal = document.getElementById('task-edit-modal');
-    if (modal) {
-        console.log('✅ ULTIMATE: Opening modal for edit');
-        
-        // Fill modal fields
-        document.getElementById('edit-task-name').value = task.title || '';
-        document.getElementById('edit-task-description').value = task.description || '';
-        document.getElementById('edit-task-cost').value = task.cost || 0;
-        document.getElementById('edit-task-frequency').value = task.frequency || 365;
-        document.getElementById('edit-task-priority').value = task.priority || 'medium';
-        
-        // Handle category
-        const categoryField = document.getElementById('edit-task-category');
-        if (categoryField) {
-            categoryField.value = task.category || 'General';
-        }
-        
-        // Handle due date - CRITICAL FIX for date capture
-        const dueDateInput = document.getElementById('edit-task-due-date');
-        if (dueDateInput) {
-            if (task.dueDate) {
-                const dueDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
-                if (!isNaN(dueDate.getTime())) {
-                    dueDateInput.value = dueDate.toISOString().split('T')[0];
+            // Override saveTaskFromEdit function
+            window.saveTaskFromEdit = function() {
+                console.log('💾 CasaCare: Saving task...');
+                
+                const editingTask = window.CasaCare.modalSystem.getTask();
+                if (!editingTask) {
+                    alert('❌ No task selected for editing. Please close the modal and try again.');
+                    return;
+                }
+                
+                // Get and validate form values
+                const title = document.getElementById('edit-task-name').value.trim();
+                const description = document.getElementById('edit-task-description').value.trim();
+                const costInput = document.getElementById('edit-task-cost').value;
+                const frequencyInput = document.getElementById('edit-task-frequency').value;
+                const priority = document.getElementById('edit-task-priority').value;
+                const category = document.getElementById('edit-task-category')?.value || 'General';
+                const dueDateInput = document.getElementById('edit-task-due-date').value;
+                
+                console.log('📝 CasaCare: Form values:', { title, description, costInput, frequencyInput, priority, category, dueDateInput });
+                
+                // Validation
+                if (!title) {
+                    alert('❌ Task name is required');
+                    document.getElementById('edit-task-name').focus();
+                    return;
+                }
+                
+                if (!description) {
+                    alert('❌ Task description is required');
+                    document.getElementById('edit-task-description').focus();
+                    return;
+                }
+                
+                const cost = parseFloat(costInput) || 0;
+                const frequency = parseInt(frequencyInput) || 365;
+                
+                if (frequency <= 0) {
+                    alert('❌ Frequency must be greater than 0');
+                    document.getElementById('edit-task-frequency').focus();
+                    return;
+                }
+                
+                // CRITICAL: Parse due date properly
+                const dueDate = window.CasaCare.dateUtils.parseFromInput(dueDateInput);
+                console.log('📅 CasaCare: Parsed due date:', dueDate, 'from input:', dueDateInput);
+                
+                // Check if new task
+                const isNewTask = editingTask.isNewTask || !window.tasks.find(t => t.id === editingTask.id);
+                
+                // Update task properties
+                editingTask.title = title;
+                editingTask.description = description;
+                editingTask.cost = cost;
+                editingTask.frequency = frequency;
+                editingTask.priority = priority;
+                editingTask.category = category;
+                editingTask.dueDate = dueDate;
+                editingTask.nextDue = dueDate; // Calendar compatibility
+                
+                // Clean up flags
+                delete editingTask.isTemplate;
+                delete editingTask.isNewTask;
+                
+                if (isNewTask) {
+                    window.tasks.push(editingTask);
+                    console.log('✅ CasaCare: New task added:', editingTask);
                 } else {
-                    dueDateInput.value = new Date().toISOString().split('T')[0];
+                    const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
+                    if (taskIndex > -1) {
+                        window.tasks[taskIndex] = editingTask;
+                        console.log('✅ CasaCare: Existing task updated:', editingTask);
+                    }
                 }
-            } else {
-                dueDateInput.value = new Date().toISOString().split('T')[0];
-            }
-        }
-        
-        // Update modal title
-        const modalTitle = document.getElementById('task-edit-title');
-        if (modalTitle) {
-            modalTitle.textContent = 'Edit Task';
-        }
-        
-        // Show delete button
-        const deleteButton = modal.querySelector('[onclick*="deleteTaskFromEdit"]');
-        if (deleteButton) {
-            deleteButton.style.display = 'block';
-        }
-        
-        // Show modal
-        modal.classList.remove('hidden');
-        
-        // Focus on task name
-        setTimeout(() => {
-            const nameField = document.getElementById('edit-task-name');
-            if (nameField) nameField.focus();
-        }, 100);
-        
-        console.log('✅ ULTIMATE: Edit modal opened successfully');
-    } else {
-        console.error('❌ ULTIMATE: Modal not found');
-        alert('❌ Task edit modal not found');
-    }
-};
-
-// STEP 5: ULTIMATE saveTaskFromEdit function
-window.saveTaskFromEdit = function() {
-    console.log('💾 ULTIMATE: Saving task...');
-    
-    // Get task from our persistent system first
-    let editingTask = window.CasaCareModalSystem.getTask();
-    
-    // Fallback to old variables if needed
-    if (!editingTask) {
-        editingTask = window.currentEditingTask || window.persistentCurrentTask;
-    }
-    
-    if (!editingTask) {
-        console.error('❌ ULTIMATE: No task being edited');
-        alert('❌ No task selected for editing. Please close the modal and try again.');
-        return;
-    }
-    
-    console.log('✅ ULTIMATE: Found task to save:', editingTask);
-    
-    // Get form values with validation
-    const title = document.getElementById('edit-task-name').value.trim();
-    const description = document.getElementById('edit-task-description').value.trim();
-    const costInput = document.getElementById('edit-task-cost').value;
-    const frequencyInput = document.getElementById('edit-task-frequency').value;
-    const priority = document.getElementById('edit-task-priority').value;
-    const category = document.getElementById('edit-task-category')?.value || 'General';
-    const dueDateInput = document.getElementById('edit-task-due-date').value;
-    
-    console.log('📝 ULTIMATE: Raw form values:', { 
-        title, description, costInput, frequencyInput, priority, category, dueDateInput 
-    });
-    
-    // Validate and parse
-    if (!title) {
-        alert('❌ Task name is required');
-        document.getElementById('edit-task-name').focus();
-        return;
-    }
-    
-    if (!description) {
-        alert('❌ Task description is required');
-        document.getElementById('edit-task-description').focus();
-        return;
-    }
-    
-    const cost = parseFloat(costInput) || 0;
-    const frequency = parseInt(frequencyInput) || 365;
-    
-    if (frequency <= 0) {
-        alert('❌ Frequency must be greater than 0');
-        document.getElementById('edit-task-frequency').focus();
-        return;
-    }
-    
-    // CRITICAL: Handle due date properly
-    let dueDate;
-    if (dueDateInput) {
-        dueDate = new Date(dueDateInput + 'T12:00:00');
-        console.log('📅 ULTIMATE: Parsed due date:', dueDate, 'from input:', dueDateInput);
-        
-        if (isNaN(dueDate.getTime())) {
-            alert('❌ Invalid due date');
-            document.getElementById('edit-task-due-date').focus();
-            return;
-        }
-    } else {
-        dueDate = new Date();
-        console.log('📅 ULTIMATE: Using default due date:', dueDate);
-    }
-    
-    // Check if this is a new task
-    const isNewTask = editingTask.isNewTask || !window.tasks.find(t => t.id === editingTask.id);
-    console.log('🆕 ULTIMATE: Is new task:', isNewTask);
-    
-    // Update task properties
-    editingTask.title = title;
-    editingTask.description = description;
-    editingTask.cost = cost;
-    editingTask.frequency = frequency;
-    editingTask.priority = priority;
-    editingTask.category = category;
-    editingTask.dueDate = dueDate;
-    editingTask.nextDue = dueDate; // Calendar compatibility
-    
-    // Remove template and new task flags
-    delete editingTask.isTemplate;
-    delete editingTask.isNewTask;
-    
-    if (isNewTask) {
-        // Add to tasks array
-        window.tasks.push(editingTask);
-        console.log('✅ ULTIMATE: New task added:', editingTask);
-    } else {
-        // Update existing task in array
-        const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
-        if (taskIndex > -1) {
-            window.tasks[taskIndex] = editingTask;
-            console.log('✅ ULTIMATE: Existing task updated:', editingTask);
-        }
-    }
-    
-    // Determine context and act accordingly
-    const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
-    const mainAppVisible = !document.getElementById('main-app').classList.contains('hidden');
-    
-    console.log('🔍 ULTIMATE: Context - Setup:', taskSetupVisible, 'Main app:', mainAppVisible);
-    
-    if (taskSetupVisible) {
-        // We're in setup - re-render task categories
-        console.log('🔄 ULTIMATE: Re-rendering setup task categories');
-        if (typeof renderTaskCategories === 'function') {
-            renderTaskCategories();
-        } else {
-            console.warn('⚠️ renderTaskCategories function not available');
-        }
-    } else {
-        // We're in main app - save and refresh
-        console.log('💾 ULTIMATE: Saving data and refreshing dashboard');
-        
-        try {
-            if (typeof window.saveData === 'function') {
-                window.saveData();
-            } else if (typeof saveData === 'function') {
-                saveData();
-            }
-            
-            // Refresh dashboard
-            if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-                window.enhancedDashboard.render();
-            } else if (typeof updateDashboard === 'function') {
-                updateDashboard();
-            }
-            
-            // Refresh calendar
-            if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-                window.casaCareCalendar.refresh();
-            }
-        } catch (error) {
-            console.error('❌ ULTIMATE: Error during save/refresh:', error);
-        }
-    }
-    
-    // CRITICAL: Close modal and clear everything
-    window.closeTaskEditModal();
-    
-    // Success message
-    const actionText = isNewTask ? 'added' : 'updated';
-    console.log(`✅ ULTIMATE: Task "${title}" ${actionText} successfully`);
-    alert(`✅ Task "${title}" ${actionText} successfully!`);
-};
-
-// STEP 6: ULTIMATE closeTaskEditModal function
-window.closeTaskEditModal = function() {
-    console.log('🚪 ULTIMATE: Closing task edit modal');
-    
-    const modal = document.getElementById('task-edit-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-        console.log('✅ ULTIMATE: Modal hidden');
-    }
-    
-    // Clear all task variables
-    window.CasaCareModalSystem.clearTask();
-    window.currentEditingTask = null;
-    window.persistentCurrentTask = null;
-    
-    console.log('✅ ULTIMATE: All task variables cleared');
-};
-
-// STEP 7: ULTIMATE deleteTaskFromEdit function
-window.deleteTaskFromEdit = function() {
-    console.log('🗑️ ULTIMATE: Deleting task...');
-    
-    // Get task from our persistent system
-    let editingTask = window.CasaCareModalSystem.getTask();
-    
-    if (!editingTask) {
-        editingTask = window.currentEditingTask || window.persistentCurrentTask;
-    }
-    
-    if (!editingTask) {
-        console.error('❌ ULTIMATE: No task being edited for delete');
-        alert('❌ No task selected for deletion');
-        return;
-    }
-    
-    const taskTitle = editingTask.title || 'Untitled Task';
-    
-    if (confirm(`Are you sure you want to delete "${taskTitle}"?`)) {
-        // Find and remove task from array
-        const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
-        if (taskIndex > -1) {
-            const deletedTask = window.tasks.splice(taskIndex, 1)[0];
-            console.log('🗑️ ULTIMATE: Task deleted:', deletedTask);
-            
-            // Determine context and refresh appropriately
-            const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
-            
-            if (taskSetupVisible) {
-                // Re-render setup categories
-                if (typeof renderTaskCategories === 'function') {
-                    renderTaskCategories();
+                
+                // Context-specific actions
+                const context = window.CasaCare.modalSystem.context;
+                console.log('🔍 CasaCare: Saving in context:', context);
+                
+                if (context === 'setup') {
+                    // Re-render task categories for setup
+                    if (typeof renderTaskCategories === 'function') {
+                        renderTaskCategories();
+                    }
+                } else {
+                    // Save data and refresh dashboard/calendar
+                    try {
+                        if (typeof window.saveData === 'function') {
+                            window.saveData();
+                        }
+                        
+                        if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
+                            window.enhancedDashboard.render();
+                        } else if (typeof updateDashboard === 'function') {
+                            updateDashboard();
+                        }
+                        
+                        if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+                            window.casaCareCalendar.refresh();
+                        }
+                    } catch (error) {
+                        console.error('❌ CasaCare: Error during save/refresh:', error);
+                    }
                 }
-            } else {
-                // Save and refresh main app
+                
+                // Close modal
+                window.closeTaskEditModal();
+                
+                const actionText = isNewTask ? 'added' : 'updated';
+                alert(`✅ Task "${title}" ${actionText} successfully!\nDue: ${window.CasaCare.dateUtils.formatForDisplay(dueDate)}`);
+            };
+            
+            // Override closeTaskEditModal function
+            window.closeTaskEditModal = function() {
+                const modal = document.getElementById('task-edit-modal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                }
+                window.CasaCare.modalSystem.clearTask();
+                console.log('✅ CasaCare: Modal closed and cleared');
+            };
+            
+            // Override deleteTaskFromEdit function
+            window.deleteTaskFromEdit = function() {
+                const editingTask = window.CasaCare.modalSystem.getTask();
+                if (!editingTask) {
+                    alert('❌ No task selected for deletion');
+                    return;
+                }
+                
+                const taskTitle = editingTask.title || 'Untitled Task';
+                
+                if (confirm(`Are you sure you want to delete "${taskTitle}"?`)) {
+                    const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
+                    if (taskIndex > -1) {
+                        window.tasks.splice(taskIndex, 1);
+                        console.log('🗑️ CasaCare: Task deleted:', taskTitle);
+                        
+                        // Context-specific refresh
+                        const context = window.CasaCare.modalSystem.context;
+                        if (context === 'setup') {
+                            if (typeof renderTaskCategories === 'function') {
+                                renderTaskCategories();
+                            }
+                        } else {
+                            try {
+                                if (typeof window.saveData === 'function') {
+                                    window.saveData();
+                                }
+                                if (window.enhancedDashboard) {
+                                    window.enhancedDashboard.render();
+                                }
+                                if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+                                    window.casaCareCalendar.refresh();
+                                }
+                            } catch (error) {
+                                console.error('❌ CasaCare: Error during delete refresh:', error);
+                            }
+                        }
+                        
+                        window.closeTaskEditModal();
+                        alert(`✅ Task "${taskTitle}" deleted successfully!`);
+                    }
+                }
+            };
+            
+            // Date picker functions
+            window.rescheduleTaskFromDashboard = function(taskId) {
+                const task = window.tasks.find(t => t.id === taskId);
+                if (!task) {
+                    alert('❌ Task not found');
+                    return;
+                }
+                
+                window.currentRescheduleTask = task;
+                
+                const modal = document.getElementById('date-picker-modal');
+                const taskNameElement = document.getElementById('reschedule-task-name');
+                const currentDueDateElement = document.getElementById('current-due-date');
+                const newDueDateInput = document.getElementById('new-due-date');
+                
+                if (modal && taskNameElement && currentDueDateElement && newDueDateInput) {
+                    taskNameElement.textContent = `"${task.title}"`;
+                    currentDueDateElement.textContent = window.CasaCare.dateUtils.formatForDisplay(task.dueDate);
+                    newDueDateInput.value = window.CasaCare.dateUtils.formatForInput(task.dueDate);
+                    
+                    modal.classList.remove('hidden');
+                    setTimeout(() => newDueDateInput.focus(), 100);
+                } else {
+                    alert('❌ Date picker modal not available');
+                }
+            };
+            
+            window.closeDatePickerModal = function() {
+                const modal = document.getElementById('date-picker-modal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                }
+                window.currentRescheduleTask = null;
+            };
+            
+            window.setQuickDate = function(daysFromNow) {
+                const newDueDateInput = document.getElementById('new-due-date');
+                if (!newDueDateInput) return;
+                
+                const newDate = new Date();
+                newDate.setDate(newDate.getDate() + daysFromNow);
+                newDueDateInput.value = newDate.toISOString().split('T')[0];
+                
+                // Visual feedback
+                newDueDateInput.style.backgroundColor = '#dbeafe';
+                setTimeout(() => newDueDateInput.style.backgroundColor = '', 300);
+            };
+            
+            window.confirmReschedule = function() {
+                if (!window.currentRescheduleTask) {
+                    alert('❌ No task selected for rescheduling');
+                    return;
+                }
+                
+                const newDueDateInput = document.getElementById('new-due-date');
+                if (!newDueDateInput || !newDueDateInput.value) {
+                    alert('❌ Please select a new due date');
+                    return;
+                }
+                
+                const newDate = window.CasaCare.dateUtils.parseFromInput(newDueDateInput.value);
+                const oldDate = window.currentRescheduleTask.dueDate;
+                
+                window.currentRescheduleTask.dueDate = newDate;
+                window.currentRescheduleTask.nextDue = newDate;
+                
+                // Save and refresh
                 try {
                     if (typeof window.saveData === 'function') {
                         window.saveData();
-                    } else if (typeof saveData === 'function') {
-                        saveData();
                     }
-                    
                     if (window.enhancedDashboard) {
                         window.enhancedDashboard.render();
-                    } else if (typeof updateDashboard === 'function') {
-                        updateDashboard();
                     }
-                    
                     if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
                         window.casaCareCalendar.refresh();
                     }
                 } catch (error) {
-                    console.error('❌ ULTIMATE: Error during delete refresh:', error);
+                    console.error('❌ Error during reschedule refresh:', error);
                 }
-            }
+                
+                window.closeDatePickerModal();
+                alert(`✅ Task rescheduled to ${window.CasaCare.dateUtils.formatForDisplay(newDate)}`);
+            };
             
-            // Close modal
-            window.closeTaskEditModal();
+            // Test function
+            window.testCasaCareClean = function() {
+                console.log('🧪 TESTING CASA CARE CLEAN SYSTEM:');
+                console.log('  CasaCare object:', typeof window.CasaCare === 'object' ? '✅' : '❌');
+                console.log('  Modal system:', typeof window.CasaCare?.modalSystem === 'object' ? '✅' : '❌');
+                console.log('  Date utils:', typeof window.CasaCare?.dateUtils === 'object' ? '✅' : '❌');
+                console.log('  addTaskFromSetup:', typeof window.addTaskFromSetup === 'function' ? '✅' : '❌');
+                console.log('  editTaskFromSetup:', typeof window.editTaskFromSetup === 'function' ? '✅' : '❌');
+                console.log('  addTaskFromDashboard:', typeof window.addTaskFromDashboard === 'function' ? '✅' : '❌');
+                console.log('  editTaskFromDashboard:', typeof window.editTaskFromDashboard === 'function' ? '✅' : '❌');
+                console.log('  saveTaskFromEdit:', typeof window.saveTaskFromEdit === 'function' ? '✅' : '❌');
+                console.log('  deleteTaskFromEdit:', typeof window.deleteTaskFromEdit === 'function' ? '✅' : '❌');
+                console.log('  Modal element:', document.getElementById('task-edit-modal') ? '✅' : '❌');
+                console.log('  Tasks array:', Array.isArray(window.tasks) ? `✅ (${window.tasks.length} tasks)` : '❌');
+                
+                if (window.CasaCare?.modalSystem) {
+                    console.log('  Modal state:');
+                    console.log('    Has task:', window.CasaCare.modalSystem.hasTask());
+                    console.log('    Context:', window.CasaCare.modalSystem.context);
+                    console.log('    Current task:', window.CasaCare.modalSystem.currentTask?.title || 'none');
+                }
+            };
             
-            alert(`✅ Task "${taskTitle}" deleted successfully!`);
-        } else {
-            console.error('❌ ULTIMATE: Task not found in array for deletion');
-            alert('❌ Task not found for deletion');
-        }
-    }
-};
-
-// STEP 8: Enhanced editTaskFromDashboard for main app
-window.editTaskFromDashboard = function(taskId) {
-    console.log('✏️ ULTIMATE: Editing task from dashboard:', taskId);
-    
-    const task = window.tasks.find(t => t.id === taskId);
-    if (!task) {
-        console.error('❌ ULTIMATE: Task not found:', taskId);
-        alert('❌ Task not found');
-        return;
-    }
-    
-    // Use the same system as setup editing
-    window.editTaskFromSetup(taskId);
-};
-
-// STEP 9: Test function
-window.testUltimateFix = function() {
-    console.log('🧪 TESTING ULTIMATE FIX:');
-    console.log('  CasaCareModalSystem:', typeof window.CasaCareModalSystem === 'object' ? '✅' : '❌');
-    console.log('  addTaskFromSetup:', typeof window.addTaskFromSetup === 'function' ? '✅' : '❌');
-    console.log('  editTaskFromSetup:', typeof window.editTaskFromSetup === 'function' ? '✅' : '❌');
-    console.log('  saveTaskFromEdit:', typeof window.saveTaskFromEdit === 'function' ? '✅' : '❌');
-    console.log('  closeTaskEditModal:', typeof window.closeTaskEditModal === 'function' ? '✅' : '❌');
-    console.log('  deleteTaskFromEdit:', typeof window.deleteTaskFromEdit === 'function' ? '✅' : '❌');
-    console.log('  editTaskFromDashboard:', typeof window.editTaskFromDashboard === 'function' ? '✅' : '❌');
-    console.log('  Modal element:', document.getElementById('task-edit-modal') ? '✅' : '❌');
-    console.log('  Tasks array:', Array.isArray(window.tasks) ? `✅ (${window.tasks.length} tasks)` : '❌');
-    
-    // Test modal system
-    if (window.CasaCareModalSystem) {
-        console.log('  Modal system state:');
-        console.log('    Has task:', window.CasaCareModalSystem.hasTask());
-        console.log('    Current task:', window.CasaCareModalSystem.currentTask);
-        console.log('    Is editing:', window.CasaCareModalSystem.isEditing);
-    }
-};
-
-console.log('✅ ULTIMATE FIX: Complete modal system loaded!');
-console.log('💡 Run testUltimateFix() to verify everything is working');
-console.log('🎯 This fix should resolve:');
-console.log('  • Add Task from setup not saving');
-console.log('  • Due dates not being captured');
-console.log('  • Edit task errors');
-console.log('  • Delete button not working');
-console.log('  • Modal state conflicts');
-</script>
-</body>
-</html>
+            console.log('✅ Casa Care: Clean comprehensive system loaded!');
+            console.log('💡 Run testCasaCareClean() to verify everything is working');
+            console.log('🎯 This clean system should fix all modal and date issues');
+            
+        }, 500); // Wait for scripts to load
+    });
+    </script>
 </body>
 </html>
