@@ -1453,78 +1453,27 @@ function deleteTaskDirect(taskId) {
 
 // FIXED: Enhanced modal functions with better error checking
 function openTaskEditModal(task, isNewTask = false) {
-    console.log(`🔧 Opening task edit modal for: ${task.title || 'New Task'}`, { isNewTask });
+    console.log('Opening modal for:', task.title || 'New Task');
     
     const modal = document.getElementById('task-edit-modal');
     if (!modal) {
-        console.error('❌ Task edit modal not found');
-        alert('❌ Task edit modal not available. Please check your HTML structure.');
+        alert('Modal not found');
         return;
     }
     
-    // Store current editing task GLOBALLY to ensure it's accessible
+    // Simple show
+    modal.classList.remove('hidden');
+    modal.style.display = 'block';
+    
+    // Fill basic fields
+    document.getElementById('edit-task-name').value = task.title || '';
+    document.getElementById('edit-task-description').value = task.description || '';
+    document.getElementById('edit-task-cost').value = task.cost || 0;
+    document.getElementById('edit-task-frequency').value = task.frequency || 365;
+    document.getElementById('edit-task-priority').value = task.priority || 'medium';
+    
     currentEditingTask = task;
     window.currentEditingTask = task;
-    
-    console.log('📝 Current editing task set:', currentEditingTask);
-    
-    // Update modal title
-    const modalTitle = document.getElementById('task-edit-title');
-    if (modalTitle) {
-        modalTitle.textContent = isNewTask ? 'Add New Task' : 'Edit Task';
-    }
-    
-    // Fill form fields with error checking
-    const fillField = (id, value) => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.value = value || '';
-        } else {
-            console.warn(`⚠️ Form field not found: ${id}`);
-        }
-    };
-    
-    fillField('edit-task-name', task.title);
-    fillField('edit-task-description', task.description);
-    fillField('edit-task-cost', task.cost || 0);
-    fillField('edit-task-frequency', task.frequency || 365);
-    fillField('edit-task-priority', task.priority || 'medium');
-    
-    // Handle category if field exists
-    const categoryField = document.getElementById('edit-task-category');
-    if (categoryField) {
-        categoryField.value = task.category || 'General';
-    }
-    
-    // Handle due date
-    const dueDateInput = document.getElementById('edit-task-due-date');
-    if (dueDateInput) {
-        if (task.dueDate) {
-            const dueDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
-            dueDateInput.value = dueDate.toISOString().split('T')[0];
-        } else {
-            dueDateInput.value = new Date().toISOString().split('T')[0];
-        }
-    }
-    
-    // Show/hide delete button
-    const deleteButton = modal.querySelector('[onclick="deleteTaskFromEdit()"]');
-    if (deleteButton) {
-        deleteButton.style.display = isNewTask ? 'none' : 'block';
-    }
-    
-    // Show modal
-    modal.classList.remove('hidden');
-    console.log('✅ Modal shown successfully');
-    
-    // Focus on task name with delay
-    setTimeout(() => {
-        const nameField = document.getElementById('edit-task-name');
-        if (nameField) {
-            nameField.focus();
-            console.log('✅ Focus set on task name field');
-        }
-    }, 100);
 }
 
 // Close task edit modal
