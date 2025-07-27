@@ -1394,5 +1394,422 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 700); // Wait for previous scripts to load
 });
 </script>
+        <script>
+// Casa Care - DEFINITIVE Modal Fix for Setup Page
+// This replaces all previous modal fixes with a clean, working solution
+
+console.log('🔧 Casa Care: Loading DEFINITIVE modal fix...');
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait for everything to load
+    setTimeout(function() {
+        console.log('🎯 Casa Care: Implementing definitive modal fix...');
+        
+        // Store original functions if they exist
+        const originalFunctions = {
+            addTaskFromSetup: window.addTaskFromSetup,
+            editTaskFromSetup: window.editTaskFromSetup,
+            addTaskFromDashboard: window.addTaskFromDashboard,
+            editTaskFromDashboard: window.editTaskFromDashboard
+        };
+        
+        // Create a single, reliable modal system
+        window.CasaCareModalFix = {
+            currentTask: null,
+            currentContext: null,
+            
+            // Show modal with enhanced debugging
+            showModal: function(task, isNewTask, context) {
+                console.log('📱 ModalFix: Showing modal for context:', context);
+                console.log('📱 ModalFix: Task:', task);
+                console.log('📱 ModalFix: Is new task:', isNewTask);
+                
+                this.currentTask = {...task}; // Clone to avoid reference issues
+                this.currentContext = context;
+                
+                const modal = document.getElementById('task-edit-modal');
+                if (!modal) {
+                    console.error('❌ ModalFix: Modal element not found!');
+                    alert('❌ Modal not found. Please refresh the page.');
+                    return false;
+                }
+                
+                // CRITICAL: Force remove hidden class and set display
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+                modal.style.position = 'fixed';
+                modal.style.top = '0';
+                modal.style.left = '0';
+                modal.style.right = '0';
+                modal.style.bottom = '0';
+                modal.style.zIndex = '99999';
+                modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                modal.style.alignItems = 'center';
+                modal.style.justifyContent = 'center';
+                
+                console.log('📱 ModalFix: Modal classes after show:', modal.className);
+                console.log('📱 ModalFix: Modal display style:', modal.style.display);
+                console.log('📱 ModalFix: Modal visibility:', getComputedStyle(modal).display);
+                
+                // Fill form fields
+                this.populateForm(task, isNewTask);
+                
+                // Focus first field after a delay
+                setTimeout(() => {
+                    const nameField = document.getElementById('edit-task-name');
+                    if (nameField) {
+                        nameField.focus();
+                        console.log('📱 ModalFix: Focused on name field');
+                    }
+                }, 200);
+                
+                // Add escape key handler
+                this.addEscapeHandler();
+                
+                console.log('✅ ModalFix: Modal should now be visible');
+                return true;
+            },
+            
+            // Populate form fields
+            populateForm: function(task, isNewTask) {
+                console.log('📝 ModalFix: Populating form...');
+                
+                // Get all form elements
+                const elements = {
+                    name: document.getElementById('edit-task-name'),
+                    description: document.getElementById('edit-task-description'),
+                    cost: document.getElementById('edit-task-cost'),
+                    frequency: document.getElementById('edit-task-frequency'),
+                    priority: document.getElementById('edit-task-priority'),
+                    category: document.getElementById('edit-task-category'),
+                    dueDate: document.getElementById('edit-task-due-date'),
+                    title: document.getElementById('task-edit-title')
+                };
+                
+                // Check if elements exist
+                Object.entries(elements).forEach(([key, element]) => {
+                    if (!element) {
+                        console.warn(`⚠️ ModalFix: Element ${key} not found`);
+                    }
+                });
+                
+                // Populate fields
+                if (elements.name) elements.name.value = task.title || '';
+                if (elements.description) elements.description.value = task.description || '';
+                if (elements.cost) elements.cost.value = task.cost || 0;
+                if (elements.frequency) elements.frequency.value = task.frequency || 365;
+                if (elements.priority) elements.priority.value = task.priority || 'medium';
+                if (elements.category) elements.category.value = task.category || 'General';
+                if (elements.title) elements.title.textContent = isNewTask ? 'Add New Task' : 'Edit Task';
+                
+                // Handle due date
+                if (elements.dueDate) {
+                    let dateValue = '';
+                    if (task.dueDate) {
+                        const date = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+                        if (!isNaN(date.getTime())) {
+                            dateValue = date.toISOString().split('T')[0];
+                        }
+                    }
+                    if (!dateValue) {
+                        dateValue = new Date().toISOString().split('T')[0];
+                    }
+                    elements.dueDate.value = dateValue;
+                    console.log('📅 ModalFix: Set due date to:', dateValue);
+                }
+                
+                // Show/hide delete button
+                const deleteBtn = document.querySelector('[onclick*="deleteTaskFromEdit"]');
+                if (deleteBtn) {
+                    deleteBtn.style.display = isNewTask ? 'none' : 'block';
+                }
+                
+                console.log('✅ ModalFix: Form populated');
+            },
+            
+            // Add escape key handler
+            addEscapeHandler: function() {
+                const handler = (e) => {
+                    if (e.key === 'Escape') {
+                        this.hideModal();
+                        document.removeEventListener('keydown', handler);
+                    }
+                };
+                document.addEventListener('keydown', handler);
+            },
+            
+            // Hide modal
+            hideModal: function() {
+                console.log('📱 ModalFix: Hiding modal');
+                const modal = document.getElementById('task-edit-modal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    modal.style.display = 'none';
+                }
+                this.currentTask = null;
+                this.currentContext = null;
+                console.log('✅ ModalFix: Modal hidden');
+            },
+            
+            // Save task
+            saveTask: function() {
+                console.log('💾 ModalFix: Saving task...');
+                
+                if (!this.currentTask) {
+                    alert('❌ No task selected for saving');
+                    return;
+                }
+                
+                // Get form values
+                const formData = {
+                    title: document.getElementById('edit-task-name')?.value?.trim() || '',
+                    description: document.getElementById('edit-task-description')?.value?.trim() || '',
+                    cost: parseFloat(document.getElementById('edit-task-cost')?.value) || 0,
+                    frequency: parseInt(document.getElementById('edit-task-frequency')?.value) || 365,
+                    priority: document.getElementById('edit-task-priority')?.value || 'medium',
+                    category: document.getElementById('edit-task-category')?.value || 'General',
+                    dueDateStr: document.getElementById('edit-task-due-date')?.value || ''
+                };
+                
+                console.log('📝 ModalFix: Form data:', formData);
+                
+                // Validate
+                if (!formData.title) {
+                    alert('❌ Task name is required');
+                    document.getElementById('edit-task-name')?.focus();
+                    return;
+                }
+                
+                if (!formData.description) {
+                    alert('❌ Task description is required');
+                    document.getElementById('edit-task-description')?.focus();
+                    return;
+                }
+                
+                if (formData.frequency <= 0) {
+                    alert('❌ Frequency must be greater than 0');
+                    document.getElementById('edit-task-frequency')?.focus();
+                    return;
+                }
+                
+                // Parse due date
+                let dueDate = new Date();
+                if (formData.dueDateStr) {
+                    dueDate = new Date(formData.dueDateStr + 'T12:00:00');
+                    if (isNaN(dueDate.getTime())) {
+                        dueDate = new Date();
+                    }
+                }
+                
+                // Update task
+                this.currentTask.title = formData.title;
+                this.currentTask.description = formData.description;
+                this.currentTask.cost = formData.cost;
+                this.currentTask.frequency = formData.frequency;
+                this.currentTask.priority = formData.priority;
+                this.currentTask.category = formData.category;
+                this.currentTask.dueDate = dueDate;
+                this.currentTask.nextDue = dueDate; // Calendar compatibility
+                
+                // Clean up flags
+                delete this.currentTask.isTemplate;
+                delete this.currentTask.isNewTask;
+                
+                // Check if new task
+                const isNewTask = !window.tasks.find(t => t.id === this.currentTask.id);
+                
+                if (isNewTask) {
+                    window.tasks.push(this.currentTask);
+                    console.log('✅ ModalFix: New task added');
+                } else {
+                    const index = window.tasks.findIndex(t => t.id === this.currentTask.id);
+                    if (index > -1) {
+                        window.tasks[index] = this.currentTask;
+                        console.log('✅ ModalFix: Task updated at index', index);
+                    }
+                }
+                
+                // Context-specific refresh
+                if (this.currentContext === 'setup') {
+                    // Refresh setup page
+                    if (typeof renderTaskCategories === 'function') {
+                        renderTaskCategories();
+                    }
+                } else {
+                    // Refresh dashboard/calendar
+                    try {
+                        if (typeof window.saveData === 'function') {
+                            window.saveData();
+                        }
+                        if (window.enhancedDashboard?.render) {
+                            window.enhancedDashboard.render();
+                        }
+                        if (window.casaCareCalendar?.refresh) {
+                            window.casaCareCalendar.refresh();
+                        }
+                    } catch (error) {
+                        console.error('❌ ModalFix: Error during refresh:', error);
+                    }
+                }
+                
+                this.hideModal();
+                alert(`✅ Task "${formData.title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
+            },
+            
+            // Delete task
+            deleteTask: function() {
+                if (!this.currentTask) {
+                    alert('❌ No task selected for deletion');
+                    return;
+                }
+                
+                const taskTitle = this.currentTask.title || 'Untitled Task';
+                
+                if (confirm(`Are you sure you want to delete "${taskTitle}"?`)) {
+                    const index = window.tasks.findIndex(t => t.id === this.currentTask.id);
+                    if (index > -1) {
+                        window.tasks.splice(index, 1);
+                        console.log('🗑️ ModalFix: Task deleted');
+                        
+                        // Context-specific refresh
+                        if (this.currentContext === 'setup') {
+                            if (typeof renderTaskCategories === 'function') {
+                                renderTaskCategories();
+                            }
+                        } else {
+                            try {
+                                if (typeof window.saveData === 'function') {
+                                    window.saveData();
+                                }
+                                if (window.enhancedDashboard?.render) {
+                                    window.enhancedDashboard.render();
+                                }
+                                if (window.casaCareCalendar?.refresh) {
+                                    window.casaCareCalendar.refresh();
+                                }
+                            } catch (error) {
+                                console.error('❌ ModalFix: Error during delete refresh:', error);
+                            }
+                        }
+                        
+                        this.hideModal();
+                        alert(`✅ Task "${taskTitle}" deleted successfully!`);
+                    }
+                }
+            }
+        };
+        
+        // Override all modal functions with working versions
+        window.addTaskFromSetup = function() {
+            console.log('➕ ModalFix: Add task from setup');
+            
+            const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]), 0);
+            const newTask = {
+                id: maxId + 1,
+                title: '',
+                description: '',
+                category: 'General',
+                frequency: 365,
+                cost: 0,
+                priority: 'medium',
+                dueDate: new Date(),
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            };
+            
+            return window.CasaCareModalFix.showModal(newTask, true, 'setup');
+        };
+        
+        window.editTaskFromSetup = function(taskId) {
+            console.log('✏️ ModalFix: Edit task from setup:', taskId);
+            
+            const task = window.tasks?.find(t => t.id === taskId);
+            if (!task) {
+                alert('❌ Task not found');
+                return false;
+            }
+            
+            return window.CasaCareModalFix.showModal(task, false, 'setup');
+        };
+        
+        window.addTaskFromDashboard = function() {
+            console.log('➕ ModalFix: Add task from dashboard');
+            
+            const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]), 0);
+            const newTask = {
+                id: maxId + 1,
+                title: '',
+                description: '',
+                category: 'General',
+                frequency: 365,
+                cost: 0,
+                priority: 'medium',
+                dueDate: new Date(),
+                lastCompleted: null,
+                isCompleted: false
+            };
+            
+            return window.CasaCareModalFix.showModal(newTask, true, 'dashboard');
+        };
+        
+        window.editTaskFromDashboard = function(taskId) {
+            console.log('✏️ ModalFix: Edit task from dashboard:', taskId);
+            
+            const task = window.tasks?.find(t => t.id === taskId);
+            if (!task) {
+                alert('❌ Task not found');
+                return false;
+            }
+            
+            return window.CasaCareModalFix.showModal(task, false, 'dashboard');
+        };
+        
+        // Override modal control functions
+        window.closeTaskEditModal = function() {
+            window.CasaCareModalFix.hideModal();
+        };
+        
+        window.saveTaskFromEdit = function() {
+            window.CasaCareModalFix.saveTask();
+        };
+        
+        window.deleteTaskFromEdit = function() {
+            window.CasaCareModalFix.deleteTask();
+        };
+        
+        // Test function
+        window.testModalFix = function() {
+            console.log('🧪 TESTING MODAL FIX:');
+            console.log('  Modal element:', document.getElementById('task-edit-modal') ? '✅' : '❌');
+            console.log('  Tasks array:', Array.isArray(window.tasks) ? `✅ (${window.tasks.length})` : '❌');
+            console.log('  CasaCareModalFix:', typeof window.CasaCareModalFix === 'object' ? '✅' : '❌');
+            console.log('  addTaskFromSetup:', typeof window.addTaskFromSetup === 'function' ? '✅' : '❌');
+            console.log('  editTaskFromSetup:', typeof window.editTaskFromSetup === 'function' ? '✅' : '❌');
+            
+            // Test modal visibility
+            console.log('🧪 Testing modal visibility...');
+            const modal = document.getElementById('task-edit-modal');
+            if (modal) {
+                modal.classList.add('debug'); // Add red background
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+                
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.style.display = 'none';
+                    modal.classList.remove('debug');
+                    console.log('✅ Modal visibility test complete');
+                }, 2000);
+            }
+        };
+        
+        console.log('✅ Casa Care: DEFINITIVE modal fix loaded!');
+        console.log('💡 Run testModalFix() to test the modal system');
+        console.log('🎯 This should fix all modal visibility issues on setup page');
+        
+    }, 1000); // Wait for all scripts to load
+});
+    </script>
   </body>
 </html>
