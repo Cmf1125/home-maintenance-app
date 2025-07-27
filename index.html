@@ -1043,5 +1043,304 @@
         }, 500); // Wait for scripts to load
     });
     </script>
+    <!-- ADD THIS SCRIPT TO YOUR HTML AFTER THE COMPREHENSIVE FIX SCRIPT -->
+<script>
+// Casa Care - Task Setup Page Refresh Fix
+console.log('🔧 Casa Care: Loading task setup refresh fix...');
+
+// Wait for the main system to load
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        
+        // Override the save function to ensure proper setup page refresh
+        const originalSaveTaskFromEdit = window.saveTaskFromEdit;
+        
+        window.saveTaskFromEdit = function() {
+            console.log('💾 Setup Fix: Enhanced save with better setup refresh...');
+            
+            const editingTask = window.CasaCare.modalSystem.getTask();
+            if (!editingTask) {
+                alert('❌ No task selected for editing. Please close the modal and try again.');
+                return;
+            }
+            
+            // Get and validate form values
+            const title = document.getElementById('edit-task-name').value.trim();
+            const description = document.getElementById('edit-task-description').value.trim();
+            const costInput = document.getElementById('edit-task-cost').value;
+            const frequencyInput = document.getElementById('edit-task-frequency').value;
+            const priority = document.getElementById('edit-task-priority').value;
+            const category = document.getElementById('edit-task-category')?.value || 'General';
+            const dueDateInput = document.getElementById('edit-task-due-date').value;
+            
+            console.log('📝 Setup Fix: Form values:', { title, description, costInput, frequencyInput, priority, category, dueDateInput });
+            
+            // Validation
+            if (!title) {
+                alert('❌ Task name is required');
+                document.getElementById('edit-task-name').focus();
+                return;
+            }
+            
+            if (!description) {
+                alert('❌ Task description is required');
+                document.getElementById('edit-task-description').focus();
+                return;
+            }
+            
+            const cost = parseFloat(costInput) || 0;
+            const frequency = parseInt(frequencyInput) || 365;
+            
+            if (frequency <= 0) {
+                alert('❌ Frequency must be greater than 0');
+                document.getElementById('edit-task-frequency').focus();
+                return;
+            }
+            
+            // Parse due date properly
+            const dueDate = window.CasaCare.dateUtils.parseFromInput(dueDateInput);
+            console.log('📅 Setup Fix: Parsed due date:', dueDate, 'from input:', dueDateInput);
+            
+            // Check if new task
+            const isNewTask = editingTask.isNewTask || !window.tasks.find(t => t.id === editingTask.id);
+            
+            // Update task properties
+            editingTask.title = title;
+            editingTask.description = description;
+            editingTask.cost = cost;
+            editingTask.frequency = frequency;
+            editingTask.priority = priority;
+            editingTask.category = category;
+            editingTask.dueDate = dueDate;
+            editingTask.nextDue = dueDate; // Calendar compatibility
+            
+            // Clean up flags
+            delete editingTask.isTemplate;
+            delete editingTask.isNewTask;
+            
+            if (isNewTask) {
+                window.tasks.push(editingTask);
+                console.log('✅ Setup Fix: New task added:', editingTask);
+            } else {
+                const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
+                if (taskIndex > -1) {
+                    window.tasks[taskIndex] = editingTask;
+                    console.log('✅ Setup Fix: Existing task updated at index', taskIndex);
+                }
+            }
+            
+            // ENHANCED: Context-specific actions with better setup handling
+            const context = window.CasaCare.modalSystem.context;
+            console.log('🔍 Setup Fix: Saving in context:', context);
+            
+            if (context === 'setup') {
+                console.log('🔄 Setup Fix: Refreshing task setup page...');
+                
+                // Force update the global tasks reference
+                window.tasks = [...window.tasks]; // Create new array reference
+                
+                // Try multiple refresh strategies
+                try {
+                    // Strategy 1: Direct renderTaskCategories call
+                    if (typeof renderTaskCategories === 'function') {
+                        console.log('🔄 Setup Fix: Calling renderTaskCategories...');
+                        renderTaskCategories();
+                    }
+                    
+                    // Strategy 2: Force re-render by calling showTaskSetup
+                    if (typeof showTaskSetup === 'function') {
+                        console.log('🔄 Setup Fix: Calling showTaskSetup...');
+                        setTimeout(() => showTaskSetup(), 100);
+                    }
+                    
+                    // Strategy 3: Manual DOM update if functions don't work
+                    setTimeout(() => {
+                        console.log('🔄 Setup Fix: Manual refresh check...');
+                        forceSetupPageRefresh();
+                    }, 200);
+                    
+                } catch (error) {
+                    console.error('❌ Setup Fix: Error during setup refresh:', error);
+                    // Fallback: manual refresh
+                    forceSetupPageRefresh();
+                }
+                
+            } else {
+                // Dashboard context - save data and refresh dashboard/calendar
+                try {
+                    if (typeof window.saveData === 'function') {
+                        window.saveData();
+                    }
+                    
+                    if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
+                        window.enhancedDashboard.render();
+                    } else if (typeof updateDashboard === 'function') {
+                        updateDashboard();
+                    }
+                    
+                    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+                        window.casaCareCalendar.refresh();
+                    }
+                } catch (error) {
+                    console.error('❌ Setup Fix: Error during dashboard refresh:', error);
+                }
+            }
+            
+            // Close modal
+            window.closeTaskEditModal();
+            
+            const actionText = isNewTask ? 'added' : 'updated';
+            alert(`✅ Task "${title}" ${actionText} successfully!\nDue: ${window.CasaCare.dateUtils.formatForDisplay(dueDate)}`);
+        };
+        
+        // Force setup page refresh function
+        function forceSetupPageRefresh() {
+            console.log('🔄 Setup Fix: Force refreshing setup page...');
+            
+            // Check if we're on the setup page
+            const taskSetup = document.getElementById('task-setup');
+            if (!taskSetup || taskSetup.classList.contains('hidden')) {
+                console.log('📋 Setup Fix: Not on setup page, skipping manual refresh');
+                return;
+            }
+            
+            // Re-render task categories manually
+            const taskCategoriesContainer = document.getElementById('task-categories');
+            if (!taskCategoriesContainer) {
+                console.log('❌ Setup Fix: Task categories container not found');
+                return;
+            }
+            
+            try {
+                console.log('🔄 Setup Fix: Manual task categories refresh...');
+                console.log('📊 Setup Fix: Current tasks count:', window.tasks.length);
+                
+                // Call the original render function with force flag
+                if (typeof renderTaskCategories === 'function') {
+                    renderTaskCategories();
+                    console.log('✅ Setup Fix: renderTaskCategories called successfully');
+                } else {
+                    console.log('⚠️ Setup Fix: renderTaskCategories function not available');
+                    
+                    // Last resort: trigger a re-render by updating stats
+                    updateTaskSummaryStats();
+                }
+                
+            } catch (error) {
+                console.error('❌ Setup Fix: Error in manual refresh:', error);
+            }
+        }
+        
+        // Update task summary stats
+        function updateTaskSummaryStats() {
+            const taskSummaryStats = document.getElementById('task-summary-stats');
+            if (!taskSummaryStats) return;
+            
+            const totalTasks = window.tasks.length;
+            const totalCost = window.tasks.reduce((sum, task) => sum + (task.cost * (365 / task.frequency)), 0);
+            const highPriorityTasks = window.tasks.filter(t => t.priority === 'high').length;
+            const seasonalTasksCount = window.tasks.filter(t => t.category === 'Seasonal').length;
+
+            taskSummaryStats.innerHTML = `
+                <div class="text-center">
+                    <div class="text-lg font-bold text-gray-900">${totalTasks}</div>
+                    <div class="text-xs text-gray-600">Total Tasks</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
+                    <div class="text-xs text-gray-600">Annual Cost</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-lg font-bold text-red-600">${highPriorityTasks}</div>
+                    <div class="text-xs text-gray-600">High Priority</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-lg font-bold text-purple-600">${seasonalTasksCount}</div>
+                    <div class="text-xs text-gray-600">Seasonal Tasks</div>
+                </div>
+            `;
+            
+            console.log('📊 Setup Fix: Task summary stats updated');
+        }
+        
+        // Also override the delete function for setup page
+        const originalDeleteTaskFromEdit = window.deleteTaskFromEdit;
+        
+        window.deleteTaskFromEdit = function() {
+            const editingTask = window.CasaCare.modalSystem.getTask();
+            if (!editingTask) {
+                alert('❌ No task selected for deletion');
+                return;
+            }
+            
+            const taskTitle = editingTask.title || 'Untitled Task';
+            
+            if (confirm(`Are you sure you want to delete "${taskTitle}"?`)) {
+                const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
+                if (taskIndex > -1) {
+                    window.tasks.splice(taskIndex, 1);
+                    console.log('🗑️ Setup Fix: Task deleted:', taskTitle);
+                    
+                    // Context-specific refresh with enhanced setup handling
+                    const context = window.CasaCare.modalSystem.context;
+                    if (context === 'setup') {
+                        console.log('🔄 Setup Fix: Refreshing after delete...');
+                        
+                        // Force update the global tasks reference
+                        window.tasks = [...window.tasks];
+                        
+                        // Multiple refresh strategies
+                        if (typeof renderTaskCategories === 'function') {
+                            renderTaskCategories();
+                        }
+                        setTimeout(() => forceSetupPageRefresh(), 100);
+                        
+                    } else {
+                        // Dashboard refresh
+                        try {
+                            if (typeof window.saveData === 'function') {
+                                window.saveData();
+                            }
+                            if (window.enhancedDashboard) {
+                                window.enhancedDashboard.render();
+                            }
+                            if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+                                window.casaCareCalendar.refresh();
+                            }
+                        } catch (error) {
+                            console.error('❌ Setup Fix: Error during delete refresh:', error);
+                        }
+                    }
+                    
+                    window.closeTaskEditModal();
+                    alert(`✅ Task "${taskTitle}" deleted successfully!`);
+                }
+            }
+        };
+        
+        // Test function
+        window.testSetupRefresh = function() {
+            console.log('🧪 TESTING SETUP REFRESH:');
+            console.log('  Current context:', window.CasaCare?.modalSystem?.context || 'unknown');
+            console.log('  On setup page:', !document.getElementById('task-setup')?.classList.contains('hidden'));
+            console.log('  Tasks count:', window.tasks?.length || 0);
+            console.log('  renderTaskCategories available:', typeof renderTaskCategories === 'function');
+            console.log('  showTaskSetup available:', typeof showTaskSetup === 'function');
+            console.log('  Task categories container:', document.getElementById('task-categories') ? '✅' : '❌');
+            console.log('  Task summary stats container:', document.getElementById('task-summary-stats') ? '✅' : '❌');
+            
+            // Test manual refresh
+            if (!document.getElementById('task-setup')?.classList.contains('hidden')) {
+                console.log('🔄 Testing manual refresh...');
+                forceSetupPageRefresh();
+            }
+        };
+        
+        console.log('✅ Setup Fix: Task setup refresh enhancement loaded!');
+        console.log('💡 Run testSetupRefresh() to test setup page refresh');
+        
+    }, 600); // Wait for main system to load first
+});
+</script>
 </body>
 </html>
