@@ -1,4 +1,4 @@
-// Casa Care App - Simplified Date System
+// Casa Care App - Clean Simple Version
 // App data
 let homeData = {};
 let tasks = [];
@@ -704,7 +704,7 @@ function updatePropertySummary() {
     `;
 }
 
-// Render task categories
+// CLEAN SIMPLE VERSION: Render task categories with minimal UI
 function renderTaskCategories() {
     const taskCategoriesContainer = document.getElementById('task-categories');
     const taskSummaryStats = document.getElementById('task-summary-stats');
@@ -778,62 +778,60 @@ function renderTaskCategories() {
 
     let categoriesHTML = '';
 
-    // Render regular categories
+    // Render regular categories with simple lists
     Object.entries(tasksByCategory).forEach(([category, categoryTasks]) => {
         const config = categoryConfig[category] || { icon: '📋', color: 'gray' };
         
         categoriesHTML += `
-            <div class="task-category">
-                <div class="bg-gray-50 p-4 border-b border-gray-100">
+            <div class="bg-white rounded-lg border border-gray-200 mb-4">
+                <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
                     <div class="flex items-center justify-between">
                         <h4 class="font-semibold text-gray-900 flex items-center gap-2">
                             <span class="text-lg">${config.icon}</span>
-                            ${category} (${categoryTasks.length} tasks)
+                            ${category}
                         </h4>
                         <span class="bg-${config.color}-100 text-${config.color}-700 px-2 py-1 rounded text-xs">
-                            $${Math.round(categoryTasks.reduce((sum, task) => sum + (task.cost * (365 / task.frequency)), 0))} annual
+                            ${categoryTasks.length} tasks
                         </span>
                     </div>
                 </div>
-                <div class="p-4 space-y-3">
-                    ${categoryTasks.map(task => renderTaskCard(task)).join('')}
+                <div class="p-4">
+                    ${renderSimpleTaskList(categoryTasks)}
                 </div>
             </div>
         `;
     });
 
-    // Render seasonal tasks
+    // Render seasonal tasks with simple lists
     const hasSeasonalTasks = Object.values(seasonalTasks).some(arr => arr.length > 0);
     
     if (hasSeasonalTasks) {
         categoriesHTML += `
-            <div class="task-category">
-                <div class="bg-gradient-to-r from-purple-100 to-pink-100 p-4 border-b border-gray-100">
+            <div class="bg-white rounded-lg border border-gray-200 mb-4">
+                <div class="bg-gradient-to-r from-purple-100 to-pink-100 px-4 py-3 border-b border-gray-200">
                     <div class="flex items-center justify-between">
                         <h4 class="font-semibold text-gray-900 flex items-center gap-2">
                             <span class="text-lg">🌍</span>
-                            Regional Seasonal Tasks (${tasks.filter(t => t.category === 'Seasonal').length} tasks)
+                            Regional Seasonal Tasks
                         </h4>
                         <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">
-                            Climate-Specific
+                            ${seasonalTasksCount} tasks
                         </span>
                     </div>
                 </div>
-                <div class="p-4 space-y-6">
+                <div class="p-4">
         `;
 
         Object.entries(seasonalTasks).forEach(([season, seasonTasks]) => {
             if (seasonTasks.length > 0) {
                 const config = seasonConfig[season];
                 categoriesHTML += `
-                    <div class="seasonal-${season} rounded-lg p-4">
-                        <h5 class="font-semibold text-gray-900 flex items-center gap-2 mb-3">
-                            <span class="text-lg">${config.icon}</span>
-                            ${config.name} Tasks (${seasonTasks.length})
+                    <div class="mb-4 last:mb-0">
+                        <h5 class="font-medium text-gray-800 flex items-center gap-2 mb-2">
+                            <span>${config.icon}</span>
+                            ${config.name}
                         </h5>
-                        <div class="space-y-3">
-                            ${seasonTasks.map(task => renderTaskCard(task)).join('')}
-                        </div>
+                        ${renderSimpleTaskList(seasonTasks)}
                     </div>
                 `;
             }
@@ -845,84 +843,52 @@ function renderTaskCategories() {
         `;
     }
 
+    // Add "Add Custom Task" button at the bottom
+    categoriesHTML += `
+        <div class="bg-white rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+            <button onclick="addTaskFromSetup()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                ➕ Add Custom Task
+            </button>
+            <p class="text-gray-500 text-sm mt-2">Add your own maintenance tasks</p>
+        </div>
+    `;
+
     taskCategoriesContainer.innerHTML = categoriesHTML;
 }
 
-// SIMPLIFIED: Render individual task card with smart due date display (no input)
-function renderTaskCard(task) {
-    const priorityClass = task.priority === 'high' ? 'bg-red-100 text-red-700' : 
-                        task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' : 
-                        'bg-gray-100 text-gray-700';
-    
-    const isRegionalTask = task.category === 'Seasonal';
-    const regionalBadge = isRegionalTask ? 
-        `<span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">🌍 Regional</span>` : '';
-    
-    const smartDueDate = getSmartDueDate(task);
-    
+// CLEAN SIMPLE VERSION: Render simple task list (just titles with edit/delete)
+function renderSimpleTaskList(taskList) {
     return `
-        <div class="border border-gray-200 rounded-lg p-4 ${isRegionalTask ? 'bg-purple-50' : ''}" data-task-id="${task.id}">
-            <div class="flex justify-between items-start">
-                <div class="flex-1">
-                    <h4 class="font-semibold text-gray-900">${task.title}</h4>
-                    <p class="text-sm text-gray-600 mt-1">${task.description}</p>
-                    <div class="flex items-center gap-3 mt-2 text-sm">
-                        ${regionalBadge}
-                        <span class="text-gray-600">Every ${task.frequency} days</span>
-                        <span class="text-gray-600">$${task.cost}</span>
-                        <span class="px-2 py-1 rounded text-xs ${priorityClass}">${task.priority} priority</span>
-                    </div>
-                    <div class="text-xs text-gray-500 mt-1">📅 Smart Due Date: ${smartDueDate}</div>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <button onclick="editTaskFromSetup(${task.id})" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 text-sm touch-btn">
-                        ✏️ Edit
-                    </button>
-                    <button onclick="deleteTaskDirect(${task.id})" class="bg-red-100 text-red-700 px-3 py-1 rounded-lg hover:bg-red-200 text-sm touch-btn" title="Delete task">
-                        🗑️
-                    </button>
-                </div>
-            </div>
+        <div class="space-y-2">
+            ${taskList.map(task => renderSimpleTaskItem(task)).join('')}
         </div>
     `;
 }
 
-// Smart due date calculation (for display purposes)
-function getSmartDueDate(task) {
-    const today = new Date();
+// CLEAN SIMPLE VERSION: Render individual task as simple list item
+function renderSimpleTaskItem(task) {
+    const priorityDot = task.priority === 'high' ? '🔴' : 
+                       task.priority === 'medium' ? '🟡' : 
+                       '⚪';
     
-    if (task.season) {
-        const currentMonth = today.getMonth();
-        let targetMonth;
-        
-        switch(task.season) {
-            case 'spring': targetMonth = 2; break; // March
-            case 'summer': targetMonth = 5; break; // June  
-            case 'fall': targetMonth = 8; break; // September
-            case 'winter': targetMonth = 10; break; // November
-            default: targetMonth = currentMonth;
-        }
-        
-        let targetYear = today.getFullYear();
-        if (targetMonth < currentMonth || (targetMonth === currentMonth && today.getDate() > 15)) {
-            targetYear++;
-        }
-        
-        const seasonalDate = new Date(targetYear, targetMonth, 15);
-        return seasonalDate.toLocaleDateString();
-    }
-    
-    // Regular task defaults
-    if (task.priority === 'high') {
-        const startDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-        return startDate.toLocaleDateString();
-    } else if (task.frequency <= 90) {
-        const startDate = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
-        return startDate.toLocaleDateString();
-    } else {
-        const startDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
-        return startDate.toLocaleDateString();
-    }
+    return `
+        <div class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" data-task-id="${task.id}">
+            <div class="flex items-center gap-3 flex-1">
+                <span class="text-sm">${priorityDot}</span>
+                <span class="font-medium text-gray-900">${task.title}</span>
+                <span class="text-xs text-gray-500">every ${task.frequency} days</span>
+                ${task.cost > 0 ? `<span class="text-xs text-green-600">$${task.cost}</span>` : ''}
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="editTaskFromSetup(${task.id})" class="text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded transition-colors" title="Edit task">
+                    ✏️
+                </button>
+                <button onclick="deleteTaskDirect(${task.id})" class="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded transition-colors" title="Delete task">
+                    🗑️
+                </button>
+            </div>
+        </div>
+    `;
 }
 
 // Navigation functions
@@ -960,9 +926,9 @@ function goBackToHomeSetup() {
     }
 }
 
-// SIMPLIFIED: Complete task setup with smart due dates
+// CLEAN SIMPLE VERSION: Complete task setup with smart due dates
 function finishTaskSetup() {
-    console.log('🚀 Starting simplified task setup completion...');
+    console.log('🚀 Starting clean simple task setup completion...');
     console.log(`📊 Processing ${tasks.length} tasks...`);
     
     let successCount = 0;
@@ -1040,12 +1006,6 @@ function finishTaskSetup() {
     // Verify we have tasks with due dates
     const tasksWithDates = tasks.filter(t => t.dueDate);
     
-    // Detailed verification logging
-    console.log('\n📋 FINAL TASK VERIFICATION:');
-    tasksWithDates.forEach(task => {
-        console.log(`  • "${task.title}" → Due: ${task.dueDate.toLocaleDateString()}`);
-    });
-    
     console.log(`📊 Final verification: ${tasksWithDates.length} tasks have due dates`);
     
     if (tasksWithDates.length === 0) {
@@ -1086,9 +1046,9 @@ function finishTaskSetup() {
     }
     
     // Success message
-    alert(`🎉 Setup Complete!\n\n✅ ${successCount} tasks scheduled successfully\n📅 Your personalized maintenance plan is ready!\n\nCheck your dashboard and calendar now.`);
+    alert(`🎉 Setup Complete!\n\n✅ ${successCount} tasks scheduled automatically\n📅 Your clean, simple maintenance plan is ready!\n\nCheck your dashboard and calendar now.`);
     
-    console.log('🎉 TASK SETUP COMPLETION SUCCESSFUL!');
+    console.log('🎉 CLEAN SIMPLE TASK SETUP COMPLETION SUCCESSFUL!');
 }
 
 // Enhanced showTab function with better error handling
@@ -1128,8 +1088,6 @@ function showTab(tabName) {
         }
         
         console.log('🏠 Initializing enhanced dashboard...');
-        console.log(`📊 Tasks available: ${window.tasks ? window.tasks.length : 'undefined'}`);
-        console.log(`📊 Tasks with due dates: ${window.tasks ? window.tasks.filter(t => t.dueDate).length : 'undefined'}`);
         
         // Enhanced dashboard initialization with fallback
         try {
@@ -1264,7 +1222,7 @@ function updateDashboard() {
     console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
 }
 
-// FIXED: Add missing function for task setup Add Task button
+// Add Task functionality for task setup
 function addTaskFromSetup() {
     console.log('➕ Adding custom task from setup...');
     
@@ -1290,7 +1248,7 @@ function addTaskFromSetup() {
     openTaskEditModal(newTask, true);
 }
 
-// FIXED: Calendar sync - update complete task to ensure proper sync
+// Complete task functionality
 function completeTask(taskId) {
     console.log(`✅ Completing task ${taskId}...`);
     
@@ -1308,9 +1266,7 @@ function completeTask(taskId) {
         task.nextDue = task.dueDate;
         
         console.log(`📅 Task "${task.title}" completed!`);
-        console.log(`  Old due date: ${oldDueDate.toLocaleDateString()}`);
         console.log(`  Next due date: ${task.dueDate.toLocaleDateString()}`);
-        console.log(`  Frequency: ${task.frequency} days`);
         
         // Save data
         saveData();
@@ -1336,7 +1292,7 @@ function completeTask(taskId) {
     }
 }
 
-// NEW: Add Task functionality for dashboard
+// Add Task functionality for dashboard
 function addTaskFromDashboard() {
     const title = prompt('Task Title:');
     if (!title) return;
@@ -1403,7 +1359,7 @@ function addTaskFromDashboard() {
     alert(`✅ Task "${title}" added successfully!`);
 }
 
-// Missing function: Edit task from setup
+// Edit task from setup
 function editTaskFromSetup(taskId) {
     const task = tasks.find(t => t.id === taskId);
     if (!task) {
@@ -1415,7 +1371,7 @@ function editTaskFromSetup(taskId) {
     openTaskEditModal(task);
 }
 
-// Missing function: Delete task directly
+// Delete task directly
 function deleteTaskDirect(taskId) {
     if (confirm('Are you sure you want to delete this task?')) {
         const taskIndex = tasks.findIndex(t => t.id === taskId);
@@ -1434,7 +1390,7 @@ function deleteTaskDirect(taskId) {
     }
 }
 
-// NEW: Open task edit modal (UPDATED with category support)
+// Open task edit modal
 function openTaskEditModal(task, isNewTask = false) {
     const modal = document.getElementById('task-edit-modal');
     if (!modal) {
@@ -1488,7 +1444,7 @@ function openTaskEditModal(task, isNewTask = false) {
     setTimeout(() => document.getElementById('edit-task-name').focus(), 100);
 }
 
-// NEW: Close task edit modal
+// Close task edit modal
 function closeTaskEditModal() {
     const modal = document.getElementById('task-edit-modal');
     if (modal) {
@@ -1496,10 +1452,10 @@ function closeTaskEditModal() {
     }
     currentEditingTask = null;
     window.currentEditingTask = null;
-    console.log('✅ Task edit modal closed (from app.js)');
+    console.log('✅ Task edit modal closed');
 }
 
-// NEW: Save task from edit modal (UPDATED to handle setup vs dashboard context)
+// Save task from edit modal
 function saveTaskFromEdit() {
     console.log('💾 Saving task from edit modal...');
     
@@ -1520,8 +1476,6 @@ function saveTaskFromEdit() {
     const priority = document.getElementById('edit-task-priority').value;
     const category = document.getElementById('edit-task-category')?.value || 'General';
     const dueDateInput = document.getElementById('edit-task-due-date');
-    
-    console.log('📝 Form values collected:', { title, description, cost, frequency, priority, category });
     
     // Validate inputs
     if (!title) {
@@ -1561,11 +1515,8 @@ function saveTaskFromEdit() {
         dueDate = new Date();
     }
     
-    console.log('📅 Due date processed:', dueDate.toLocaleDateString());
-    
     // Check if this is a new task
     const isNewTask = !tasks.find(t => t.id === editingTask.id);
-    console.log('🆕 Is new task:', isNewTask);
     
     // Update task properties
     editingTask.title = title;
@@ -1591,17 +1542,11 @@ function saveTaskFromEdit() {
     const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
     const mainAppVisible = !document.getElementById('main-app').classList.contains('hidden');
     
-    console.log('🔍 Context check - Task setup visible:', taskSetupVisible, 'Main app visible:', mainAppVisible);
-    
     if (taskSetupVisible) {
         // We're in task setup, re-render categories
-        console.log('🔄 Re-rendering task categories for setup');
         renderTaskCategories();
     } else if (mainAppVisible) {
         // We're in main app, save and refresh
-        console.log('💾 Saving data and refreshing dashboard');
-        
-        // Save data
         saveData();
         
         // Refresh dashboard
@@ -1616,8 +1561,7 @@ function saveTaskFromEdit() {
             window.casaCareCalendar.refresh();
         }
     } else {
-        console.log('⚠️ Unknown context - assuming main app and saving');
-        // Default behavior if we can't determine context
+        // Default behavior
         saveData();
         if (window.enhancedDashboard) {
             window.enhancedDashboard.render();
@@ -1632,7 +1576,7 @@ function saveTaskFromEdit() {
     alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
 }
 
-// NEW: Delete task from edit modal
+// Delete task from edit modal
 function deleteTaskFromEdit() {
     if (!currentEditingTask) {
         console.error('❌ No task being edited');
@@ -1783,7 +1727,7 @@ function hasExistingData() {
 
 // Enhanced initialization
 function initializeApp() {
-    console.log('🏠 Casa Care SIMPLIFIED VERSION initializing...');
+    console.log('🏠 Casa Care CLEAN SIMPLE VERSION initializing...');
     
     // Make well water function available globally ASAP
     window.toggleWellWaterOptions = toggleWellWaterOptions;
@@ -1818,7 +1762,7 @@ function initializeApp() {
         document.getElementById('main-app').classList.add('hidden');
     }
     
-    console.log('✅ Casa Care SIMPLIFIED VERSION initialized successfully!');
+    console.log('✅ Casa Care CLEAN SIMPLE VERSION initialized successfully!');
 }
 
 // Export functions to global scope
@@ -1845,4 +1789,4 @@ if (document.readyState !== 'loading') {
     initializeApp();
 }
 
-console.log('🏠 Casa Care SIMPLIFIED VERSION script loaded successfully!');
+console.log('🏠 Casa Care CLEAN SIMPLE VERSION script loaded successfully!');
