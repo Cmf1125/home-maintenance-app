@@ -1,4 +1,4 @@
-// Casa Care App - Clean Simple Version
+// Casa Care App - Clean Simple Version with All Fixes
 // App data
 let homeData = {};
 let tasks = [];
@@ -704,7 +704,7 @@ function updatePropertySummary() {
     `;
 }
 
-// CLEAN SIMPLE VERSION: Render task categories with minimal UI
+// FIXED: Clean simple task categories without big button at bottom
 function renderTaskCategories() {
     const taskCategoriesContainer = document.getElementById('task-categories');
     const taskSummaryStats = document.getElementById('task-summary-stats');
@@ -843,15 +843,7 @@ function renderTaskCategories() {
         `;
     }
 
-    // Add "Add Custom Task" button at the bottom
-    categoriesHTML += `
-        <div class="bg-white rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
-            <button onclick="addTaskFromSetup()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
-                ➕ Add Custom Task
-            </button>
-            <p class="text-gray-500 text-sm mt-2">Add your own maintenance tasks</p>
-        </div>
-    `;
+    // REMOVED: Big "Add Custom Task" button at bottom - cleaner interface
 
     taskCategoriesContainer.innerHTML = categoriesHTML;
 }
@@ -1222,9 +1214,17 @@ function updateDashboard() {
     console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
 }
 
-// Add Task functionality for task setup
+// FIXED: Enhanced Add Task function for setup with better modal handling
 function addTaskFromSetup() {
     console.log('➕ Adding custom task from setup...');
+    
+    // Verify modal is available
+    const modal = document.getElementById('task-edit-modal');
+    if (!modal) {
+        console.error('❌ Task edit modal not found');
+        alert('❌ Cannot add task: Edit modal not available. Please check that you are on the correct page.');
+        return;
+    }
     
     // Find next available ID
     const maxId = Math.max(...tasks.map(t => t.id), 0);
@@ -1244,52 +1244,99 @@ function addTaskFromSetup() {
         isTemplate: true // Important: mark as template so it gets processed correctly
     };
     
+    console.log('📋 New task created:', newTask);
+    
     // Open modal for new task
     openTaskEditModal(newTask, true);
 }
 
-// Complete task functionality
+// FIXED: Enhanced task completion with better calendar sync
 function completeTask(taskId) {
     console.log(`✅ Completing task ${taskId}...`);
     
     const task = tasks.find(t => t.id === taskId);
-    if (task) {
-        const oldDueDate = task.dueDate ? new Date(task.dueDate) : new Date();
-        
-        task.lastCompleted = new Date();
-        
-        // Calculate next due date from current due date + frequency
-        task.dueDate = new Date(oldDueDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
-        task.isCompleted = false; // Will be due again in the future
-        
-        // CRITICAL: Update nextDue for calendar compatibility
-        task.nextDue = task.dueDate;
-        
-        console.log(`📅 Task "${task.title}" completed!`);
-        console.log(`  Next due date: ${task.dueDate.toLocaleDateString()}`);
-        
-        // Save data
-        saveData();
-        
-        // Update global references
-        window.tasks = tasks;
-        
-        // Refresh enhanced dashboard or fallback
-        if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-            window.enhancedDashboard.render();
-        } else {
-            updateDashboard();
-        }
-        
-        // Refresh calendar if it exists
-        if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-            window.casaCareCalendar.refresh();
-        }
-        
-        alert(`✅ Task "${task.title}" completed!\nNext due: ${task.dueDate.toLocaleDateString()}`);
-    } else {
+    if (!task) {
         console.error('❌ Task not found:', taskId);
+        alert('❌ Task not found');
+        return;
     }
+
+    const oldDueDate = task.dueDate ? new Date(task.dueDate) : new Date();
+    
+    // Mark as completed with timestamp
+    task.lastCompleted = new Date();
+    task.isCompleted = false; // Will be due again in the future
+    
+    // Calculate next due date from current due date + frequency
+    const nextDueDate = new Date(oldDueDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
+    
+    // CRITICAL: Set both dueDate and nextDue for full compatibility
+    task.dueDate = nextDueDate;
+    task.nextDue = nextDueDate;
+    
+    console.log(`📅 Task "${task.title}" completed!`);
+    console.log(`  Old due date: ${oldDueDate.toLocaleDateString()}`);
+    console.log(`  Next due date: ${nextDueDate.toLocaleDateString()}`);
+    console.log(`  Frequency: ${task.frequency} days`);
+    console.log(`  Both dueDate and nextDue set: ${task.dueDate} | ${task.nextDue}`);
+    
+    // Save data immediately
+    try {
+        saveData();
+        console.log('💾 Data saved after task completion');
+    } catch (error) {
+        console.error('❌ Error saving data after completion:', error);
+        alert('❌ Error saving task completion');
+        return;
+    }
+    
+    // Update global references
+    window.tasks = tasks;
+    
+    // Refresh enhanced dashboard
+    if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
+        console.log('🔄 Refreshing enhanced dashboard...');
+        window.enhancedDashboard.render();
+    } else {
+        console.log('🔄 Refreshing basic dashboard...');
+        updateDashboard();
+    }
+    
+    // CRITICAL: Force calendar refresh with verification
+    if (window.casaCareCalendar) {
+        console.log('📅 Forcing calendar refresh...');
+        try {
+            if (typeof window.casaCareCalendar.refresh === 'function') {
+                window.casaCareCalendar.refresh();
+                console.log('✅ Calendar refresh called successfully');
+            } else if (typeof window.casaCareCalendar.render === 'function') {
+                window.casaCareCalendar.render();
+                console.log('✅ Calendar render called successfully');
+            } else {
+                console.warn('⚠️ Calendar refresh method not found, trying to recreate...');
+                // Try to recreate calendar if refresh doesn't work
+                if (typeof CasaCareCalendar !== 'undefined') {
+                    window.casaCareCalendar = new CasaCareCalendar();
+                    console.log('✅ Calendar recreated successfully');
+                }
+            }
+        } catch (error) {
+            console.error('❌ Error refreshing calendar:', error);
+        }
+    } else {
+        console.warn('⚠️ Calendar not found, attempting to create...');
+        if (typeof CasaCareCalendar !== 'undefined') {
+            try {
+                window.casaCareCalendar = new CasaCareCalendar();
+                console.log('✅ Calendar created successfully after task completion');
+            } catch (error) {
+                console.error('❌ Error creating calendar:', error);
+            }
+        }
+    }
+    
+    // Success message
+    alert(`✅ Task "${task.title}" completed!\nNext due: ${nextDueDate.toLocaleDateString()}`);
 }
 
 // Add Task functionality for dashboard
@@ -1333,6 +1380,7 @@ function addTaskFromDashboard() {
         cost: cost,
         priority: priority,
         dueDate: dueDate,
+        nextDue: dueDate, // Calendar compatibility
         lastCompleted: null,
         isCompleted: false
     };
@@ -1359,16 +1407,29 @@ function addTaskFromDashboard() {
     alert(`✅ Task "${title}" added successfully!`);
 }
 
-// Edit task from setup
+// FIXED: Enhanced Edit Task function for setup with better modal handling
 function editTaskFromSetup(taskId) {
+    console.log(`✏️ Editing task from setup: ${taskId}`);
+    
     const task = tasks.find(t => t.id === taskId);
     if (!task) {
         console.error('❌ Task not found:', taskId);
+        alert('❌ Task not found');
+        return;
+    }
+    
+    console.log('📋 Task found for editing:', task);
+    
+    // Verify modal is available
+    const modal = document.getElementById('task-edit-modal');
+    if (!modal) {
+        console.error('❌ Task edit modal not found');
+        alert('❌ Cannot edit task: Edit modal not available. Please check that you are on the correct page.');
         return;
     }
     
     // Open the task edit modal
-    openTaskEditModal(task);
+    openTaskEditModal(task, false);
 }
 
 // Delete task directly
@@ -1390,16 +1451,22 @@ function deleteTaskDirect(taskId) {
     }
 }
 
-// Open task edit modal
+// FIXED: Enhanced modal functions with better error checking
 function openTaskEditModal(task, isNewTask = false) {
+    console.log(`🔧 Opening task edit modal for: ${task.title || 'New Task'}`, { isNewTask });
+    
     const modal = document.getElementById('task-edit-modal');
     if (!modal) {
         console.error('❌ Task edit modal not found');
+        alert('❌ Task edit modal not available. Please check your HTML structure.');
         return;
     }
     
-    // Store current editing task
+    // Store current editing task GLOBALLY to ensure it's accessible
     currentEditingTask = task;
+    window.currentEditingTask = task;
+    
+    console.log('📝 Current editing task set:', currentEditingTask);
     
     // Update modal title
     const modalTitle = document.getElementById('task-edit-title');
@@ -1407,12 +1474,21 @@ function openTaskEditModal(task, isNewTask = false) {
         modalTitle.textContent = isNewTask ? 'Add New Task' : 'Edit Task';
     }
     
-    // Fill form fields
-    document.getElementById('edit-task-name').value = task.title || '';
-    document.getElementById('edit-task-description').value = task.description || '';
-    document.getElementById('edit-task-cost').value = task.cost || 0;
-    document.getElementById('edit-task-frequency').value = task.frequency || 365;
-    document.getElementById('edit-task-priority').value = task.priority || 'medium';
+    // Fill form fields with error checking
+    const fillField = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.value = value || '';
+        } else {
+            console.warn(`⚠️ Form field not found: ${id}`);
+        }
+    };
+    
+    fillField('edit-task-name', task.title);
+    fillField('edit-task-description', task.description);
+    fillField('edit-task-cost', task.cost || 0);
+    fillField('edit-task-frequency', task.frequency || 365);
+    fillField('edit-task-priority', task.priority || 'medium');
     
     // Handle category if field exists
     const categoryField = document.getElementById('edit-task-category');
@@ -1439,9 +1515,16 @@ function openTaskEditModal(task, isNewTask = false) {
     
     // Show modal
     modal.classList.remove('hidden');
+    console.log('✅ Modal shown successfully');
     
-    // Focus on task name
-    setTimeout(() => document.getElementById('edit-task-name').focus(), 100);
+    // Focus on task name with delay
+    setTimeout(() => {
+        const nameField = document.getElementById('edit-task-name');
+        if (nameField) {
+            nameField.focus();
+            console.log('✅ Focus set on task name field');
+        }
+    }, 100);
 }
 
 // Close task edit modal
@@ -1727,7 +1810,7 @@ function hasExistingData() {
 
 // Enhanced initialization
 function initializeApp() {
-    console.log('🏠 Casa Care CLEAN SIMPLE VERSION initializing...');
+    console.log('🏠 Casa Care CLEAN SIMPLE VERSION WITH ALL FIXES initializing...');
     
     // Make well water function available globally ASAP
     window.toggleWellWaterOptions = toggleWellWaterOptions;
@@ -1762,7 +1845,7 @@ function initializeApp() {
         document.getElementById('main-app').classList.add('hidden');
     }
     
-    console.log('✅ Casa Care CLEAN SIMPLE VERSION initialized successfully!');
+    console.log('✅ Casa Care CLEAN SIMPLE VERSION WITH ALL FIXES initialized successfully!');
 }
 
 // Export functions to global scope
@@ -1789,4 +1872,4 @@ if (document.readyState !== 'loading') {
     initializeApp();
 }
 
-console.log('🏠 Casa Care CLEAN SIMPLE VERSION script loaded successfully!');
+console.log('🏠 Casa Care CLEAN SIMPLE VERSION WITH ALL FIXES script loaded successfully!');
