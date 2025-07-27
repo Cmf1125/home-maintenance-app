@@ -848,7 +848,7 @@ function renderTaskCategories() {
     taskCategoriesContainer.innerHTML = categoriesHTML;
 }
 
-// SIMPLIFIED: Render individual task card with only Due Date
+// SIMPLIFIED: Render individual task card with smart due date display (no input)
 function renderTaskCard(task) {
     const priorityClass = task.priority === 'high' ? 'bg-red-100 text-red-700' : 
                         task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' : 
@@ -872,7 +872,7 @@ function renderTaskCard(task) {
                         <span class="text-gray-600">$${task.cost}</span>
                         <span class="px-2 py-1 rounded text-xs ${priorityClass}">${task.priority} priority</span>
                     </div>
-                    <div class="text-xs text-gray-500 mt-1">📅 Due: ${smartDueDate}</div>
+                    <div class="text-xs text-gray-500 mt-1">📅 Smart Due Date: ${smartDueDate}</div>
                 </div>
                 <div class="flex flex-col gap-2">
                     <button onclick="editTaskFromSetup(${task.id})" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 text-sm touch-btn">
@@ -887,7 +887,7 @@ function renderTaskCard(task) {
     `;
 }
 
-// Smart due date calculation (renamed from getSuggestedDueDate)
+// Smart due date calculation (for display purposes)
 function getSmartDueDate(task) {
     const today = new Date();
     
@@ -960,7 +960,7 @@ function goBackToHomeSetup() {
     }
 }
 
-// SIMPLIFIED: Complete task setup
+// SIMPLIFIED: Complete task setup with smart due dates
 function finishTaskSetup() {
     console.log('🚀 Starting simplified task setup completion...');
     console.log(`📊 Processing ${tasks.length} tasks...`);
@@ -968,42 +968,73 @@ function finishTaskSetup() {
     let successCount = 0;
     let errorCount = 0;
     
-   // Process each template task with smart due dates
-tasks.forEach(task => {
-    if (task.isTemplate) {
-        try {
-            console.log(`⚙️ Processing task: ${task.title}`);
-            
-            // Use smart due date calculation
-            let dueDate;
-            
-            if (task.season) {
-                // Seasonal tasks
-                const today = new Date();
-                const currentMonth = today.getMonth();
-                let targetMonth;
+    // Process each template task with smart due dates
+    tasks.forEach(task => {
+        if (task.isTemplate) {
+            try {
+                console.log(`⚙️ Processing task: ${task.title}`);
                 
-                switch(task.season) {
-                    case 'spring': targetMonth = 2; break; // March
-                    case 'summer': targetMonth = 5; break; // June
-                    case 'fall': targetMonth = 8; break; // September
-                    case 'winter': targetMonth = 10; break; // November
-                    default: targetMonth = currentMonth;
+                // Use smart due date calculation
+                let dueDate;
+                
+                if (task.season) {
+                    // Seasonal tasks
+                    const today = new Date();
+                    const currentMonth = today.getMonth();
+                    let targetMonth;
+                    
+                    switch(task.season) {
+                        case 'spring': targetMonth = 2; break; // March
+                        case 'summer': targetMonth = 5; break; // June
+                        case 'fall': targetMonth = 8; break; // September
+                        case 'winter': targetMonth = 10; break; // November
+                        default: targetMonth = currentMonth;
+                    }
+                    
+                    let targetYear = today.getFullYear();
+                    if (targetMonth < currentMonth || (targetMonth === currentMonth && today.getDate() > 15)) {
+                        targetYear++;
+                    }
+                    
+                    dueDate = new Date(targetYear, targetMonth, 15, 12, 0, 0);
+                } else {
+                    // Regular tasks with smart defaults
+                    const today = new Date();
+                    if (task.priority === 'high') {
+                        dueDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000); // 1 week
+                    } else if (task.frequency <= 90) {
+                        dueDate = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000); // 2 weeks
+                    } else {
+                        dueDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000); // 1 month
+                    }
                 }
                 
-                let targetYear = today.getFullYear();
-                if (targetMonth < currentMonth || (targetMonth === currentMonth && today.getDate() > 15)) {
-                    targetYear++;
+                // Validate the date
+                if (isNaN(dueDate.getTime())) {
+                    throw new Error(`Invalid due date for task ${task.title}`);
                 }
                 
-                dueDate = new Date(targetYear, targetMonth, 15, 12, 0, 0);
-            } else {
-                // Regular tasks with smart defaults
-                const today = new Date();
-                if (task.priority === 'high') {
-                    dueDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000); // 1 week
-                } else if (task.frequency <= 90) {
-                    dueDate = new Date(
+                // Set the due date
+                task.dueDate = dueDate;
+                
+                // CRITICAL: Set nextDue for calendar compatibility
+                task.nextDue = dueDate;
+                
+                // Clean up template flag
+                delete task.isTemplate;
+                task.isCompleted = false;
+                task.lastCompleted = null;
+                
+                console.log(`  ✅ FINAL: Task "${task.title}" due: ${task.dueDate.toLocaleDateString()}`);
+                successCount++;
+                
+            } catch (error) {
+                console.error(`❌ Error processing task ${task.title}:`, error);
+                errorCount++;
+            }
+        }
+    });
+    
     console.log(`✅ Task processing complete: ${successCount} successful, ${errorCount} errors`);
     
     // Verify we have tasks with due dates
@@ -1068,14 +1099,14 @@ function showTab(tabName) {
     window.tasks = tasks;
     window.homeData = homeData;
     
-   // Hide all views
-const dashboardView = document.getElementById('dashboard-view');
-const calendarView = document.getElementById('calendar-view');
-const documentsView = document.getElementById('documents-view');
+    // Hide all views
+    const dashboardView = document.getElementById('dashboard-view');
+    const calendarView = document.getElementById('calendar-view');
+    const documentsView = document.getElementById('documents-view');
 
-if (dashboardView) dashboardView.classList.add('hidden');
-if (calendarView) calendarView.classList.add('hidden');
-if (documentsView) documentsView.classList.add('hidden');
+    if (dashboardView) dashboardView.classList.add('hidden');
+    if (calendarView) calendarView.classList.add('hidden');
+    if (documentsView) documentsView.classList.add('hidden');
     
     // Update tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1233,17 +1264,6 @@ function updateDashboard() {
     console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
 }
 
-// NEW: Close task edit modal (available for both setup and dashboard)
-function closeTaskEditModal() {
-    const modal = document.getElementById('task-edit-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-    }
-    currentEditingTask = null;
-    window.currentEditingTask = null;
-    console.log('✅ Task edit modal closed (from app.js)');
-}
-
 // FIXED: Add missing function for task setup Add Task button
 function addTaskFromSetup() {
     console.log('➕ Adding custom task from setup...');
@@ -1383,153 +1403,6 @@ function addTaskFromDashboard() {
     alert(`✅ Task "${title}" added successfully!`);
 }
 
-// Utility functions
-function showHomeInfo() {
-    if (homeData.fullAddress) {
-        alert(`🏠 Home Info\n\n${homeData.fullAddress}\nBuilt: ${homeData.yearBuilt} • ${homeData.sqft?.toLocaleString()} sq ft`);
-    } else {
-        alert('🏠 No home information set yet. Complete the setup to add your home details.');
-    }
-}
-
-function clearData() {
-    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
-        homeData = {};
-        tasks = [];
-        
-        localStorage.removeItem('casaCareData');
-        
-        document.getElementById('setup-form').style.display = 'block';
-        document.getElementById('task-setup').classList.add('hidden');
-        document.getElementById('main-app').classList.add('hidden');
-        document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
-        
-        alert('✅ All data cleared. Starting fresh!');
-    }
-}
-
-function exportData() {
-    const data = {
-        homeData: homeData,
-        tasks: tasks,
-        exportDate: new Date().toISOString(),
-        version: '2.1'
-    };
-
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
-    const link = document.createElement("a");
-    link.setAttribute("href", dataStr);
-    link.setAttribute("download", "casa_care_backup.json");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    alert('📄 Data exported successfully!');
-}
-
-function saveData() {
-    // Ensure calendar compatibility before saving
-    if (window.tasks) {
-        window.tasks.forEach(task => {
-            if (task.dueDate && !task.nextDue) {
-                task.nextDue = task.dueDate;
-            }
-        });
-    }
-    
-    const data = { 
-        homeData: homeData, 
-        tasks: tasks,
-        version: '2.1'
-    };
-    
-    try {
-        localStorage.setItem('casaCareData', JSON.stringify(data));
-        console.log('✅ Data saved to browser storage with calendar compatibility');
-    } catch (error) {
-        console.error('❌ Failed to save data:', error);
-        throw error; // Re-throw so caller can handle
-    }
-}
-
-function loadData() {
-    try {
-        const savedData = localStorage.getItem('casaCareData');
-        if (savedData) {
-            const data = JSON.parse(savedData);
-            
-            homeData = data.homeData || {};
-            tasks = data.tasks || [];
-            
-            // Restore dates - handle both old nextDue and new dueDate formats
-            tasks.forEach(task => {
-                if (task.nextDue) {
-                    task.dueDate = new Date(task.nextDue);
-                    // Keep nextDue for calendar compatibility
-                    task.nextDue = new Date(task.nextDue);
-                } else if (task.dueDate) {
-                    task.dueDate = new Date(task.dueDate);
-                    // Set nextDue for calendar compatibility
-                    task.nextDue = new Date(task.dueDate);
-                }
-                if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
-            });
-            
-            console.log('✅ Data loaded from browser storage with calendar compatibility');
-            return true;
-        }
-    } catch (error) {
-        console.error('❌ Failed to load data:', error);
-    }
-    return false;
-}
-
-function hasExistingData() {
-    return loadData() && homeData.fullAddress;
-}
-
-// Enhanced initialization
-function initializeApp() {
-    console.log('🏠 Casa Care SIMPLIFIED VERSION initializing...');
-    
-    // Make well water function available globally ASAP
-    window.toggleWellWaterOptions = toggleWellWaterOptions;
-    
-    // Make tasks and homeData available globally for other scripts
-    window.tasks = tasks;
-    window.homeData = homeData;
-    
-    if (hasExistingData()) {
-        console.log('👋 Existing data found, loading main app...');
-        
-        // Hide setup screens
-        document.getElementById('setup-form').style.display = 'none';
-        document.getElementById('task-setup').classList.add('hidden');
-        document.getElementById('main-app').classList.remove('hidden');
-        
-        // Update header
-        document.getElementById('header-subtitle').textContent = homeData.fullAddress;
-        
-        // Update global references
-        window.tasks = tasks;
-        window.homeData = homeData;
-        
-        // Show dashboard
-        showTab('dashboard');
-        
-        console.log(`👋 Welcome back! Loaded ${tasks.length} tasks for ${homeData.fullAddress}`);
-    } else {
-        console.log('🆕 New user, showing setup form...');
-        document.getElementById('setup-form').style.display = 'block';
-        document.getElementById('task-setup').classList.add('hidden');
-        document.getElementById('main-app').classList.add('hidden');
-    }
-    
-    console.log('✅ Casa Care SIMPLIFIED VERSION initialized successfully!');
-}
-
-// FIXED: Add missing functions for task setup and proper modals
-
 // Missing function: Edit task from setup
 function editTaskFromSetup(taskId) {
     const task = tasks.find(t => t.id === taskId);
@@ -1622,6 +1495,8 @@ function closeTaskEditModal() {
         modal.classList.add('hidden');
     }
     currentEditingTask = null;
+    window.currentEditingTask = null;
+    console.log('✅ Task edit modal closed (from app.js)');
 }
 
 // NEW: Save task from edit modal (UPDATED to handle setup vs dashboard context)
@@ -1800,12 +1675,166 @@ function deleteTaskFromEdit() {
         }
     }
 }
+
+// Utility functions
+function showHomeInfo() {
+    if (homeData.fullAddress) {
+        alert(`🏠 Home Info\n\n${homeData.fullAddress}\nBuilt: ${homeData.yearBuilt} • ${homeData.sqft?.toLocaleString()} sq ft`);
+    } else {
+        alert('🏠 No home information set yet. Complete the setup to add your home details.');
+    }
+}
+
+function clearData() {
+    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+        homeData = {};
+        tasks = [];
+        
+        localStorage.removeItem('casaCareData');
+        
+        document.getElementById('setup-form').style.display = 'block';
+        document.getElementById('task-setup').classList.add('hidden');
+        document.getElementById('main-app').classList.add('hidden');
+        document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
+        
+        alert('✅ All data cleared. Starting fresh!');
+    }
+}
+
+function exportData() {
+    const data = {
+        homeData: homeData,
+        tasks: tasks,
+        exportDate: new Date().toISOString(),
+        version: '2.1'
+    };
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+    const link = document.createElement("a");
+    link.setAttribute("href", dataStr);
+    link.setAttribute("download", "casa_care_backup.json");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    alert('📄 Data exported successfully!');
+}
+
+function saveData() {
+    // Ensure calendar compatibility before saving
+    if (window.tasks) {
+        window.tasks.forEach(task => {
+            if (task.dueDate && !task.nextDue) {
+                task.nextDue = task.dueDate;
+            }
+        });
+    }
+    
+    const data = { 
+        homeData: homeData, 
+        tasks: tasks,
+        version: '2.1'
+    };
+    
+    try {
+        localStorage.setItem('casaCareData', JSON.stringify(data));
+        console.log('✅ Data saved to browser storage with calendar compatibility');
+    } catch (error) {
+        console.error('❌ Failed to save data:', error);
+        throw error; // Re-throw so caller can handle
+    }
+}
+
+function loadData() {
+    try {
+        const savedData = localStorage.getItem('casaCareData');
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            
+            homeData = data.homeData || {};
+            tasks = data.tasks || [];
+            
+            // Restore dates - handle both old nextDue and new dueDate formats
+            tasks.forEach(task => {
+                if (task.nextDue) {
+                    task.dueDate = new Date(task.nextDue);
+                    // Keep nextDue for calendar compatibility
+                    task.nextDue = new Date(task.nextDue);
+                } else if (task.dueDate) {
+                    task.dueDate = new Date(task.dueDate);
+                    // Set nextDue for calendar compatibility
+                    task.nextDue = new Date(task.dueDate);
+                }
+                if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
+            });
+            
+            console.log('✅ Data loaded from browser storage with calendar compatibility');
+            return true;
+        }
+    } catch (error) {
+        console.error('❌ Failed to load data:', error);
+    }
+    return false;
+}
+
+function hasExistingData() {
+    return loadData() && homeData.fullAddress;
+}
+
+// Enhanced initialization
+function initializeApp() {
+    console.log('🏠 Casa Care SIMPLIFIED VERSION initializing...');
+    
+    // Make well water function available globally ASAP
+    window.toggleWellWaterOptions = toggleWellWaterOptions;
+    
+    // Make tasks and homeData available globally for other scripts
+    window.tasks = tasks;
+    window.homeData = homeData;
+    
+    if (hasExistingData()) {
+        console.log('👋 Existing data found, loading main app...');
+        
+        // Hide setup screens
+        document.getElementById('setup-form').style.display = 'none';
+        document.getElementById('task-setup').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        
+        // Update header
+        document.getElementById('header-subtitle').textContent = homeData.fullAddress;
+        
+        // Update global references
+        window.tasks = tasks;
+        window.homeData = homeData;
+        
+        // Show dashboard
+        showTab('dashboard');
+        
+        console.log(`👋 Welcome back! Loaded ${tasks.length} tasks for ${homeData.fullAddress}`);
+    } else {
+        console.log('🆕 New user, showing setup form...');
+        document.getElementById('setup-form').style.display = 'block';
+        document.getElementById('task-setup').classList.add('hidden');
+        document.getElementById('main-app').classList.add('hidden');
+    }
+    
+    console.log('✅ Casa Care SIMPLIFIED VERSION initialized successfully!');
+}
+
+// Export functions to global scope
 window.createMaintenancePlan = createMaintenancePlan;
 window.finishTaskSetup = finishTaskSetup;
 window.goBackToHomeSetup = goBackToHomeSetup;
 window.showTab = showTab;
 window.completeTask = completeTask;
 window.addTaskFromDashboard = addTaskFromDashboard;
+window.addTaskFromSetup = addTaskFromSetup;
+window.editTaskFromSetup = editTaskFromSetup;
+window.deleteTaskDirect = deleteTaskDirect;
+window.openTaskEditModal = openTaskEditModal;
+window.closeTaskEditModal = closeTaskEditModal;
+window.saveTaskFromEdit = saveTaskFromEdit;
+window.deleteTaskFromEdit = deleteTaskFromEdit;
 window.showHomeInfo = showHomeInfo;
 window.clearData = clearData;
 window.exportData = exportData;
