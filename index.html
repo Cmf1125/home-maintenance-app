@@ -77,6 +77,28 @@ button[onclick*="addTask"]:hover {
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2) !important;
     border: 2px solid rgba(255, 255, 255, 0.3) !important;
 }
+        /* 🍼 STEP 5: Professional Form Inputs */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+    border: 2px solid var(--surface-200) !important;
+    border-radius: 12px !important;
+    padding: 16px 20px !important;
+    font-size: 16px !important;
+    transition: all 0.3s ease !important;
+    background: white !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: var(--accent-500) !important;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1) !important;
+    transform: translateY(-1px) !important;
+}
     /* Ensure task edit modal appears above everything */
     #task-edit-modal {
         z-index: 9999 !important;
