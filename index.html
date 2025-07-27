@@ -104,6 +104,40 @@ body {
     background: linear-gradient(135deg, var(--surface-50) 0%, var(--surface-200) 100%) !important;
     min-height: 100vh !important;
 }
+        /* 🍼 STEP 7: Professional Task Cards */
+.enhanced-task-card,
+.task-card-pro,
+.day-panel-task {
+    background: white !important;
+    border-radius: 16px !important;
+    padding: 20px !important;
+    border: 1px solid var(--surface-100) !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.enhanced-task-card:hover,
+.task-card-pro:hover,
+.day-panel-task:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+.enhanced-task-card.priority-high,
+.day-panel-task.priority-high {
+    border-left: 4px solid var(--danger-500) !important;
+}
+
+.enhanced-task-card.priority-medium,
+.day-panel-task.priority-medium {
+    border-left: 4px solid var(--warning-500) !important;
+}
+
+.enhanced-task-card.priority-low,
+.day-panel-task.priority-low {
+    border-left: 4px solid var(--success-500) !important;
+}
     /* Ensure task edit modal appears above everything */
     #task-edit-modal {
         z-index: 9999 !important;
