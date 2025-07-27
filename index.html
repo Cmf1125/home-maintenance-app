@@ -104,7 +104,7 @@ body {
     background: linear-gradient(135deg, var(--surface-50) 0%, var(--surface-200) 100%) !important;
     min-height: 100vh !important;
 }
-        /* 🍼 STEP 7: Professional Task Cards */
+       /* 🍼 STEP 7: Professional Task Cards (No Colored Borders) */
 .enhanced-task-card,
 .task-card-pro,
 .day-panel-task {
@@ -123,54 +123,7 @@ body {
     transform: translateY(-2px) !important;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1) !important;
 }
-
-.enhanced-task-card.priority-high,
-.day-panel-task.priority-high {
-    border-left: 4px solid var(--danger-500) !important;
-}
-
-.enhanced-task-card.priority-medium,
-.day-panel-task.priority-medium {
-    border-left: 4px solid var(--warning-500) !important;
-}
-
-.enhanced-task-card.priority-low,
-.day-panel-task.priority-low {
-    border-left: 4px solid var(--success-500) !important;
-}
-        /* 🍼 STEP 7B: More Comprehensive Task Card Targeting */
-.enhanced-task-card,
-.task-card-pro,
-.day-panel-task,
-.bg-gray-50,
-.p-4.border-b,
-div[data-task-id] {
-    border-left: 3px solid transparent !important;
-}
-
-/* High Priority - Red Border */
-.priority-high,
-.enhanced-task-card.priority-high,
-div[class*="priority-high"],
-div[class*="high"] {
-    border-left: 4px solid #ef4444 !important;
-}
-
-/* Medium Priority - Orange Border */
-.priority-medium,
-.enhanced-task-card.priority-medium,
-div[class*="priority-medium"],
-div[class*="medium"] {
-    border-left: 4px solid #f59e0b !important;
-}
-
-/* Low Priority - Green Border */
-.priority-low,
-.enhanced-task-card.priority-low,
-div[class*="priority-low"],
-div[class*="low"] {
-    border-left: 4px solid #10b981 !important;
-}
+       
     /* Ensure task edit modal appears above everything */
     #task-edit-modal {
         z-index: 9999 !important;
