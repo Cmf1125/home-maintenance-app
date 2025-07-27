@@ -1103,12 +1103,14 @@ function showTab(tabName) {
     window.tasks = tasks;
     window.homeData = homeData;
     
-    // Hide all views
-    const dashboardView = document.getElementById('dashboard-view');
-    const calendarView = document.getElementById('calendar-view');
-    
-    if (dashboardView) dashboardView.classList.add('hidden');
-    if (calendarView) calendarView.classList.add('hidden');
+   // Hide all views
+const dashboardView = document.getElementById('dashboard-view');
+const calendarView = document.getElementById('calendar-view');
+const documentsView = document.getElementById('documents-view');
+
+if (dashboardView) dashboardView.classList.add('hidden');
+if (calendarView) calendarView.classList.add('hidden');
+if (documentsView) documentsView.classList.add('hidden');
     
     // Update tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1178,6 +1180,34 @@ function showTab(tabName) {
             }
         } catch (error) {
             console.error('❌ Error initializing calendar:', error);
+        }
+        
+    } else if (tabName === 'documents') {
+        // Show documents
+        if (documentsView) {
+            documentsView.classList.remove('hidden');
+        }
+        
+        // Update tab styling
+        const documentsTab = document.getElementById('tab-documents');
+        if (documentsTab) {
+            documentsTab.classList.add('bg-blue-100', 'text-blue-700');
+            documentsTab.classList.remove('text-gray-600');
+        }
+        
+        console.log('📄 Initializing documents...');
+        
+        // Initialize documents module
+        try {
+            if (!window.casaCareDocuments && typeof CasaCareDocuments !== 'undefined') {
+                console.log('📄 Creating new documents instance...');
+                window.casaCareDocuments = new CasaCareDocuments();
+            } else if (window.casaCareDocuments) {
+                console.log('📄 Refreshing documents...');
+                window.casaCareDocuments.render();
+            }
+        } catch (error) {
+            console.error('❌ Error initializing documents:', error);
         }
     }
 }
