@@ -627,17 +627,6 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
     return regionalTasks;
 }
 
-// Show task setup screen
-function showTaskSetup() {
-    console.log('📋 Showing task setup screen...');
-    
-    // Update property summary
-    updatePropertySummary();
-    
-    // Render task categories
-    renderTaskCategories();
-}
-
 // Update property summary
 function updatePropertySummary() {
     const taskSetupSummary = document.getElementById('task-setup-summary');
