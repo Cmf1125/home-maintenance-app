@@ -947,5 +947,145 @@
     console.log('✅ CLEAN SLATE: Modal system loaded!');
     console.log('💡 Run testCleanSlate() to test the system');
     </script>
+         <script>
+    // Debug function to check modal visibility
+    window.debugModal = function() {
+        console.log('🔍 DEBUGGING MODAL VISIBILITY:');
+        
+        const modal = document.getElementById('task-edit-modal');
+        if (!modal) {
+            console.log('❌ Modal element not found');
+            return;
+        }
+        
+        console.log('📋 Modal element found ✅');
+        console.log('  Classes:', modal.className);
+        console.log('  Style display:', modal.style.display);
+        console.log('  Style visibility:', modal.style.visibility);
+        console.log('  Style z-index:', modal.style.zIndex);
+        console.log('  Computed styles:');
+        
+        const computed = window.getComputedStyle(modal);
+        console.log('    display:', computed.display);
+        console.log('    visibility:', computed.visibility);
+        console.log('    opacity:', computed.opacity);
+        console.log('    z-index:', computed.zIndex);
+        console.log('    position:', computed.position);
+        
+        // Check if modal is hidden by classes
+        const isHidden = modal.classList.contains('hidden');
+        console.log('  Has "hidden" class:', isHidden);
+        
+        // Check modal position on screen
+        const rect = modal.getBoundingClientRect();
+        console.log('  Position:', {
+            top: rect.top,
+            left: rect.left,
+            width: rect.width,
+            height: rect.height,
+            visible: rect.width > 0 && rect.height > 0
+        });
+        
+        // Check if anything is covering the modal
+        const elementsAtCenter = document.elementsFromPoint(
+            window.innerWidth / 2, 
+            window.innerHeight / 2
+        );
+        console.log('  Elements at screen center:', elementsAtCenter.map(el => el.tagName + (el.id ? '#' + el.id : '') + (el.className ? '.' + el.className.split(' ')[0] : '')));
+        
+        // Check parent elements
+        let parent = modal.parentElement;
+        let level = 0;
+        while (parent && level < 5) {
+            console.log(`  Parent ${level}:`, parent.tagName, parent.className, parent.style.display);
+            parent = parent.parentElement;
+            level++;
+        }
+    };
+
+    // Enhanced test that also debugs modal
+    window.testModalVisibility = function() {
+        console.log('🧪 TESTING MODAL VISIBILITY:');
+        
+        // First run the regular test
+        testCleanSlate();
+        
+        console.log('\n📋 MODAL STATE BEFORE OPENING:');
+        debugModal();
+        
+        console.log('\n▶️ OPENING MODAL...');
+        window.addTaskFromSetup();
+        
+        console.log('\n📋 MODAL STATE AFTER OPENING:');
+        setTimeout(() => {
+            debugModal();
+            
+            // Try to make modal visible if it's hidden
+            console.log('\n🔧 ATTEMPTING TO FORCE MODAL VISIBLE...');
+            const modal = document.getElementById('task-edit-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+                modal.style.visibility = 'visible';
+                modal.style.opacity = '1';
+                modal.style.zIndex = '9999';
+                modal.style.position = 'fixed';
+                modal.style.top = '0';
+                modal.style.left = '0';
+                modal.style.right = '0';
+                modal.style.bottom = '0';
+                modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                
+                console.log('🔧 Force visibility applied');
+                
+                // Check again
+                setTimeout(() => {
+                    console.log('\n📋 MODAL STATE AFTER FORCE:');
+                    debugModal();
+                }, 200);
+            }
+        }, 200);
+    };
+
+    // Quick function to check if modal can be forced open
+    window.forceModalOpen = function() {
+        const modal = document.getElementById('task-edit-modal');
+        if (!modal) {
+            console.log('❌ Modal not found');
+            return;
+        }
+        
+        console.log('🔧 FORCING MODAL OPEN...');
+        
+        // Remove all hiding
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex !important';
+        modal.style.visibility = 'visible !important';
+        modal.style.opacity = '1 !important';
+        modal.style.zIndex = '99999 !important';
+        modal.style.position = 'fixed !important';
+        modal.style.inset = '0 !important';
+        modal.style.alignItems = 'center !important';
+        modal.style.justifyContent = 'center !important';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.8) !important';
+        
+        // Also style the inner content
+        const innerDiv = modal.querySelector('.bg-white');
+        if (innerDiv) {
+            innerDiv.style.position = 'relative !important';
+            innerDiv.style.zIndex = '100000 !important';
+            innerDiv.style.margin = 'auto !important';
+        }
+        
+        console.log('🔧 Modal should now be visible!');
+        console.log('   Try clicking in the center of the screen');
+        console.log('   Or run closeTaskEditModal() to close it');
+    };
+
+    console.log('🔍 Debug functions loaded!');
+    console.log('💡 Run testModalVisibility() to debug the modal issue');
+    console.log('💡 Run forceModalOpen() to force the modal visible');
+    </script>
+
   </body>
 </html>
