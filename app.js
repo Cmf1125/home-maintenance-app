@@ -104,13 +104,19 @@ function createMaintenancePlan() {
         window.homeData = homeData;
         window.tasks = tasks;
 
-        // Show task setup
-        document.getElementById('setup-form').style.display = 'none';
-        document.getElementById('task-setup').classList.remove('hidden');
-        showTaskSetup();
-        
-        console.log('✅ Successfully moved to task setup screen');
-        
+        // Skip task setup, go straight to dashboard
+document.getElementById('setup-form').style.display = 'none';
+document.getElementById('main-app').classList.remove('hidden');
+document.getElementById('header-subtitle').textContent = homeData.fullAddress;
+
+// Update global references
+window.homeData = homeData;
+window.tasks = tasks;
+
+// Show dashboard
+showTab('dashboard');
+
+console.log('✅ Setup complete! Going straight to dashboard');
     } catch (error) {
         console.error('❌ Error in createMaintenancePlan:', error);
         alert('❌ Error creating maintenance plan. Check console for details.');
