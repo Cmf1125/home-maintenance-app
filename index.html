@@ -123,7 +123,44 @@ body {
     transform: translateY(-2px) !important;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1) !important;
 }
-       
+       /* 🍼 STEP 8: Final Polish */
+/* Better checkboxes */
+input[type="checkbox"] {
+    appearance: none !important;
+    width: 20px !important;
+    height: 20px !important;
+    border: 2px solid var(--surface-200) !important;
+    border-radius: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+}
+
+input[type="checkbox"]:checked {
+    background: var(--accent-500) !important;
+    border-color: var(--accent-500) !important;
+}
+
+input[type="checkbox"]:checked::after {
+    content: '✓' !important;
+    color: white !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+}
+
+/* Better navigation */
+.bottom-nav {
+    background: white !important;
+    border-top: 1px solid var(--surface-100) !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.tab-btn.bg-blue-100 {
+    background: rgba(14, 165, 233, 0.1) !important;
+    color: var(--accent-600) !important;
+}
     /* Ensure task edit modal appears above everything */
     #task-edit-modal {
         z-index: 9999 !important;
