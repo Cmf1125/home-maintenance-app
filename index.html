@@ -579,132 +579,202 @@
     <script src="calendar.js"></script>
     <script src="enhanced-dashboard.js"></script>
     <script src="documents.js"></script> 
+ <script>
+    console.log('🧹 CLEAN SLATE: Starting fresh modal system...');
 
-    <!-- Replace the comprehensive fix script at the bottom of your HTML with this: -->
-    <script>
-    // Casa Care - FIXED Modal System
-    console.log('🔧 Casa Care: Loading FIXED modal system...');
-
-    // Create the modal system immediately (not waiting for DOM)
-    window.CasaCare = {
-        modalSystem: {
-            currentTask: null,
-            isEditing: false,
-            context: 'none',
+    // Simple, clean modal system
+    window.Casa = {
+        currentTask: null,
+        isSetupContext: false,
+        
+        openModal: function(task, isNew, context = 'dashboard') {
+            console.log('📝 Opening modal:', task.title || 'New Task', 'Context:', context);
             
-            setTask: function(task, context = 'dashboard') {
-                this.currentTask = {...task};
-                this.isEditing = true;
-                this.context = context;
-                console.log(`📝 CasaCare: Task set for ${context}:`, this.currentTask);
-            },
+            this.currentTask = {...task}; // Clone to avoid reference issues
+            this.isSetupContext = (context === 'setup');
             
-            getTask: function() {
-                return this.currentTask;
-            },
+            const modal = document.getElementById('task-edit-modal');
+            if (!modal) {
+                alert('❌ Modal not found');
+                return;
+            }
             
-            clearTask: function() {
-                console.log('🧹 CasaCare: Clearing modal task');
-                this.currentTask = null;
-                this.isEditing = false;
-                this.context = 'none';
-            },
+            // Fill form
+            this.fillForm(task);
             
-            hasTask: function() {
-                return this.currentTask !== null && this.isEditing;
+            // Update title and delete button
+            const title = document.getElementById('task-edit-title');
+            if (title) title.textContent = isNew ? 'Add Task' : 'Edit Task';
+            
+            const deleteBtn = modal.querySelector('[onclick*="deleteTaskFromEdit"]');
+            if (deleteBtn) deleteBtn.style.display = isNew ? 'none' : 'block';
+            
+            // Show modal
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            
+            // Focus first field
+            setTimeout(() => {
+                const nameField = document.getElementById('edit-task-name');
+                if (nameField) nameField.focus();
+            }, 100);
+            
+            console.log('✅ Modal opened successfully');
+        },
+        
+        fillForm: function(task) {
+            const fields = [
+                ['edit-task-name', task.title || ''],
+                ['edit-task-description', task.description || ''],
+                ['edit-task-cost', task.cost || 0],
+                ['edit-task-frequency', task.frequency || 365],
+                ['edit-task-priority', task.priority || 'medium'],
+                ['edit-task-category', task.category || 'General']
+            ];
+            
+            fields.forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) element.value = value;
+            });
+            
+            // Handle date
+            const dateField = document.getElementById('edit-task-due-date');
+            if (dateField) {
+                const date = task.dueDate ? new Date(task.dueDate) : new Date();
+                dateField.value = date.toISOString().split('T')[0];
             }
         },
         
-        dateUtils: {
-            formatForInput: function(date) {
-                if (!date) return new Date().toISOString().split('T')[0];
-                const d = date instanceof Date ? date : new Date(date);
-                return isNaN(d.getTime()) ? new Date().toISOString().split('T')[0] : d.toISOString().split('T')[0];
-            },
+        saveTask: function() {
+            console.log('💾 Saving task...');
             
-            parseFromInput: function(dateString) {
-                if (!dateString) return new Date();
-                const date = new Date(dateString + 'T12:00:00');
-                return isNaN(date.getTime()) ? new Date() : date;
-            },
-            
-            formatForDisplay: function(date) {
-                if (!date) return 'Not set';
-                const d = date instanceof Date ? date : new Date(date);
-                return isNaN(d.getTime()) ? 'Invalid date' : d.toLocaleDateString();
+            if (!this.currentTask) {
+                alert('❌ No task to save');
+                return;
             }
+            
+            // Get values
+            const title = document.getElementById('edit-task-name').value.trim();
+            const description = document.getElementById('edit-task-description').value.trim();
+            const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
+            const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
+            const priority = document.getElementById('edit-task-priority').value;
+            const category = document.getElementById('edit-task-category').value || 'General';
+            const dueDateStr = document.getElementById('edit-task-due-date').value;
+            
+            // Validate
+            if (!title) {
+                alert('❌ Title required');
+                return;
+            }
+            if (!description) {
+                alert('❌ Description required');
+                return;
+            }
+            
+            // Create date
+            const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
+            
+            // Update task with FULL calendar compatibility
+            this.currentTask.title = title;
+            this.currentTask.description = description;
+            this.currentTask.cost = cost;
+            this.currentTask.frequency = frequency;
+            this.currentTask.priority = priority;
+            this.currentTask.category = category;
+            this.currentTask.dueDate = dueDate;
+            this.currentTask.nextDue = dueDate; // CRITICAL: Calendar sync
+            
+            // Ensure calendar compatibility
+            this.ensureCalendarSync(this.currentTask);
+            
+            // Remove flags
+            delete this.currentTask.isTemplate;
+            delete this.currentTask.isNewTask;
+            
+            // Add to tasks if new
+            const isNew = !window.tasks.find(t => t.id === this.currentTask.id);
+            if (isNew) {
+                window.tasks.push(this.currentTask);
+            } else {
+                // Update existing
+                const index = window.tasks.findIndex(t => t.id === this.currentTask.id);
+                if (index > -1) window.tasks[index] = this.currentTask;
+            }
+            
+            console.log('✅ Task saved:', this.currentTask);
+            
+            // Refresh based on context
+            this.refreshAfterSave();
+            
+            // Close modal
+            this.closeModal();
+            
+            alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
+        },
+        
+        deleteTask: function() {
+            if (!this.currentTask) return;
+            
+            const title = this.currentTask.title || 'Untitled';
+            if (!confirm(`Delete "${title}"?`)) return;
+            
+            const index = window.tasks.findIndex(t => t.id === this.currentTask.id);
+            if (index > -1) {
+                window.tasks.splice(index, 1);
+                console.log('🗑️ Deleted:', title);
+                
+                this.refreshAfterSave();
+                this.closeModal();
+                alert(`✅ "${title}" deleted!`);
+            }
+        },
+        
+        closeModal: function() {
+            const modal = document.getElementById('task-edit-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+            this.currentTask = null;
+            this.isSetupContext = false;
+        },
+        
+        refreshAfterSave: function() {
+            if (this.isSetupContext) {
+                // Setup page - re-render categories
+                if (typeof renderTaskCategories === 'function') {
+                    renderTaskCategories();
+                }
+            } else {
+                // Dashboard - save and refresh
+                try {
+                    if (typeof saveData === 'function') saveData();
+                    if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
+                    if (window.casaCareCalendar?.refresh) window.casaCareCalendar.refresh();
+                } catch (e) {
+                    console.warn('Refresh error:', e);
+                }
+            }
+        },
+        
+        // CALENDAR SYNC: Ensure calendar compatibility
+        ensureCalendarSync: function(task) {
+            // Make sure both date properties exist for calendar
+            if (task.dueDate && !task.nextDue) {
+                task.nextDue = task.dueDate;
+            }
+            if (task.nextDue && !task.dueDate) {
+                task.dueDate = task.nextDue;
+            }
+            console.log('📅 Calendar sync ensured for task:', task.title);
         }
     };
 
-    // CRITICAL: Make openTaskModal globally accessible immediately
-    window.openTaskModal = function(task, isNewTask) {
-        const modal = document.getElementById('task-edit-modal');
-        if (!modal) {
-            console.error('❌ Task edit modal not found, retrying in 100ms...');
-            // Retry after a short delay
-            setTimeout(() => window.openTaskModal(task, isNewTask), 100);
-            return;
-        }
-        
-        console.log('📝 CasaCare: Opening modal for task:', task);
-        
-        // Fill form fields with proper date handling
-        const nameField = document.getElementById('edit-task-name');
-        const descField = document.getElementById('edit-task-description');
-        const costField = document.getElementById('edit-task-cost');
-        const freqField = document.getElementById('edit-task-frequency');
-        const priorityField = document.getElementById('edit-task-priority');
-        const categoryField = document.getElementById('edit-task-category');
-        const dueDateField = document.getElementById('edit-task-due-date');
-        
-        if (nameField) nameField.value = task.title || '';
-        if (descField) descField.value = task.description || '';
-        if (costField) costField.value = task.cost || 0;
-        if (freqField) freqField.value = task.frequency || 365;
-        if (priorityField) priorityField.value = task.priority || 'medium';
-        if (categoryField) categoryField.value = task.category || 'General';
-        
-        // CRITICAL: Proper date handling
-        if (dueDateField) {
-            dueDateField.value = window.CasaCare.dateUtils.formatForInput(task.dueDate);
-            console.log('📅 CasaCare: Set due date input to:', dueDateField.value);
-        }
-        
-        // Update modal title
-        const modalTitle = document.getElementById('task-edit-title');
-        if (modalTitle) {
-            modalTitle.textContent = isNewTask ? 'Add Custom Task' : 'Edit Task';
-        }
-        
-        // Show/hide delete button
-        const deleteButton = modal.querySelector('[onclick*="deleteTaskFromEdit"]');
-        if (deleteButton) {
-            deleteButton.style.display = isNewTask ? 'none' : 'block';
-        }
-        
-        // Show modal
-        modal.classList.remove('hidden');
-        modal.style.display = 'flex';
-        
-        // Focus on first field
-        setTimeout(() => {
-            if (nameField) nameField.focus();
-        }, 100);
-        
-        console.log('✅ CasaCare: Modal opened successfully');
-    };
-
-    // FIXED: Override functions immediately (not waiting for DOM)
+    // CLEAN: Override all the problematic functions
     window.addTaskFromSetup = function() {
-        console.log('➕ CasaCare: Adding task from setup...');
-        
-        if (!window.tasks) {
-            console.error('❌ Tasks array not available');
-            alert('❌ Cannot add task: Tasks not loaded');
-            return;
-        }
-        
-        const maxId = Math.max(...window.tasks.map(t => t.id), 0);
+        console.log('➕ Add task from setup');
+        const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
         const newTask = {
             id: maxId + 1,
             title: '',
@@ -714,45 +784,24 @@
             cost: 0,
             priority: 'medium',
             dueDate: new Date(),
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true,
             isNewTask: true
         };
-        
-        window.CasaCare.modalSystem.setTask(newTask, 'setup');
-        window.openTaskModal(newTask, true);
+        window.Casa.openModal(newTask, true, 'setup');
     };
-    
+
     window.editTaskFromSetup = function(taskId) {
-        console.log('✏️ CasaCare: Editing task from setup:', taskId);
-        
-        if (!window.tasks) {
-            console.error('❌ Tasks array not available');
-            alert('❌ Cannot edit task: Tasks not loaded');
-            return;
-        }
-        
-        const task = window.tasks.find(t => t.id === taskId);
+        console.log('✏️ Edit task from setup:', taskId);
+        const task = window.tasks?.find(t => t.id === taskId);
         if (!task) {
             alert('❌ Task not found');
             return;
         }
-        
-        window.CasaCare.modalSystem.setTask(task, 'setup');
-        window.openTaskModal(task, false);
+        window.Casa.openModal(task, false, 'setup');
     };
-    
+
     window.addTaskFromDashboard = function() {
-        console.log('➕ CasaCare: Adding task from dashboard...');
-        
-        if (!window.tasks) {
-            console.error('❌ Tasks array not available');
-            alert('❌ Cannot add task: Tasks not loaded');
-            return;
-        }
-        
-        const maxId = Math.max(...window.tasks.map(t => t.id), 0);
+        console.log('➕ Add task from dashboard');
+        const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
         const newTask = {
             id: maxId + 1,
             title: '',
@@ -762,204 +811,35 @@
             cost: 0,
             priority: 'medium',
             dueDate: new Date(),
-            lastCompleted: null,
-            isCompleted: false,
             isNewTask: true
         };
-        
-        window.CasaCare.modalSystem.setTask(newTask, 'dashboard');
-        window.openTaskModal(newTask, true);
+        window.Casa.openModal(newTask, true, 'dashboard');
     };
-    
+
     window.editTaskFromDashboard = function(taskId) {
-        console.log('✏️ CasaCare: Editing task from dashboard:', taskId);
-        
-        if (!window.tasks) {
-            console.error('❌ Tasks array not available');
-            alert('❌ Cannot edit task: Tasks not loaded');
-            return;
-        }
-        
-        const task = window.tasks.find(t => t.id === taskId);
+        console.log('✏️ Edit task from dashboard:', taskId);
+        const task = window.tasks?.find(t => t.id === taskId);
         if (!task) {
             alert('❌ Task not found');
             return;
         }
-        
-        window.CasaCare.modalSystem.setTask(task, 'dashboard');
-        window.openTaskModal(task, false);
+        window.Casa.openModal(task, false, 'dashboard');
     };
 
-    // Enhanced save function
+    // Modal control functions
     window.saveTaskFromEdit = function() {
-        console.log('💾 CasaCare: Saving task...');
-        
-        const editingTask = window.CasaCare.modalSystem.getTask();
-        if (!editingTask) {
-            alert('❌ No task selected for editing. Please close the modal and try again.');
-            return;
-        }
-        
-        // Get and validate form values
-        const title = document.getElementById('edit-task-name').value.trim();
-        const description = document.getElementById('edit-task-description').value.trim();
-        const costInput = document.getElementById('edit-task-cost').value;
-        const frequencyInput = document.getElementById('edit-task-frequency').value;
-        const priority = document.getElementById('edit-task-priority').value;
-        const category = document.getElementById('edit-task-category')?.value || 'General';
-        const dueDateInput = document.getElementById('edit-task-due-date').value;
-        
-        console.log('📝 CasaCare: Form values:', { title, description, costInput, frequencyInput, priority, category, dueDateInput });
-        
-        // Validation
-        if (!title) {
-            alert('❌ Task name is required');
-            document.getElementById('edit-task-name').focus();
-            return;
-        }
-        
-        if (!description) {
-            alert('❌ Task description is required');
-            document.getElementById('edit-task-description').focus();
-            return;
-        }
-        
-        const cost = parseFloat(costInput) || 0;
-        const frequency = parseInt(frequencyInput) || 365;
-        
-        if (frequency <= 0) {
-            alert('❌ Frequency must be greater than 0');
-            document.getElementById('edit-task-frequency').focus();
-            return;
-        }
-        
-        // Parse due date properly
-        const dueDate = window.CasaCare.dateUtils.parseFromInput(dueDateInput);
-        console.log('📅 CasaCare: Parsed due date:', dueDate, 'from input:', dueDateInput);
-        
-        // Check if new task
-        const isNewTask = editingTask.isNewTask || !window.tasks.find(t => t.id === editingTask.id);
-        
-        // Update task properties
-        editingTask.title = title;
-        editingTask.description = description;
-        editingTask.cost = cost;
-        editingTask.frequency = frequency;
-        editingTask.priority = priority;
-        editingTask.category = category;
-        editingTask.dueDate = dueDate;
-        editingTask.nextDue = dueDate; // Calendar compatibility
-        
-        // Clean up flags
-        delete editingTask.isTemplate;
-        delete editingTask.isNewTask;
-        
-        if (isNewTask) {
-            window.tasks.push(editingTask);
-            console.log('✅ CasaCare: New task added:', editingTask);
-        } else {
-            const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
-            if (taskIndex > -1) {
-                window.tasks[taskIndex] = editingTask;
-                console.log('✅ CasaCare: Existing task updated:', editingTask);
-            }
-        }
-        
-        // Context-specific actions
-        const context = window.CasaCare.modalSystem.context;
-        console.log('🔍 CasaCare: Saving in context:', context);
-        
-        if (context === 'setup') {
-            // Re-render task categories for setup
-            if (typeof renderTaskCategories === 'function') {
-                renderTaskCategories();
-            }
-        } else {
-            // Save data and refresh dashboard/calendar
-            try {
-                if (typeof window.saveData === 'function') {
-                    window.saveData();
-                } else if (typeof saveData === 'function') {
-                    saveData();
-                }
-                
-                if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-                    window.enhancedDashboard.render();
-                } else if (typeof updateDashboard === 'function') {
-                    updateDashboard();
-                }
-                
-                if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-                    window.casaCareCalendar.refresh();
-                }
-            } catch (error) {
-                console.error('❌ CasaCare: Error during save/refresh:', error);
-            }
-        }
-        
-        // Close modal
-        window.closeTaskEditModal();
-        
-        const actionText = isNewTask ? 'added' : 'updated';
-        alert(`✅ Task "${title}" ${actionText} successfully!\nDue: ${window.CasaCare.dateUtils.formatForDisplay(dueDate)}`);
-    };
-    
-    window.closeTaskEditModal = function() {
-        const modal = document.getElementById('task-edit-modal');
-        if (modal) {
-            modal.classList.add('hidden');
-            modal.style.display = 'none';
-        }
-        window.CasaCare.modalSystem.clearTask();
-        console.log('✅ CasaCare: Modal closed and cleared');
-    };
-    
-    window.deleteTaskFromEdit = function() {
-        const editingTask = window.CasaCare.modalSystem.getTask();
-        if (!editingTask) {
-            alert('❌ No task selected for deletion');
-            return;
-        }
-        
-        const taskTitle = editingTask.title || 'Untitled Task';
-        
-        if (confirm(`Are you sure you want to delete "${taskTitle}"?`)) {
-            const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
-            if (taskIndex > -1) {
-                window.tasks.splice(taskIndex, 1);
-                console.log('🗑️ CasaCare: Task deleted:', taskTitle);
-                
-                // Context-specific refresh
-                const context = window.CasaCare.modalSystem.context;
-                if (context === 'setup') {
-                    if (typeof renderTaskCategories === 'function') {
-                        renderTaskCategories();
-                    }
-                } else {
-                    try {
-                        if (typeof window.saveData === 'function') {
-                            window.saveData();
-                        } else if (typeof saveData === 'function') {
-                            saveData();
-                        }
-                        if (window.enhancedDashboard) {
-                            window.enhancedDashboard.render();
-                        }
-                        if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-                            window.casaCareCalendar.refresh();
-                        }
-                    } catch (error) {
-                        console.error('❌ CasaCare: Error during delete refresh:', error);
-                    }
-                }
-                
-                window.closeTaskEditModal();
-                alert(`✅ Task "${taskTitle}" deleted successfully!`);
-            }
-        }
+        window.Casa.saveTask();
     };
 
-    // Date picker functions (keeping the existing ones)
+    window.deleteTaskFromEdit = function() {
+        window.Casa.deleteTask();
+    };
+
+    window.closeTaskEditModal = function() {
+        window.Casa.closeModal();
+    };
+
+    // Keep existing reschedule functions (they work fine)
     window.rescheduleTaskFromDashboard = function(taskId) {
         const task = window.tasks.find(t => t.id === taskId);
         if (!task) {
@@ -976,440 +856,96 @@
         
         if (modal && taskNameElement && currentDueDateElement && newDueDateInput) {
             taskNameElement.textContent = `"${task.title}"`;
-            currentDueDateElement.textContent = window.CasaCare.dateUtils.formatForDisplay(task.dueDate);
-            newDueDateInput.value = window.CasaCare.dateUtils.formatForInput(task.dueDate);
+            const currentDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+            currentDueDateElement.textContent = currentDate.toLocaleDateString();
+            newDueDateInput.value = currentDate.toISOString().split('T')[0];
             
             modal.classList.remove('hidden');
             setTimeout(() => newDueDateInput.focus(), 100);
-        } else {
-            alert('❌ Date picker modal not available');
         }
     };
     
     window.closeDatePickerModal = function() {
         const modal = document.getElementById('date-picker-modal');
-        if (modal) {
-            modal.classList.add('hidden');
-        }
+        if (modal) modal.classList.add('hidden');
         window.currentRescheduleTask = null;
     };
     
     window.setQuickDate = function(daysFromNow) {
-        const newDueDateInput = document.getElementById('new-due-date');
-        if (!newDueDateInput) return;
+        const input = document.getElementById('new-due-date');
+        if (!input) return;
         
-        const newDate = new Date();
-        newDate.setDate(newDate.getDate() + daysFromNow);
-        newDueDateInput.value = newDate.toISOString().split('T')[0];
+        const date = new Date();
+        date.setDate(date.getDate() + daysFromNow);
+        input.value = date.toISOString().split('T')[0];
         
-        // Visual feedback
-        newDueDateInput.style.backgroundColor = '#dbeafe';
-        setTimeout(() => newDueDateInput.style.backgroundColor = '', 300);
+        input.style.backgroundColor = '#dbeafe';
+        setTimeout(() => input.style.backgroundColor = '', 300);
     };
     
     window.confirmReschedule = function() {
         if (!window.currentRescheduleTask) {
-            alert('❌ No task selected for rescheduling');
+            alert('❌ No task selected');
             return;
         }
         
-        const newDueDateInput = document.getElementById('new-due-date');
-        if (!newDueDateInput || !newDueDateInput.value) {
-            alert('❌ Please select a new due date');
+        const input = document.getElementById('new-due-date');
+        if (!input?.value) {
+            alert('❌ Please select a date');
             return;
         }
         
-        const newDate = window.CasaCare.dateUtils.parseFromInput(newDueDateInput.value);
+        const newDate = new Date(input.value + 'T12:00:00');
         window.currentRescheduleTask.dueDate = newDate;
-        window.currentRescheduleTask.nextDue = newDate;
+        window.currentRescheduleTask.nextDue = newDate; // CRITICAL: Calendar sync
         
-        // Save and refresh
+        // Ensure calendar sync
+        window.Casa.ensureCalendarSync(window.currentRescheduleTask);
+        
         try {
-            if (typeof window.saveData === 'function') {
-                window.saveData();
-            } else if (typeof saveData === 'function') {
-                saveData();
-            }
-            if (window.enhancedDashboard) {
-                window.enhancedDashboard.render();
-            }
-            if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-                window.casaCareCalendar.refresh();
-            }
-        } catch (error) {
-            console.error('❌ Error during reschedule refresh:', error);
+            if (typeof saveData === 'function') saveData();
+            if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
+            if (window.casaCareCalendar?.refresh) window.casaCareCalendar.refresh();
+        } catch (e) {
+            console.warn('Refresh error:', e);
         }
         
         window.closeDatePickerModal();
-        alert(`✅ Task rescheduled to ${window.CasaCare.dateUtils.formatForDisplay(newDate)}`);
+        alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
     };
 
-    // Test function
-    window.testCasaCareFixed = function() {
-        console.log('🧪 TESTING CASA CARE FIXED SYSTEM:');
-        console.log('  CasaCare object:', typeof window.CasaCare === 'object' ? '✅' : '❌');
-        console.log('  openTaskModal (global):', typeof window.openTaskModal === 'function' ? '✅' : '❌');
+    // Test function with calendar sync testing
+    window.testCleanSlate = function() {
+        console.log('🧪 TESTING CLEAN SLATE SYSTEM:');
+        console.log('  Casa object:', typeof window.Casa === 'object' ? '✅' : '❌');
         console.log('  addTaskFromSetup:', typeof window.addTaskFromSetup === 'function' ? '✅' : '❌');
         console.log('  editTaskFromSetup:', typeof window.editTaskFromSetup === 'function' ? '✅' : '❌');
         console.log('  Modal element:', document.getElementById('task-edit-modal') ? '✅' : '❌');
-        console.log('  Tasks array:', Array.isArray(window.tasks) ? `✅ (${window.tasks.length} tasks)` : '❌');
+        console.log('  Tasks array:', Array.isArray(window.tasks) ? `✅ (${window.tasks.length})` : '❌');
+        console.log('  Calendar object:', window.casaCareCalendar ? '✅' : '❌');
         
-        // Test modal opening
-        console.log('🧪 Testing modal opening...');
-        if (document.getElementById('task-edit-modal')) {
-            console.log('  Modal element found ✅');
-            console.log('  Modal classes:', document.getElementById('task-edit-modal').className);
-        } else {
-            console.log('  Modal element NOT found ❌');
+        // Test calendar sync
+        if (window.tasks && window.tasks.length > 0) {
+            console.log('📅 CALENDAR SYNC TEST:');
+            const tasksWithDates = window.tasks.filter(t => t.dueDate);
+            console.log(`  Tasks with dueDate: ${tasksWithDates.length}`);
+            const tasksWithNextDue = window.tasks.filter(t => t.nextDue);
+            console.log(`  Tasks with nextDue: ${tasksWithNextDue.length}`);
+            console.log(`  Calendar sync status: ${tasksWithDates.length === tasksWithNextDue.length ? '✅ SYNCED' : '⚠️ NEEDS SYNC'}`);
+        }
+        
+        // Test clicking the add button
+        console.log('🧪 Testing add button click...');
+        try {
+            window.addTaskFromSetup();
+            console.log('✅ Add button function executed without error');
+        } catch (e) {
+            console.log('❌ Add button error:', e);
         }
     };
 
-    console.log('✅ Casa Care: FIXED modal system loaded!');
-    console.log('💡 Run testCasaCareFixed() to verify everything is working');
-    console.log('🎯 The modal should now work on both setup and dashboard pages');
+    console.log('✅ CLEAN SLATE: Modal system loaded!');
+    console.log('💡 Run testCleanSlate() to test the system');
     </script>
-    <!-- ADD THIS SCRIPT AFTER YOUR SETUP REFRESH FIX SCRIPT -->
-<script>
-// Casa Care - Date Synchronization Fix
-// This fixes the disconnect between setup page dates and modal dates
-console.log('📅 Casa Care: Loading date synchronization fix...');
-
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        
-        // Override the task modal opening functions to sync dates properly
-        const originalOpenTaskModal = window.CasaCare ? 
-            (function() {
-                // Store reference to original modal opening logic
-                const originalAddFromSetup = window.addTaskFromSetup;
-                const originalEditFromSetup = window.editTaskFromSetup;
-                
-                // Enhanced addTaskFromSetup with date sync
-                window.addTaskFromSetup = function() {
-                    console.log('➕ Date Sync: Adding task from setup with date sync...');
-                    
-                    const maxId = Math.max(...window.tasks.map(t => t.id), 0);
-                    const newTask = {
-                        id: maxId + 1,
-                        title: '',
-                        description: '',
-                        category: 'General',
-                        frequency: 365,
-                        cost: 0,
-                        priority: 'medium',
-                        dueDate: new Date(),
-                        lastCompleted: null,
-                        isCompleted: false,
-                        isTemplate: true,
-                        isNewTask: true
-                    };
-                    
-                    window.CasaCare.modalSystem.setTask(newTask, 'setup');
-                    openTaskModalWithDateSync(newTask, true);
-                };
-                
-                // Enhanced editTaskFromSetup with date sync
-                window.editTaskFromSetup = function(taskId) {
-                    console.log('✏️ Date Sync: Editing task from setup with date sync:', taskId);
-                    
-                    const task = window.tasks.find(t => t.id === taskId);
-                    if (!task) {
-                        alert('❌ Task not found');
-                        return;
-                    }
-                    
-                    // CRITICAL: Check if task has a setup page date input and use that
-                    const setupDateInput = document.getElementById(`due-date-${taskId}`);
-                    if (setupDateInput && setupDateInput.value) {
-                        console.log('📅 Date Sync: Found setup page date input:', setupDateInput.value);
-                        // Update task with the setup page date
-                        task.dueDate = new Date(setupDateInput.value + 'T12:00:00');
-                        console.log('📅 Date Sync: Updated task due date from setup input:', task.dueDate);
-                    }
-                    
-                    window.CasaCare.modalSystem.setTask(task, 'setup');
-                    openTaskModalWithDateSync(task, false);
-                };
-                
-            })() : null;
-        
-        // Enhanced modal opening function with date sync
-        function openTaskModalWithDateSync(task, isNewTask) {
-            const modal = document.getElementById('task-edit-modal');
-            if (!modal) {
-                alert('❌ Task edit modal not found');
-                return;
-            }
-            
-            console.log('📝 Date Sync: Opening modal for task with date sync:', task);
-            
-            // Fill form fields
-            document.getElementById('edit-task-name').value = task.title || '';
-            document.getElementById('edit-task-description').value = task.description || '';
-            document.getElementById('edit-task-cost').value = task.cost || 0;
-            document.getElementById('edit-task-frequency').value = task.frequency || 365;
-            document.getElementById('edit-task-priority').value = task.priority || 'medium';
-            
-            const categoryField = document.getElementById('edit-task-category');
-            if (categoryField) {
-                categoryField.value = task.category || 'General';
-            }
-            
-            // CRITICAL: Enhanced date handling with sync
-            const dueDateInput = document.getElementById('edit-task-due-date');
-            if (dueDateInput) {
-                let dateToUse = task.dueDate;
-                
-                // For existing tasks, check if there's a setup page date input
-                if (!isNewTask && task.id) {
-                    const setupDateInput = document.getElementById(`due-date-${task.id}`);
-                    if (setupDateInput && setupDateInput.value) {
-                        console.log('📅 Date Sync: Using date from setup page input:', setupDateInput.value);
-                        dateToUse = new Date(setupDateInput.value + 'T12:00:00');
-                        // Update the task object to match
-                        task.dueDate = dateToUse;
-                    }
-                }
-                
-                const formattedDate = window.CasaCare.dateUtils.formatForInput(dateToUse);
-                dueDateInput.value = formattedDate;
-                console.log('📅 Date Sync: Set modal date input to:', formattedDate, 'from date:', dateToUse);
-            }
-            
-            // Update modal title
-            const modalTitle = document.getElementById('task-edit-title');
-            if (modalTitle) {
-                modalTitle.textContent = isNewTask ? 'Add Custom Task' : 'Edit Task';
-            }
-            
-            // Show/hide delete button
-            const deleteButton = modal.querySelector('[onclick*="deleteTaskFromEdit"]');
-            if (deleteButton) {
-                deleteButton.style.display = isNewTask ? 'none' : 'block';
-            }
-            
-            // Show modal
-            modal.classList.remove('hidden');
-            
-            // Focus on first field
-            setTimeout(() => {
-                const nameField = document.getElementById('edit-task-name');
-                if (nameField) nameField.focus();
-            }, 100);
-            
-            console.log('✅ Date Sync: Modal opened with synchronized dates');
-        }
-        
-        // Override the save function to update both modal and setup page dates
-        const originalSaveTaskFromEdit = window.saveTaskFromEdit;
-        
-        window.saveTaskFromEdit = function() {
-            console.log('💾 Date Sync: Enhanced save with date synchronization...');
-            
-            const editingTask = window.CasaCare.modalSystem.getTask();
-            if (!editingTask) {
-                alert('❌ No task selected for editing. Please close the modal and try again.');
-                return;
-            }
-            
-            // Get form values
-            const title = document.getElementById('edit-task-name').value.trim();
-            const description = document.getElementById('edit-task-description').value.trim();
-            const costInput = document.getElementById('edit-task-cost').value;
-            const frequencyInput = document.getElementById('edit-task-frequency').value;
-            const priority = document.getElementById('edit-task-priority').value;
-            const category = document.getElementById('edit-task-category')?.value || 'General';
-            const dueDateInput = document.getElementById('edit-task-due-date').value;
-            
-            console.log('📝 Date Sync: Form values:', { title, description, costInput, frequencyInput, priority, category, dueDateInput });
-            
-            // Validation
-            if (!title) {
-                alert('❌ Task name is required');
-                document.getElementById('edit-task-name').focus();
-                return;
-            }
-            
-            if (!description) {
-                alert('❌ Task description is required');
-                document.getElementById('edit-task-description').focus();
-                return;
-            }
-            
-            const cost = parseFloat(costInput) || 0;
-            const frequency = parseInt(frequencyInput) || 365;
-            
-            if (frequency <= 0) {
-                alert('❌ Frequency must be greater than 0');
-                document.getElementById('edit-task-frequency').focus();
-                return;
-            }
-            
-            // CRITICAL: Parse due date and sync with setup page
-            const dueDate = window.CasaCare.dateUtils.parseFromInput(dueDateInput);
-            console.log('📅 Date Sync: Parsed due date from modal:', dueDate, 'from input:', dueDateInput);
-            
-            // Check if new task
-            const isNewTask = editingTask.isNewTask || !window.tasks.find(t => t.id === editingTask.id);
-            
-            // Update task properties
-            editingTask.title = title;
-            editingTask.description = description;
-            editingTask.cost = cost;
-            editingTask.frequency = frequency;
-            editingTask.priority = priority;
-            editingTask.category = category;
-            editingTask.dueDate = dueDate;
-            editingTask.nextDue = dueDate; // Calendar compatibility
-            
-            // Clean up flags
-            delete editingTask.isTemplate;
-            delete editingTask.isNewTask;
-            
-            if (isNewTask) {
-                window.tasks.push(editingTask);
-                console.log('✅ Date Sync: New task added:', editingTask);
-            } else {
-                const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
-                if (taskIndex > -1) {
-                    window.tasks[taskIndex] = editingTask;
-                    console.log('✅ Date Sync: Existing task updated at index', taskIndex);
-                }
-            }
-            
-            // CRITICAL: Sync the setup page date input if it exists
-            const setupDateInput = document.getElementById(`due-date-${editingTask.id}`);
-            if (setupDateInput) {
-                const syncedDateValue = window.CasaCare.dateUtils.formatForInput(dueDate);
-                setupDateInput.value = syncedDateValue;
-                console.log('📅 Date Sync: Synced setup page date input to:', syncedDateValue);
-            }
-            
-            // Context-specific refresh
-            const context = window.CasaCare.modalSystem.context;
-            console.log('🔍 Date Sync: Saving in context:', context);
-            
-            if (context === 'setup') {
-                console.log('🔄 Date Sync: Refreshing setup page with date sync...');
-                
-                // Force update the global tasks reference
-                window.tasks = [...window.tasks];
-                
-                // Multiple refresh strategies with date sync
-                try {
-                    if (typeof renderTaskCategories === 'function') {
-                        console.log('🔄 Date Sync: Calling renderTaskCategories...');
-                        renderTaskCategories();
-                    }
-                    
-                    // Also call the force refresh
-                    setTimeout(() => {
-                        console.log('🔄 Date Sync: Force refreshing with date sync...');
-                        syncAllSetupPageDates();
-                    }, 100);
-                    
-                } catch (error) {
-                    console.error('❌ Date Sync: Error during setup refresh:', error);
-                }
-                
-            } else {
-                // Dashboard context
-                try {
-                    if (typeof window.saveData === 'function') {
-                        window.saveData();
-                    }
-                    if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-                        window.enhancedDashboard.render();
-                    } else if (typeof updateDashboard === 'function') {
-                        updateDashboard();
-                    }
-                    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-                        window.casaCareCalendar.refresh();
-                    }
-                } catch (error) {
-                    console.error('❌ Date Sync: Error during dashboard refresh:', error);
-                }
-            }
-            
-            // Close modal
-            window.closeTaskEditModal();
-            
-            const actionText = isNewTask ? 'added' : 'updated';
-            alert(`✅ Task "${title}" ${actionText} successfully!\nDue: ${window.CasaCare.dateUtils.formatForDisplay(dueDate)}`);
-        };
-        
-        // Function to sync all setup page date inputs with task objects
-        function syncAllSetupPageDates() {
-            console.log('🔄 Date Sync: Syncing all setup page dates...');
-            
-            window.tasks.forEach(task => {
-                const setupDateInput = document.getElementById(`due-date-${task.id}`);
-                if (setupDateInput && task.dueDate) {
-                    const syncedValue = window.CasaCare.dateUtils.formatForInput(task.dueDate);
-                    if (setupDateInput.value !== syncedValue) {
-                        setupDateInput.value = syncedValue;
-                        console.log(`📅 Date Sync: Synced task ${task.id} date input to:`, syncedValue);
-                    }
-                }
-            });
-        }
-        
-        // Override the updateTaskDueDate function to sync with task objects
-        if (typeof window.updateTaskDueDate === 'function') {
-            const originalUpdateTaskDueDate = window.updateTaskDueDate;
-            
-            window.updateTaskDueDate = function(taskId, dueDateStr) {
-                console.log(`📅 Date Sync: Updating task ${taskId} due date to: ${dueDateStr}`);
-                
-                // Call original function
-                originalUpdateTaskDueDate(taskId, dueDateStr);
-                
-                // Also update the actual task object
-                const task = window.tasks.find(t => t.id === taskId);
-                if (task && dueDateStr) {
-                    const newDate = new Date(dueDateStr + 'T12:00:00');
-                    if (!isNaN(newDate.getTime())) {
-                        task.dueDate = newDate;
-                        task.nextDue = newDate;
-                        console.log(`📅 Date Sync: Updated task object date to:`, newDate);
-                    }
-                }
-            };
-        }
-        
-        // Test function
-        window.testDateSync = function() {
-            console.log('🧪 TESTING DATE SYNCHRONIZATION:');
-            console.log('  Current context:', window.CasaCare?.modalSystem?.context || 'unknown');
-            console.log('  Tasks count:', window.tasks?.length || 0);
-            
-            // Check task dates
-            if (window.tasks && window.tasks.length > 0) {
-                console.log('📅 Task dates:');
-                window.tasks.forEach((task, index) => {
-                    const setupDateInput = document.getElementById(`due-date-${task.id}`);
-                    const setupInputValue = setupDateInput ? setupDateInput.value : 'no input';
-                    const taskDueDate = task.dueDate ? window.CasaCare.dateUtils.formatForDisplay(task.dueDate) : 'no date';
-                    const formattedForInput = task.dueDate ? window.CasaCare.dateUtils.formatForInput(task.dueDate) : 'no date';
-                    
-                    console.log(`  Task ${task.id} (${task.title || 'untitled'}):`);
-                    console.log(`    Setup input: ${setupInputValue}`);
-                    console.log(`    Task object: ${taskDueDate}`);
-                    console.log(`    Formatted: ${formattedForInput}`);
-                    console.log(`    Match: ${setupInputValue === formattedForInput ? '✅' : '❌'}`);
-                });
-            }
-            
-            // Test sync function
-            console.log('🔄 Testing sync...');
-            syncAllSetupPageDates();
-        };
-        
-        console.log('✅ Date Sync: Date synchronization fix loaded!');
-        console.log('💡 Run testDateSync() to check date synchronization');
-        
-    }, 700); // Wait for previous scripts to load
-});
-</script>
   </body>
 </html>
