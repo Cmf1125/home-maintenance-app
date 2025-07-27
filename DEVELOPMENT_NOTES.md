@@ -24,3 +24,36 @@ Document Upload ideas:
 Store insurance policies, warranties, receipts per task
 Photo attachments for completed tasks
 Maintenance history with photos
+
+If you need to add features, build on the window.CasaCare system
+Use window.CasaCare.dateUtils for any date handling
+The modal system is now rock-solid for future enhancements
+
+📊 What Goes Where:
+data.js - Data & Storage
+
+homeData and tasks variables
+saveData(), loadData(), clearData(), exportData()
+Data validation functions
+
+task-generator.js - Task Logic
+
+generateTaskTemplates()
+generateRegionalTasks()
+getClimateRegion()
+All the task creation logic
+
+ui-components.js - UI Rendering
+
+renderTaskCategories()
+renderTaskCard()
+updateDashboard()
+renderTasks()
+updatePropertySummary()
+
+app.js - Main Controller
+
+initializeApp()
+Navigation functions (showTaskSetup(), finishTaskSetup())
+Event handlers (createMaintenancePlan(), completeTask())
+Modal functions (editTaskFromSetup(), closeTaskEditModal())
