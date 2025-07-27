@@ -57,3 +57,33 @@ initializeApp()
 Navigation functions (showTaskSetup(), finishTaskSetup())
 Event handlers (createMaintenancePlan(), completeTask())
 Modal functions (editTaskFromSetup(), closeTaskEditModal())
+
+🎨 Ideas to Simplify the Task Generation Page:
+Option 1: Summary-First Approach
+
+Show just the overview (property summary + total task count)
+"Looks good!" button to proceed
+"Customize" button to expand and see details
+Most users hit "Looks good" and move on
+
+Option 2: Category Highlights Only
+
+Show just the major categories (HVAC: 3 tasks, Water Systems: 2 tasks, etc.)
+Click to expand if they want to see/edit specifics
+Much less scrolling and visual complexity
+
+Option 3: Smart Defaults
+
+Remove individual date inputs (let the app set smart defaults)
+Show just task titles in a simple list
+"Add Custom Task" button for additions
+Way cleaner interface
+
+Option 4: Progressive Disclosure
+
+Page 1: "We created X tasks for your home" + preview
+Page 2: (Optional) "Want to customize?" → detailed view
+Most users skip Page 2
+
+🤔 Which Appeals to You?
+Or do you have other ideas for simplifying it? I think Option 3 (remove date inputs, smart defaults) might be the sweet spot - still shows what was generated but way cleaner.
