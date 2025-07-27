@@ -1043,20 +1043,143 @@
         }, 500); // Wait for scripts to load
     });
     </script>
-    <!-- ADD THIS SCRIPT TO YOUR HTML AFTER THE COMPREHENSIVE FIX SCRIPT -->
+    <!-- ADD THIS SCRIPT AFTER YOUR SETUP REFRESH FIX SCRIPT -->
 <script>
-// Casa Care - Task Setup Page Refresh Fix
-console.log('🔧 Casa Care: Loading task setup refresh fix...');
+// Casa Care - Date Synchronization Fix
+// This fixes the disconnect between setup page dates and modal dates
+console.log('📅 Casa Care: Loading date synchronization fix...');
 
-// Wait for the main system to load
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
         
-        // Override the save function to ensure proper setup page refresh
+        // Override the task modal opening functions to sync dates properly
+        const originalOpenTaskModal = window.CasaCare ? 
+            (function() {
+                // Store reference to original modal opening logic
+                const originalAddFromSetup = window.addTaskFromSetup;
+                const originalEditFromSetup = window.editTaskFromSetup;
+                
+                // Enhanced addTaskFromSetup with date sync
+                window.addTaskFromSetup = function() {
+                    console.log('➕ Date Sync: Adding task from setup with date sync...');
+                    
+                    const maxId = Math.max(...window.tasks.map(t => t.id), 0);
+                    const newTask = {
+                        id: maxId + 1,
+                        title: '',
+                        description: '',
+                        category: 'General',
+                        frequency: 365,
+                        cost: 0,
+                        priority: 'medium',
+                        dueDate: new Date(),
+                        lastCompleted: null,
+                        isCompleted: false,
+                        isTemplate: true,
+                        isNewTask: true
+                    };
+                    
+                    window.CasaCare.modalSystem.setTask(newTask, 'setup');
+                    openTaskModalWithDateSync(newTask, true);
+                };
+                
+                // Enhanced editTaskFromSetup with date sync
+                window.editTaskFromSetup = function(taskId) {
+                    console.log('✏️ Date Sync: Editing task from setup with date sync:', taskId);
+                    
+                    const task = window.tasks.find(t => t.id === taskId);
+                    if (!task) {
+                        alert('❌ Task not found');
+                        return;
+                    }
+                    
+                    // CRITICAL: Check if task has a setup page date input and use that
+                    const setupDateInput = document.getElementById(`due-date-${taskId}`);
+                    if (setupDateInput && setupDateInput.value) {
+                        console.log('📅 Date Sync: Found setup page date input:', setupDateInput.value);
+                        // Update task with the setup page date
+                        task.dueDate = new Date(setupDateInput.value + 'T12:00:00');
+                        console.log('📅 Date Sync: Updated task due date from setup input:', task.dueDate);
+                    }
+                    
+                    window.CasaCare.modalSystem.setTask(task, 'setup');
+                    openTaskModalWithDateSync(task, false);
+                };
+                
+            })() : null;
+        
+        // Enhanced modal opening function with date sync
+        function openTaskModalWithDateSync(task, isNewTask) {
+            const modal = document.getElementById('task-edit-modal');
+            if (!modal) {
+                alert('❌ Task edit modal not found');
+                return;
+            }
+            
+            console.log('📝 Date Sync: Opening modal for task with date sync:', task);
+            
+            // Fill form fields
+            document.getElementById('edit-task-name').value = task.title || '';
+            document.getElementById('edit-task-description').value = task.description || '';
+            document.getElementById('edit-task-cost').value = task.cost || 0;
+            document.getElementById('edit-task-frequency').value = task.frequency || 365;
+            document.getElementById('edit-task-priority').value = task.priority || 'medium';
+            
+            const categoryField = document.getElementById('edit-task-category');
+            if (categoryField) {
+                categoryField.value = task.category || 'General';
+            }
+            
+            // CRITICAL: Enhanced date handling with sync
+            const dueDateInput = document.getElementById('edit-task-due-date');
+            if (dueDateInput) {
+                let dateToUse = task.dueDate;
+                
+                // For existing tasks, check if there's a setup page date input
+                if (!isNewTask && task.id) {
+                    const setupDateInput = document.getElementById(`due-date-${task.id}`);
+                    if (setupDateInput && setupDateInput.value) {
+                        console.log('📅 Date Sync: Using date from setup page input:', setupDateInput.value);
+                        dateToUse = new Date(setupDateInput.value + 'T12:00:00');
+                        // Update the task object to match
+                        task.dueDate = dateToUse;
+                    }
+                }
+                
+                const formattedDate = window.CasaCare.dateUtils.formatForInput(dateToUse);
+                dueDateInput.value = formattedDate;
+                console.log('📅 Date Sync: Set modal date input to:', formattedDate, 'from date:', dateToUse);
+            }
+            
+            // Update modal title
+            const modalTitle = document.getElementById('task-edit-title');
+            if (modalTitle) {
+                modalTitle.textContent = isNewTask ? 'Add Custom Task' : 'Edit Task';
+            }
+            
+            // Show/hide delete button
+            const deleteButton = modal.querySelector('[onclick*="deleteTaskFromEdit"]');
+            if (deleteButton) {
+                deleteButton.style.display = isNewTask ? 'none' : 'block';
+            }
+            
+            // Show modal
+            modal.classList.remove('hidden');
+            
+            // Focus on first field
+            setTimeout(() => {
+                const nameField = document.getElementById('edit-task-name');
+                if (nameField) nameField.focus();
+            }, 100);
+            
+            console.log('✅ Date Sync: Modal opened with synchronized dates');
+        }
+        
+        // Override the save function to update both modal and setup page dates
         const originalSaveTaskFromEdit = window.saveTaskFromEdit;
         
         window.saveTaskFromEdit = function() {
-            console.log('💾 Setup Fix: Enhanced save with better setup refresh...');
+            console.log('💾 Date Sync: Enhanced save with date synchronization...');
             
             const editingTask = window.CasaCare.modalSystem.getTask();
             if (!editingTask) {
@@ -1064,7 +1187,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Get and validate form values
+            // Get form values
             const title = document.getElementById('edit-task-name').value.trim();
             const description = document.getElementById('edit-task-description').value.trim();
             const costInput = document.getElementById('edit-task-cost').value;
@@ -1073,7 +1196,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const category = document.getElementById('edit-task-category')?.value || 'General';
             const dueDateInput = document.getElementById('edit-task-due-date').value;
             
-            console.log('📝 Setup Fix: Form values:', { title, description, costInput, frequencyInput, priority, category, dueDateInput });
+            console.log('📝 Date Sync: Form values:', { title, description, costInput, frequencyInput, priority, category, dueDateInput });
             
             // Validation
             if (!title) {
@@ -1097,9 +1220,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Parse due date properly
+            // CRITICAL: Parse due date and sync with setup page
             const dueDate = window.CasaCare.dateUtils.parseFromInput(dueDateInput);
-            console.log('📅 Setup Fix: Parsed due date:', dueDate, 'from input:', dueDateInput);
+            console.log('📅 Date Sync: Parsed due date from modal:', dueDate, 'from input:', dueDateInput);
             
             // Check if new task
             const isNewTask = editingTask.isNewTask || !window.tasks.find(t => t.id === editingTask.id);
@@ -1120,69 +1243,66 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (isNewTask) {
                 window.tasks.push(editingTask);
-                console.log('✅ Setup Fix: New task added:', editingTask);
+                console.log('✅ Date Sync: New task added:', editingTask);
             } else {
                 const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
                 if (taskIndex > -1) {
                     window.tasks[taskIndex] = editingTask;
-                    console.log('✅ Setup Fix: Existing task updated at index', taskIndex);
+                    console.log('✅ Date Sync: Existing task updated at index', taskIndex);
                 }
             }
             
-            // ENHANCED: Context-specific actions with better setup handling
+            // CRITICAL: Sync the setup page date input if it exists
+            const setupDateInput = document.getElementById(`due-date-${editingTask.id}`);
+            if (setupDateInput) {
+                const syncedDateValue = window.CasaCare.dateUtils.formatForInput(dueDate);
+                setupDateInput.value = syncedDateValue;
+                console.log('📅 Date Sync: Synced setup page date input to:', syncedDateValue);
+            }
+            
+            // Context-specific refresh
             const context = window.CasaCare.modalSystem.context;
-            console.log('🔍 Setup Fix: Saving in context:', context);
+            console.log('🔍 Date Sync: Saving in context:', context);
             
             if (context === 'setup') {
-                console.log('🔄 Setup Fix: Refreshing task setup page...');
+                console.log('🔄 Date Sync: Refreshing setup page with date sync...');
                 
                 // Force update the global tasks reference
-                window.tasks = [...window.tasks]; // Create new array reference
+                window.tasks = [...window.tasks];
                 
-                // Try multiple refresh strategies
+                // Multiple refresh strategies with date sync
                 try {
-                    // Strategy 1: Direct renderTaskCategories call
                     if (typeof renderTaskCategories === 'function') {
-                        console.log('🔄 Setup Fix: Calling renderTaskCategories...');
+                        console.log('🔄 Date Sync: Calling renderTaskCategories...');
                         renderTaskCategories();
                     }
                     
-                    // Strategy 2: Force re-render by calling showTaskSetup
-                    if (typeof showTaskSetup === 'function') {
-                        console.log('🔄 Setup Fix: Calling showTaskSetup...');
-                        setTimeout(() => showTaskSetup(), 100);
-                    }
-                    
-                    // Strategy 3: Manual DOM update if functions don't work
+                    // Also call the force refresh
                     setTimeout(() => {
-                        console.log('🔄 Setup Fix: Manual refresh check...');
-                        forceSetupPageRefresh();
-                    }, 200);
+                        console.log('🔄 Date Sync: Force refreshing with date sync...');
+                        syncAllSetupPageDates();
+                    }, 100);
                     
                 } catch (error) {
-                    console.error('❌ Setup Fix: Error during setup refresh:', error);
-                    // Fallback: manual refresh
-                    forceSetupPageRefresh();
+                    console.error('❌ Date Sync: Error during setup refresh:', error);
                 }
                 
             } else {
-                // Dashboard context - save data and refresh dashboard/calendar
+                // Dashboard context
                 try {
                     if (typeof window.saveData === 'function') {
                         window.saveData();
                     }
-                    
                     if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
                         window.enhancedDashboard.render();
                     } else if (typeof updateDashboard === 'function') {
                         updateDashboard();
                     }
-                    
                     if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
                         window.casaCareCalendar.refresh();
                     }
                 } catch (error) {
-                    console.error('❌ Setup Fix: Error during dashboard refresh:', error);
+                    console.error('❌ Date Sync: Error during dashboard refresh:', error);
                 }
             }
             
@@ -1193,154 +1313,78 @@ document.addEventListener('DOMContentLoaded', function() {
             alert(`✅ Task "${title}" ${actionText} successfully!\nDue: ${window.CasaCare.dateUtils.formatForDisplay(dueDate)}`);
         };
         
-        // Force setup page refresh function
-        function forceSetupPageRefresh() {
-            console.log('🔄 Setup Fix: Force refreshing setup page...');
+        // Function to sync all setup page date inputs with task objects
+        function syncAllSetupPageDates() {
+            console.log('🔄 Date Sync: Syncing all setup page dates...');
             
-            // Check if we're on the setup page
-            const taskSetup = document.getElementById('task-setup');
-            if (!taskSetup || taskSetup.classList.contains('hidden')) {
-                console.log('📋 Setup Fix: Not on setup page, skipping manual refresh');
-                return;
-            }
-            
-            // Re-render task categories manually
-            const taskCategoriesContainer = document.getElementById('task-categories');
-            if (!taskCategoriesContainer) {
-                console.log('❌ Setup Fix: Task categories container not found');
-                return;
-            }
-            
-            try {
-                console.log('🔄 Setup Fix: Manual task categories refresh...');
-                console.log('📊 Setup Fix: Current tasks count:', window.tasks.length);
-                
-                // Call the original render function with force flag
-                if (typeof renderTaskCategories === 'function') {
-                    renderTaskCategories();
-                    console.log('✅ Setup Fix: renderTaskCategories called successfully');
-                } else {
-                    console.log('⚠️ Setup Fix: renderTaskCategories function not available');
-                    
-                    // Last resort: trigger a re-render by updating stats
-                    updateTaskSummaryStats();
-                }
-                
-            } catch (error) {
-                console.error('❌ Setup Fix: Error in manual refresh:', error);
-            }
-        }
-        
-        // Update task summary stats
-        function updateTaskSummaryStats() {
-            const taskSummaryStats = document.getElementById('task-summary-stats');
-            if (!taskSummaryStats) return;
-            
-            const totalTasks = window.tasks.length;
-            const totalCost = window.tasks.reduce((sum, task) => sum + (task.cost * (365 / task.frequency)), 0);
-            const highPriorityTasks = window.tasks.filter(t => t.priority === 'high').length;
-            const seasonalTasksCount = window.tasks.filter(t => t.category === 'Seasonal').length;
-
-            taskSummaryStats.innerHTML = `
-                <div class="text-center">
-                    <div class="text-lg font-bold text-gray-900">${totalTasks}</div>
-                    <div class="text-xs text-gray-600">Total Tasks</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
-                    <div class="text-xs text-gray-600">Annual Cost</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-lg font-bold text-red-600">${highPriorityTasks}</div>
-                    <div class="text-xs text-gray-600">High Priority</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-lg font-bold text-purple-600">${seasonalTasksCount}</div>
-                    <div class="text-xs text-gray-600">Seasonal Tasks</div>
-                </div>
-            `;
-            
-            console.log('📊 Setup Fix: Task summary stats updated');
-        }
-        
-        // Also override the delete function for setup page
-        const originalDeleteTaskFromEdit = window.deleteTaskFromEdit;
-        
-        window.deleteTaskFromEdit = function() {
-            const editingTask = window.CasaCare.modalSystem.getTask();
-            if (!editingTask) {
-                alert('❌ No task selected for deletion');
-                return;
-            }
-            
-            const taskTitle = editingTask.title || 'Untitled Task';
-            
-            if (confirm(`Are you sure you want to delete "${taskTitle}"?`)) {
-                const taskIndex = window.tasks.findIndex(t => t.id === editingTask.id);
-                if (taskIndex > -1) {
-                    window.tasks.splice(taskIndex, 1);
-                    console.log('🗑️ Setup Fix: Task deleted:', taskTitle);
-                    
-                    // Context-specific refresh with enhanced setup handling
-                    const context = window.CasaCare.modalSystem.context;
-                    if (context === 'setup') {
-                        console.log('🔄 Setup Fix: Refreshing after delete...');
-                        
-                        // Force update the global tasks reference
-                        window.tasks = [...window.tasks];
-                        
-                        // Multiple refresh strategies
-                        if (typeof renderTaskCategories === 'function') {
-                            renderTaskCategories();
-                        }
-                        setTimeout(() => forceSetupPageRefresh(), 100);
-                        
-                    } else {
-                        // Dashboard refresh
-                        try {
-                            if (typeof window.saveData === 'function') {
-                                window.saveData();
-                            }
-                            if (window.enhancedDashboard) {
-                                window.enhancedDashboard.render();
-                            }
-                            if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-                                window.casaCareCalendar.refresh();
-                            }
-                        } catch (error) {
-                            console.error('❌ Setup Fix: Error during delete refresh:', error);
-                        }
+            window.tasks.forEach(task => {
+                const setupDateInput = document.getElementById(`due-date-${task.id}`);
+                if (setupDateInput && task.dueDate) {
+                    const syncedValue = window.CasaCare.dateUtils.formatForInput(task.dueDate);
+                    if (setupDateInput.value !== syncedValue) {
+                        setupDateInput.value = syncedValue;
+                        console.log(`📅 Date Sync: Synced task ${task.id} date input to:`, syncedValue);
                     }
-                    
-                    window.closeTaskEditModal();
-                    alert(`✅ Task "${taskTitle}" deleted successfully!`);
                 }
-            }
-        };
+            });
+        }
+        
+        // Override the updateTaskDueDate function to sync with task objects
+        if (typeof window.updateTaskDueDate === 'function') {
+            const originalUpdateTaskDueDate = window.updateTaskDueDate;
+            
+            window.updateTaskDueDate = function(taskId, dueDateStr) {
+                console.log(`📅 Date Sync: Updating task ${taskId} due date to: ${dueDateStr}`);
+                
+                // Call original function
+                originalUpdateTaskDueDate(taskId, dueDateStr);
+                
+                // Also update the actual task object
+                const task = window.tasks.find(t => t.id === taskId);
+                if (task && dueDateStr) {
+                    const newDate = new Date(dueDateStr + 'T12:00:00');
+                    if (!isNaN(newDate.getTime())) {
+                        task.dueDate = newDate;
+                        task.nextDue = newDate;
+                        console.log(`📅 Date Sync: Updated task object date to:`, newDate);
+                    }
+                }
+            };
+        }
         
         // Test function
-        window.testSetupRefresh = function() {
-            console.log('🧪 TESTING SETUP REFRESH:');
+        window.testDateSync = function() {
+            console.log('🧪 TESTING DATE SYNCHRONIZATION:');
             console.log('  Current context:', window.CasaCare?.modalSystem?.context || 'unknown');
-            console.log('  On setup page:', !document.getElementById('task-setup')?.classList.contains('hidden'));
             console.log('  Tasks count:', window.tasks?.length || 0);
-            console.log('  renderTaskCategories available:', typeof renderTaskCategories === 'function');
-            console.log('  showTaskSetup available:', typeof showTaskSetup === 'function');
-            console.log('  Task categories container:', document.getElementById('task-categories') ? '✅' : '❌');
-            console.log('  Task summary stats container:', document.getElementById('task-summary-stats') ? '✅' : '❌');
             
-            // Test manual refresh
-            if (!document.getElementById('task-setup')?.classList.contains('hidden')) {
-                console.log('🔄 Testing manual refresh...');
-                forceSetupPageRefresh();
+            // Check task dates
+            if (window.tasks && window.tasks.length > 0) {
+                console.log('📅 Task dates:');
+                window.tasks.forEach((task, index) => {
+                    const setupDateInput = document.getElementById(`due-date-${task.id}`);
+                    const setupInputValue = setupDateInput ? setupDateInput.value : 'no input';
+                    const taskDueDate = task.dueDate ? window.CasaCare.dateUtils.formatForDisplay(task.dueDate) : 'no date';
+                    const formattedForInput = task.dueDate ? window.CasaCare.dateUtils.formatForInput(task.dueDate) : 'no date';
+                    
+                    console.log(`  Task ${task.id} (${task.title || 'untitled'}):`);
+                    console.log(`    Setup input: ${setupInputValue}`);
+                    console.log(`    Task object: ${taskDueDate}`);
+                    console.log(`    Formatted: ${formattedForInput}`);
+                    console.log(`    Match: ${setupInputValue === formattedForInput ? '✅' : '❌'}`);
+                });
             }
+            
+            // Test sync function
+            console.log('🔄 Testing sync...');
+            syncAllSetupPageDates();
         };
         
-        console.log('✅ Setup Fix: Task setup refresh enhancement loaded!');
-        console.log('💡 Run testSetupRefresh() to test setup page refresh');
+        console.log('✅ Date Sync: Date synchronization fix loaded!');
+        console.log('💡 Run testDateSync() to check date synchronization');
         
-    }, 600); // Wait for main system to load first
+    }, 700); // Wait for previous scripts to load
 });
 </script>
-</body>
+  </body>
 </html>
