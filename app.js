@@ -104,19 +104,13 @@ function createMaintenancePlan() {
         window.homeData = homeData;
         window.tasks = tasks;
 
-        // Skip task setup, go straight to dashboard
-document.getElementById('setup-form').style.display = 'none';
-document.getElementById('main-app').classList.remove('hidden');
-document.getElementById('header-subtitle').textContent = homeData.fullAddress;
-
-// Update global references
-window.homeData = homeData;
-window.tasks = tasks;
-
-// Show dashboard
-showTab('dashboard');
-
-console.log('✅ Setup complete! Going straight to dashboard');
+        // Show task setup
+        document.getElementById('setup-form').style.display = 'none';
+        document.getElementById('task-setup').classList.remove('hidden');
+        showTaskSetup();
+        
+        console.log('✅ Successfully moved to task setup screen');
+        
     } catch (error) {
         console.error('❌ Error in createMaintenancePlan:', error);
         alert('❌ Error creating maintenance plan. Check console for details.');
@@ -625,6 +619,17 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
     }
 
     return regionalTasks;
+}
+
+// Show task setup screen
+function showTaskSetup() {
+    console.log('📋 Showing task setup screen...');
+    
+    // Update property summary
+    updatePropertySummary();
+    
+    // Render task categories
+    renderTaskCategories();
 }
 
 // Update property summary
