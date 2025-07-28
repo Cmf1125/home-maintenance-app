@@ -1,4 +1,4 @@
-// Calendar functionality for Casa Care
+// Calendar functionality for The Home Keeper
 class CasaCareCalendar {
     constructor() {
         this.currentDate = new Date();
