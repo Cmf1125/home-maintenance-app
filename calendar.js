@@ -68,19 +68,6 @@ class CasaCareCalendar {
                     <div id="calendar-days" class="calendar-days-container"></div>
                 </div>
 
-                <!-- Debug Info -->
-                <div class="p-4 bg-gray-100 text-sm">
-                    <strong>Debug Info:</strong> 
-                    <span id="debug-info">Loading...</span>
-                    <br>
-                    <strong>Task Date Range:</strong> 
-                    <span id="date-range-info">Calculating...</span>
-                    <br>
-                    <button onclick="window.casaCareCalendar.goToTaskMonth()" class="bg-blue-500 text-white px-2 py-1 rounded text-xs mt-1">
-                        Go to First Task Month
-                    </button>
-                </div>
-
                 <!-- Selected Day Panel -->
                 <div id="selected-day-panel" class="selected-day-panel hidden">
                     <div class="selected-day-header">
@@ -114,33 +101,6 @@ class CasaCareCalendar {
     renderCalendar() {
         this.updateMonthYearDisplay();
         this.renderCalendarDays();
-        this.updateDebugInfo();
-    }
-
-    updateDebugInfo() {
-        const debugElement = document.getElementById('debug-info');
-        const dateRangeElement = document.getElementById('date-range-info');
-        
-        if (debugElement) {
-            const taskCount = window.tasks ? window.tasks.length : 0;
-            const tasksWithDates = window.tasks ? window.tasks.filter(t => t.nextDue).length : 0;
-            debugElement.textContent = `${taskCount} total tasks, ${tasksWithDates} with due dates`;
-        }
-
-        if (dateRangeElement && window.tasks) {
-            const taskDates = window.tasks
-                .filter(t => t.nextDue)
-                .map(t => t.nextDue instanceof Date ? t.nextDue : new Date(t.nextDue))
-                .sort((a, b) => a - b);
-            
-            if (taskDates.length > 0) {
-                const firstDate = taskDates[0].toDateString();
-                const lastDate = taskDates[taskDates.length - 1].toDateString();
-                dateRangeElement.textContent = `${firstDate} to ${lastDate}`;
-            } else {
-                dateRangeElement.textContent = 'No tasks with dates';
-            }
-        }
     }
 
     goToTaskMonth() {
