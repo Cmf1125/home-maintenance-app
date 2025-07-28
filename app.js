@@ -1503,17 +1503,13 @@ function saveTaskFromEdit() {
     const dueDateInput = document.getElementById('edit-task-due-date');
     
     // Validate inputs
-    if (!title) {
-        alert('❌ Task name is required');
-        document.getElementById('edit-task-name').focus();
-        return;
-    }
-    
-    if (!description) {
-        alert('❌ Task description is required');
-        document.getElementById('edit-task-description').focus();
-        return;
-    }
+if (!title) {
+    alert('❌ Task name is required');
+    document.getElementById('edit-task-name').focus();
+    return;
+}
+
+// Description is now optional - no validation needed
     
     if (frequency <= 0) {
         alert('❌ Frequency must be greater than 0');
