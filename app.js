@@ -1,4 +1,4 @@
-// Casa Care App - Clean Simple Version with All Fixes
+// The Home Keeper App - Clean Simple Version with All Fixes
 // App data
 let homeData = {};
 let tasks = [];
@@ -1653,13 +1653,157 @@ function deleteTaskFromEdit() {
 }
 
 // Utility functions
+// Enhanced Home Info Functions - Replace the existing showHomeInfo function
+
+/**
+ * Open editable home info modal instead of simple alert
+ */
 function showHomeInfo() {
-    if (homeData.fullAddress) {
-        alert(`🏠 Home Info\n\n${homeData.fullAddress}\nBuilt: ${homeData.yearBuilt} • ${homeData.sqft?.toLocaleString()} sq ft`);
-    } else {
+    console.log('🏠 Opening editable home info modal...');
+    
+    if (!homeData.fullAddress) {
         alert('🏠 No home information set yet. Complete the setup to add your home details.');
+        return;
     }
+    
+    // Open the modal
+    const modal = document.getElementById('home-info-modal');
+    if (!modal) {
+        console.error('❌ Home info modal not found');
+        alert('❌ Cannot edit home info: Modal not available.');
+        return;
+    }
+    
+    // Populate the form with current data
+    populateHomeInfoForm();
+    
+    // Show modal
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    
+    console.log('✅ Home info modal opened');
 }
+
+/**
+ * Populate the home info form with current data
+ */
+function populateHomeInfoForm() {
+    const fields = [
+        ['edit-home-address', homeData.address || ''],
+        ['edit-home-city', homeData.city || ''],
+        ['edit-home-state', homeData.state || ''],
+        ['edit-home-zipcode', homeData.zipcode || ''],
+        ['edit-home-property-type', homeData.propertyType || 'single-family'],
+        ['edit-home-year-built', homeData.yearBuilt || 2000],
+        ['edit-home-sqft', homeData.sqft || 2000]
+    ];
+    
+    fields.forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.value = value;
+        } else {
+            console.warn(`⚠️ Element not found: ${id}`);
+        }
+    });
+    
+    console.log('📝 Home info form populated with current data');
+}
+
+/**
+ * Close the home info modal
+ */
+function closeHomeInfoModal() {
+    const modal = document.getElementById('home-info-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    }
+    console.log('✅ Home info modal closed');
+}
+
+/**
+ * Save the updated home information
+ */
+function saveHomeInfo() {
+    console.log('💾 Saving updated home information...');
+    
+    // Get form values
+    const newAddress = document.getElementById('edit-home-address').value.trim();
+    const newCity = document.getElementById('edit-home-city').value.trim();
+    const newState = document.getElementById('edit-home-state').value.trim();
+    const newZipcode = document.getElementById('edit-home-zipcode').value.trim();
+    const newPropertyType = document.getElementById('edit-home-property-type').value;
+    const newYearBuilt = parseInt(document.getElementById('edit-home-year-built').value) || 2000;
+    const newSqft = parseInt(document.getElementById('edit-home-sqft').value) || 2000;
+    
+    // Validate required fields
+    if (!newAddress || !newCity || !newState || !newZipcode) {
+        alert('❌ Please fill in all address fields');
+        return;
+    }
+    
+    if (newState.length !== 2) {
+        alert('❌ State must be 2 letters (e.g., NY, CA, TX)');
+        document.getElementById('edit-home-state').focus();
+        return;
+    }
+    
+    // Update homeData object
+    const oldAddress = homeData.fullAddress;
+    
+    homeData.address = newAddress;
+    homeData.city = newCity;
+    homeData.state = newState.toUpperCase();
+    homeData.zipcode = newZipcode;
+    homeData.propertyType = newPropertyType;
+    homeData.yearBuilt = newYearBuilt;
+    homeData.sqft = newSqft;
+    homeData.fullAddress = `${newAddress}, ${newCity}, ${homeData.state} ${newZipcode}`;
+    
+    // Update global reference
+    window.homeData = homeData;
+    
+    // Save to storage
+    try {
+        saveData();
+        console.log('💾 Home data saved successfully');
+    } catch (error) {
+        console.error('❌ Error saving home data:', error);
+        alert('❌ Error saving changes. Please try again.');
+        return;
+    }
+    
+    // Update UI elements that show the address
+    const headerSubtitle = document.getElementById('header-subtitle');
+    if (headerSubtitle) {
+        headerSubtitle.textContent = homeData.fullAddress;
+    }
+    
+    const homeAddressElement = document.getElementById('home-address');
+    if (homeAddressElement) {
+        homeAddressElement.textContent = `Managing maintenance for ${homeData.fullAddress}`;
+    }
+    
+    // Close modal
+    closeHomeInfoModal();
+    
+    // Show success message
+    const addressChanged = oldAddress !== homeData.fullAddress;
+    if (addressChanged) {
+        alert(`✅ Home information updated!\n\nNew address: ${homeData.fullAddress}\n\nYour existing tasks and schedules remain unchanged.`);
+    } else {
+        alert(`✅ Home information updated successfully!\n\nProperty details have been saved.`);
+    }
+    
+    console.log('✅ Home information updated:', homeData.fullAddress);
+}
+
+// Make functions globally available
+window.showHomeInfo = showHomeInfo;
+window.closeHomeInfoModal = closeHomeInfoModal;
+window.saveHomeInfo = saveHomeInfo;
+window.populateHomeInfoForm = populateHomeInfoForm;
 
 function clearData() {
     if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
