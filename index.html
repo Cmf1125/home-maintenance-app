@@ -716,10 +716,7 @@
                 alert('❌ Title required');
                 return;
             }
-            if (!description) {
-                alert('❌ Description required');
-                return;
-            }
+
             
             // Create date
             const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
