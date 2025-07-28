@@ -1759,7 +1759,7 @@ function hasExistingData() {
 
 // Enhanced initialization
 function initializeApp() {
-    console.log('🏠 Casa Care CLEAN SIMPLE VERSION WITH ALL FIXES initializing...');
+    console.log('🏠 The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initializing...');
     
     // Make well water function available globally ASAP
     window.toggleWellWaterOptions = toggleWellWaterOptions;
@@ -1797,7 +1797,7 @@ function initializeApp() {
    // ADD THIS LINE at the end:
     initializeDateManagement();
     
-    console.log('✅ Casa Care CLEAN SIMPLE VERSION WITH ALL FIXES initialized successfully!');
+    console.log('✅ The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initialized successfully!');
 }
 
 // Export functions to global scope
@@ -1824,7 +1824,7 @@ if (document.readyState !== 'loading') {
     initializeApp();
 }
 
-console.log('🏠 Casa Care CLEAN SIMPLE VERSION WITH ALL FIXES script loaded successfully!');
+console.log('🏠 The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES script loaded successfully!');
 // ========================================
 // STEP 3: CALENDAR-SAFE DATE MANAGEMENT SYSTEM
 // Enhances existing calendar sync with utilities and safety checks
@@ -2258,7 +2258,7 @@ CasaCare.debug = {
 const originalInitializeApp = typeof initializeApp !== 'undefined' ? initializeApp : function() {};
 
 function initializeAppWithNamespace() {
-    console.log('🏠 Casa Care ORGANIZED VERSION initializing...');
+    console.log('🏠 The Home Keeper ORGANIZED VERSION initializing...');
     
     // Call original initialization
     if (typeof originalInitializeApp === 'function') {
@@ -2281,7 +2281,7 @@ function initializeAppWithNamespace() {
         }
     }, 100);
     
-    console.log('✅ Casa Care organized namespace initialized');
+    console.log('✅ The Home Keeper organized namespace initialized');
     console.log('📋 Available namespaces:', Object.keys(CasaCare));
 }
 
