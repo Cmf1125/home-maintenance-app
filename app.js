@@ -1208,7 +1208,7 @@ function updateDashboard() {
     // Update home address
     const homeAddressElement = document.getElementById('home-address');
     if (homeAddressElement && window.homeData) {
-        homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
+       homeAddressElement.textContent = window.homeData.fullAddress;
     }
     
     console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
