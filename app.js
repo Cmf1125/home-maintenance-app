@@ -2266,6 +2266,9 @@ CasaCare.utils = {
     showHomeInfo: typeof showHomeInfo !== 'undefined' ? showHomeInfo : function() { console.warn('showHomeInfo not defined'); },
     clearData: typeof clearData !== 'undefined' ? clearData : function() { console.warn('clearData not defined'); },
     exportData: typeof exportData !== 'undefined' ? exportData : function() { console.warn('exportData not defined'); },
+    closeHomeInfoModal: typeof closeHomeInfoModal !== 'undefined' ? closeHomeInfoModal : function() { console.warn('closeHomeInfoModal not defined'); },
+    saveHomeInfo: typeof saveHomeInfo !== 'undefined' ? saveHomeInfo : function() { console.warn('saveHomeInfo not defined'); },
+    populateHomeInfoForm: typeof populateHomeInfoForm !== 'undefined' ? populateHomeInfoForm : function() { console.warn('populateHomeInfoForm not defined'); },
     
     // Date management utilities (from Step 3)
     setTaskDate: setTaskDate,
