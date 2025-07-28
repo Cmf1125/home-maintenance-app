@@ -2057,3 +2057,252 @@ window.completeTaskSafe = completeTaskSafe;
 window.initializeDateManagement = initializeDateManagement;
 
 console.log('✅ Step 3: Calendar-safe date management system loaded');
+// ========================================
+// STEP 4: ORGANIZED NAMESPACE SYSTEM
+// Keeps calendar-critical functions global, organizes UI functions under namespace
+// ========================================
+
+// Create main app namespace
+window.CasaCare = window.CasaCare || {};
+
+console.log('🏗️ Setting up organized namespace system...');
+
+// ========================================
+// KEEP THESE GLOBAL (CALENDAR CRITICAL) ✅
+// ========================================
+
+// These MUST stay global for calendar synchronization:
+// window.completeTask - already set by date management system ✅
+// window.saveData - already global ✅
+// window.loadData - already global ✅
+// window.tasks - already global ✅
+// window.homeData - already global ✅
+
+// These are called by HTML onclick handlers, must stay global:
+// window.createMaintenancePlan - already global ✅
+// window.finishTaskSetup - already global ✅
+// window.showTab - already global ✅
+// window.toggleWellWaterOptions - already global ✅
+
+// ========================================
+// ORGANIZE UNDER NAMESPACE (UI FUNCTIONS) 🏗️
+// ========================================
+
+// Setup and navigation functions
+CasaCare.setup = {
+    goBackToHomeSetup: typeof goBackToHomeSetup !== 'undefined' ? goBackToHomeSetup : function() { console.warn('goBackToHomeSetup not defined'); },
+    addTaskFromSetup: typeof addTaskFromSetup !== 'undefined' ? addTaskFromSetup : function() { console.warn('addTaskFromSetup not defined'); },
+    editTaskFromSetup: typeof editTaskFromSetup !== 'undefined' ? editTaskFromSetup : function() { console.warn('editTaskFromSetup not defined'); },
+    deleteTaskDirect: typeof deleteTaskDirect !== 'undefined' ? deleteTaskDirect : function() { console.warn('deleteTaskDirect not defined'); }
+};
+
+// Dashboard functions  
+CasaCare.dashboard = {
+    addTaskFromDashboard: typeof addTaskFromDashboard !== 'undefined' ? addTaskFromDashboard : function() { console.warn('addTaskFromDashboard not defined'); },
+    editTaskFromDashboard: typeof editTaskFromDashboard !== 'undefined' ? editTaskFromDashboard : function() { console.warn('editTaskFromDashboard not defined'); },
+    rescheduleTaskFromDashboard: typeof rescheduleTaskFromDashboard !== 'undefined' ? rescheduleTaskFromDashboard : function() { console.warn('rescheduleTaskFromDashboard not defined'); },
+    exportTaskList: typeof exportTaskList !== 'undefined' ? exportTaskList : function() { console.warn('exportTaskList not defined'); }
+};
+
+// Modal management
+CasaCare.modals = {
+    openTaskEditModal: typeof openTaskEditModal !== 'undefined' ? openTaskEditModal : function() { console.warn('openTaskEditModal not defined'); },
+    closeTaskEditModal: typeof closeTaskEditModal !== 'undefined' ? closeTaskEditModal : function() { console.warn('closeTaskEditModal not defined'); },
+    saveTaskFromEdit: typeof saveTaskFromEdit !== 'undefined' ? saveTaskFromEdit : function() { console.warn('saveTaskFromEdit not defined'); },
+    deleteTaskFromEdit: typeof deleteTaskFromEdit !== 'undefined' ? deleteTaskFromEdit : function() { console.warn('deleteTaskFromEdit not defined'); },
+    
+    // Date picker modal functions
+    closeDatePickerModal: typeof closeDatePickerModal !== 'undefined' ? closeDatePickerModal : function() { console.warn('closeDatePickerModal not defined'); },
+    setQuickDate: typeof setQuickDate !== 'undefined' ? setQuickDate : function() { console.warn('setQuickDate not defined'); },
+    confirmReschedule: typeof confirmReschedule !== 'undefined' ? confirmReschedule : function() { console.warn('confirmReschedule not defined'); }
+};
+
+// Utility functions
+CasaCare.utils = {
+    showHomeInfo: typeof showHomeInfo !== 'undefined' ? showHomeInfo : function() { console.warn('showHomeInfo not defined'); },
+    clearData: typeof clearData !== 'undefined' ? clearData : function() { console.warn('clearData not defined'); },
+    exportData: typeof exportData !== 'undefined' ? exportData : function() { console.warn('exportData not defined'); },
+    
+    // Date management utilities (from Step 3)
+    setTaskDate: setTaskDate,
+    calculateNextDueDate: calculateNextDueDate,
+    ensureTaskDateConsistency: ensureTaskDateConsistency,
+    migrateTaskDates: migrateTaskDates
+};
+
+// Component instances (these stay global for inter-component communication)
+CasaCare.components = {
+    enhancedDashboard: null, // Will be set when dashboard initializes
+    calendar: null, // Will be set when calendar initializes  
+    documents: null // Will be set when documents initializes
+};
+
+// ========================================
+// DEBUGGING AND DIAGNOSTICS 🔍
+// ========================================
+
+CasaCare.debug = {
+    listGlobalFunctions: function() {
+        console.log('🌍 GLOBAL FUNCTIONS (Calendar Critical):');
+        const criticalGlobals = [
+            'completeTask', 'saveData', 'loadData', 'tasks', 'homeData',
+            'createMaintenancePlan', 'finishTaskSetup', 'showTab', 'toggleWellWaterOptions'
+        ];
+        
+        criticalGlobals.forEach(name => {
+            const exists = typeof window[name] !== 'undefined';
+            const type = typeof window[name];
+            console.log(`  ${name}: ${exists ? '✅' : '❌'} (${type})`);
+        });
+    },
+    
+    listNamespacedFunctions: function() {
+        console.log('🏗️ NAMESPACED FUNCTIONS:');
+        Object.keys(CasaCare).forEach(namespace => {
+            if (typeof CasaCare[namespace] === 'object' && namespace !== 'debug') {
+                console.log(`  CasaCare.${namespace}:`, Object.keys(CasaCare[namespace]));
+            }
+        });
+    },
+    
+    testCalendarSync: function() {
+        console.log('📅 TESTING CALENDAR SYNC:');
+        
+        // Test tasks array
+        const tasksExist = Array.isArray(window.tasks);
+        console.log(`  window.tasks: ${tasksExist ? '✅' : '❌'} (${tasksExist ? window.tasks.length : 0} tasks)`);
+        
+        // Test date consistency
+        if (tasksExist && window.tasks.length > 0) {
+            let syncedCount = 0;
+            let totalWithDates = 0;
+            
+            window.tasks.forEach(task => {
+                if (task.dueDate || task.nextDue) {
+                    totalWithDates++;
+                    if (task.dueDate && task.nextDue) {
+                        const dueTime = new Date(task.dueDate).getTime();
+                        const nextTime = new Date(task.nextDue).getTime();
+                        if (Math.abs(dueTime - nextTime) <= 1000) {
+                            syncedCount++;
+                        }
+                    }
+                }
+            });
+            
+            console.log(`  Date sync status: ${syncedCount}/${totalWithDates} tasks synced (${syncedCount === totalWithDates ? '✅ PERFECT' : '⚠️ NEEDS ATTENTION'})`);
+        }
+        
+        // Test calendar object
+        const calendarExists = typeof window.casaCareCalendar === 'object' && window.casaCareCalendar !== null;
+        console.log(`  window.casaCareCalendar: ${calendarExists ? '✅' : '❌'}`);
+        
+        // Test complete task function
+        const completeTaskExists = typeof window.completeTask === 'function';
+        console.log(`  window.completeTask: ${completeTaskExists ? '✅' : '❌'}`);
+        
+        // Test enhanced dashboard
+        const dashboardExists = typeof window.enhancedDashboard === 'object' && window.enhancedDashboard !== null;
+        console.log(`  window.enhancedDashboard: ${dashboardExists ? '✅' : '❌'}`);
+        
+        return {
+            tasksArray: tasksExist,
+            calendarObject: calendarExists, 
+            completeTaskFunction: completeTaskExists,
+            dashboardObject: dashboardExists,
+            tasksCount: tasksExist ? window.tasks.length : 0,
+            syncStatus: tasksExist && window.tasks.length > 0 ? 'tested' : 'no-tasks'
+        };
+    },
+    
+    fixDateSync: function() {
+        console.log('🔧 ATTEMPTING TO FIX DATE SYNC ISSUES...');
+        
+        if (!window.tasks || !Array.isArray(window.tasks)) {
+            console.log('❌ No tasks array found');
+            return false;
+        }
+        
+        const fixed = ensureTaskDateConsistency(window.tasks);
+        
+        if (fixed > 0) {
+            try {
+                saveData();
+                console.log(`✅ Fixed ${fixed} tasks and saved data`);
+                
+                // Refresh displays
+                if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
+                    window.enhancedDashboard.render();
+                }
+                if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+                    window.casaCareCalendar.refresh();
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('❌ Error saving fixes:', error);
+                return false;
+            }
+        } else {
+            console.log('✅ No sync issues found - all tasks are properly synchronized');
+            return true;
+        }
+    }
+};
+
+// ========================================
+// COMPONENT REFERENCE UPDATES 🔗
+// ========================================
+
+// Update component references when they initialize
+const originalInitializeApp = typeof initializeApp !== 'undefined' ? initializeApp : function() {};
+
+function initializeAppWithNamespace() {
+    console.log('🏠 Casa Care ORGANIZED VERSION initializing...');
+    
+    // Call original initialization
+    if (typeof originalInitializeApp === 'function') {
+        originalInitializeApp();
+    }
+    
+    // Set up component references after a short delay to ensure they're created
+    setTimeout(() => {
+        if (window.enhancedDashboard) {
+            CasaCare.components.enhancedDashboard = window.enhancedDashboard;
+            console.log('🎯 Enhanced dashboard linked to namespace');
+        }
+        if (window.casaCareCalendar) {
+            CasaCare.components.calendar = window.casaCareCalendar;
+            console.log('📅 Calendar linked to namespace');
+        }
+        if (window.casaCareDocuments) {
+            CasaCare.components.documents = window.casaCareDocuments;
+            console.log('📄 Documents linked to namespace');
+        }
+    }, 100);
+    
+    console.log('✅ Casa Care organized namespace initialized');
+    console.log('📋 Available namespaces:', Object.keys(CasaCare));
+}
+
+// Update the global initializeApp reference
+window.initializeApp = initializeAppWithNamespace;
+
+// ========================================
+// MAKE DEBUG FUNCTIONS EASILY ACCESSIBLE 🧪
+// ========================================
+
+// Make the main debug function globally available (this was missing before!)
+window.debugCasaCare = CasaCare.debug.testCalendarSync;
+window.fixCalendarSync = CasaCare.debug.fixDateSync;
+window.listGlobalFunctions = CasaCare.debug.listGlobalFunctions;
+window.listNamespacedFunctions = CasaCare.debug.listNamespacedFunctions;
+
+// ========================================
+// FINAL INITIALIZATION 🚀
+// ========================================
+
+console.log('✅ Step 4: Namespace cleanup completed - calendar functions preserved');
+console.log('🧪 Debug tools available: debugCasaCare(), fixCalendarSync(), listGlobalFunctions()');
+console.log('🏗️ Organized namespaces: CasaCare.setup, CasaCare.dashboard, CasaCare.modals, CasaCare.utils');
+console.log('💡 Your calendar synchronization is protected and enhanced!');
