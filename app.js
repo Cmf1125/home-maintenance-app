@@ -6,14 +6,12 @@ let currentEditingTask = null;
 
 // CRITICAL FIX 1: Well water dropdown - Make function available immediately
 function toggleWellWaterOptions() {
-    console.log('🔧 Toggling well water options...');
     const wellWaterCheckbox = document.getElementById('well-water');
     const wellWaterOptions = document.getElementById('well-water-options');
     
     if (wellWaterCheckbox && wellWaterOptions) {
         if (wellWaterCheckbox.checked) {
             wellWaterOptions.classList.remove('hidden');
-            console.log('✅ Well water options shown');
         } else {
             wellWaterOptions.classList.add('hidden');
             // Uncheck all sub-options
@@ -22,10 +20,10 @@ function toggleWellWaterOptions() {
                 const element = document.getElementById(id);
                 if (element) element.checked = false;
             });
-            console.log('✅ Well water options hidden and cleared');
+
         }
     } else {
-        console.warn('⚠️ Well water elements not found');
+        
     }
 }
 
@@ -55,7 +53,7 @@ function getClimateRegion(state) {
 
 // Create maintenance plan
 function createMaintenancePlan() {
-    console.log('🔧 Creating maintenance plan...');
+   
     
     try {
         // Collect home data
@@ -93,12 +91,11 @@ function createMaintenancePlan() {
             otherFeatures: document.getElementById('other-features')?.value || ''
         };
 
-        console.log('🏠 Home data collected:', homeData);
-        console.log('🏠 Features collected:', homeData.features);
+    
 
         // Generate tasks
         generateTaskTemplates();
-        console.log('📋 Tasks generated:', tasks.length);
+    
 
         // Update global references immediately
         window.homeData = homeData;
@@ -119,7 +116,7 @@ function createMaintenancePlan() {
 
 // Generate task templates
 function generateTaskTemplates() {
-    console.log('🔧 Starting task generation...');
+
     
     tasks = [];
     let id = 1;
@@ -483,10 +480,7 @@ function generateTaskTemplates() {
         const climateRegion = getClimateRegion(homeData.state);
         const regionalTasks = generateRegionalTasks(climateRegion, id, hasExteriorResponsibility);
         tasks.push(...regionalTasks);
-        console.log(`🌍 Added ${regionalTasks.length} regional tasks for ${climateRegion}`);
     }
-
-    console.log('✅ Final task count:', tasks.length);
 }
 
 // Generate regional seasonal tasks
@@ -623,7 +617,6 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
 
 // Show task setup screen
 function showTaskSetup() {
-    console.log('📋 Showing task setup screen...');
     
     // Update property summary
     updatePropertySummary();
@@ -1913,7 +1906,6 @@ function initializeApp() {
     window.homeData = homeData;
     
     if (hasExistingData()) {
-        console.log('👋 Existing data found, loading main app...');
         
         // Hide setup screens
         document.getElementById('setup-form').style.display = 'none';
@@ -1932,7 +1924,6 @@ function initializeApp() {
         
         console.log(`👋 Welcome back! Loaded ${tasks.length} tasks for ${homeData.fullAddress}`);
     } else {
-        console.log('🆕 New user, showing setup form...');
         document.getElementById('setup-form').style.display = 'block';
         document.getElementById('task-setup').classList.add('hidden');
         document.getElementById('main-app').classList.add('hidden');
