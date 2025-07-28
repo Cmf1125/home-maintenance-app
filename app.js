@@ -1978,8 +1978,7 @@ function setTaskDate(task, date) {
     // Set both properties for maximum compatibility (enhances your existing system)
     task.dueDate = new Date(date);
     task.nextDue = new Date(date); // Critical for calendar display
-    
-    console.log(`📅 Task "${task.title}" date set to: ${date.toLocaleDateString()}`);
+
     return true;
 }
 
@@ -2034,12 +2033,10 @@ function ensureTaskDateConsistency(tasks) {
         
         if (needsSync) {
             fixedCount++;
-            console.log(`🔧 Fixed date sync for task: ${task.title}`);
         }
     });
     
     if (fixedCount > 0) {
-        console.log(`✅ Fixed date consistency for ${fixedCount} tasks`);
     }
     
     return fixedCount;
@@ -2144,10 +2141,8 @@ function refreshAllDisplays() {
  * Migration function to fix any existing data
  */
 function migrateTaskDates() {
-    console.log('🔄 Migrating task dates for calendar compatibility...');
     
     if (!window.tasks || !Array.isArray(window.tasks)) {
-        console.log('⚠️ No tasks to migrate');
         return;
     }
     
@@ -2162,8 +2157,7 @@ function migrateTaskDates() {
             console.error('❌ Error saving date migration:', error);
         }
     }
-    
-    console.log('✅ Task date migration completed');
+
 }
 
 /**
@@ -2199,8 +2193,6 @@ console.log('✅ Step 3: Calendar-safe date management system loaded');
 
 // Create main app namespace
 window.CasaCare = window.CasaCare || {};
-
-console.log('🏗️ Setting up organized namespace system...');
 
 // ========================================
 // KEEP THESE GLOBAL (CALENDAR CRITICAL) ✅
@@ -2396,8 +2388,7 @@ CasaCare.debug = {
 const originalInitializeApp = typeof initializeApp !== 'undefined' ? initializeApp : function() {};
 
 function initializeAppWithNamespace() {
-    console.log('🏠 The Home Keeper ORGANIZED VERSION initializing...');
-    
+
     // Call original initialization
     if (typeof originalInitializeApp === 'function') {
         originalInitializeApp();
@@ -2407,20 +2398,14 @@ function initializeAppWithNamespace() {
     setTimeout(() => {
         if (window.enhancedDashboard) {
             CasaCare.components.enhancedDashboard = window.enhancedDashboard;
-            console.log('🎯 Enhanced dashboard linked to namespace');
         }
         if (window.casaCareCalendar) {
             CasaCare.components.calendar = window.casaCareCalendar;
-            console.log('📅 Calendar linked to namespace');
         }
         if (window.casaCareDocuments) {
             CasaCare.components.documents = window.casaCareDocuments;
-            console.log('📄 Documents linked to namespace');
         }
     }, 100);
-    
-    console.log('✅ The Home Keeper organized namespace initialized');
-    console.log('📋 Available namespaces:', Object.keys(CasaCare));
 }
 
 // Update the global initializeApp reference
@@ -2440,7 +2425,3 @@ window.listNamespacedFunctions = CasaCare.debug.listNamespacedFunctions;
 // FINAL INITIALIZATION 🚀
 // ========================================
 
-console.log('✅ Step 4: Namespace cleanup completed - calendar functions preserved');
-console.log('🧪 Debug tools available: debugCasaCare(), fixCalendarSync(), listGlobalFunctions()');
-console.log('🏗️ Organized namespaces: CasaCare.setup, CasaCare.dashboard, CasaCare.modals, CasaCare.utils');
-console.log('💡 Your calendar synchronization is protected and enhanced!');
