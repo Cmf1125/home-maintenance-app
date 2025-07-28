@@ -1504,8 +1504,7 @@ function saveTaskFromEdit() {
     
     // Validate inputs
 if (!title) {
-    alert('❌ Task name is required');
-    document.getElementById('edit-task-name').focus();
+    alert('❌ Title required');
     return;
 }
 
