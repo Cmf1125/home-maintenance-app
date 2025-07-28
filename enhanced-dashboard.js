@@ -852,39 +852,8 @@ function showSuccessNotification(message) {
     }, 3000);
 }
 
-// FORCE OVERRIDE: Make ALL functions globally available and override any existing ones
-window.addTaskFromDashboard = addTaskFromDashboard;
-window.editTaskFromDashboard = editTaskFromDashboard;
-window.rescheduleTaskFromDashboard = rescheduleTaskFromDashboard;
-window.exportTaskList = exportTaskList;
-
-// Modal functions - FORCE OVERRIDE
-window.closeTaskEditModal = closeTaskEditModal;
-window.saveTaskFromEdit = saveTaskFromEdit;
-window.deleteTaskFromEdit = deleteTaskFromEdit;
-
-// Date picker functions - FORCE OVERRIDE
-window.closeDatePickerModal = closeDatePickerModal;
-window.setQuickDate = setQuickDate;
-window.confirmReschedule = confirmReschedule;
-window.showSuccessNotification = showSuccessNotification;
-
 // Ensure enhanced dashboard is available globally
 window.EnhancedDashboard = EnhancedDashboard;
-
-// FORCE OVERRIDE any existing functions
-console.log('🔄 Enhanced Dashboard: FORCE OVERRIDING existing functions...');
-
-// Override any prompt-based functions that might exist
-if (typeof window.addTaskFromDashboard !== 'function' || window.addTaskFromDashboard.toString().includes('prompt')) {
-    console.log('⚠️ Overriding prompt-based addTaskFromDashboard');
-    window.addTaskFromDashboard = addTaskFromDashboard;
-}
-
-if (typeof window.editTaskFromDashboard !== 'function' || window.editTaskFromDashboard.toString().includes('prompt')) {
-    console.log('⚠️ Overriding prompt-based editTaskFromDashboard');
-    window.editTaskFromDashboard = editTaskFromDashboard;
-}
 
 // Debug function to check function status
 window.debugDashboardFunctions = function() {
