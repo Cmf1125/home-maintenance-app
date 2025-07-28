@@ -260,7 +260,11 @@ class EnhancedDashboard {
         document.getElementById('week-count').textContent = weekCount;
         document.getElementById('total-count').textContent = totalTasks;
         document.getElementById('annual-cost').textContent = '$' + Math.round(totalCost);
-
+ // ADD THIS: Update home address in enhanced dashboard too
+    const homeAddressElement = document.getElementById('home-address');
+    if (homeAddressElement && window.homeData?.fullAddress) {
+        homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
+    }
         console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
     }
 }
