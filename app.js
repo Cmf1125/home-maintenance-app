@@ -1207,8 +1207,8 @@ function updateDashboard() {
     
     // Update home address
     const homeAddressElement = document.getElementById('home-address');
-    if (homeAddressElement && window.homeData) {
-      homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
+    if (homeAddressElement && window.homeData?.fullAddress) {
+        homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
     }
     
     console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
@@ -1940,18 +1940,6 @@ function initializeApp() {
     
    // ADD THIS LINE at the end:
     initializeDateManagement();
-    // ADD THIS SECTION:
-    // Update dashboard address display on every app load
-    setTimeout(() => {
-        const homeAddressElement = document.getElementById('home-address');
-        if (homeAddressElement && window.homeData?.fullAddress) {
-            homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
-            console.log('✅ Dashboard address updated to:', window.homeData.fullAddress);
-        } else if (homeAddressElement) {
-            // Keep default text if no address is set
-            homeAddressElement.textContent = 'Managing maintenance for your home';
-        }
-    }, 500); // Small delay to ensure everything is loaded
     
     console.log('✅ The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initialized successfully!');
 }
