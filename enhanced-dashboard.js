@@ -9,7 +9,6 @@ class EnhancedDashboard {
     init() {
         this.bindEvents();
         this.render();
-        console.log('✅ Enhanced Dashboard initialized');
     }
 
     bindEvents() {
@@ -29,15 +28,12 @@ class EnhancedDashboard {
         document.getElementById('cost-card')?.addEventListener('click', () => {
             this.setFilter('cost');
         });
-
-        console.log('🎯 Dashboard events bound to stat cards');
     }
 
     setFilter(filterType) {
         this.currentFilter = filterType;
         this.updateFilterUI();
         this.renderFilteredTasks();
-        console.log(`🔍 Filter set to: ${filterType}`);
     }
 
     updateFilterUI() {
@@ -121,7 +117,6 @@ class EnhancedDashboard {
         }
 
         const filteredTasks = this.getFilteredTasks();
-        console.log(`📋 Rendering ${filteredTasks.length} filtered tasks`);
 
         if (filteredTasks.length === 0) {
             const emptyMessages = {
