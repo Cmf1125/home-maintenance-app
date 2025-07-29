@@ -875,7 +875,7 @@ function renderTaskCategories() {
 
     // Render regular categories with simple lists
     Object.entries(tasksByCategory).forEach(([category, categoryTasks]) => {
-        const config = categoryConfig[category] || { icon: '📋', color: 'gray' };
+      const config = window.categoryConfig?.[category] || { icon: '📋', color: 'gray' };
         
         categoriesHTML += `
             <div class="bg-white rounded-lg border border-gray-200 mb-4">
