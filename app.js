@@ -1148,7 +1148,6 @@ function showTab(tabName) {
         } catch (error) {
             console.error('❌ Error initializing documents:', error);
         }
-    }
 }
 // ADD THIS NEW CASE right after the documents case:
 else if (tabName === 'appliances') {
