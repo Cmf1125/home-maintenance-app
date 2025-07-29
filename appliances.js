@@ -484,7 +484,8 @@ renderApplianceDetail() {
     `;
 }
 
-// Handle add form submission
+// Replace your existing handleAddFormSubmit method with this version:
+
 handleAddFormSubmit(event) {
     event.preventDefault();
     
@@ -521,7 +522,7 @@ handleAddFormSubmit(event) {
         serialNumber: serial,
         location: location,
         notes: notes,
-        photos: [],
+        photos: window.tempAppliancePhotos ? [...window.tempAppliancePhotos] : [], // Copy temp photos
         createdDate: new Date().toISOString()
     };
     
@@ -531,13 +532,17 @@ handleAddFormSubmit(event) {
     // Save to storage
     this.saveAppliances();
     
+    // Clear temporary photos
+    window.tempAppliancePhotos = [];
+    
     // Show success message and return to overview
-    alert(`✅ Appliance "${name}" added successfully!`);
+    const photoCount = newAppliance.photos.length;
+    const photoText = photoCount > 0 ? ` with ${photoCount} photo${photoCount !== 1 ? 's' : ''}` : '';
+    alert(`✅ Appliance "${name}" added successfully${photoText}!`);
     this.showOverview();
     
     console.log('✅ New appliance added:', newAppliance);
 }
-
 // Calculate warranty expiration date
 calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
     if (!purchaseDate || !warrantyMonths) return null;
