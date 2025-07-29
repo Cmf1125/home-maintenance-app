@@ -668,7 +668,7 @@
             
             const modal = document.getElementById('task-edit-modal');
             if (!modal) {
-                alert('❌ Modal not found');
+                showToast('Modal not found', 'error');
                 return;
             }
             
@@ -722,7 +722,7 @@
             console.log('💾 Saving task...');
             
             if (!this.currentTask) {
-                alert('❌ No task to save');
+                showToast('No task to save', 'error');
                 return;
             }
             
@@ -737,7 +737,7 @@
             
             // Validate
             if (!title) {
-                alert('❌ Title required');
+                showToast('Title required', 'error');
                 return;
             }
 
@@ -780,7 +780,7 @@
             // Close modal
             this.closeModal();
             
-            alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
+            showToast(`Task "${title}" ${isNew ? 'added' : 'updated'}!`);
         },
         
         deleteTask: function() {
@@ -796,7 +796,7 @@
                 
                 this.refreshAfterSave();
                 this.closeModal();
-                alert(`✅ "${title}" deleted!`);
+                showToast(`"${title}" deleted!`);
             }
         },
         
@@ -863,7 +863,7 @@
         console.log('✏️ Edit task from setup:', taskId);
         const task = window.tasks?.find(t => t.id === taskId);
         if (!task) {
-            alert('❌ Task not found');
+            showToast('Task not found', 'error');
             return;
         }
         window.Casa.openModal(task, false, 'setup');
@@ -890,7 +890,7 @@
         console.log('✏️ Edit task from dashboard:', taskId);
         const task = window.tasks?.find(t => t.id === taskId);
         if (!task) {
-            alert('❌ Task not found');
+            showToast('Task not found', 'error');
             return;
         }
         window.Casa.openModal(task, false, 'dashboard');
@@ -913,7 +913,7 @@
     window.rescheduleTaskFromDashboard = function(taskId) {
         const task = window.tasks.find(t => t.id === taskId);
         if (!task) {
-            alert('❌ Task not found');
+            showToast('Task not found', 'error');
             return;
         }
         
@@ -955,13 +955,13 @@
     
     window.confirmReschedule = function() {
         if (!window.currentRescheduleTask) {
-            alert('❌ No task selected');
+            showToast('No task selected', 'error');
             return;
         }
         
         const input = document.getElementById('new-due-date');
         if (!input?.value) {
-            alert('❌ Please select a date');
+            showToast('Please select a date', 'error');
             return;
         }
         
@@ -981,7 +981,7 @@
         }
         
         window.closeDatePickerModal();
-        alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
+        showToast(`Task rescheduled to ${newDate.toLocaleDateString()}`);
     };
 
     // Test function with calendar sync testing
