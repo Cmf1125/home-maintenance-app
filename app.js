@@ -141,7 +141,7 @@ function createMaintenancePlan() {
         
     } catch (error) {
         console.error('❌ Error in createMaintenancePlan:', error);
-        alert('❌ Error creating maintenance plan. Check console for details.');
+        showToast('Error creating maintenance plan. Check console for details.', 'error');
     }
 }
 
@@ -1145,8 +1145,7 @@ function finishTaskSetup() {
     }
     
     // Success message
-    alert(`🎉 Setup Complete!\n\n✅ ${successCount} tasks scheduled automatically\n📅 Your clean, simple maintenance plan is ready!\n\nCheck your dashboard and calendar now.`);
-    
+    showToast(`Setup Complete! ${successCount} tasks scheduled automatically`);
     console.log('🎉 CLEAN SIMPLE TASK SETUP COMPLETION SUCCESSFUL!');
 }
 
@@ -1511,7 +1510,7 @@ function completeTask(taskId) {
     }
     
     // Success message
-    alert(`✅ Task "${task.title}" completed!\nNext due: ${nextDueDate.toLocaleDateString()}`);
+    showToast(`"${task.title}" completed! Next due: ${nextDueDate.toLocaleDateString()}`);
 }
 
 // Add Task functionality for dashboard
@@ -1621,7 +1620,7 @@ function deleteTaskDirect(taskId) {
             // Re-render task categories
             renderTaskCategories();
             
-            alert(`✅ Task "${deletedTask.title}" deleted successfully!`);
+            showToast(`Task "${deletedTask.title}" deleted successfully!`);
         }
     }
 }
@@ -1770,7 +1769,7 @@ if (!title) {
     // Close modal
     closeTaskEditModal();
     
-    alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
+   showToast(`Task "${title}" ${isNew ? 'added' : 'updated'} successfully!`)
 }
 
 // Delete task from edit modal
@@ -2270,7 +2269,7 @@ function completeTaskSafe(taskId) {
     refreshAllDisplays();
     
     // Success message
-    alert(`✅ Task "${task.title}" completed!\nNext due: ${nextDueDate.toLocaleDateString()}`);
+   showToast(`"${task.title}" completed! Next due: ${nextDueDate.toLocaleDateString()}`);
 }
 
 /**
