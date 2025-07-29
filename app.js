@@ -1179,7 +1179,9 @@ function showTab(tabName) {
     } catch (error) {
         console.error('❌ Error initializing appliances:', error);
     }
-}
+        }
+    }
+
 
 // Basic dashboard fallback function
 function updateDashboard() {
