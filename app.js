@@ -1048,10 +1048,12 @@ function showTab(tabName) {
     const dashboardView = document.getElementById('dashboard-view');
     const calendarView = document.getElementById('calendar-view');
     const documentsView = document.getElementById('documents-view');
+    const appliancesView = document.getElementById('appliances-view'); 
 
     if (dashboardView) dashboardView.classList.add('hidden');
     if (calendarView) calendarView.classList.add('hidden');
     if (documentsView) documentsView.classList.add('hidden');
+    if (appliancesView) appliancesView.classList.add('hidden'); 
     
     // Update tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
