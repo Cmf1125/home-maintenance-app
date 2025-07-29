@@ -486,6 +486,77 @@ function generateTaskTemplates() {
             isTemplate: true
         });
     }
+// Add these tasks to your generateTaskTemplates() function in app.js
+// (after your existing tasks, before regional tasks)
+
+// PEST CONTROL TASKS (for properties with exterior responsibility)
+if (hasExteriorResponsibility) {
+    const pestControlTasks = [
+        {
+            id: id++,
+            title: 'Quarterly Pest Control Treatment',
+            category: 'Pest Control',
+            frequency: 90,
+            cost: 150,
+            priority: getAutoPriority('Quarterly Pest Control Treatment', 'Pest Control'),
+            description: 'Professional pest control service or DIY perimeter treatment',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        },
+        {
+            id: id++,
+            title: 'Inspect for Termite Signs',
+            category: 'Pest Control',
+            frequency: 365,
+            cost: 0,
+            priority: getAutoPriority('Inspect for Termite Signs', 'Pest Control'),
+            description: 'Check foundation, basement, and crawl space for termite damage',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        }
+    ];
+    
+    tasks.push(...pestControlTasks);
+    
+    // EXTERIOR TASKS (includes yard tasks - all outside work)
+    const exteriorTasks = [
+        {
+            id: id++,
+            title: 'Tree Inspection & Pruning',
+            category: 'Exterior',
+            frequency: 365,
+            cost: 200,
+            priority: getAutoPriority('Tree Inspection & Pruning', 'Exterior'),
+            description: 'Inspect trees for dead branches, especially near house/power lines',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        },
+        {
+            id: id++,
+            title: 'Lawn Fertilizer Application',
+            category: 'Exterior',
+            frequency: 120,
+            cost: 50,
+            priority: getAutoPriority('Lawn Fertilizer Application', 'Exterior'),
+            description: 'Seasonal lawn fertilizing (spring, summer, fall)',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        }
+    ];
+    
+    // Only add lawn-specific tasks for single-family/townhouse
+    if (['single-family', 'townhouse'].includes(homeData.propertyType)) {
+        tasks.push(...exteriorTasks);
+    }
+}
 
     // Generate regional seasonal tasks
     if (homeData.state) {
