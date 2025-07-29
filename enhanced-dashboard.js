@@ -247,9 +247,9 @@ scrollToTaskList() {
                     </div>
                     
                     <div class="flex items-center gap-3 text-xs flex-wrap">
-                        <span class="category-badge px-2 py-1 rounded-full bg-blue-50 text-blue-700 font-medium">
-                            ${task.category}
-                        </span>
+                       <span class="category-badge px-2 py-1 rounded-full bg-${this.categoryConfig[task.category]?.color || 'gray'}-50 text-${this.categoryConfig[task.category]?.color || 'gray'}-700 font-medium">
+    ${this.categoryConfig[task.category]?.icon || '📋'} ${task.category}
+</span>
                         ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
                         <span class="text-gray-500">Every ${task.frequency}d</span>
                     </div>
