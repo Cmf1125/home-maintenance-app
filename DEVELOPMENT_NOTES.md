@@ -87,3 +87,15 @@ Most users skip Page 2
 
 🤔 Which Appeals to You?
 Or do you have other ideas for simplifying it? I think Option 3 (remove date inputs, smart defaults) might be the sweet spot - still shows what was generated but way cleaner.
+
+Quick Wins:
+
+📸 Photo upload for completed tasks ("Here's proof I cleaned the gutters!")
+🔔 Browser notifications for upcoming tasks
+📍 Location features ("Find Home Depot near me for this task")
+
+User Account Features (Later):
+
+☁️ Cloud sync so data works across devices
+👥 Family sharing for multiple users
+🏠 Multiple properties for vacation homes
