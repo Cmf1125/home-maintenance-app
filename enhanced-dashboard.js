@@ -188,89 +188,89 @@ scrollToTaskList() {
     }
 
     renderEnhancedTaskCard(task) {
-        const now = new Date();
-        const taskDate = new Date(task.dueDate);
-        const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
-        const isOverdue = daysUntilDue < 0;
-        
-        // Status styling
-        const statusClass = isOverdue ? 'bg-red-50 border-l-4 border-red-400' : 
-                           daysUntilDue <= 7 ? 'bg-orange-50 border-l-4 border-orange-400' : 'bg-white';
-        
-        // Due date display
-        let dueDateDisplay;
-        if (isOverdue) {
-            dueDateDisplay = `<span class="text-red-600 font-semibold">${Math.abs(daysUntilDue)}d overdue</span>`;
-        } else if (daysUntilDue === 0) {
-            dueDateDisplay = `<span class="text-orange-600 font-semibold">Due today</span>`;
-        } else if (daysUntilDue <= 7) {
-            dueDateDisplay = `<span class="text-orange-600">Due in ${daysUntilDue}d</span>`;
-        } else {
-            dueDateDisplay = `<span class="text-gray-600">Due in ${daysUntilDue}d</span>`;
-        }
+    const now = new Date();
+    const taskDate = new Date(task.dueDate);
+    const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
+    const isOverdue = daysUntilDue < 0;
+    
+    // Simplified status styling - focus on urgency, not arbitrary priority
+    let statusClass = 'bg-white';
+    let urgencyDot = '⚪';
+    
+    if (isOverdue) {
+        statusClass = 'bg-red-50 border-l-4 border-red-400';
+        urgencyDot = '🔴';
+    } else if (daysUntilDue <= 7) {
+        statusClass = 'bg-orange-50 border-l-4 border-orange-400';
+        urgencyDot = '🟡';
+    } else if (task.category === 'Safety') {
+        urgencyDot = '🟠'; // Safety tasks get orange dot even when not due soon
+    }
+    
+    // Clean due date display
+    let dueDateDisplay;
+    if (isOverdue) {
+        dueDateDisplay = `<span class="text-red-600 font-semibold">${Math.abs(daysUntilDue)}d overdue</span>`;
+    } else if (daysUntilDue === 0) {
+        dueDateDisplay = `<span class="text-orange-600 font-semibold">Due today</span>`;
+    } else if (daysUntilDue <= 7) {
+        dueDateDisplay = `<span class="text-orange-600">Due in ${daysUntilDue}d</span>`;
+    } else if (daysUntilDue <= 30) {
+        dueDateDisplay = `<span class="text-gray-700">Due in ${daysUntilDue}d</span>`;
+    } else {
+        dueDateDisplay = `<span class="text-gray-600">Due ${taskDate.toLocaleDateString()}</span>`;
+    }
 
-        // Last completed display
-        let lastCompletedDisplay = '';
-        if (task.lastCompleted) {
-            const lastDate = new Date(task.lastCompleted);
-            const daysSince = Math.floor((now - lastDate) / (24 * 60 * 60 * 1000));
-            lastCompletedDisplay = `<div class="text-xs text-gray-500 mt-1">
-                ✅ Last done: ${daysSince}d ago (${lastDate.toLocaleDateString()})
-            </div>`;
-        } else {
-            lastCompletedDisplay = `<div class="text-xs text-gray-500 mt-1">❌ Never completed</div>`;
-        }
+    // Last completed display
+    let lastCompletedDisplay = '';
+    if (task.lastCompleted) {
+        const lastDate = new Date(task.lastCompleted);
+        const daysSince = Math.floor((now - lastDate) / (24 * 60 * 60 * 1000));
+        lastCompletedDisplay = `<div class="text-xs text-gray-500 mt-1">
+            ✅ Completed ${daysSince}d ago
+        </div>`;
+    }
 
-        // Priority badge colors
-        const priorityColors = {
-            'high': 'bg-red-100 text-red-700',
-            'medium': 'bg-yellow-100 text-yellow-700',
-            'low': 'bg-gray-100 text-gray-700'
-        };
-
-        return `
-            <div class="p-4 border-b ${statusClass} enhanced-task-card">
-                <div class="flex justify-between items-start">
-                    <div class="flex-1 pr-3">
-                        <div class="flex items-start justify-between mb-2">
-                            <div class="flex-1">
-                                <h4 class="font-semibold text-gray-900 text-sm">${task.title}</h4>
-                                <p class="text-xs text-gray-600 mt-1">${task.description}</p>
-                            </div>
-                            <div class="ml-3 text-right text-xs">
-                                <div class="font-semibold due-date">${taskDate.toLocaleDateString()}</div>
-                                <div class="days-until">${dueDateDisplay}</div>
-                            </div>
+    return `
+        <div class="p-4 border-b ${statusClass} enhanced-task-card transition-all duration-200">
+            <div class="flex justify-between items-start">
+                <div class="flex-1 pr-3">
+                    <div class="flex items-start gap-3 mb-2">
+                        <span class="text-lg mt-0.5 flex-shrink-0">${urgencyDot}</span>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-semibold text-gray-900 text-sm leading-tight">${task.title}</h4>
+                            <p class="text-xs text-gray-600 mt-1 leading-relaxed">${task.description}</p>
                         </div>
-                        
-                        <div class="task-meta-row">
-                            <span class="category-badge">${task.category}</span>
-                            <span class="priority-badge px-2 py-1 rounded ${priorityColors[task.priority]}">${task.priority}</span>
-                            <span class="text-green-600 font-medium text-xs">$${task.cost}</span>
-                            <span class="text-gray-500 text-xs">Every ${task.frequency}d</span>
+                        <div class="text-right text-xs flex-shrink-0">
+                            <div class="days-until">${dueDateDisplay}</div>
                         </div>
-                        
-                        ${lastCompletedDisplay}
                     </div>
                     
-                    <div class="task-actions">
-                        <button onclick="completeTask(${task.id})" 
-                                class="task-action-btn task-action-complete">
-                            ✅ Complete
-                        </button>
-                        <button onclick="editTaskFromDashboard(${task.id})" 
-                                class="task-action-btn task-action-edit">
-                            ✏️ Edit
-                        </button>
-                        <button onclick="rescheduleTaskFromDashboard(${task.id})" 
-                                class="task-action-btn task-action-reschedule">
-                            📅 Reschedule
-                        </button>
+                    <div class="flex items-center gap-3 text-xs flex-wrap">
+                        <span class="category-badge px-2 py-1 rounded-full bg-blue-50 text-blue-700 font-medium">
+                            ${task.category}
+                        </span>
+                        ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
+                        <span class="text-gray-500">Every ${task.frequency}d</span>
                     </div>
+                    
+                    ${lastCompletedDisplay}
+                </div>
+                
+                <div class="task-actions flex flex-col gap-2 ml-3">
+                    <button onclick="completeTask(${task.id})" 
+                            class="task-action-btn bg-green-100 text-green-700 hover:bg-green-200 px-3 py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap">
+                        ✅ Complete
+                    </button>
+                    <button onclick="rescheduleTaskFromDashboard(${task.id})" 
+                            class="task-action-btn bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap">
+                        📅 Reschedule
+                    </button>
                 </div>
             </div>
-        `;
-    }
+        </div>
+    `;
+}
 
     render() {
         this.updateStats();
