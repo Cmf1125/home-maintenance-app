@@ -91,8 +91,7 @@ function createMaintenancePlan() {
             otherFeatures: document.getElementById('other-features')?.value || ''
         };
 
-    // Add this function before generateTaskTemplates() in app.js:
-
+   // 👇 ADD THIS FUNCTION RIGHT HERE 👇
 function getAutoPriority(title, category) {
     // Safety tasks are always high priority
     if (category === 'Safety') return 'high';
@@ -106,6 +105,7 @@ function getAutoPriority(title, category) {
     // Everything else is normal priority
     return 'normal';
 }
+
 
         // Generate tasks
         generateTaskTemplates();
