@@ -396,15 +396,29 @@ class ApplianceManager {
     }
 }
 
-// Initialize the appliance manager
-let applianceManager;
+// appliances.js - Updated initialization section (replace the bottom part of your file)
 
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = ApplianceManager;
-} else {
-    // Browser environment
-    window.ApplianceManager = ApplianceManager;
+// Make ApplianceManager available globally
+window.ApplianceManager = ApplianceManager;
+
+// Initialize when DOM is ready or immediately if already ready
+function initializeApplianceManager() {
+    if (!window.applianceManager) {
+        console.log('⚙️ Creating new appliance manager instance...');
+        window.applianceManager = new ApplianceManager();
+    }
+    return window.applianceManager;
 }
+
+// Initialize immediately if DOM is ready, otherwise wait
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApplianceManager);
+} else {
+    // DOM is already ready, initialize now but with a small delay to ensure all scripts are loaded
+    setTimeout(initializeApplianceManager, 100);
+}
+
+// Make the initialization function available globally for manual initialization
+window.initializeApplianceManager = initializeApplianceManager;
 
 console.log('⚙️ Appliance Manager Module: Loaded successfully');
