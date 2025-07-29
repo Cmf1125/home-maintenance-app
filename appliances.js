@@ -503,7 +503,7 @@ handleAddFormSubmit(event) {
     
     // Validate required fields
     if (!name) {
-        alert('❌ Please enter an appliance name');
+        showToast('Please enter an appliance name', 'error');
         document.getElementById('appliance-name').focus();
         return;
     }
@@ -538,7 +538,7 @@ handleAddFormSubmit(event) {
     // Show success message and return to overview
     const photoCount = newAppliance.photos.length;
     const photoText = photoCount > 0 ? ` with ${photoCount} photo${photoCount !== 1 ? 's' : ''}` : '';
-    alert(`✅ Appliance "${name}" added successfully${photoText}!`);
+   showToast(`Appliance "${name}" added successfully!`);
     this.showOverview();
     
     console.log('✅ New appliance added:', newAppliance);
@@ -967,7 +967,7 @@ handleEditFormSubmit(event) {
     
     // Validate required fields
     if (!name) {
-        alert('❌ Please enter an appliance name');
+        showToast('Please enter an appliance name', 'error');
         document.getElementById('edit-appliance-name').focus();
         return;
     }
@@ -990,7 +990,7 @@ handleEditFormSubmit(event) {
     this.saveAppliances();
     
     // Show success message and return to overview
-    alert(`✅ Appliance "${name}" updated successfully!`);
+   showToast(`Appliance "${name}" updated successfully!`);
     this.showOverview();
     
     console.log('✅ Appliance updated:', this.currentAppliance);
@@ -1008,7 +1008,7 @@ deleteAppliance(applianceId) {
         this.appliances = this.appliances.filter(a => a.id != applianceId);
         this.saveAppliances();
         
-        alert(`✅ Appliance "${appliance.name}" deleted successfully!`);
+       showToast(`Appliance "${appliance.name}" deleted successfully!`);
         this.showOverview();
         
         console.log('🗑️ Appliance deleted:', appliance.name);
