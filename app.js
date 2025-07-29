@@ -2420,3 +2420,203 @@ window.listNamespacedFunctions = CasaCare.debug.listNamespacedFunctions;
 // FINAL INITIALIZATION 🚀
 // ========================================
 
+// ========================================
+// SMART INSTALLATION BANNER SYSTEM
+// Shows device-specific PWA installation instructions
+// ========================================
+
+class InstallationBanner {
+    constructor() {
+        this.banner = null;
+        this.isInstalled = false;
+        this.isDismissed = false;
+        this.init();
+    }
+    
+    init() {
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.setup());
+        } else {
+            this.setup();
+        }
+    }
+    
+    setup() {
+        this.banner = document.getElementById('install-banner');
+        if (!this.banner) {
+            console.warn('⚠️ Install banner element not found');
+            return;
+        }
+        
+        // Check if user previously dismissed the banner
+        this.isDismissed = localStorage.getItem('install-banner-dismissed') === 'true';
+        
+        // Check if app is already installed
+        this.checkIfInstalled();
+        
+        // Set up event listeners
+        this.bindEvents();
+        
+        // Show banner if appropriate
+        setTimeout(() => this.showBannerIfNeeded(), 2000); // Delay to not overwhelm new users
+    }
+    
+    bindEvents() {
+        // Close button
+        const closeBtn = document.getElementById('install-banner-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => this.dismissBanner());
+        }
+        
+        // Listen for app installation
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // App can be installed
+            this.isInstalled = false;
+        });
+        
+        window.addEventListener('appinstalled', (e) => {
+            // App was installed
+            this.isInstalled = true;
+            this.hideBanner();
+        });
+    }
+    
+    checkIfInstalled() {
+        // Check if running as installed PWA
+        if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+            this.isInstalled = true;
+        }
+        
+        // Check if launched from home screen (iOS)
+        if (window.navigator.standalone === true) {
+            this.isInstalled = true;
+        }
+    }
+    
+    showBannerIfNeeded() {
+        // Don't show if already installed, dismissed, or no banner element
+        if (this.isInstalled || this.isDismissed || !this.banner) {
+            return;
+        }
+        
+        // Get device-specific instructions
+        const instructions = this.getInstallInstructions();
+        if (!instructions) {
+            return; // Don't show on unsupported browsers
+        }
+        
+        // Update banner text
+        const instructionsElement = document.getElementById('install-instructions');
+        if (instructionsElement) {
+            instructionsElement.innerHTML = instructions;
+        }
+        
+        // Show the banner
+        this.showBanner();
+    }
+    
+    getInstallInstructions() {
+        const userAgent = navigator.userAgent;
+        const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+        const isAndroid = /Android/.test(userAgent);
+        const isChrome = /Chrome/.test(userAgent);
+        const isSafari = /Safari/.test(userAgent) && !isChrome;
+        const isFirefox = /Firefox/.test(userAgent);
+        const isEdge = /Edg/.test(userAgent);
+        
+        if (isIOS) {
+            if (isSafari) {
+                return `Tap <strong>Share</strong> <span style="font-size: 16px;">⤴</span> → <strong>"Add to Home Screen"</strong>`;
+            } else if (isChrome) {
+                return `Tap <strong>Share</strong> <span style="font-size: 16px;">⤴</span> → scroll down → <strong>"Add to Home Screen"</strong><br><small style="opacity: 0.8;">💡 For easier installation, try opening in Safari</small>`;
+            } else {
+                return `Open in Safari for best installation experience`;
+            }
+        } else if (isAndroid) {
+            if (isChrome) {
+                return `Tap menu <strong>⋮</strong> → <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong>`;
+            } else if (isFirefox) {
+                return `Tap menu <strong>⋮</strong> → <strong>"Install"</strong> or <strong>"Add to Home Screen"</strong>`;
+            } else {
+                return `Look for <strong>"Add to Home Screen"</strong> or <strong>"Install"</strong> in your browser menu`;
+            }
+        } else {
+            // Desktop
+            if (isChrome || isEdge) {
+                return `Look for the <strong>install icon</strong> <span style="font-size: 16px;">⊕</span> in your address bar`;
+            } else {
+                return `Use Chrome, Edge, or Firefox for the best installation experience`;
+            }
+        }
+        
+        return null; // Don't show on unsupported browsers
+    }
+    
+    showBanner() {
+        if (!this.banner) return;
+        
+        this.banner.classList.remove('hidden');
+        document.body.classList.add('install-banner-visible');
+        
+        // Animate in
+        setTimeout(() => {
+            this.banner.classList.add('show');
+        }, 100);
+        
+        console.log('📱 Install banner shown');
+    }
+    
+    hideBanner() {
+        if (!this.banner) return;
+        
+        this.banner.classList.remove('show');
+        document.body.classList.remove('install-banner-visible');
+        
+        setTimeout(() => {
+            this.banner.classList.add('hidden');
+        }, 300);
+    }
+    
+    dismissBanner() {
+        this.hideBanner();
+        this.isDismissed = true;
+        
+        // Remember dismissal for 7 days
+        const dismissUntil = new Date();
+        dismissUntil.setDate(dismissUntil.getDate() + 7);
+        localStorage.setItem('install-banner-dismissed', 'true');
+        localStorage.setItem('install-banner-dismiss-until', dismissUntil.toISOString());
+        
+        console.log('📱 Install banner dismissed for 7 days');
+    }
+    
+    // Public method to manually show the banner
+    show() {
+        this.isDismissed = false;
+        localStorage.removeItem('install-banner-dismissed');
+        this.showBannerIfNeeded();
+    }
+}
+
+// Initialize the installation banner system
+let installBanner;
+
+// Make it available globally for debugging
+window.showInstallBanner = function() {
+    if (installBanner) {
+        installBanner.show();
+    }
+};
+
+// Initialize when app starts
+document.addEventListener('DOMContentLoaded', () => {
+    installBanner = new InstallationBanner();
+});
+
+// Also initialize if DOM is already ready
+if (document.readyState !== 'loading') {
+    installBanner = new InstallationBanner();
+}
+
+console.log('📱 Smart installation banner system loaded');
