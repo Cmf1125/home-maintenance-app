@@ -2124,6 +2124,56 @@ window.showHomeInfo = showHomeInfo;
 window.clearData = clearData;
 window.exportData = exportData;
 
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg transform translate-x-full transition-all duration-300 max-w-sm`;
+    
+    // Different styles for different types
+    const styles = {
+        success: 'bg-green-500 text-white',
+        error: 'bg-red-500 text-white', 
+        info: 'bg-blue-500 text-white',
+        warning: 'bg-yellow-500 text-black'
+    };
+    
+    toast.className += ` ${styles[type] || styles.success}`;
+    
+    // Get appropriate emoji
+    const emojis = {
+        success: '✅',
+        error: '❌', 
+        info: 'ℹ️',
+        warning: '⚠️'
+    };
+    
+    toast.innerHTML = `
+        <div class="flex items-center gap-2">
+            <span class="text-lg">${emojis[type] || emojis.success}</span>
+            <span class="font-medium text-sm">${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-lg opacity-70 hover:opacity-100">×</button>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Slide in
+    setTimeout(() => {
+        toast.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Auto-remove after 4 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.classList.add('translate-x-full');
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    document.body.removeChild(toast);
+                }
+            }, 300);
+        }
+    }, 4000);
+}
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', initializeApp);
 if (document.readyState !== 'loading') {
@@ -2578,59 +2628,7 @@ function initializeAppWithNamespace() {
         }
     }, 100);
 }
-// Add this to the END of your app.js file (before the initialization section):
 
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg transform translate-x-full transition-all duration-300 max-w-sm`;
-    
-    // Different styles for different types
-    const styles = {
-        success: 'bg-green-500 text-white',
-        error: 'bg-red-500 text-white', 
-        info: 'bg-blue-500 text-white',
-        warning: 'bg-yellow-500 text-black'
-    };
-    
-    toast.className += ` ${styles[type] || styles.success}`;
-    
-    // Get appropriate emoji
-    const emojis = {
-        success: '✅',
-        error: '❌', 
-        info: 'ℹ️',
-        warning: '⚠️'
-    };
-    
-    toast.innerHTML = `
-        <div class="flex items-center gap-2">
-            <span class="text-lg">${emojis[type] || emojis.success}</span>
-            <span class="font-medium text-sm">${message}</span>
-            <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-lg opacity-70 hover:opacity-100">×</button>
-        </div>
-    `;
-    
-    document.body.appendChild(toast);
-    
-    // Slide in
-    setTimeout(() => {
-        toast.classList.remove('translate-x-full');
-    }, 100);
-    
-    // Auto-remove after 4 seconds
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.classList.add('translate-x-full');
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    document.body.removeChild(toast);
-                }
-            }, 300);
-        }
-    }, 4000);
-}
-// Make it globally available
-window.showToast = showToast;
 // Update the global initializeApp reference
 window.initializeApp = initializeAppWithNamespace;
 
