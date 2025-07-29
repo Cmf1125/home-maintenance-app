@@ -952,19 +952,32 @@ function renderSimpleTaskList(taskList) {
     `;
 }
 
-// CLEAN SIMPLE VERSION: Render individual task as simple list item
+// Replace your renderSimpleTaskItem function with this enhanced version:
+
 function renderSimpleTaskItem(task) {
     const priorityDot = task.priority === 'high' ? '🔴' : 
                        task.priority === 'medium' ? '🟡' : 
                        '⚪';
     
+    // Get category info from global config
+    const categoryInfo = window.categoryConfig?.[task.category] || { icon: '📋', color: 'gray' };
+    
     return `
-        <div class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" data-task-id="${task.id}">
+        <div class="flex items-center justify-between py-3 px-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" data-task-id="${task.id}">
             <div class="flex items-center gap-3 flex-1">
                 <span class="text-sm">${priorityDot}</span>
-                <span class="font-medium text-gray-900">${task.title}</span>
-                <span class="text-xs text-gray-500">every ${task.frequency} days</span>
-                ${task.cost > 0 ? `<span class="text-xs text-green-600">$${task.cost}</span>` : ''}
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="font-medium text-gray-900 text-sm">${task.title}</span>
+                        <span class="px-2 py-1 rounded-full bg-${categoryInfo.color}-50 text-${categoryInfo.color}-700 text-xs font-medium">
+                            ${categoryInfo.icon} ${task.category}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs text-gray-500">
+                        <span>Every ${task.frequency} days</span>
+                        ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
+                    </div>
+                </div>
             </div>
             <div class="flex items-center gap-2">
                 <button onclick="editTaskFromSetup(${task.id})" class="text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded transition-colors" title="Edit task">
@@ -977,7 +990,6 @@ function renderSimpleTaskItem(task) {
         </div>
     `;
 }
-
 // Navigation functions
 function goBackToHomeSetup() {
     document.getElementById('task-setup').classList.add('hidden');
