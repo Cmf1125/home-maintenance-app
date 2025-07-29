@@ -64,6 +64,25 @@ function getAutoPriority(title, category) {
     // Everything else is normal priority
     return 'normal';
 }
+// Add this right after your getAutoPriority function in app.js:
+
+function getAutoPriority(title, category) {
+    // ... your existing getAutoPriority code ...
+    return 'normal';
+}
+
+// Global category configuration (shared between setup and dashboard)
+const categoryConfig = {
+    'HVAC': { icon: '🌡️', color: 'blue' },
+    'Water Systems': { icon: '💧', color: 'cyan' },
+    'Exterior': { icon: '🏠', color: 'green' },
+    'Pest Control': { icon: '🐛', color: 'orange' },
+    'Safety': { icon: '⚠️', color: 'red' },
+    'General': { icon: '🔧', color: 'gray' }
+};
+
+// Make it globally available
+window.categoryConfig = categoryConfig;
 
 // Create maintenance plan
 function createMaintenancePlan() {
