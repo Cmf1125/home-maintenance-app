@@ -49,7 +49,7 @@ class ApplianceManager {
         } catch (error) {
             console.error('❌ Appliances: Error saving appliances:', error);
             if (error.name === 'QuotaExceededError') {
-                alert('❌ Storage quota exceeded. Please delete some photos to free up space.');
+                showToast('Storage quota exceeded. Please delete some photos to free up space.', 'error');
             }
         }
     }
@@ -337,12 +337,12 @@ handleAddFormPhotoUpload(event) {
     
     // Validate file
     if (!file.type.startsWith('image/')) {
-        alert('❌ Please select an image file');
+        showToast('Please select an image file', 'error');
         return;
     }
     
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        alert('❌ Image too large. Please select an image smaller than 5MB');
+        showToast('Image too large. Please select an image smaller than 5MB', 'error');
         return;
     }
     
@@ -661,7 +661,7 @@ editAppliance(applianceId) {
         this.render();
     } else {
         console.error('Appliance not found:', applianceId);
-        alert('❌ Appliance not found');
+        showToast('Appliance not found', 'error');
     }
 }
 
@@ -851,12 +851,12 @@ handlePhotoUpload(event, context = 'add') {
     
     // Validate file
     if (!file.type.startsWith('image/')) {
-        alert('❌ Please select an image file');
+        showToast('Please select an image file', 'error');
         return;
     }
     
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        alert('❌ Image too large. Please select an image smaller than 5MB');
+        showToast('Image too large. Please select an image smaller than 5MB', 'error');
         return;
     }
     
@@ -896,7 +896,7 @@ handlePhotoUpload(event, context = 'add') {
 viewPhoto(applianceId, photoIndex) {
     const appliance = this.appliances.find(a => a.id == applianceId);
     if (!appliance || !appliance.photos || !appliance.photos[photoIndex]) {
-        alert('❌ Photo not found');
+        showToast('Photo not found', 'error');
         return;
     }
     
@@ -925,7 +925,7 @@ viewPhoto(applianceId, photoIndex) {
 deletePhoto(applianceId, photoIndex) {
     const appliance = this.appliances.find(a => a.id == applianceId);
     if (!appliance || !appliance.photos || !appliance.photos[photoIndex]) {
-        alert('❌ Photo not found');
+        showToast('Photo not found', 'error');
         return;
     }
     
@@ -949,7 +949,7 @@ handleEditFormSubmit(event) {
     event.preventDefault();
     
     if (!this.currentAppliance) {
-        alert('❌ No appliance selected for editing');
+        showToast('No appliance selected for editing', 'error');
         return;
     }
     
@@ -1000,7 +1000,7 @@ handleEditFormSubmit(event) {
 deleteAppliance(applianceId) {
     const appliance = this.appliances.find(a => a.id == applianceId);
     if (!appliance) {
-        alert('❌ Appliance not found');
+        showToast('Appliance not found', 'error');
         return;
     }
     
