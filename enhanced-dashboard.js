@@ -76,31 +76,45 @@ scrollToTaskList() {
     }
 }
     updateFilterUI() {
-        // Remove active class from all cards
-        document.querySelectorAll('.stat-card').forEach(card => {
-            card.classList.remove('active-filter');
-        });
+    // Remove active class from all cards
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.classList.remove('active-filter');
+    });
 
-        // Add active class to selected card
-        const activeCard = document.getElementById(`${this.currentFilter}-card`);
-        if (activeCard) {
-            activeCard.classList.add('active-filter');
-        }
-
-        // Update filter title
-        const filterTitles = {
-            'all': 'Upcoming Tasks',
-            'overdue': 'Overdue Tasks ⚠️',
-            'week': 'This Week\'s Tasks 📅',
-            'total': 'All Active Tasks 📋',
-            'cost': 'Tasks by Cost 💰'
-        };
-
-        const titleElement = document.getElementById('tasks-list-title');
-        if (titleElement) {
-            titleElement.textContent = filterTitles[this.currentFilter] || 'Tasks';
-        }
+    // Add active class to selected card
+    const activeCard = document.getElementById(`${this.currentFilter}-card`);
+    if (activeCard) {
+        activeCard.classList.add('active-filter');
+        
+        // Add a subtle pulse effect to show it was clicked
+        activeCard.style.transition = 'transform 0.2s ease';
+        activeCard.style.transform = 'scale(1.05)';
+        setTimeout(() => {
+            activeCard.style.transform = '';
+        }, 200);
     }
+
+    // Update filter title with better descriptions and emojis
+    const filterTitles = {
+        'all': '📋 Upcoming Tasks',
+        'overdue': '⚠️ Overdue Tasks',
+        'week': '📅 This Week\'s Tasks',
+        'total': '📋 All Active Tasks',
+        'cost': '💰 Tasks by Cost'
+    };
+
+    const titleElement = document.getElementById('tasks-list-title');
+    if (titleElement) {
+        const newTitle = filterTitles[this.currentFilter] || 'Tasks';
+        titleElement.textContent = newTitle;
+        
+        // Add a subtle animation to the title change
+        titleElement.style.opacity = '0.7';
+        setTimeout(() => {
+            titleElement.style.opacity = '1';
+        }, 150);
+    }
+}
 
     getFilteredTasks() {
         if (!window.tasks) {
