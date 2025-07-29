@@ -50,6 +50,20 @@ function getClimateRegion(state) {
     }
     return 'GENERAL';
 }
+// 👇 ADD THE FUNCTION RIGHT HERE 👇
+function getAutoPriority(title, category) {
+    // Safety tasks are always high priority
+    if (category === 'Safety') return 'high';
+    
+    // Critical safety keywords
+    const safetyKeywords = ['smoke', 'detector', 'carbon monoxide', 'chimney', 'boiler', 'fire'];
+    if (safetyKeywords.some(keyword => title.toLowerCase().includes(keyword))) {
+        return 'high';
+    }
+    
+    // Everything else is normal priority
+    return 'normal';
+}
 
 // Create maintenance plan
 function createMaintenancePlan() {
@@ -90,22 +104,6 @@ function createMaintenancePlan() {
             basement: document.getElementById('basement')?.checked || false,
             otherFeatures: document.getElementById('other-features')?.value || ''
         };
-
-   // 👇 ADD THIS FUNCTION RIGHT HERE 👇
-function getAutoPriority(title, category) {
-    // Safety tasks are always high priority
-    if (category === 'Safety') return 'high';
-    
-    // Critical safety keywords
-    const safetyKeywords = ['smoke', 'detector', 'carbon monoxide', 'chimney', 'boiler', 'fire'];
-    if (safetyKeywords.some(keyword => title.toLowerCase().includes(keyword))) {
-        return 'high';
-    }
-    
-    // Everything else is normal priority
-    return 'normal';
-}
-
 
         // Generate tasks
         generateTaskTemplates();
