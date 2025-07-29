@@ -1,4 +1,4 @@
-// Enhanced Dashboard functionality for Casa Care - Updated for Simplified Date System
+// Enhanced Dashboard functionality for The Home Keeper - Updated for Simplified Date System
 class EnhancedDashboard {
     constructor() {
         this.currentFilter = 'all'; // 'all', 'overdue', 'week', 'total', 'cost'
