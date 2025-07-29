@@ -1,10 +1,21 @@
 // Enhanced Dashboard functionality for The Home Keeper - Updated for Simplified Date System
 class EnhancedDashboard {
     constructor() {
-        this.currentFilter = 'all'; // 'all', 'overdue', 'week', 'total', 'cost'
-        console.log('🎯 Enhanced Dashboard initializing with simplified dates...');
-        this.init();
-    }
+    this.currentFilter = 'all'; // 'all', 'overdue', 'week', 'total', 'cost'
+    
+    // Add category configuration for consistent colors and icons
+    this.categoryConfig = {
+        'HVAC': { icon: '🌡️', color: 'blue' },
+        'Water Systems': { icon: '💧', color: 'cyan' },
+        'Exterior': { icon: '🏠', color: 'green' },
+        'Pest Control': { icon: '🐛', color: 'orange' },
+        'Safety': { icon: '⚠️', color: 'red' },
+        'General': { icon: '🔧', color: 'gray' }
+    };
+    
+    console.log('🎯 Enhanced Dashboard initializing with simplified dates...');
+    this.init();
+}
 
     init() {
         this.bindEvents();
@@ -247,12 +258,12 @@ scrollToTaskList() {
                     </div>
                     
                     <div class="flex items-center gap-3 text-xs flex-wrap">
-                       <span class="category-badge px-2 py-1 rounded-full bg-${this.categoryConfig[task.category]?.color || 'gray'}-50 text-${this.categoryConfig[task.category]?.color || 'gray'}-700 font-medium">
-    ${this.categoryConfig[task.category]?.icon || '📋'} ${task.category}
-</span>
-                        ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
-                        <span class="text-gray-500">Every ${task.frequency}d</span>
-                    </div>
+    <span class="category-badge px-2 py-1 rounded-full bg-${this.categoryConfig[task.category]?.color || 'gray'}-50 text-${this.categoryConfig[task.category]?.color || 'gray'}-700 font-medium">
+        ${this.categoryConfig[task.category]?.icon || '📋'} ${task.category}
+    </span>
+    ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
+    <span class="text-gray-500">Every ${task.frequency}d</span>
+</div>
                     
                     ${lastCompletedDisplay}
                 </div>
