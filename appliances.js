@@ -174,7 +174,273 @@ class ApplianceManager {
             </div>
         `;
     }
+    // Add these methods to your ApplianceManager class (after the renderOverview method)
+
+// Render add appliance form
+renderAddForm() {
+    const appliancesView = document.getElementById('appliances-view');
+    if (!appliancesView) return;
     
+    appliancesView.innerHTML = `
+        <div class="p-4">
+            <div class="max-w-2xl mx-auto">
+                <!-- Header -->
+                <div class="flex items-center gap-4 mb-6">
+                    <button onclick="window.applianceManager.showOverview()" 
+                            class="text-gray-500 hover:text-gray-700 transition-colors">
+                        ← Back
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">Add Appliance</h2>
+                        <p class="text-gray-600 text-sm">Add a new appliance to your home inventory</p>
+                    </div>
+                </div>
+                
+                <!-- Add Form -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <form id="appliance-add-form" class="space-y-6">
+                        <!-- Basic Information -->
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Appliance Name *</label>
+                                <input type="text" id="appliance-name" required
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="e.g., Kitchen Refrigerator">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                                <select id="appliance-category" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    ${this.categories.map(cat => 
+                                        `<option value="${cat.id}">${cat.icon} ${cat.name}</option>`
+                                    ).join('')}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Manufacturer</label>
+                                <input type="text" id="appliance-manufacturer"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="e.g., Whirlpool, GE, Samsung">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Model Number</label>
+                                <input type="text" id="appliance-model"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="e.g., WRF535SWHZ">
+                            </div>
+                        </div>
+                        
+                        <!-- Purchase Information -->
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Date</label>
+                                <input type="date" id="appliance-purchase-date"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Price</label>
+                                <input type="number" id="appliance-price" min="0" step="0.01"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="0.00">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Warranty (Months)</label>
+                                <input type="number" id="appliance-warranty" min="0"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="12">
+                            </div>
+                        </div>
+                        
+                        <!-- Serial Number & Location -->
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Serial Number</label>
+                                <input type="text" id="appliance-serial"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Serial number from appliance label">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                                <input type="text" id="appliance-location"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="e.g., Kitchen, Basement, Garage">
+                            </div>
+                        </div>
+                        
+                        <!-- Notes -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+                            <textarea id="appliance-notes" rows="3"
+                                      class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                      placeholder="Additional details, maintenance notes, etc."></textarea>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex gap-3 pt-4">
+                            <button type="button" onclick="window.applianceManager.showOverview()"
+                                    class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                    class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                                💾 Save Appliance
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Set up form submission
+    const form = document.getElementById('appliance-add-form');
+    if (form) {
+        form.addEventListener('submit', (e) => this.handleAddFormSubmit(e));
+    }
+}
+
+// Render edit appliance form
+renderEditForm() {
+    if (!this.currentAppliance) {
+        this.showOverview();
+        return;
+    }
+    
+    const appliancesView = document.getElementById('appliances-view');
+    if (!appliancesView) return;
+    
+    appliancesView.innerHTML = `
+        <div class="p-4">
+            <div class="max-w-2xl mx-auto">
+                <!-- Header -->
+                <div class="flex items-center gap-4 mb-6">
+                    <button onclick="window.applianceManager.showOverview()" 
+                            class="text-gray-500 hover:text-gray-700 transition-colors">
+                        ← Back
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">Edit Appliance</h2>
+                        <p class="text-gray-600 text-sm">Update appliance information</p>
+                    </div>
+                </div>
+                
+                <!-- Edit Form (similar to add form but with values filled) -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <p class="text-gray-600 mb-4">Edit form coming soon...</p>
+                    <button onclick="window.applianceManager.showOverview()"
+                            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                        Back to Overview
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Render appliance detail view
+renderApplianceDetail() {
+    if (!this.currentAppliance) {
+        this.showOverview();
+        return;
+    }
+    
+    const appliancesView = document.getElementById('appliances-view');
+    if (!appliancesView) return;
+    
+    appliancesView.innerHTML = `
+        <div class="p-4">
+            <div class="max-w-2xl mx-auto">
+                <!-- Header -->
+                <div class="flex items-center gap-4 mb-6">
+                    <button onclick="window.applianceManager.showOverview()" 
+                            class="text-gray-500 hover:text-gray-700 transition-colors">
+                        ← Back
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">${this.currentAppliance.name}</h2>
+                        <p class="text-gray-600 text-sm">Appliance Details</p>
+                    </div>
+                </div>
+                
+                <!-- Detail View -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <p class="text-gray-600 mb-4">Detailed view coming soon...</p>
+                    <button onclick="window.applianceManager.showOverview()"
+                            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                        Back to Overview
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Handle add form submission
+handleAddFormSubmit(event) {
+    event.preventDefault();
+    
+    // Get form values
+    const name = document.getElementById('appliance-name').value.trim();
+    const category = document.getElementById('appliance-category').value;
+    const manufacturer = document.getElementById('appliance-manufacturer').value.trim();
+    const model = document.getElementById('appliance-model').value.trim();
+    const purchaseDate = document.getElementById('appliance-purchase-date').value;
+    const price = parseFloat(document.getElementById('appliance-price').value) || 0;
+    const warranty = parseInt(document.getElementById('appliance-warranty').value) || 0;
+    const serial = document.getElementById('appliance-serial').value.trim();
+    const location = document.getElementById('appliance-location').value.trim();
+    const notes = document.getElementById('appliance-notes').value.trim();
+    
+    // Validate required fields
+    if (!name) {
+        alert('❌ Please enter an appliance name');
+        document.getElementById('appliance-name').focus();
+        return;
+    }
+    
+    // Create new appliance object
+    const newAppliance = {
+        id: Date.now(), // Simple ID generation
+        name: name,
+        category: category,
+        manufacturer: manufacturer || 'Unknown',
+        model: model,
+        purchaseDate: purchaseDate,
+        purchasePrice: price,
+        warrantyMonths: warranty,
+        warrantyExpiration: this.calculateWarrantyExpiration(purchaseDate, warranty),
+        serialNumber: serial,
+        location: location,
+        notes: notes,
+        photos: [],
+        createdDate: new Date().toISOString()
+    };
+    
+    // Add to appliances array
+    this.appliances.push(newAppliance);
+    
+    // Save to storage
+    this.saveAppliances();
+    
+    // Show success message and return to overview
+    alert(`✅ Appliance "${name}" added successfully!`);
+    this.showOverview();
+    
+    console.log('✅ New appliance added:', newAppliance);
+}
+
+// Calculate warranty expiration date
+calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
+    if (!purchaseDate || !warrantyMonths) return null;
+    
+    const purchase = new Date(purchaseDate);
+    const expiration = new Date(purchase);
+    expiration.setMonth(expiration.getMonth() + warrantyMonths);
+    
+    return expiration.toISOString().split('T')[0]; // Return as YYYY-MM-DD
+}
     // Render appliances grouped by category
     renderApplianceCategories(appliancesByCategory) {
         if (Object.keys(appliancesByCategory).length === 0) {
