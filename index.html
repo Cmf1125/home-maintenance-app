@@ -367,11 +367,7 @@
                 <!-- Calendar View -->
                 <div id="calendar-view" class="hidden">
                     <!-- Calendar will be rendered here by calendar.js -->
-                </div
-                     <!-- NEW: Appliances View -->
-        <div id="appliances-view" class="hidden">
-            <!-- appliances content will be rendered here -->
-        </div>
+                </div>
                 <!-- Documents View - ADD THIS ENTIRE BLOCK -->
         <div id="documents-view" class="hidden">
             <!-- Documents content will be rendered here by documents.js -->
@@ -389,19 +385,19 @@
             <div class="text-lg mb-1">📅</div>
             <div class="text-xs">Calendar</div>
         </button>
-        <!-- NEW: Appliances Tab -->
-        <button onclick="showTab('appliances')" id="tab-appliances" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-            <div class="text-lg mb-1">⚙️</div>
-            <div class="text-xs">Appliances</div>
-        </button>
+        <!-- NEW: Documents Tab -->
         <button onclick="showTab('documents')" id="tab-documents" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
             <div class="text-lg mb-1">📄</div>
             <div class="text-xs">Documents</div>
         </button>
-        <button onclick="exportTaskList()" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-            <div class="text-lg mb-1">📋</div>
-            <div class="text-xs">Export Tasks</div>
+        <button onclick="clearData()" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
+            <div class="text-lg mb-1">🗑️</div>
+            <div class="text-xs">Reset</div>
         </button>
+        <button onclick="exportTaskList()" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
+    <div class="text-lg mb-1">📋</div>
+    <div class="text-xs">Export</div>
+</button>
     </div>
 </div>
             
@@ -653,7 +649,6 @@
     <script src="calendar.js"></script>
     <script src="enhanced-dashboard.js"></script>
     <script src="documents.js"></script> 
-    <script src="appliances.js"></script> 
  <script>
     console.log('🧹 CLEAN SLATE: Starting fresh modal system...');
 
