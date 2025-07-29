@@ -477,15 +477,26 @@ calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
         `;
     }
     
-    // Render individual appliance card
-    renderApplianceCard(appliance) {
-        const statusInfo = this.getApplianceStatus(appliance);
-        const warrantyStatus = this.getWarrantyStatus(appliance);
-        
-        return `
-            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                 onclick="window.applianceManager.showApplianceDetail('${appliance.id}')">
-                <div class="flex items-start justify-between mb-3">
+    // Replace your existing renderApplianceCard method with this version:
+
+renderApplianceCard(appliance) {
+    const statusInfo = this.getApplianceStatus(appliance);
+    const warrantyStatus = this.getWarrantyStatus(appliance);
+    
+    return `
+        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow relative group">
+            <!-- Edit Button (appears on hover) -->
+            <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onclick="window.applianceManager.editAppliance('${appliance.id}')" 
+                        class="bg-blue-100 text-blue-700 hover:bg-blue-200 p-2 rounded-lg text-sm transition-colors"
+                        title="Edit appliance">
+                    ✏️
+                </button>
+            </div>
+            
+            <!-- Clickable area for details -->
+            <div class="cursor-pointer" onclick="window.applianceManager.showApplianceDetail('${appliance.id}')">
+                <div class="flex items-start justify-between mb-3 pr-8">
                     <div class="flex-1">
                         <h4 class="font-semibold text-gray-900 text-sm">${appliance.name}</h4>
                         <p class="text-xs text-gray-600">${appliance.manufacturer} ${appliance.model || ''}</p>
@@ -506,24 +517,28 @@ calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
                         </div>
                     ` : ''}
                     
-                    ${appliance.nextMaintenance ? `
+                    ${appliance.location ? `
                         <div class="flex items-center gap-2">
-                            <span class="text-xs text-gray-500">🔧 Next: ${appliance.nextMaintenance}</span>
+                            <span class="text-xs text-gray-500">📍 ${appliance.location}</span>
                         </div>
                     ` : ''}
                 </div>
                 
-                <div class="flex gap-2 mt-3">
+                <div class="flex gap-2 mt-3 flex-wrap">
                     ${appliance.photos && appliance.photos.length > 0 ? 
                         `<span class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs">📸 ${appliance.photos.length}</span>` : ''
                     }
-                    ${appliance.manualUrl ? 
-                        `<span class="bg-green-50 text-green-700 px-2 py-1 rounded text-xs">📋 Manual</span>` : ''
+                    ${appliance.serialNumber ? 
+                        `<span class="bg-green-50 text-green-700 px-2 py-1 rounded text-xs">🔢 Serial</span>` : ''
+                    }
+                    ${appliance.purchaseDate ? 
+                        `<span class="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs">📅 ${new Date(appliance.purchaseDate).getFullYear()}</span>` : ''
                     }
                 </div>
             </div>
-        `;
-    }
+        </div>
+    `;
+}
     
     // Render empty state when no appliances
     renderEmptyState() {
