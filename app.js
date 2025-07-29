@@ -1177,6 +1177,8 @@ function showTab(tabName) {
     } catch (error) {
         console.error('❌ Error initializing appliances:', error);
     }
+        }
+        
 // END OF NEW CODE
 }
 
