@@ -1048,12 +1048,10 @@ function showTab(tabName) {
     const dashboardView = document.getElementById('dashboard-view');
     const calendarView = document.getElementById('calendar-view');
     const documentsView = document.getElementById('documents-view');
-    const appliancesView = document.getElementById('appliances-view');
 
     if (dashboardView) dashboardView.classList.add('hidden');
     if (calendarView) calendarView.classList.add('hidden');
     if (documentsView) documentsView.classList.add('hidden');
-    if (appliancesView) appliancesView.classList.add('hidden');
     
     // Update tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1150,38 +1148,8 @@ function showTab(tabName) {
         } catch (error) {
             console.error('❌ Error initializing documents:', error);
         }
-// 🚀 ADD THE APPLIANCES CODE RIGHT HERE:
-} else if (tabName === 'appliances') {
-    // Show appliances
-    const appliancesView = document.getElementById('appliances-view');
-    if (appliancesView) {
-        appliancesView.classList.remove('hidden');
     }
-    
-    // Update tab styling
-    const appliancesTab = document.getElementById('tab-appliances');
-    if (appliancesTab) {
-        appliancesTab.classList.add('bg-blue-100', 'text-blue-700');
-        appliancesTab.classList.remove('text-gray-600');
-    }
-    
-    console.log('⚙️ Initializing appliances...');
-    
-    // Initialize appliances manager
-    try {
-        if (!window.applianceManager && typeof ApplianceManager !== 'undefined') {
-            console.log('⚙️ Creating new appliance manager...');
-            window.applianceManager = new ApplianceManager();
-        } else if (window.applianceManager) {
-            console.log('⚙️ Refreshing existing appliance manager...');
-            window.applianceManager.render();
-        }
-    } catch (error) {
-        console.error('❌ Error initializing appliances:', error);
-    }
-        }
-    }
-
+}
 
 // Basic dashboard fallback function
 function updateDashboard() {
