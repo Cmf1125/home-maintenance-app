@@ -1109,7 +1109,7 @@ function finishTaskSetup() {
     
     if (tasksWithDates.length === 0) {
         console.error('❌ CRITICAL: No tasks have due dates after processing!');
-        alert('❌ Error: No tasks were properly scheduled. Please try again.');
+        showtoast('No tasks were properly scheduled. Please try again.','error');
         return;
     }
     
@@ -1119,7 +1119,7 @@ function finishTaskSetup() {
         console.log('💾 Data saved successfully');
     } catch (error) {
         console.error('❌ Error saving data:', error);
-        alert('❌ Error saving data. Please try again.');
+        showtoast('Error saving data. Please try again.','error');
         return;
     }
     
@@ -1396,7 +1396,7 @@ function addTaskFromSetup() {
     const modal = document.getElementById('task-edit-modal');
     if (!modal) {
         console.error('❌ Task edit modal not found');
-        alert('❌ Cannot add task: Edit modal not available. Please check that you are on the correct page.');
+        showtoast('Cannot add task: Edit modal not available. Please check that you are on the correct page.', 'error');
         return;
     }
     
@@ -1431,7 +1431,7 @@ function completeTask(taskId) {
     const task = tasks.find(t => t.id === taskId);
     if (!task) {
         console.error('❌ Task not found:', taskId);
-        alert('❌ Task not found');
+        showtoast('Task not found', 'error');
         return;
     }
 
@@ -1460,7 +1460,7 @@ function completeTask(taskId) {
         console.log('💾 Data saved after task completion');
     } catch (error) {
         console.error('❌ Error saving data after completion:', error);
-        alert('❌ Error saving task completion');
+        showtoast('Error saving task completion', 'error');
         return;
     }
     
@@ -1578,7 +1578,7 @@ function addTaskFromDashboard() {
     }
     
     console.log('✅ New task added:', newTask);
-    alert(`✅ Task "${title}" added successfully!`);
+    showtoast(`Task "${title}" added successfully!`);
 }
 
 // FIXED: Enhanced Edit Task function for setup with better modal handling
@@ -1588,7 +1588,7 @@ function editTaskFromSetup(taskId) {
     const task = tasks.find(t => t.id === taskId);
     if (!task) {
         console.error('❌ Task not found:', taskId);
-        alert('❌ Task not found');
+        showtoast('Task not found', 'error');
         return;
     }
     
@@ -1598,7 +1598,7 @@ function editTaskFromSetup(taskId) {
     const modal = document.getElementById('task-edit-modal');
     if (!modal) {
         console.error('❌ Task edit modal not found');
-        alert('❌ Cannot edit task: Edit modal not available. Please check that you are on the correct page.');
+        showtoast('Cannot edit task: Edit modal not available. Please check that you are on the correct page.', 'error');
         return;
     }
     
@@ -1667,7 +1667,7 @@ function saveTaskFromEdit() {
     
     if (!currentEditingTask && !window.currentEditingTask) {
         console.error('❌ No task being edited');
-        alert('❌ No task selected for editing');
+        showtoast('No task selected for editing', 'error');
         return;
     }
     
@@ -1685,14 +1685,14 @@ function saveTaskFromEdit() {
     
     // Validate inputs
 if (!title) {
-    alert('❌ Title required');
+    showtoast('Title required', 'error');
     return;
 }
 
 // Description is now optional - no validation needed
     
     if (frequency <= 0) {
-        alert('❌ Frequency must be greater than 0');
+        showtoast('Frequency must be greater than 0', 'error');
         document.getElementById('edit-task-frequency').focus();
         return;
     }
@@ -1702,7 +1702,7 @@ if (!title) {
     if (dueDateInput && dueDateInput.value) {
         dueDate = new Date(dueDateInput.value + 'T12:00:00');
         if (isNaN(dueDate.getTime())) {
-            alert('❌ Invalid due date');
+            showtoast('Invalid due date', 'error');
             dueDateInput.focus();
             return;
         }
@@ -1811,7 +1811,7 @@ function deleteTaskFromEdit() {
             // Close modal
             closeTaskEditModal();
             
-            alert(`✅ Task "${deletedTask.title}" deleted successfully!`);
+            showtoast(`Task "${deletedTask.title}" deleted successfully!`);
         }
     }
 }
@@ -1834,7 +1834,7 @@ function showHomeInfo() {
     const modal = document.getElementById('home-info-modal');
     if (!modal) {
         console.error('❌ Home info modal not found');
-        alert('❌ Cannot edit home info: Modal not available.');
+        showtoast('Cannot edit home info: Modal not available.', 'error');
         return;
     }
     
@@ -1903,12 +1903,12 @@ function saveHomeInfo() {
     
     // Validate required fields
     if (!newAddress || !newCity || !newState || !newZipcode) {
-        alert('❌ Please fill in all address fields');
+        showtoast('Please fill in all address fields', 'error');
         return;
     }
     
     if (newState.length !== 2) {
-        alert('❌ State must be 2 letters (e.g., NY, CA, TX)');
+        showtoast('State must be 2 letters (e.g., NY, CA, TX)', 'error');
         document.getElementById('edit-home-state').focus();
         return;
     }
@@ -1934,7 +1934,7 @@ function saveHomeInfo() {
         console.log('💾 Home data saved successfully');
     } catch (error) {
         console.error('❌ Error saving home data:', error);
-        alert('❌ Error saving changes. Please try again.');
+        showtoast('Error saving changes. Please try again.', 'error');
         return;
     }
     
@@ -1955,9 +1955,9 @@ function saveHomeInfo() {
     // Show success message
     const addressChanged = oldAddress !== homeData.fullAddress;
     if (addressChanged) {
-        alert(`✅ Home information updated!\n\nNew address: ${homeData.fullAddress}\n\nYour existing tasks and schedules remain unchanged.`);
+        showtoast(`Home information updated!\n\nNew address: ${homeData.fullAddress}\n\nYour existing tasks and schedules remain unchanged.`);
     } else {
-        alert(`✅ Home information updated successfully!\n\nProperty details have been saved.`);
+        showtoast(`Home information updated successfully!\n\nProperty details have been saved.`);
     }
     
     console.log('✅ Home information updated:', homeData.fullAddress);
@@ -1981,7 +1981,7 @@ function clearData() {
         document.getElementById('main-app').classList.add('hidden');
         document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
         
-        alert('✅ All data cleared. Starting fresh!');
+        showtoast('All data cleared. Starting fresh!');
     }
 }
 
@@ -2223,7 +2223,7 @@ function completeTaskSafe(taskId) {
     const task = tasks.find(t => t.id === taskId);
     if (!task) {
         console.error('❌ Task not found:', taskId);
-        alert('❌ Task not found');
+        showtoast('Task not found', 'error');
         return;
     }
 
@@ -2236,13 +2236,13 @@ function completeTaskSafe(taskId) {
     // Calculate next due date using enhanced system
     const nextDueDate = calculateNextDueDate(task, oldDueDate);
     if (!nextDueDate) {
-        alert('❌ Error calculating next due date');
+        showtoast('Error calculating next due date', 'error);
         return;
     }
     
     // Use unified date setter (ensures calendar sync)
     if (!setTaskDate(task, nextDueDate)) {
-        alert('❌ Error setting new due date');
+        showtoast('Error setting new due date', 'error');
         return;
     }
     
@@ -2258,7 +2258,7 @@ function completeTaskSafe(taskId) {
         console.log('💾 Data saved after task completion');
     } catch (error) {
         console.error('❌ Error saving data after completion:', error);
-        alert('❌ Error saving task completion');
+        showtoast('Error saving task completion', 'error');
         return;
     }
     
