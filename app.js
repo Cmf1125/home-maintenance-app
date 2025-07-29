@@ -1148,9 +1148,9 @@ function showTab(tabName) {
         } catch (error) {
             console.error('❌ Error initializing documents:', error);
         }
-}
-// ADD THIS NEW CASE right after the documents case:
-else if (tabName === 'appliances') {
+        
+// ADD THE APPLIANCES CODE RIGHT HERE:    
+} else if (tabName === 'appliances') {
     // Show appliances
     const appliancesView = document.getElementById('appliances-view');
     if (appliancesView) {
@@ -1178,6 +1178,7 @@ else if (tabName === 'appliances') {
     } catch (error) {
         console.error('❌ Error initializing appliances:', error);
     }
+// END OF NEW CODE
 }
 // Basic dashboard fallback function
 function updateDashboard() {
