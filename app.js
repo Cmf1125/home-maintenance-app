@@ -1529,7 +1529,7 @@ function addTaskFromDashboard() {
     
     const priority = prompt('Priority (high, medium, low):', 'medium');
     if (!['high', 'medium', 'low'].includes(priority)) {
-        alert('Invalid priority. Please use: high, medium, or low');
+        showToast('Invalid priority. Please use: high, medium, or low', 'error');
         return;
     }
     
@@ -1538,7 +1538,7 @@ function addTaskFromDashboard() {
     
     const dueDate = new Date(dueDateStr + 'T12:00:00');
     if (isNaN(dueDate.getTime())) {
-        alert('Invalid date format');
+        showToast('Invalid date format', 'error');
         return;
     }
     
@@ -1631,7 +1631,7 @@ function openTaskEditModal(task, isNewTask = false) {
     
     const modal = document.getElementById('task-edit-modal');
     if (!modal) {
-        alert('Modal not found');
+        showToast('Modal not found', 'error');
         return;
     }
     
@@ -1826,7 +1826,7 @@ function showHomeInfo() {
     console.log('🏠 Opening editable home info modal...');
     
     if (!homeData.fullAddress) {
-        alert('🏠 No home information set yet. Complete the setup to add your home details.');
+        showToast('No home information set yet. Complete the setup to add your home details.', 'info');
         return;
     }
     
@@ -2001,7 +2001,7 @@ function exportData() {
     link.click();
     document.body.removeChild(link);
     
-    alert('📄 Data exported successfully!');
+    showToast('Data exported successfully!');
 }
 
 function saveData() {
