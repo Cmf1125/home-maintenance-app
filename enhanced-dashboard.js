@@ -31,11 +31,50 @@ class EnhancedDashboard {
     }
 
     setFilter(filterType) {
-        this.currentFilter = filterType;
-        this.updateFilterUI();
-        this.renderFilteredTasks();
-    }
+    this.currentFilter = filterType;
+    this.updateFilterUI();
+    this.renderFilteredTasks();
+    
+    // 🎯 NEW: Smooth scroll to task list with visual feedback
+    this.scrollToTaskList();
+}
+    // Add this method to your EnhancedDashboard class:
 
+scrollToTaskList() {
+    const tasksList = document.getElementById('tasks-list');
+    const tasksSection = tasksList?.closest('.bg-white.rounded-2xl.shadow-lg');
+    
+    if (tasksSection) {
+        // Add a subtle flash effect to show something happened
+        tasksSection.style.transition = 'all 0.3s ease';
+        tasksSection.style.boxShadow = '0 0 20px rgba(14, 165, 233, 0.4)';
+        tasksSection.style.transform = 'scale(1.01)';
+        
+        // Smooth scroll to the tasks section with some offset
+        const rect = tasksSection.getBoundingClientRect();
+        const offset = window.pageYOffset + rect.top - 20; // 20px offset from top
+        
+        window.scrollTo({
+            top: offset,
+            behavior: 'smooth'
+        });
+        
+        // Remove the flash effect after animation
+        setTimeout(() => {
+            tasksSection.style.boxShadow = '';
+            tasksSection.style.transform = '';
+        }, 800);
+        
+        // Add a brief highlight to the tasks list content
+        if (tasksList) {
+            tasksList.style.transition = 'background-color 0.3s ease';
+            tasksList.style.backgroundColor = '#f0f9ff';
+            setTimeout(() => {
+                tasksList.style.backgroundColor = '';
+            }, 600);
+        }
+    }
+}
     updateFilterUI() {
         // Remove active class from all cards
         document.querySelectorAll('.stat-card').forEach(card => {
