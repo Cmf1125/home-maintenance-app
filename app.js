@@ -2173,6 +2173,8 @@ function showToast(message, type = 'success') {
         }
     }, 4000);
 }
+// 👇 ADD THIS LINE:
+window.showToast = showToast;
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', initializeApp);
