@@ -1037,6 +1037,8 @@ function finishTaskSetup() {
 }
 
 // Enhanced showTab function with better error handling
+// In your app.js, find the showTab function and make it look like this:
+
 function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
     
@@ -1149,6 +1151,71 @@ function showTab(tabName) {
             }
         } catch (error) {
             console.error('❌ Error initializing documents:', error);
+        }
+        
+    } else if (tabName === 'appliances') {
+        // Show appliances view
+        if (appliancesView) {
+            appliancesView.classList.remove('hidden');
+        }
+        
+        // Update tab styling  
+        const appliancesTab = document.getElementById('tab-appliances');
+        if (appliancesTab) {
+            appliancesTab.classList.add('bg-blue-100', 'text-blue-700');
+            appliancesTab.classList.remove('text-gray-600');
+        }
+        
+        console.log('⚙️ Switching to appliances tab...');
+        
+        // Initialize or refresh appliances module
+        try {
+            if (!window.applianceManager) {
+                console.log('⚙️ Appliance manager not found, initializing...');
+                if (typeof window.initializeApplianceManager === 'function') {
+                    window.applianceManager = window.initializeApplianceManager();
+                } else if (typeof ApplianceManager !== 'undefined') {
+                    console.log('⚙️ Creating appliance manager directly...');
+                    window.applianceManager = new ApplianceManager();
+                } else {
+                    console.error('❌ ApplianceManager class not available');
+                    // Show fallback content
+                    if (appliancesView) {
+                        appliancesView.innerHTML = `
+                            <div class="p-4">
+                                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                                    <p class="text-red-800">⚠️ Appliances module failed to load. Please refresh the page.</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+            }
+            
+            // Render the appliances view
+            if (window.applianceManager && typeof window.applianceManager.render === 'function') {
+                console.log('⚙️ Rendering appliances view...');
+                window.applianceManager.render();
+            } else {
+                console.error('❌ Appliance manager render method not available');
+            }
+            
+        } catch (error) {
+            console.error('❌ Error initializing appliances:', error);
+            // Show error message to user
+            if (appliancesView) {
+                appliancesView.innerHTML = `
+                    <div class="p-4">
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <p class="text-red-800">❌ Error loading appliances: ${error.message}</p>
+                            <button onclick="location.reload()" class="mt-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                                Refresh Page
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
         }
     }
 }
