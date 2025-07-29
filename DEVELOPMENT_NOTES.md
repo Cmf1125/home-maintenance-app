@@ -99,3 +99,23 @@ User Account Features (Later):
 ☁️ Cloud sync so data works across devices
 👥 Family sharing for multiple users
 🏠 Multiple properties for vacation homes
+
+// FINAL CATEGORY SYSTEM (6 categories):
+
+// 1. 🔧 General - Basic home maintenance
+//    - Dryer vent cleaning, garage door, basement checks, etc.
+
+// 2. 🌡️ HVAC - Heating, cooling, air quality
+//    - Filter changes, professional service, duct cleaning
+
+// 3. 💧 Water Systems - All water-related
+//    - Well water, septic, filters, plumbing
+
+// 4. 🏠 Exterior - Everything outside the house
+//    - Gutters, deck, trees, lawn, irrigation, roof, siding
+
+// 5. 🐛 Pest Control - Pest prevention & treatment
+//    - Quarterly treatments, termite inspection, ant baits
+
+// 6. ⚠️ Safety - Critical safety tasks
+//    - Smoke detectors, chimney cleaning, fire safety
