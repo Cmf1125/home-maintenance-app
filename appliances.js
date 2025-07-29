@@ -539,6 +539,369 @@ renderApplianceCard(appliance) {
         </div>
     `;
 }
+    // Add these methods to your ApplianceManager class:
+
+// Edit appliance method
+editAppliance(applianceId) {
+    this.currentAppliance = this.appliances.find(a => a.id == applianceId);
+    if (this.currentAppliance) {
+        this.currentView = 'edit';
+        this.render();
+    } else {
+        console.error('Appliance not found:', applianceId);
+        alert('❌ Appliance not found');
+    }
+}
+
+// Updated renderEditForm method (replace the placeholder one)
+renderEditForm() {
+    if (!this.currentAppliance) {
+        this.showOverview();
+        return;
+    }
+    
+    const appliancesView = document.getElementById('appliances-view');
+    if (!appliancesView) return;
+    
+    appliancesView.innerHTML = `
+        <div class="p-4">
+            <div class="max-w-2xl mx-auto">
+                <!-- Header -->
+                <div class="flex items-center gap-4 mb-6">
+                    <button onclick="window.applianceManager.showOverview()" 
+                            class="text-gray-500 hover:text-gray-700 transition-colors">
+                        ← Back
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">Edit Appliance</h2>
+                        <p class="text-gray-600 text-sm">Update ${this.currentAppliance.name}</p>
+                    </div>
+                </div>
+                
+                <!-- Edit Form -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <form id="appliance-edit-form" class="space-y-6">
+                        <!-- Basic Information -->
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Appliance Name *</label>
+                                <input type="text" id="edit-appliance-name" required
+                                       value="${this.currentAppliance.name || ''}"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="e.g., Kitchen Refrigerator">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                                <select id="edit-appliance-category" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    ${this.categories.map(cat => 
+                                        `<option value="${cat.id}" ${cat.id === this.currentAppliance.category ? 'selected' : ''}>${cat.icon} ${cat.name}</option>`
+                                    ).join('')}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Manufacturer</label>
+                                <input type="text" id="edit-appliance-manufacturer"
+                                       value="${this.currentAppliance.manufacturer || ''}"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="e.g., Whirlpool, GE, Samsung">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Model Number</label>
+                                <input type="text" id="edit-appliance-model"
+                                       value="${this.currentAppliance.model || ''}"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="e.g., WRF535SWHZ">
+                            </div>
+                        </div>
+                        
+                        <!-- Purchase Information -->
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Date</label>
+                                <input type="date" id="edit-appliance-purchase-date"
+                                       value="${this.currentAppliance.purchaseDate || ''}"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Price</label>
+                                <input type="number" id="edit-appliance-price" min="0" step="0.01"
+                                       value="${this.currentAppliance.purchasePrice || ''}"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="0.00">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Warranty (Months)</label>
+                                <input type="number" id="edit-appliance-warranty" min="0"
+                                       value="${this.currentAppliance.warrantyMonths || ''}"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="12">
+                            </div>
+                        </div>
+                        
+                        <!-- Serial Number & Location -->
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Serial Number</label>
+                                <input type="text" id="edit-appliance-serial"
+                                       value="${this.currentAppliance.serialNumber || ''}"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Serial number from appliance label">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                                <input type="text" id="edit-appliance-location"
+                                       value="${this.currentAppliance.location || ''}"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="e.g., Kitchen, Basement, Garage">
+                            </div>
+                        </div>
+                        
+                        <!-- Photos Section -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Photos</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                                <!-- Existing Photos -->
+                                ${this.currentAppliance.photos && this.currentAppliance.photos.length > 0 ? `
+                                    <div class="mb-4">
+                                        <p class="text-sm text-gray-600 mb-2">Current Photos:</p>
+                                        <div class="grid grid-cols-3 gap-2">
+                                            ${this.currentAppliance.photos.map((photo, index) => `
+                                                <div class="relative group">
+                                                    <img src="${photo.data}" alt="Appliance photo" 
+                                                         class="w-full h-20 object-cover rounded cursor-pointer"
+                                                         onclick="window.applianceManager.viewPhoto('${this.currentAppliance.id}', ${index})">
+                                                    <button onclick="window.applianceManager.deletePhoto('${this.currentAppliance.id}', ${index})"
+                                                            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                <!-- Add New Photo -->
+                                <div class="text-center">
+                                    <input type="file" id="edit-photo-input" accept="image/*" class="hidden" 
+                                           onchange="window.applianceManager.handlePhotoUpload(event, 'edit')">
+                                    <button type="button" onclick="document.getElementById('edit-photo-input').click()"
+                                            class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition-colors">
+                                        📸 Add Photo
+                                    </button>
+                                    <p class="text-xs text-gray-500 mt-2">Click to add photos of model stickers, receipts, or the appliance</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Notes -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                            <textarea id="edit-appliance-notes" rows="3"
+                                      class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                      placeholder="Additional details, maintenance notes, etc.">${this.currentAppliance.notes || ''}</textarea>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex gap-3 pt-4">
+                            <button type="button" onclick="window.applianceManager.deleteAppliance('${this.currentAppliance.id}')"
+                                    class="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-colors">
+                                🗑️ Delete
+                            </button>
+                            <button type="button" onclick="window.applianceManager.showOverview()"
+                                    class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                    class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                                💾 Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Set up form submission
+    const form = document.getElementById('appliance-edit-form');
+    if (form) {
+        form.addEventListener('submit', (e) => this.handleEditFormSubmit(e));
+    }
+}
+
+// Handle photo upload
+handlePhotoUpload(event, context = 'add') {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Validate file
+    if (!file.type.startsWith('image/')) {
+        alert('❌ Please select an image file');
+        return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        alert('❌ Image too large. Please select an image smaller than 5MB');
+        return;
+    }
+    
+    // Read file as base64
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const photoData = {
+            data: e.target.result,
+            fileName: file.name,
+            uploadDate: new Date().toISOString(),
+            size: file.size
+        };
+        
+        if (context === 'edit' && this.currentAppliance) {
+            // Add to current appliance
+            if (!this.currentAppliance.photos) this.currentAppliance.photos = [];
+            this.currentAppliance.photos.push(photoData);
+            
+            // Re-render the edit form to show the new photo
+            this.renderEditForm();
+            
+            console.log('📸 Photo added to appliance:', this.currentAppliance.name);
+        } else {
+            // Store temporarily for add form
+            if (!window.tempAppliancePhotos) window.tempAppliancePhotos = [];
+            window.tempAppliancePhotos.push(photoData);
+            
+            // Update add form preview (you'll need to implement this)
+            console.log('📸 Photo added to temp storage');
+        }
+    };
+    
+    reader.readAsDataURL(file);
+}
+
+// View photo in full size
+viewPhoto(applianceId, photoIndex) {
+    const appliance = this.appliances.find(a => a.id == applianceId);
+    if (!appliance || !appliance.photos || !appliance.photos[photoIndex]) {
+        alert('❌ Photo not found');
+        return;
+    }
+    
+    const photo = appliance.photos[photoIndex];
+    
+    // Create a modal to view the photo
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4';
+    modal.onclick = () => document.body.removeChild(modal);
+    
+    modal.innerHTML = `
+        <div class="max-w-4xl max-h-full">
+            <img src="${photo.data}" alt="Appliance photo" 
+                 class="max-w-full max-h-full object-contain rounded-lg">
+            <div class="text-center mt-4">
+                <p class="text-white text-sm">${photo.fileName}</p>
+                <p class="text-gray-300 text-xs">Click anywhere to close</p>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// Delete photo
+deletePhoto(applianceId, photoIndex) {
+    const appliance = this.appliances.find(a => a.id == applianceId);
+    if (!appliance || !appliance.photos || !appliance.photos[photoIndex]) {
+        alert('❌ Photo not found');
+        return;
+    }
+    
+    if (confirm('Delete this photo?')) {
+        appliance.photos.splice(photoIndex, 1);
+        this.saveAppliances();
+        
+        // Re-render current view
+        if (this.currentView === 'edit') {
+            this.renderEditForm();
+        } else {
+            this.render();
+        }
+        
+        console.log('🗑️ Photo deleted from appliance:', appliance.name);
+    }
+}
+
+// Handle edit form submission
+handleEditFormSubmit(event) {
+    event.preventDefault();
+    
+    if (!this.currentAppliance) {
+        alert('❌ No appliance selected for editing');
+        return;
+    }
+    
+    // Get form values
+    const name = document.getElementById('edit-appliance-name').value.trim();
+    const category = document.getElementById('edit-appliance-category').value;
+    const manufacturer = document.getElementById('edit-appliance-manufacturer').value.trim();
+    const model = document.getElementById('edit-appliance-model').value.trim();
+    const purchaseDate = document.getElementById('edit-appliance-purchase-date').value;
+    const price = parseFloat(document.getElementById('edit-appliance-price').value) || 0;
+    const warranty = parseInt(document.getElementById('edit-appliance-warranty').value) || 0;
+    const serial = document.getElementById('edit-appliance-serial').value.trim();
+    const location = document.getElementById('edit-appliance-location').value.trim();
+    const notes = document.getElementById('edit-appliance-notes').value.trim();
+    
+    // Validate required fields
+    if (!name) {
+        alert('❌ Please enter an appliance name');
+        document.getElementById('edit-appliance-name').focus();
+        return;
+    }
+    
+    // Update appliance object
+    this.currentAppliance.name = name;
+    this.currentAppliance.category = category;
+    this.currentAppliance.manufacturer = manufacturer || 'Unknown';
+    this.currentAppliance.model = model;
+    this.currentAppliance.purchaseDate = purchaseDate;
+    this.currentAppliance.purchasePrice = price;
+    this.currentAppliance.warrantyMonths = warranty;
+    this.currentAppliance.warrantyExpiration = this.calculateWarrantyExpiration(purchaseDate, warranty);
+    this.currentAppliance.serialNumber = serial;
+    this.currentAppliance.location = location;
+    this.currentAppliance.notes = notes;
+    this.currentAppliance.lastModified = new Date().toISOString();
+    
+    // Save to storage
+    this.saveAppliances();
+    
+    // Show success message and return to overview
+    alert(`✅ Appliance "${name}" updated successfully!`);
+    this.showOverview();
+    
+    console.log('✅ Appliance updated:', this.currentAppliance);
+}
+
+// Delete appliance
+deleteAppliance(applianceId) {
+    const appliance = this.appliances.find(a => a.id == applianceId);
+    if (!appliance) {
+        alert('❌ Appliance not found');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to delete "${appliance.name}"? This action cannot be undone.`)) {
+        this.appliances = this.appliances.filter(a => a.id != applianceId);
+        this.saveAppliances();
+        
+        alert(`✅ Appliance "${appliance.name}" deleted successfully!`);
+        this.showOverview();
+        
+        console.log('🗑️ Appliance deleted:', appliance.name);
+    }
+}
     
     // Render empty state when no appliances
     renderEmptyState() {
