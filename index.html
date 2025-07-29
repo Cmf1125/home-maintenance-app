@@ -368,7 +368,11 @@
                 <div id="calendar-view" class="hidden">
                     <!-- Calendar will be rendered here by calendar.js -->
                 </div>
-                <!-- Documents View - ADD THIS ENTIRE BLOCK -->
+                <!-- NEW: Appliances View -->
+        <div id="appliances-view" class="hidden">
+            <!-- appliances content will be rendered here -->
+        </div>
+                <!-- Documents View -->
         <div id="documents-view" class="hidden">
             <!-- Documents content will be rendered here by documents.js -->
     </div>
@@ -385,7 +389,10 @@
             <div class="text-lg mb-1">📅</div>
             <div class="text-xs">Calendar</div>
         </button>
-        <!-- NEW: Documents Tab -->
+         <button onclick="showTab('appliances')" id="tab-appliances" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
+            <div class="text-lg mb-1">⚙️</div>
+            <div class="text-xs">Appliances</div>
+        </button>
         <button onclick="showTab('documents')" id="tab-documents" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
             <div class="text-lg mb-1">📄</div>
             <div class="text-xs">Documents</div>
