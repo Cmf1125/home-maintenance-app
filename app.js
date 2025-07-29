@@ -91,7 +91,21 @@ function createMaintenancePlan() {
             otherFeatures: document.getElementById('other-features')?.value || ''
         };
 
+    // Add this function before generateTaskTemplates() in app.js:
+
+function getAutoPriority(title, category) {
+    // Safety tasks are always high priority
+    if (category === 'Safety') return 'high';
     
+    // Critical safety keywords
+    const safetyKeywords = ['smoke', 'detector', 'carbon monoxide', 'chimney', 'boiler', 'fire'];
+    if (safetyKeywords.some(keyword => title.toLowerCase().includes(keyword))) {
+        return 'high';
+    }
+    
+    // Everything else is normal priority
+    return 'normal';
+}
 
         // Generate tasks
         generateTaskTemplates();
@@ -129,7 +143,7 @@ function generateTaskTemplates() {
             category: 'Safety',
             frequency: 180,
             cost: 0,
-            priority: 'high',
+           priority: getAutoPriority('Test Smoke Detectors', 'Safety'), // ← ADD THIS LINE
             description: 'Test all smoke and carbon monoxide detectors',
             dueDate: null,
             lastCompleted: null,
@@ -142,7 +156,7 @@ function generateTaskTemplates() {
             category: 'General',
             frequency: 365,
             cost: 100,
-            priority: 'medium',
+           priority: getAutoPriority('Dryer Vent Cleaning', 'General'), // ← ADD THIS LINE
             description: 'Clean dryer vent to prevent fire hazard',
             dueDate: null,
             lastCompleted: null,
@@ -162,7 +176,7 @@ function generateTaskTemplates() {
                 category: 'Exterior',
                 frequency: 180,
                 cost: 150,
-                priority: 'medium',
+                 priority: getAutoPriority('Clean Gutters', 'Exterior'), // ← ADD THIS LINE
                 description: 'Clean gutters and downspouts',
                 dueDate: null,
                 lastCompleted: null,
@@ -175,7 +189,7 @@ function generateTaskTemplates() {
                 category: 'General',
                 frequency: 365,
                 cost: 50,
-                priority: 'low',
+                 priority: getAutoPriority('Inspect Caulking', 'General'), // ← ADD THIS LINE
                 description: 'Check and replace caulking around windows and doors',
                 dueDate: null,
                 lastCompleted: null,
@@ -190,7 +204,7 @@ function generateTaskTemplates() {
             category: 'General',
             frequency: 365,
             cost: 0,
-            priority: 'low',
+            priority: getAutoPriority('Inspect Window Seats', 'General'), // ← ADD THIS LINE
             description: 'Check window and door seals for air leaks',
             dueDate: null,
             lastCompleted: null,
@@ -210,7 +224,7 @@ function generateTaskTemplates() {
                 category: 'HVAC',
                 frequency: 90,
                 cost: 25,
-                priority: 'high',
+                priority: getAutoPriority('Replace HVAC Filter', 'HVAC'), // ← ADD THIS LINE
                 description: 'Replace central air system filter',
                 dueDate: null,
                 lastCompleted: null,
@@ -223,7 +237,7 @@ function generateTaskTemplates() {
                 category: 'HVAC',
                 frequency: 365,
                 cost: 150,
-                priority: 'medium',
+                priority: getAutoPriority('HVAC Professional Service', 'HVAC'), // ← ADD THIS LINE
                 description: 'Annual professional HVAC maintenance',
                 dueDate: null,
                 lastCompleted: null,
@@ -240,7 +254,7 @@ function generateTaskTemplates() {
             category: 'HVAC',
             frequency: 60,
             cost: 0,
-            priority: 'medium',
+            priority: getAutoPriority('Clean Mini-Split Filters', 'HVAC'), // ← ADD THIS LINE
             description: 'Clean mini-split unit filters',
             dueDate: null,
             lastCompleted: null,
@@ -256,7 +270,7 @@ function generateTaskTemplates() {
             category: 'HVAC',
             frequency: 30,
             cost: 0,
-            priority: 'medium',
+            priority: getAutoPriority('Clean Wall AC Filters', 'HVAC'), // ← ADD THIS LINE
             description: 'Clean wall air conditioner filters',
             dueDate: null,
             lastCompleted: null,
@@ -272,7 +286,7 @@ function generateTaskTemplates() {
             category: 'HVAC',
             frequency: 180,
             cost: 0,
-            priority: 'medium',
+            priority: getAutoPriority('Clean Electric Baseboard Heaters', 'HVAC'), // ← ADD THIS LINE
             description: 'Clean dust from electric baseboard heating elements',
             dueDate: null,
             lastCompleted: null,
@@ -288,7 +302,7 @@ function generateTaskTemplates() {
             category: 'HVAC',
             frequency: 365,
             cost: 200,
-            priority: 'high',
+            priority: getAutoPriority('Boiler Annual Service', 'HVAC'), // ← ADD THIS LINE
             description: 'Professional boiler inspection and maintenance',
             dueDate: null,
             lastCompleted: null,
@@ -305,7 +319,7 @@ function generateTaskTemplates() {
             category: 'Water Systems',
             frequency: 365,
             cost: 75,
-            priority: 'high',
+            priority: getAutoPriority('Test Well Water', 'Water Systems'), // ← ADD THIS LINE
             description: 'Annual water quality testing',
             dueDate: null,
             lastCompleted: null,
@@ -320,7 +334,7 @@ function generateTaskTemplates() {
                 category: 'Water Systems',
                 frequency: 90,
                 cost: 25,
-                priority: 'medium',
+                priority: getAutoPriority('Replace Sediment Filter', 'Water Systems'), // ← ADD THIS LINE
                 description: 'Replace sediment filter for well water system',
                 dueDate: null,
                 lastCompleted: null,
@@ -336,7 +350,7 @@ function generateTaskTemplates() {
                 category: 'Water Systems',
                 frequency: 365,
                 cost: 150,
-                priority: 'medium',
+                priority: getAutoPriority('Replace UV Filter', 'Water Systems'), // ← ADD THIS LINE
                 description: 'Replace UV filter for water treatment',
                 dueDate: null,
                 lastCompleted: null,
@@ -352,7 +366,7 @@ function generateTaskTemplates() {
                 category: 'Water Systems',
                 frequency: 60,
                 cost: 30,
-                priority: 'medium',
+                priority: getAutoPriority('Refill Water Softener Salt', 'Water Systems'), // ← ADD THIS LINE
                 description: 'Check and refill water softener salt',
                 dueDate: null,
                 lastCompleted: null,
@@ -368,7 +382,7 @@ function generateTaskTemplates() {
                 category: 'Water Systems',
                 frequency: 180,
                 cost: 50,
-                priority: 'medium',
+                priority: getAutoPriority('Replace Whole House Filter', 'Water Systems'), // ← ADD THIS LINE
                 description: 'Replace whole house water filter',
                 dueDate: null,
                 lastCompleted: null,
@@ -385,7 +399,7 @@ function generateTaskTemplates() {
             category: 'Water Systems',
             frequency: 1095, // 3 years
             cost: 400,
-            priority: 'high',
+            priority: getAutoPriority('Septic Tank Pumping', 'Water Systems'), // ← ADD THIS LINE
             description: 'Professional septic pumping',
             dueDate: null,
             lastCompleted: null,
@@ -402,7 +416,7 @@ function generateTaskTemplates() {
             category: 'Safety',
             frequency: 365,
             cost: 300,
-            priority: 'high',
+            priority: getAutoPriority('Chimney Inspection & Cleaning', 'Safety'), // ← ADD THIS LINE
             description: 'Professional chimney cleaning and inspection',
             dueDate: null,
             lastCompleted: null,
@@ -418,7 +432,7 @@ function generateTaskTemplates() {
             category: 'Exterior',
             frequency: 730, // 2 years
             cost: 200,
-            priority: 'medium',
+            priority: getAutoPriority('Deck Staining/Sealing', 'Exterior'), // ← ADD THIS LINE
             description: 'Stain or seal deck to protect from weather',
             dueDate: null,
             lastCompleted: null,
@@ -434,7 +448,7 @@ function generateTaskTemplates() {
             category: 'General',
             frequency: 182, // Twice yearly
             cost: 300,
-            priority: 'high',
+            priority: getAutoPriority('Pool Opening/Closing', 'General'), // ← ADD THIS LINE
             description: 'Seasonal pool opening and closing',
             dueDate: null,
             lastCompleted: null,
@@ -450,7 +464,7 @@ function generateTaskTemplates() {
             category: 'General',
             frequency: 365,
             cost: 50,
-            priority: 'medium',
+            priority: getAutoPriority('Garage Door Maintenance', 'General'), // ← ADD THIS LINE
             description: 'Lubricate garage door hardware and test safety features',
             dueDate: null,
             lastCompleted: null,
@@ -466,7 +480,7 @@ function generateTaskTemplates() {
             category: 'General',
             frequency: 180,
             cost: 0,
-            priority: 'medium',
+            priority: getAutoPriority('Check Basement for Moisture', 'General'), // ← ADD THIS LINE
             description: 'Inspect basement for signs of moisture, leaks, or mold',
             dueDate: null,
             lastCompleted: null,
@@ -497,7 +511,7 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     category: 'Seasonal',
                     frequency: 365,
                     cost: 0,
-                    priority: 'medium',
+                    priority: getAutoPriority('Check AC Before Summer', 'Seasonal'), // ← ADD THIS LINE
                     description: 'Test air conditioning system before hot weather arrives',
                     season: 'spring',
                     dueDate: null,
@@ -511,7 +525,7 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     category: 'Seasonal',
                     frequency: 365,
                     cost: 0,
-                    priority: 'high',
+                    priority: getAutoPriority('Check Heating Before Winter', 'Seasonal'), // ← ADD THIS LINE
                     description: 'Test heating system operation before cold weather',
                     season: 'fall',
                     dueDate: null,
@@ -528,7 +542,7 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     category: 'Seasonal',
                     frequency: 365,
                     cost: 50,
-                    priority: 'high',
+                    priority: getAutoPriority('Winterize Outdoor Pipes', 'Seasonal'), // ← ADD THIS LINE
                     description: 'Shut off and drain outdoor water lines before first freeze',
                     season: 'fall',
                     dueDate: null,
@@ -547,7 +561,7 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     category: 'Seasonal',
                     frequency: 365,
                     cost: 150,
-                    priority: 'high',
+                    priority: getAutoPriority('AC Pre-Season Tune-Up', 'Seasonal'), // ← ADD THIS LINE
                     description: 'Professional AC maintenance before summer heat',
                     season: 'spring',
                     dueDate: null,
@@ -561,7 +575,7 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     category: 'Seasonal',
                     frequency: 365,
                     cost: 50,
-                    priority: 'high',
+                    priority: getAutoPriority('Hurricane Emergency Kit Check', 'Seasonal'), // ← ADD THIS LINE
                     description: 'Update emergency supplies for hurricane season',
                     season: 'spring',
                     dueDate: null,
@@ -581,7 +595,7 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                         category: 'Seasonal',
                         frequency: 365,
                         cost: 50,
-                        priority: 'medium',
+                        priority: getAutoPriority('Earthquake Emergency Kit Check', 'Seasonal'), // ← ADD THIS LINE
                         description: 'Update emergency supplies and secure items',
                         season: 'spring',
                         dueDate: null,
@@ -601,7 +615,7 @@ function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibil
                     category: 'Seasonal',
                     frequency: 365,
                     cost: 0,
-                    priority: 'medium',
+                    priority: getAutoPriority('Spring System Check', 'Seasonal'), // ← ADD THIS LINE
                     description: 'Check HVAC and prepare for warmer weather',
                     season: 'spring',
                     dueDate: null,
@@ -1566,7 +1580,7 @@ function saveTaskFromEdit() {
     const description = document.getElementById('edit-task-description').value.trim();
     const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
     const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
-    const priority = document.getElementById('edit-task-priority').value;
+    const priority = getAutoPriority(title, category);
     const category = document.getElementById('edit-task-category')?.value || 'General';
     const dueDateInput = document.getElementById('edit-task-due-date');
     
@@ -1581,11 +1595,6 @@ if (!title) {
     if (frequency <= 0) {
         alert('❌ Frequency must be greater than 0');
         document.getElementById('edit-task-frequency').focus();
-        return;
-    }
-    
-    if (!['high', 'medium', 'low'].includes(priority)) {
-        alert('❌ Invalid priority');
         return;
     }
     
