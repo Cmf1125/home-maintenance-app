@@ -601,3 +601,60 @@
 @media (prefers-color-scheme: dark) and (max-width: 768px) {
     /* We can add dark mode later if needed */
 }
+
+/* Mobile Optimizations for Simplified Task Cards */
+@media (max-width: 768px) {
+    .enhanced-task-card {
+        padding: 1rem 0.75rem;
+    }
+    
+    .enhanced-task-card .flex:first-child {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .task-actions {
+        flex-direction: row !important;
+        gap: 0.5rem;
+        justify-content: stretch;
+        width: 100%;
+        margin-left: 0 !important;
+    }
+    
+    .task-actions button {
+        flex: 1;
+        text-align: center;
+        padding: 0.75rem 0.5rem !important;
+        font-size: 0.8125rem !important;
+        min-height: 44px; /* Touch-friendly */
+    }
+    
+    /* Make urgency dots more prominent on mobile */
+    .enhanced-task-card .text-lg {
+        font-size: 1.25rem;
+    }
+    
+    /* Better category badge sizing for mobile */
+    .category-badge {
+        font-size: 0.6875rem !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+    
+    /* Ensure due dates don't wrap awkwardly */
+    .days-until {
+        white-space: nowrap;
+        min-width: fit-content;
+    }
+}
+
+/* Enhanced stat card hover effects */
+.stat-card.active-filter {
+    border-color: #0891b2;
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    box-shadow: 0 8px 25px -5px rgb(8 145 178 / 0.2);
+}
+
+.stat-card:hover:not(.active-filter) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1);
+}
