@@ -1,10 +1,10 @@
 // Enhanced Dashboard functionality for The Home Keeper - Updated for Simplified Date System
 class EnhancedDashboard {
     constructor() {
-    this.currentFilter = 'all'; // 'all', 'overdue', 'week', 'total', 'cost'
+    this.currentFilter = 'all';
     
-    // Add category configuration for consistent colors and icons
-    this.categoryConfig = {
+    // Use global category configuration (defined in app.js)
+    this.categoryConfig = window.categoryConfig || {
         'HVAC': { icon: '🌡️', color: 'blue' },
         'Water Systems': { icon: '💧', color: 'cyan' },
         'Exterior': { icon: '🏠', color: 'green' },
@@ -13,7 +13,7 @@ class EnhancedDashboard {
         'General': { icon: '🔧', color: 'gray' }
     };
     
-    console.log('🎯 Enhanced Dashboard initializing with simplified dates...');
+    console.log('🎯 Enhanced Dashboard initializing with shared categoryConfig');
     this.init();
 }
 
