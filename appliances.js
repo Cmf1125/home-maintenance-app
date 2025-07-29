@@ -176,10 +176,14 @@ class ApplianceManager {
     }
     // Add these methods to your ApplianceManager class (after the renderOverview method)
 
-// Render add appliance form
+// Replace your existing renderAddForm method with this version:
+
 renderAddForm() {
     const appliancesView = document.getElementById('appliances-view');
     if (!appliancesView) return;
+    
+    // Clear any temporary photos from previous sessions
+    window.tempAppliancePhotos = [];
     
     appliancesView.innerHTML = `
         <div class="p-4">
@@ -269,6 +273,31 @@ renderAddForm() {
                             </div>
                         </div>
                         
+                        <!-- Photos Section -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Photos (Optional)</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                                <!-- Photo Preview Area -->
+                                <div id="photo-preview-area" class="mb-4 hidden">
+                                    <p class="text-sm text-gray-600 mb-2">Added Photos:</p>
+                                    <div id="photo-preview-grid" class="grid grid-cols-3 gap-2">
+                                        <!-- Photos will be added here dynamically -->
+                                    </div>
+                                </div>
+                                
+                                <!-- Add Photo Button -->
+                                <div class="text-center">
+                                    <input type="file" id="add-photo-input" accept="image/*" class="hidden" 
+                                           onchange="window.applianceManager.handleAddFormPhotoUpload(event)">
+                                    <button type="button" onclick="document.getElementById('add-photo-input').click()"
+                                            class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition-colors">
+                                        📸 Add Photo
+                                    </button>
+                                    <p class="text-xs text-gray-500 mt-2">Add photos of model stickers, purchase receipts, or the appliance itself</p>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <!-- Notes -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
@@ -298,6 +327,84 @@ renderAddForm() {
     const form = document.getElementById('appliance-add-form');
     if (form) {
         form.addEventListener('submit', (e) => this.handleAddFormSubmit(e));
+    }
+}
+
+// Handle photo upload for add form
+handleAddFormPhotoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Validate file
+    if (!file.type.startsWith('image/')) {
+        alert('❌ Please select an image file');
+        return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        alert('❌ Image too large. Please select an image smaller than 5MB');
+        return;
+    }
+    
+    // Read file as base64
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const photoData = {
+            data: e.target.result,
+            fileName: file.name,
+            uploadDate: new Date().toISOString(),
+            size: file.size
+        };
+        
+        // Add to temporary storage
+        if (!window.tempAppliancePhotos) window.tempAppliancePhotos = [];
+        window.tempAppliancePhotos.push(photoData);
+        
+        // Update preview
+        this.updateAddFormPhotoPreview();
+        
+        console.log('📸 Photo added to temp storage:', file.name);
+    };
+    
+    reader.readAsDataURL(file);
+    
+    // Clear the input so the same file can be selected again
+    event.target.value = '';
+}
+
+// Update photo preview in add form
+updateAddFormPhotoPreview() {
+    const previewArea = document.getElementById('photo-preview-area');
+    const previewGrid = document.getElementById('photo-preview-grid');
+    
+    if (!previewArea || !previewGrid || !window.tempAppliancePhotos) return;
+    
+    if (window.tempAppliancePhotos.length === 0) {
+        previewArea.classList.add('hidden');
+        return;
+    }
+    
+    previewArea.classList.remove('hidden');
+    
+    previewGrid.innerHTML = window.tempAppliancePhotos.map((photo, index) => `
+        <div class="relative group">
+            <img src="${photo.data}" alt="Preview" 
+                 class="w-full h-20 object-cover rounded border">
+            <button onclick="window.applianceManager.removeAddFormPhoto(${index})"
+                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                ×
+            </button>
+            <div class="text-xs text-gray-500 mt-1 truncate">${photo.fileName}</div>
+        </div>
+    `).join('');
+}
+
+// Remove photo from add form
+removeAddFormPhoto(index) {
+    if (window.tempAppliancePhotos && window.tempAppliancePhotos[index]) {
+        window.tempAppliancePhotos.splice(index, 1);
+        this.updateAddFormPhotoPreview();
+        console.log('🗑️ Photo removed from temp storage');
     }
 }
 
