@@ -2629,7 +2629,6 @@ function showToast(message, type = 'success') {
         }
     }, 4000);
 }
-
 // Make it globally available
 window.showToast = showToast;
 // Update the global initializeApp reference
