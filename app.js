@@ -1361,6 +1361,7 @@ function showAllTasks() {
     
     console.log('✅ All Tasks view displayed');
 }
+
 function renderAllTasksView() {
     const allTasksView = document.getElementById('all-tasks-view');
     if (!allTasksView) return;
