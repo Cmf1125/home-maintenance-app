@@ -729,27 +729,31 @@
         },
         
         saveTask: function() {
-            console.log('💾 Saving task...');
-            
-            if (!this.currentTask) {
-                showToast('No task to save', 'error');
-                return;
-            }
-            
-            // Get values
-            const title = document.getElementById('edit-task-name').value.trim();
-            const description = document.getElementById('edit-task-description').value.trim();
-            const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
-            const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
-            const priority = getAutoPriority(title, category);
-            const category = document.getElementById('edit-task-category').value || 'General';
-            const dueDateStr = document.getElementById('edit-task-due-date').value;
-            
-            // Validate
-            if (!title) {
-                showToast('Title required', 'error');
-                return;
-            }
+    console.log('💾 Saving task...');
+    
+    if (!this.currentTask) {
+        showToast('No task to save', 'error');
+        return;
+    }
+    
+    // Get values IN THE RIGHT ORDER
+    const title = document.getElementById('edit-task-name').value.trim();
+    const description = document.getElementById('edit-task-description').value.trim();
+    const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
+    const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
+    const category = document.getElementById('edit-task-category').value || 'General';  // ← FIRST
+    const dueDateStr = document.getElementById('edit-task-due-date').value;
+    
+    // NOW we can calculate priority using category
+    const priority = getAutoPriority(title, category);  // ← SECOND
+    
+    // Validate
+    if (!title) {
+        showToast('Title required', 'error');
+        return;
+    }
+    
+    // Rest of your function continues...
 
             
             // Create date
