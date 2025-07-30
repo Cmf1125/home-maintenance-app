@@ -481,18 +481,8 @@
                             <option value="Safety">⚠️ Safety</option>
                             <option value="Seasonal">🌍 Seasonal</option>
                         </select>
+                        <p class="text-xs text-gray-500 mt-1">💡 Priority is automatically set: Safety tasks = High, others = Medium</p>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Priority (Auto-calculated)</label>
-                        <select id="edit-task-priority" disabled
-                                class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 text-base">
-                            <option value="high">🔴 High Priority</option>
-                            <option value="medium">🟡 Medium Priority</option>
-                            <option value="low">⚪ Low Priority</option>
-                        </select>
-                        <p class="text-xs text-gray-500 mt-1">Priority is automatically set based on category and keywords</p>
-                    </div>
-                </div>
                 
                 <!-- Action Buttons -->
                 <div class="flex gap-3 mt-6">
@@ -725,12 +715,12 @@
             
             fillForm: function(task) {
                 const fields = [
-                    ['edit-task-name', task.title || ''],
-                    ['edit-task-description', task.description || ''],
-                    ['edit-task-cost', task.cost || 0],
-                    ['edit-task-frequency', task.frequency || 365],
-                    ['edit-task-category', task.category || 'General'],
-                    ['edit-task-priority', task.priority || 'medium']
+    ['edit-task-name', task.title || ''],
+    ['edit-task-description', task.description || ''],
+    ['edit-task-cost', task.cost || 0],
+    ['edit-task-frequency', task.frequency || 365],
+    ['edit-task-category', task.category || 'General']
+    // Priority removed - auto-calculated in save()
                 ];
                 
                 fields.forEach(([id, value]) => {
