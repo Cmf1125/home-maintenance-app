@@ -1350,15 +1350,6 @@ function showAllTasks() {
         console.error('❌ All tasks view not found');
         return;
     }
-    
-    // Update tab styling (clear all active states)
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-blue-100', 'text-blue-700');
-        btn.classList.add('text-gray-600');
-    });
-    
-    console.log('✅ All Tasks view displayed');
-}
 
 // Basic dashboard fallback function
 function updateDashboard() {
