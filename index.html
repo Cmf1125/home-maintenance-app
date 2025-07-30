@@ -1297,5 +1297,119 @@ console.log('✅ CALENDAR SYNC AND DOTS RESTORED!');
 console.log('💡 Run debugCalendarDots() to see what tasks are on which dates');
 console.log('💡 Run refreshCalendarWithDots() to force refresh');
 </script>
+            <script>
+console.log('🎨 FORCING CALENDAR DOTS TO APPEAR...');
+
+// Force calendar to re-render with dots
+function forceCalendarDotsRefresh() {
+    // First, let's see if calendar is on the right month
+    if (window.casaCareCalendar) {
+        console.log('📅 Current calendar month:', window.casaCareCalendar.currentMonth + 1, window.casaCareCalendar.currentYear);
+        
+        // Jump to a month that definitely has tasks
+        const firstTaskWithDate = window.tasks.find(t => t.nextDue);
+        if (firstTaskWithDate) {
+            const taskDate = new Date(firstTaskWithDate.nextDue);
+            console.log('📅 Jumping to month with tasks:', taskDate.toDateString());
+            
+            window.casaCareCalendar.currentMonth = taskDate.getMonth();
+            window.casaCareCalendar.currentYear = taskDate.getFullYear();
+            window.casaCareCalendar.renderCalendar();
+        }
+    } else {
+        console.log('📅 Calendar not found, creating new one...');
+        if (typeof CasaCareCalendar !== 'undefined') {
+            window.casaCareCalendar = new CasaCareCalendar();
+        }
+    }
+}
+
+// Enhanced debug to check specific calendar rendering
+function debugCalendarRendering() {
+    console.log('🔍 CALENDAR RENDERING DEBUG:');
+    
+    // Check if calendar view is visible
+    const calendarView = document.getElementById('calendar-view');
+    console.log('📱 Calendar view exists:', !!calendarView);
+    console.log('📱 Calendar view visible:', calendarView && !calendarView.classList.contains('hidden'));
+    
+    // Check if calendar HTML exists
+    const calendarDays = document.getElementById('calendar-days');
+    console.log('📅 Calendar days container:', !!calendarDays);
+    
+    if (calendarDays) {
+        const dayElements = calendarDays.querySelectorAll('.calendar-day');
+        console.log('📅 Day elements found:', dayElements.length);
+        
+        // Check for task dots
+        const dotsFound = calendarDays.querySelectorAll('.task-dot').length;
+        console.log('🔵 Task dots found:', dotsFound);
+        
+        // Check a specific day with tasks
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        const todayElement = document.querySelector(`[data-date="${todayStr}"]`);
+        if (todayElement) {
+            console.log('📅 Today element found:', !!todayElement);
+            console.log('📅 Today element content:', todayElement.innerHTML);
+        }
+    }
+    
+    // Check calendar object
+    if (window.casaCareCalendar) {
+        console.log('📅 Calendar object exists:', true);
+        console.log('📅 Calendar methods available:', {
+            render: typeof window.casaCareCalendar.renderCalendar === 'function',
+            refresh: typeof window.casaCareCalendar.refresh === 'function',
+            getTasksForDate: typeof window.casaCareCalendar.getTasksForDate === 'function'
+        });
+        
+        // Test getTasksForDate for today
+        const today = new Date();
+        const tasksToday = window.casaCareCalendar.getTasksForDate(today);
+        console.log(`📅 Tasks for today (${today.toDateString()}):`, tasksToday.length);
+    }
+}
+
+// Quick fix: Recreate calendar completely
+function recreateCalendar() {
+    console.log('🔄 RECREATING CALENDAR COMPLETELY...');
+    
+    // Switch to calendar tab first
+    showTab('calendar');
+    
+    // Wait a moment for tab to switch
+    setTimeout(() => {
+        // Recreate calendar object
+        if (typeof CasaCareCalendar !== 'undefined') {
+            window.casaCareCalendar = new CasaCareCalendar();
+            console.log('✅ Calendar recreated');
+            
+            // Force it to current month with tasks
+            const firstTask = window.tasks.find(t => t.nextDue);
+            if (firstTask) {
+                const taskDate = new Date(firstTask.nextDue);
+                window.casaCareCalendar.currentMonth = taskDate.getMonth();
+                window.casaCareCalendar.currentYear = taskDate.getFullYear();
+                window.casaCareCalendar.renderCalendar();
+                console.log('✅ Calendar set to month with tasks');
+            }
+        }
+    }, 100);
+}
+
+// Run the fixes
+debugCalendarRendering();
+forceCalendarDotsRefresh();
+
+// Make functions available
+window.forceCalendarDotsRefresh = forceCalendarDotsRefresh;
+window.debugCalendarRendering = debugCalendarRendering;
+window.recreateCalendar = recreateCalendar;
+
+console.log('✅ Calendar debugging complete');
+console.log('💡 Try: recreateCalendar() if dots still missing');
+console.log('💡 Try: debugCalendarRendering() to see what is rendered');
+</script>
   </body>
 </html>
