@@ -1333,6 +1333,42 @@ function showTab(tabName) {
         }
     }
 }
+function showAllTasks() {
+    console.log('📋 Switching to All Tasks view...');
+    
+    // Hide all other views (copy pattern from showTab)
+    const dashboardView = document.getElementById('dashboard-view');
+    const calendarView = document.getElementById('calendar-view');
+    const documentsView = document.getElementById('documents-view');
+    const appliancesView = document.getElementById('appliances-view');
+    const allTasksView = document.getElementById('all-tasks-view');
+
+    if (dashboardView) dashboardView.classList.add('hidden');
+    if (calendarView) calendarView.classList.add('hidden');
+    if (documentsView) documentsView.classList.add('hidden');
+    if (appliancesView) appliancesView.classList.add('hidden');
+    
+    // Show all tasks view
+    if (allTasksView) {
+        allTasksView.classList.remove('hidden');
+    } else {
+        console.error('❌ All tasks view not found');
+        return;
+    }
+    
+    // Update tab styling (clear all active states)
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-blue-100', 'text-blue-700');
+        btn.classList.add('text-gray-600');
+    });
+    
+    // No specific tab gets active styling since this is in secondary nav
+    
+    console.log('✅ All Tasks view displayed');
+    
+    // Later we'll add: renderAllTasksView();
+}
+
 // Basic dashboard fallback function
 function updateDashboard() {
     console.log('🔄 Running basic dashboard update...');
@@ -2133,6 +2169,7 @@ window.deleteTaskFromEdit = deleteTaskFromEdit;
 window.showHomeInfo = showHomeInfo;
 window.clearData = clearData;
 window.exportData = exportData;
+window.showAllTasks = showAllTasks;
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', initializeApp);
