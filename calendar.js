@@ -191,34 +191,61 @@ class CasaCareCalendar {
     }
 
     renderDayTaskDots(dayTasks) {
-        if (dayTasks.length === 0) return '';
+    if (dayTasks.length === 0) return '';
 
-        // Group tasks by priority
-        const priorityCounts = { high: 0, medium: 0, low: 0 };
-        dayTasks.forEach(task => {
-            priorityCounts[task.priority]++;
-        });
-
-        let dotsHTML = '';
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0); // Normalize to start of day for comparison
+    
+    // Categorize tasks by visual priority (same logic as dashboard)
+    const priorityCounts = { overdue: 0, safety: 0, dueSoon: 0, normal: 0 };
+    
+    dayTasks.forEach(task => {
+        const taskDate = new Date(task.nextDue || task.dueDate);
+        taskDate.setHours(0, 0, 0, 0); // Normalize task date
         
-        // Add dots for each priority level
-        if (priorityCounts.high > 0) {
-            dotsHTML += `<div class="task-dot high" title="${priorityCounts.high} high priority tasks"></div>`;
+        const daysUntilDue = Math.ceil((taskDate - currentDate) / (24 * 60 * 60 * 1000));
+        const isOverdue = daysUntilDue < 0;
+        
+        // Apply same visual priority logic as dashboard
+        if (isOverdue) {
+            priorityCounts.overdue++;
+        } else if (task.category === 'Safety') {
+            priorityCounts.safety++;
+        } else if (daysUntilDue <= 7) {
+            priorityCounts.dueSoon++;
+        } else {
+            priorityCounts.normal++;
         }
-        if (priorityCounts.medium > 0) {
-            dotsHTML += `<div class="task-dot medium" title="${priorityCounts.medium} medium priority tasks"></div>`;
-        }
-        if (priorityCounts.low > 0) {
-            dotsHTML += `<div class="task-dot low" title="${priorityCounts.low} low priority tasks"></div>`;
-        }
+    });
 
-        // Show count if more than 3 tasks
-        if (dayTasks.length > 3) {
-            dotsHTML += `<div class="task-count">+${dayTasks.length - 3}</div>`;
-        }
-
-        return dotsHTML;
+    let dotsHTML = '';
+    
+    // Add dots for each priority level (highest priority first)
+    if (priorityCounts.overdue > 0) {
+        dotsHTML += `<div class="task-dot overdue" title="${priorityCounts.overdue} overdue tasks"></div>`;
     }
+    if (priorityCounts.safety > 0) {
+        dotsHTML += `<div class="task-dot safety" title="${priorityCounts.safety} safety tasks"></div>`;
+    }
+    if (priorityCounts.dueSoon > 0) {
+        dotsHTML += `<div class="task-dot due-soon" title="${priorityCounts.dueSoon} tasks due soon"></div>`;
+    }
+    if (priorityCounts.normal > 0) {
+        dotsHTML += `<div class="task-dot normal" title="${priorityCounts.normal} normal tasks"></div>`;
+    }
+
+    // Show count if more than 4 total dots would be displayed
+    const totalVisualDots = (priorityCounts.overdue > 0 ? 1 : 0) + 
+                           (priorityCounts.safety > 0 ? 1 : 0) + 
+                           (priorityCounts.dueSoon > 0 ? 1 : 0) + 
+                           (priorityCounts.normal > 0 ? 1 : 0);
+    
+    if (dayTasks.length > 4 && totalVisualDots >= 3) {
+        dotsHTML += `<div class="task-count">+${dayTasks.length - 3}</div>`;
+    }
+
+    return dotsHTML;
+}
 
     getTasksForDate(date) {
         // Check if window.tasks exists and has data
@@ -302,30 +329,55 @@ class CasaCareCalendar {
     }
 
     renderDayPanelTask(task) {
-        const taskDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
-        const isOverdue = taskDate < new Date();
-        const priorityClass = `priority-${task.priority}`;
-        const overdueClass = isOverdue ? 'overdue' : '';
+    const taskDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    const taskDateNormalized = new Date(taskDate);
+    taskDateNormalized.setHours(0, 0, 0, 0);
+    
+    const daysUntilDue = Math.ceil((taskDateNormalized - currentDate) / (24 * 60 * 60 * 1000));
+    const isOverdue = daysUntilDue < 0;
+    
+    // Apply visual priority logic (same as dashboard)
+    let priorityClass = 'priority-normal';
+    let priorityDot = '⚪';
+    let priorityLabel = 'normal';
+    
+    if (isOverdue) {
+        priorityClass = 'priority-overdue';
+        priorityDot = '🔴';
+        priorityLabel = 'overdue';
+    } else if (task.category === 'Safety') {
+        priorityClass = 'priority-safety';
+        priorityDot = '🟠';
+        priorityLabel = 'safety';
+    } else if (daysUntilDue <= 7) {
+        priorityClass = 'priority-due-soon';
+        priorityDot = '🟡';
+        priorityLabel = 'due soon';
+    }
+    
+    const overdueClass = isOverdue ? 'overdue' : '';
 
-        return `
-            <div class="day-panel-task ${priorityClass} ${overdueClass}">
-                <div class="task-info">
-                    <h4 class="task-title">${task.title}</h4>
-                    <p class="task-description">${task.description}</p>
-                    <div class="task-meta">
-                        <span class="task-category">${task.category}</span>
-                        <span class="task-cost">$${task.cost}</span>
-                        <span class="task-priority">${task.priority} priority</span>
-                        ${isOverdue ? '<span class="overdue-badge">OVERDUE</span>' : ''}
-                    </div>
-                </div>
-                <div class="task-actions">
-                    <button onclick="completeTask(${task.id})" class="complete-task-btn">✅ Complete</button>
-                    <button onclick="rescheduleTask(${task.id})" class="reschedule-task-btn">📅 Reschedule</button>
+    return `
+        <div class="day-panel-task ${priorityClass} ${overdueClass}">
+            <div class="task-info">
+                <h4 class="task-title">${priorityDot} ${task.title}</h4>
+                <p class="task-description">${task.description}</p>
+                <div class="task-meta">
+                    <span class="task-category">${task.category}</span>
+                    <span class="task-cost">$${task.cost}</span>
+                    <span class="task-priority">${priorityLabel} priority</span>
+                    ${isOverdue ? '<span class="overdue-badge">OVERDUE</span>' : ''}
                 </div>
             </div>
-        `;
-    }
+            <div class="task-actions">
+                <button onclick="completeTask(${task.id})" class="complete-task-btn">✅ Complete</button>
+                <button onclick="rescheduleTask(${task.id})" class="reschedule-task-btn">📅 Reschedule</button>
+            </div>
+        </div>
+    `;
+}
 
     closeDayPanel() {
         const panel = document.getElementById('selected-day-panel');
