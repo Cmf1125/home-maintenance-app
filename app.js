@@ -969,7 +969,7 @@ function renderSimpleTaskItem(task) {
                     </div>
                     <div class="flex items-center gap-3 text-xs text-gray-500">
                         <span>Every ${task.frequency} days</span>
-                        ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
+                        ${task.cost > 0 ? '<span class="text-green-600 font-medium">$' + task.cost + '</span>' : ''}
                     </div>
                 </div>
             </div>
