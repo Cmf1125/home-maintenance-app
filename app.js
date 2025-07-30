@@ -1726,6 +1726,7 @@ function closeTaskEditModal() {
 }
 
 // Save task from edit modal
+
 function saveTaskFromEdit() {
     console.log('💾 Saving task from edit modal...');
 
@@ -1755,17 +1756,14 @@ function saveTaskFromEdit() {
             return;
         }
 
-        // Use auto priority
         const priority = getAutoPriority(title, category);
-
-        // Normalize date at noon local to avoid TZ edge cases
         const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
         if (isNaN(dueDate.getTime())) {
             alert('❌ Invalid due date');
             return;
         }
 
-        // Update the working object
+        // update currentEditingTask
         window.currentEditingTask.title = title;
         window.currentEditingTask.description = description;
         window.currentEditingTask.cost = cost;
@@ -1775,10 +1773,8 @@ function saveTaskFromEdit() {
         window.currentEditingTask.dueDate = dueDate;
         window.currentEditingTask.nextDue = dueDate;
 
-        // Critical: ensure this is a real scheduled task, not a template
         delete window.currentEditingTask.isTemplate;
 
-        // Upsert into window.tasks
         if (!Array.isArray(window.tasks)) window.tasks = [];
         const idx = window.tasks.findIndex(t => t.id === window.currentEditingTask.id);
         const isNew = idx === -1;
@@ -1788,13 +1784,25 @@ function saveTaskFromEdit() {
             window.tasks[idx] = window.currentEditingTask;
         }
 
-        // Persist and refresh
+        console.log("DEBUG - currentEditingTask", window.currentEditingTask);
+        console.log("DEBUG - tasks BEFORE save", JSON.stringify(window.tasks, null, 2));
+
         saveData();
+
+        // Force reload from storage for debugging
+        const saved = JSON.parse(localStorage.getItem('casaCareData') || '{}');
+        if (saved.tasks) {
+            window.tasks = saved.tasks;
+            tasks = saved.tasks;
+            console.log("DEBUG - Reloaded tasks from storage", saved.tasks);
+        } else {
+            console.log("DEBUG - No tasks found in storage after save");
+        }
+
         if (typeof refreshUIAfterTaskChange === 'function') {
             refreshUIAfterTaskChange();
         }
 
-        // Close modal and notify
         closeTaskEditModal();
         alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'} with ${priority} priority!`);
 
@@ -1803,6 +1811,7 @@ function saveTaskFromEdit() {
         alert('❌ Error saving task: ' + error.message);
     }
 }
+
 
 // Delete task from edit modal
 function deleteTaskFromEdit() {
@@ -2036,6 +2045,7 @@ function exportData() {
     alert('📄 Data exported successfully!');
 }
 
+
 function saveData() {
     try {
         const data = {
@@ -2043,6 +2053,7 @@ function saveData() {
             tasks: window.tasks,
             savedAt: new Date().toISOString()
         };
+        console.log("DEBUG - saving data to localStorage", JSON.stringify(window.tasks, null, 2));
         localStorage.setItem('casaCareData', JSON.stringify(data));
         console.log('💾 Data saved:', data);
     } catch (error) {
@@ -2050,6 +2061,7 @@ function saveData() {
         alert('❌ Failed to save data. Please try again.');
     }
 }
+
 
 function loadData() {
     try {
@@ -2820,13 +2832,14 @@ if (document.readyState !== 'loading') {
 console.log('📱 Smart installation banner system loaded');
 
 
+
 function refreshUIAfterTaskChange() {
-    // Keep globals in sync
     if (Array.isArray(window.tasks)) {
         tasks = window.tasks;
     } else {
         window.tasks = tasks = [];
     }
+    console.log("DEBUG - tasks AFTER save (refreshUI)", JSON.stringify(window.tasks, null, 2));
 
     const setupEl = document.getElementById('task-setup');
     const isSetupVisible = setupEl && !setupEl.classList.contains('hidden');
@@ -2850,3 +2863,4 @@ function refreshUIAfterTaskChange() {
         console.warn('⚠️ UI refresh warning:', err);
     }
 }
+
