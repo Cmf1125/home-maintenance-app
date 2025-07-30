@@ -718,67 +718,70 @@
             }
         },
         
-        
-saveTask: function() {
-    console.log('💾 Saving task...');
+        saveTask: function() {
+            console.log('💾 Saving task...');
+            
+            if (!this.currentTask) {
+                alert('❌ No task to save');
+                return;
+            }
+            
+            // Get values
+            const title = document.getElementById('edit-task-name').value.trim();
+            const description = document.getElementById('edit-task-description').value.trim();
+            const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
+            const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
+            const priority = document.getElementById('edit-task-priority').value;
+            const category = document.getElementById('edit-task-category').value || 'General';
+            const dueDateStr = document.getElementById('edit-task-due-date').value;
+            
+            // Validate
+            if (!title) {
+                alert('❌ Title required');
+                return;
+            }
 
-    if (!this.currentTask) {
-        alert('❌ No task to save');
-        return;
-    }
-
-    const title = document.getElementById('edit-task-name').value.trim();
-    const description = document.getElementById('edit-task-description').value.trim();
-    const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
-    const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
-    const category = document.getElementById('edit-task-category').value || 'General';
-    const dueDateStr = document.getElementById('edit-task-due-date').value;
-
-    if (!title) {
-        alert('❌ Title required');
-        return;
-    }
-
-    const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
-
-    // Update task fields
-    this.currentTask.title = title;
-    this.currentTask.description = description;
-    this.currentTask.cost = cost;
-    this.currentTask.frequency = frequency;
-    this.currentTask.category = category;
-    this.currentTask.dueDate = dueDate;
-    this.currentTask.nextDue = dueDate;
-
-    // Ensure calendar sync
-    this.ensureCalendarSync(this.currentTask);
-
-    // Remove template flags
-    delete this.currentTask.isTemplate;
-    delete this.currentTask.isNewTask;
-
-    const isNew = !window.tasks.find(t => t.id === this.currentTask.id);
-    if (isNew) {
-        window.tasks.push(this.currentTask);
-    } else {
-        const index = window.tasks.findIndex(t => t.id === this.currentTask.id);
-        if (index > -1) window.tasks[index] = this.currentTask;
-    }
-
-    // Persist
-    if (typeof saveData === 'function') saveData();
-
-    console.log('✅ Task saved:', this.currentTask);
-
-    // Refresh UI
-    this.refreshAfterSave();
-
-    // Close modal
-    this.closeModal();
-
-    alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
-},
-
+            
+            // Create date
+            const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
+            
+            // Update task with FULL calendar compatibility
+            this.currentTask.title = title;
+            this.currentTask.description = description;
+            this.currentTask.cost = cost;
+            this.currentTask.frequency = frequency;
+            this.currentTask.priority = priority;
+            this.currentTask.category = category;
+            this.currentTask.dueDate = dueDate;
+            this.currentTask.nextDue = dueDate; // CRITICAL: Calendar sync
+            
+            // Ensure calendar compatibility
+            this.ensureCalendarSync(this.currentTask);
+            
+            // Remove flags
+            delete this.currentTask.isTemplate;
+            delete this.currentTask.isNewTask;
+            
+            // Add to tasks if new
+            const isNew = !window.tasks.find(t => t.id === this.currentTask.id);
+            if (isNew) {
+                window.tasks.push(this.currentTask);
+            } else {
+                // Update existing
+                const index = window.tasks.findIndex(t => t.id === this.currentTask.id);
+                if (index > -1) window.tasks[index] = this.currentTask;
+            }
+            
+            console.log('✅ Task saved:', this.currentTask);
+            
+            // Refresh based on context
+            this.refreshAfterSave();
+            
+            // Close modal
+            this.closeModal();
+            
+            alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
+        },
         
         deleteTask: function() {
             if (!this.currentTask) return;
