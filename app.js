@@ -1578,7 +1578,7 @@ function addTaskFromDashboard() {
     }
     
     console.log('✅ New task added:', newTask);
-    showToast(`Task "${title}" added successfully!`);
+    showToast(`Task "${title}" added successfully!`, 'success');
 }
 
 // FIXED: Enhanced Edit Task function for setup with better modal handling
@@ -1620,7 +1620,7 @@ function deleteTaskDirect(taskId) {
             // Re-render task categories
             renderTaskCategories();
             
-            showToast(`Task "${deletedTask.title}" deleted successfully!`);
+            showToast(`Task "${deletedTask.title}" deleted successfully!`, 'sucess');
         }
     }
 }
@@ -1958,7 +1958,7 @@ function saveHomeInfo() {
     if (addressChanged) {
         showToast(`Home information updated!\n\nNew address: ${homeData.fullAddress}\n\nYour existing tasks and schedules remain unchanged.`);
     } else {
-        showToast(`Home information updated successfully!\n\nProperty details have been saved.`);
+        showToast(`Home information updated successfully!\n\nProperty details have been saved.`, 'success');
     }
     
     console.log('✅ Home information updated:', homeData.fullAddress);
@@ -1982,7 +1982,7 @@ function clearData() {
         document.getElementById('main-app').classList.add('hidden');
         document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
         
-        showToast('All data cleared. Starting fresh!');
+        showToast('All data cleared. Starting fresh!', 'success');
     }
 }
 
@@ -2002,7 +2002,7 @@ function exportData() {
     link.click();
     document.body.removeChild(link);
     
-    showToast('Data exported successfully!');
+    showToast('Data exported successfully!', 'sucess');
 }
 
 function saveData() {
