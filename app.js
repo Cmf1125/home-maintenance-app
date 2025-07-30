@@ -1718,6 +1718,7 @@ function saveTaskFromEdit() {
             return;
         }
         
+        // ✅ FIXED: Use getAutoPriority instead of reading from dropdown
         const priority = getAutoPriority(title, category);
         
         const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
