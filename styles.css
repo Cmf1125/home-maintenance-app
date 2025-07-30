@@ -658,3 +658,20 @@
     transform: translateY(-2px);
     box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1);
 }
+/* Fix for new 2-row bottom navigation */
+.main-content {
+    padding-bottom: 140px; /* Increased from 100px to accommodate 2 rows */
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding-bottom: 160px; /* More space on mobile */
+    }
+}
+
+/* Secondary nav styling */
+.bottom-nav .grid:last-child button {
+    font-size: 0.75rem;
+    padding: 0.5rem;
+    min-height: 40px;
+}
