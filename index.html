@@ -450,7 +450,7 @@
                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base" required>
                     </div>
                     
-                    <!-- Frequency and Cost Row -->
+                    <!-- Frequency and Cost Row - IMPROVED -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Frequency (days) *</label>
@@ -464,6 +464,7 @@
                             <input type="number" id="edit-task-cost" 
                                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
                                    min="0" step="0.01" placeholder="0.00">
+                            <p class="text-xs text-gray-500 mt-1">Estimated cost per task</p>
                         </div>
                     </div>
                     
@@ -659,47 +660,43 @@
         </div>
     </div>
 </div>
-    <!-- Load Original Scripts -->
+    <!-- Core Scripts -->
     <script src="app.js"></script>
     <script src="calendar.js"></script>
     <script src="enhanced-dashboard.js"></script>
     <script src="documents.js"></script> 
     <script src="appliances.js"></script>
-<!-- COMPLETE OVERRIDE - BYPASS ALL PROBLEMATIC FUNCTIONS -->
+    
+    <!-- Task System Override (Working Fix) -->
     <script>
-        console.log('🚨 COMPLETE OVERRIDE: Bypassing all problematic functions...');
+        console.log('🚨 Loading task system override...');
 
-        // STEP 1: Completely override all modal functions to prevent conflicts
+        // Complete override system (keep this exactly as is - it's working!)
         window.openTaskEditModal = function(task, isNew) {
-            console.log('🔄 OVERRIDE: openTaskEditModal called, redirecting to working version');
             window.TaskManager.openModal(task, isNew);
         };
 
         window.saveTaskFromEdit = function() {
-            console.log('🔄 OVERRIDE: saveTaskFromEdit called, redirecting to working version');
             window.TaskManager.save();
         };
 
         window.closeTaskEditModal = function() {
-            console.log('🔄 OVERRIDE: closeTaskEditModal called, redirecting to working version');
             window.TaskManager.close();
         };
 
-        // STEP 2: Create a completely new, working task manager that bypasses everything
+        // TaskManager object (keep exactly as is)
         window.TaskManager = {
             currentTask: null,
             
             openModal: function(task, isNew) {
-                console.log('📝 TaskManager: Opening modal for:', task.title || 'New Task', 'IsNew:', isNew);
+                console.log('📝 Opening modal for:', task.title || 'New Task');
                 
-                // Store the task
-                this.currentTask = {...task}; // Clone to avoid reference issues
+                this.currentTask = {...task};
                 window.currentEditingTask = this.currentTask;
                 
-                // Get modal
                 const modal = document.getElementById('task-edit-modal');
                 if (!modal) {
-                    alert('❌ Modal element not found');
+                    alert('❌ Modal not found');
                     return;
                 }
                 
@@ -707,78 +704,56 @@
                 const titleElement = document.getElementById('task-edit-title');
                 if (titleElement) {
                     titleElement.textContent = isNew ? 'Add Task' : 'Edit Task';
-                    console.log('✅ Title set to:', isNew ? 'Add Task' : 'Edit Task');
-                } else {
-                    console.warn('⚠️ Title element not found');
                 }
                 
                 // Show/hide delete button
                 const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
                 if (deleteBtn) {
                     deleteBtn.style.display = isNew ? 'none' : 'block';
-                    console.log('✅ Delete button:', isNew ? 'hidden' : 'visible');
                 }
                 
-                // Fill form - with null checks
                 this.fillForm(task);
                 
-                // Show modal
                 modal.classList.remove('hidden');
                 modal.style.display = 'flex';
                 
-                // Focus
                 setTimeout(() => {
                     const nameField = document.getElementById('edit-task-name');
                     if (nameField) nameField.focus();
                 }, 100);
-                
-                console.log('✅ Modal opened successfully');
             },
             
             fillForm: function(task) {
-                console.log('📝 TaskManager: Filling form...');
-                
-                // Form field mappings
-                const fieldMappings = [
-                    ['edit-task-name', task.title || '', 'text'],
-                    ['edit-task-description', task.description || '', 'textarea'],
-                    ['edit-task-cost', task.cost || 0, 'number'],
-                    ['edit-task-frequency', task.frequency || 365, 'number'],
-                    ['edit-task-category', task.category || 'General', 'select'],
-                    ['edit-task-priority', task.priority || 'medium', 'select']
+                const fields = [
+                    ['edit-task-name', task.title || ''],
+                    ['edit-task-description', task.description || ''],
+                    ['edit-task-cost', task.cost || 0],
+                    ['edit-task-frequency', task.frequency || 365],
+                    ['edit-task-category', task.category || 'General'],
+                    ['edit-task-priority', task.priority || 'medium']
                 ];
                 
-                // Fill each field with null check
-                fieldMappings.forEach(([id, value, type]) => {
+                fields.forEach(([id, value]) => {
                     const element = document.getElementById(id);
                     if (element) {
                         element.value = value;
-                        console.log(`  ✅ ${id}: "${value}"`);
-                    } else {
-                        console.error(`  ❌ Element ${id} not found!`);
                     }
                 });
                 
-                // Handle date separately
                 const dateField = document.getElementById('edit-task-due-date');
                 if (dateField) {
                     const date = task.dueDate ? new Date(task.dueDate) : new Date();
                     dateField.value = date.toISOString().split('T')[0];
-                    console.log(`  ✅ due-date: ${dateField.value}`);
-                } else {
-                    console.error('  ❌ Date field not found!');
                 }
             },
             
             save: function() {
-                console.log('💾 TaskManager: Saving task...');
-                
                 if (!this.currentTask) {
                     alert('❌ No task to save');
                     return;
                 }
                 
-                // Get all form values with null checks
+                // Get form values
                 const nameEl = document.getElementById('edit-task-name');
                 const descEl = document.getElementById('edit-task-description');
                 const costEl = document.getElementById('edit-task-cost');
@@ -786,17 +761,11 @@
                 const catEl = document.getElementById('edit-task-category');
                 const dateEl = document.getElementById('edit-task-due-date');
                 
-                // Check if elements exist
                 if (!nameEl || !descEl || !costEl || !freqEl || !catEl || !dateEl) {
-                    alert('❌ Some form elements are missing. Cannot save.');
-                    console.error('Missing form elements:', {
-                        name: !!nameEl, desc: !!descEl, cost: !!costEl, 
-                        freq: !!freqEl, cat: !!catEl, date: !!dateEl
-                    });
+                    alert('❌ Form elements missing');
                     return;
                 }
                 
-                // Get values
                 const title = nameEl.value.trim();
                 const description = descEl.value.trim();
                 const cost = parseFloat(costEl.value) || 0;
@@ -804,38 +773,23 @@
                 const category = catEl.value || 'General';
                 const dueDateStr = dateEl.value;
                 
-                console.log('📝 Form values:', { title, description, cost, frequency, category, dueDateStr });
-                
-                // Validate
                 if (!title) {
-                    alert('❌ Task name is required');
-                    nameEl.focus();
+                    alert('❌ Task name required');
                     return;
                 }
                 
                 if (frequency <= 0) {
-                    alert('❌ Frequency must be greater than 0');
-                    freqEl.focus();
+                    alert('❌ Frequency must be > 0');
                     return;
                 }
                 
-                // Calculate priority
+                // Auto-calculate priority
                 let priority = 'medium';
-                if (category === 'Safety') {
-                    priority = 'high';
-                } else if (title.toLowerCase().includes('smoke') || 
-                          title.toLowerCase().includes('detector') || 
-                          title.toLowerCase().includes('fire')) {
+                if (category === 'Safety' || title.toLowerCase().includes('smoke') || title.toLowerCase().includes('detector')) {
                     priority = 'high';
                 }
                 
-                // Handle date
                 const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
-                if (isNaN(dueDate.getTime())) {
-                    alert('❌ Invalid date');
-                    dateEl.focus();
-                    return;
-                }
                 
                 // Update task
                 this.currentTask.title = title;
@@ -845,62 +799,46 @@
                 this.currentTask.category = category;
                 this.currentTask.priority = priority;
                 this.currentTask.dueDate = dueDate;
-                this.currentTask.nextDue = dueDate; // Calendar compatibility
+                this.currentTask.nextDue = dueDate;
                 
-                // Remove template flag
                 delete this.currentTask.isTemplate;
                 
-                // Add or update in tasks array
+                // Add or update
                 const isNew = !window.tasks.find(t => t.id === this.currentTask.id);
                 
                 if (isNew) {
                     window.tasks.push(this.currentTask);
-                    console.log('✅ Added new task to array');
                 } else {
                     const index = window.tasks.findIndex(t => t.id === this.currentTask.id);
                     if (index > -1) {
                         window.tasks[index] = this.currentTask;
-                        console.log('✅ Updated existing task in array');
                     }
                 }
                 
-                // Save and refresh based on context
                 this.saveAndRefresh();
-                
-                // Close modal
                 this.close();
                 
-                alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'} successfully!`);
-                console.log('✅ TaskManager: Save completed');
+                alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
             },
             
             saveAndRefresh: function() {
-                // Check which view is active
                 const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
                 const mainAppVisible = !document.getElementById('main-app').classList.contains('hidden');
                 
                 if (taskSetupVisible) {
-                    console.log('🔄 Refreshing task setup...');
                     if (typeof renderTaskCategories === 'function') {
                         renderTaskCategories();
                     }
                 } else if (mainAppVisible) {
-                    console.log('🔄 Refreshing main app...');
-                    
-                    // Save data
                     if (typeof saveData === 'function') {
                         saveData();
                     }
                     
-                    // Refresh dashboard
-                    if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
+                    if (window.enhancedDashboard && window.enhancedDashboard.render) {
                         window.enhancedDashboard.render();
-                    } else if (typeof updateDashboard === 'function') {
-                        updateDashboard();
                     }
                     
-                    // Refresh calendar
-                    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+                    if (window.casaCareCalendar && window.casaCareCalendar.refresh) {
                         window.casaCareCalendar.refresh();
                     }
                 }
@@ -914,110 +852,52 @@
                 }
                 this.currentTask = null;
                 window.currentEditingTask = null;
-                console.log('✅ TaskManager: Modal closed');
             }
         };
 
-        // STEP 3: Override all the add/edit functions
+        // Override functions
         window.addTaskFromSetup = function() {
-            console.log('➕ OVERRIDE: Add task from setup');
             const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
             const newTask = {
-                id: maxId + 1,
-                title: '',
-                description: '',
-                category: 'General',
-                frequency: 365,
-                cost: 0,
-                priority: 'medium',
-                dueDate: new Date(),
-                isTemplate: true
+                id: maxId + 1, title: '', description: '', category: 'General',
+                frequency: 365, cost: 0, priority: 'medium', dueDate: new Date(), isTemplate: true
             };
             window.TaskManager.openModal(newTask, true);
         };
 
         window.addTaskFromDashboard = function() {
-            console.log('➕ OVERRIDE: Add task from dashboard');
             const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
             const newTask = {
-                id: maxId + 1,
-                title: '',
-                description: '',
-                category: 'General',
-                frequency: 365,
-                cost: 0,
-                priority: 'medium',
-                dueDate: new Date()
+                id: maxId + 1, title: '', description: '', category: 'General',
+                frequency: 365, cost: 0, priority: 'medium', dueDate: new Date()
             };
             window.TaskManager.openModal(newTask, true);
         };
 
         window.editTaskFromSetup = function(taskId) {
-            console.log('✏️ OVERRIDE: Edit task from setup:', taskId);
             const task = window.tasks?.find(t => t.id === taskId);
-            if (!task) {
-                alert('❌ Task not found');
-                return;
+            if (task) {
+                window.TaskManager.openModal(task, false);
             }
-            window.TaskManager.openModal(task, false);
         };
 
-        // STEP 4: Override delete function too
         window.deleteTaskFromEdit = function() {
-            if (!window.TaskManager.currentTask) {
-                alert('❌ No task to delete');
-                return;
-            }
+            if (!window.TaskManager.currentTask) return;
             
             const taskTitle = window.TaskManager.currentTask.title || 'Untitled';
             if (confirm(`Delete "${taskTitle}"?`)) {
-                const taskId = window.TaskManager.currentTask.id;
-                const index = window.tasks.findIndex(t => t.id === taskId);
-                
+                const index = window.tasks.findIndex(t => t.id === window.TaskManager.currentTask.id);
                 if (index > -1) {
                     window.tasks.splice(index, 1);
-                    console.log('🗑️ Task deleted:', taskTitle);
-                    
-                    // Save and refresh
                     window.TaskManager.saveAndRefresh();
                     window.TaskManager.close();
-                    
                     alert(`✅ "${taskTitle}" deleted!`);
                 }
             }
         };
 
-        // STEP 5: Test function
-        window.testCompleteOverride = function() {
-            console.log('🧪 TESTING COMPLETE OVERRIDE:');
-            
-            // Test modal element
-            const modal = document.getElementById('task-edit-modal');
-            console.log('  Modal element:', modal ? '✅' : '❌');
-            
-            // Test form elements
-            const formIds = ['edit-task-name', 'edit-task-description', 'edit-task-cost', 
-                           'edit-task-frequency', 'edit-task-category', 'edit-task-due-date'];
-            
-            console.log('  Form elements:');
-            formIds.forEach(id => {
-                const el = document.getElementById(id);
-                console.log(`    ${id}: ${el ? '✅' : '❌'}`);
-            });
-            
-            // Test functions
-            console.log('  Functions:');
-            console.log('    TaskManager:', typeof window.TaskManager === 'object' ? '✅' : '❌');
-            console.log('    addTaskFromSetup:', typeof window.addTaskFromSetup === 'function' ? '✅' : '❌');
-            console.log('    Tasks array:', Array.isArray(window.tasks) ? `✅ (${window.tasks.length})` : '❌');
-            
-            return 'Override test complete';
-        };
-
-        console.log('🚨 COMPLETE OVERRIDE applied successfully!');
-        console.log('💡 Run testCompleteOverride() to verify all elements exist');
-        console.log('🔧 This bypasses ALL problematic functions in app.js and enhanced-dashboard.js');
+        console.log('✅ Task system override loaded (cleaned up version)');
     </script>
-     
+ 
   </body>
 </html>
