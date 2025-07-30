@@ -1027,6 +1027,109 @@
     console.log('✅ CLEAN SLATE: Modal system loaded!');
     console.log('💡 Run testCleanSlate() to test the system');
     </script>
-     
+     <script>
+console.log('🚑 EMERGENCY FIXES LOADING...');
+
+// Fix 1: Ensure showToast works
+window.showToast = window.showToast || function(message, type = 'success') {
+    console.log(`${type.toUpperCase()}: ${message}`);
+    // Simple visual feedback
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 9999;
+        background: ${type === 'error' ? '#ef4444' : '#10b981'}; 
+        color: white; padding: 12px 20px; border-radius: 8px;
+        font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+};
+
+// Fix 2: Ensure well water toggle works
+window.toggleWellWaterOptions = function() {
+    const checkbox = document.getElementById('well-water');
+    const options = document.getElementById('well-water-options');
+    if (checkbox && options) {
+        if (checkbox.checked) {
+            options.classList.remove('hidden');
+        } else {
+            options.classList.add('hidden');
+            ['sediment-filter', 'uv-filter', 'water-softener', 'whole-house-filter'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.checked = false;
+            });
+        }
+    }
+};
+
+// Fix 3: Ensure create plan works
+window.createMaintenancePlan = window.createMaintenancePlan || function() {
+    showToast('Loading...', 'info');
+    setTimeout(() => {
+        if (typeof window.createMaintenancePlan === 'function') {
+            window.createMaintenancePlan();
+        } else {
+            showToast('Please refresh the page and try again', 'error');
+        }
+    }, 500);
+};
+
+// Fix 4: Simple reschedule function
+window.rescheduleTaskFromDashboard = function(taskId) {
+    const task = window.tasks?.find(t => t.id === taskId);
+    if (!task) {
+        showToast('Task not found', 'error');
+        return;
+    }
+    
+    const currentDate = task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+    const newDateStr = prompt(`Reschedule "${task.title}" to (YYYY-MM-DD):`, currentDate);
+    
+    if (newDateStr && newDateStr !== currentDate) {
+        const newDate = new Date(newDateStr + 'T12:00:00');
+        if (!isNaN(newDate.getTime())) {
+            task.dueDate = newDate;
+            task.nextDue = newDate; // Calendar compatibility
+            
+            // Save and refresh
+            if (typeof saveData === 'function') saveData();
+            if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
+            if (window.casaCareCalendar?.refresh) window.casaCareCalendar.refresh();
+            
+            showToast(`Task rescheduled to ${newDate.toLocaleDateString()}`, 'success');
+        } else {
+            showToast('Invalid date format', 'error');
+        }
+    }
+};
+
+// Fix 5: Remove priority from Casa system (you don't need it!)
+if (window.Casa) {
+    const originalSaveTask = window.Casa.saveTask;
+    window.Casa.saveTask = function() {
+        // Remove priority requirement
+        const priorityElement = document.getElementById('edit-task-priority');
+        if (!priorityElement) {
+            // Create temporary element to prevent errors
+            const temp = document.createElement('select');
+            temp.id = 'edit-task-priority';
+            temp.value = 'medium';
+            temp.style.display = 'none';
+            document.body.appendChild(temp);
+            
+            // Call original function
+            if (originalSaveTask) originalSaveTask.call(this);
+            
+            // Remove temp element
+            temp.remove();
+        } else {
+            if (originalSaveTask) originalSaveTask.call(this);
+        }
+    };
+}
+
+console.log('✅ EMERGENCY FIXES APPLIED - Try your functions now!');
+</script>
   </body>
 </html>
