@@ -141,7 +141,7 @@ function createMaintenancePlan() {
         
     } catch (error) {
         console.error('❌ Error in createMaintenancePlan:', error);
-        showToast('Error creating maintenance plan. Check console for details.', 'error');
+        alert('❌ Error creating maintenance plan. Check console for details.');
     }
 }
 
@@ -1109,7 +1109,7 @@ function finishTaskSetup() {
     
     if (tasksWithDates.length === 0) {
         console.error('❌ CRITICAL: No tasks have due dates after processing!');
-        showToast('No tasks were properly scheduled. Please try again.','error');
+        alert('❌ Error: No tasks were properly scheduled. Please try again.');
         return;
     }
     
@@ -1119,7 +1119,7 @@ function finishTaskSetup() {
         console.log('💾 Data saved successfully');
     } catch (error) {
         console.error('❌ Error saving data:', error);
-        showToast('Error saving data. Please try again.','error');
+        alert('❌ Error saving data. Please try again.');
         return;
     }
     
@@ -1145,7 +1145,8 @@ function finishTaskSetup() {
     }
     
     // Success message
-    showToast(`Setup Complete! ${successCount} tasks scheduled automatically`);
+    alert(`🎉 Setup Complete!\n\n✅ ${successCount} tasks scheduled automatically\n📅 Your clean, simple maintenance plan is ready!\n\nCheck your dashboard and calendar now.`);
+    
     console.log('🎉 CLEAN SIMPLE TASK SETUP COMPLETION SUCCESSFUL!');
 }
 
@@ -1396,7 +1397,7 @@ function addTaskFromSetup() {
     const modal = document.getElementById('task-edit-modal');
     if (!modal) {
         console.error('❌ Task edit modal not found');
-        showToast('Cannot add task: Edit modal not available. Please check that you are on the correct page.', 'error');
+        alert('❌ Cannot add task: Edit modal not available. Please check that you are on the correct page.');
         return;
     }
     
@@ -1431,7 +1432,7 @@ function completeTask(taskId) {
     const task = tasks.find(t => t.id === taskId);
     if (!task) {
         console.error('❌ Task not found:', taskId);
-        showToast('Task not found', 'error');
+        alert('❌ Task not found');
         return;
     }
 
@@ -1460,7 +1461,7 @@ function completeTask(taskId) {
         console.log('💾 Data saved after task completion');
     } catch (error) {
         console.error('❌ Error saving data after completion:', error);
-        showToast('Error saving task completion', 'error');
+        alert('❌ Error saving task completion');
         return;
     }
     
@@ -1510,7 +1511,7 @@ function completeTask(taskId) {
     }
     
     // Success message
-    showToast(`"${task.title}" completed! Next due: ${nextDueDate.toLocaleDateString()}`);
+    alert(`✅ Task "${task.title}" completed!\nNext due: ${nextDueDate.toLocaleDateString()}`);
 }
 
 // Add Task functionality for dashboard
@@ -1529,7 +1530,7 @@ function addTaskFromDashboard() {
     
     const priority = prompt('Priority (high, medium, low):', 'medium');
     if (!['high', 'medium', 'low'].includes(priority)) {
-        showToast('Invalid priority. Please use: high, medium, or low', 'error');
+        alert('Invalid priority. Please use: high, medium, or low');
         return;
     }
     
@@ -1538,7 +1539,7 @@ function addTaskFromDashboard() {
     
     const dueDate = new Date(dueDateStr + 'T12:00:00');
     if (isNaN(dueDate.getTime())) {
-        showToast('Invalid date format', 'error');
+        alert('Invalid date format');
         return;
     }
     
@@ -1578,7 +1579,7 @@ function addTaskFromDashboard() {
     }
     
     console.log('✅ New task added:', newTask);
-    showToast(`Task "${title}" added successfully!`, 'success');
+    alert(`✅ Task "${title}" added successfully!`);
 }
 
 // FIXED: Enhanced Edit Task function for setup with better modal handling
@@ -1588,7 +1589,7 @@ function editTaskFromSetup(taskId) {
     const task = tasks.find(t => t.id === taskId);
     if (!task) {
         console.error('❌ Task not found:', taskId);
-        showToast('Task not found', 'error');
+        alert('❌ Task not found');
         return;
     }
     
@@ -1598,7 +1599,7 @@ function editTaskFromSetup(taskId) {
     const modal = document.getElementById('task-edit-modal');
     if (!modal) {
         console.error('❌ Task edit modal not found');
-        showToast('Cannot edit task: Edit modal not available. Please check that you are on the correct page.', 'error');
+        alert('❌ Cannot edit task: Edit modal not available. Please check that you are on the correct page.');
         return;
     }
     
@@ -1620,7 +1621,7 @@ function deleteTaskDirect(taskId) {
             // Re-render task categories
             renderTaskCategories();
             
-            showToast(`Task "${deletedTask.title}" deleted successfully!`, 'sucess');
+            alert(`✅ Task "${deletedTask.title}" deleted successfully!`);
         }
     }
 }
@@ -1631,7 +1632,7 @@ function openTaskEditModal(task, isNewTask = false) {
     
     const modal = document.getElementById('task-edit-modal');
     if (!modal) {
-        showToast('Modal not found', 'error');
+        alert('Modal not found');
         return;
     }
     
@@ -1667,7 +1668,7 @@ function saveTaskFromEdit() {
     
     if (!currentEditingTask && !window.currentEditingTask) {
         console.error('❌ No task being edited');
-        showToast('No task selected for editing', 'error');
+        alert('❌ No task selected for editing');
         return;
     }
     
@@ -1685,14 +1686,14 @@ function saveTaskFromEdit() {
     
     // Validate inputs
 if (!title) {
-    showToast('Title required', 'error');
+    alert('❌ Title required');
     return;
 }
 
 // Description is now optional - no validation needed
     
     if (frequency <= 0) {
-        showToast('Frequency must be greater than 0', 'error');
+        alert('❌ Frequency must be greater than 0');
         document.getElementById('edit-task-frequency').focus();
         return;
     }
@@ -1702,7 +1703,7 @@ if (!title) {
     if (dueDateInput && dueDateInput.value) {
         dueDate = new Date(dueDateInput.value + 'T12:00:00');
         if (isNaN(dueDate.getTime())) {
-            showToast('Invalid due date', 'error');
+            alert('❌ Invalid due date');
             dueDateInput.focus();
             return;
         }
@@ -1769,8 +1770,7 @@ if (!title) {
     // Close modal
     closeTaskEditModal();
     
-   showToast(`Task "${title}" ${isNew ? 'added' : 'updated'} successfully!`, 'success');
-
+    alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
 }
 
 // Delete task from edit modal
@@ -1812,7 +1812,7 @@ function deleteTaskFromEdit() {
             // Close modal
             closeTaskEditModal();
             
-            showToast(`Task "${deletedTask.title}" deleted successfully!`);
+            alert(`✅ Task "${deletedTask.title}" deleted successfully!`);
         }
     }
 }
@@ -1827,7 +1827,7 @@ function showHomeInfo() {
     console.log('🏠 Opening editable home info modal...');
     
     if (!homeData.fullAddress) {
-        showToast('No home information set yet. Complete the setup to add your home details.', 'info');
+        alert('🏠 No home information set yet. Complete the setup to add your home details.');
         return;
     }
     
@@ -1835,7 +1835,7 @@ function showHomeInfo() {
     const modal = document.getElementById('home-info-modal');
     if (!modal) {
         console.error('❌ Home info modal not found');
-        showToast('Cannot edit home info: Modal not available.', 'error');
+        alert('❌ Cannot edit home info: Modal not available.');
         return;
     }
     
@@ -1904,12 +1904,12 @@ function saveHomeInfo() {
     
     // Validate required fields
     if (!newAddress || !newCity || !newState || !newZipcode) {
-        showToast('Please fill in all address fields', 'error');
+        alert('❌ Please fill in all address fields');
         return;
     }
     
     if (newState.length !== 2) {
-        showToast('State must be 2 letters (e.g., NY, CA, TX)', 'error');
+        alert('❌ State must be 2 letters (e.g., NY, CA, TX)');
         document.getElementById('edit-home-state').focus();
         return;
     }
@@ -1935,7 +1935,7 @@ function saveHomeInfo() {
         console.log('💾 Home data saved successfully');
     } catch (error) {
         console.error('❌ Error saving home data:', error);
-        showToast('Error saving changes. Please try again.', 'error');
+        alert('❌ Error saving changes. Please try again.');
         return;
     }
     
@@ -1956,9 +1956,9 @@ function saveHomeInfo() {
     // Show success message
     const addressChanged = oldAddress !== homeData.fullAddress;
     if (addressChanged) {
-        showToast(`Home information updated!\n\nNew address: ${homeData.fullAddress}\n\nYour existing tasks and schedules remain unchanged.`);
+        alert(`✅ Home information updated!\n\nNew address: ${homeData.fullAddress}\n\nYour existing tasks and schedules remain unchanged.`);
     } else {
-        showToast(`Home information updated successfully!\n\nProperty details have been saved.`, 'success');
+        alert(`✅ Home information updated successfully!\n\nProperty details have been saved.`);
     }
     
     console.log('✅ Home information updated:', homeData.fullAddress);
@@ -1982,7 +1982,7 @@ function clearData() {
         document.getElementById('main-app').classList.add('hidden');
         document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
         
-        showToast('All data cleared. Starting fresh!', 'success');
+        alert('✅ All data cleared. Starting fresh!');
     }
 }
 
@@ -2002,7 +2002,7 @@ function exportData() {
     link.click();
     document.body.removeChild(link);
     
-    showToast('Data exported successfully!', 'sucess');
+    alert('📄 Data exported successfully!');
 }
 
 function saveData() {
@@ -2108,7 +2108,6 @@ function initializeApp() {
 }
 
 // Export functions to global scope
-window.showToast = showToast;
 window.createMaintenancePlan = createMaintenancePlan;
 window.finishTaskSetup = finishTaskSetup;
 window.goBackToHomeSetup = goBackToHomeSetup;
@@ -2125,56 +2124,6 @@ window.deleteTaskFromEdit = deleteTaskFromEdit;
 window.showHomeInfo = showHomeInfo;
 window.clearData = clearData;
 window.exportData = exportData;
-
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg transform translate-x-full transition-all duration-300 max-w-sm`;
-    
-    // Different styles for different types
-    const styles = {
-        success: 'bg-green-500 text-white',
-        error: 'bg-red-500 text-white', 
-        info: 'bg-blue-500 text-white',
-        warning: 'bg-yellow-500 text-black'
-    };
-    
-    toast.className += ` ${styles[type] || styles.success}`;
-    
-    // Get appropriate emoji
-    const emojis = {
-        success: '✅',
-        error: '❌', 
-        info: 'ℹ️',
-        warning: '⚠️'
-    };
-    
-    toast.innerHTML = `
-        <div class="flex items-center gap-2">
-            <span class="text-lg">${emojis[type] || emojis.success}</span>
-            <span class="font-medium text-sm">${message}</span>
-            <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-lg opacity-70 hover:opacity-100">×</button>
-        </div>
-    `;
-    
-    document.body.appendChild(toast);
-    
-    // Slide in
-    setTimeout(() => {
-        toast.classList.remove('translate-x-full');
-    }, 100);
-    
-    // Auto-remove after 4 seconds
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.classList.add('translate-x-full');
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    document.body.removeChild(toast);
-                }
-            }, 300);
-        }
-    }, 4000);
-}
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', initializeApp);
@@ -2275,7 +2224,7 @@ function completeTaskSafe(taskId) {
     const task = tasks.find(t => t.id === taskId);
     if (!task) {
         console.error('❌ Task not found:', taskId);
-        showToast('Task not found', 'error');
+        alert('❌ Task not found');
         return;
     }
 
@@ -2288,13 +2237,13 @@ function completeTaskSafe(taskId) {
     // Calculate next due date using enhanced system
     const nextDueDate = calculateNextDueDate(task, oldDueDate);
     if (!nextDueDate) {
-        showToast('Error calculating next due date', 'error');
+        alert('❌ Error calculating next due date');
         return;
     }
     
     // Use unified date setter (ensures calendar sync)
     if (!setTaskDate(task, nextDueDate)) {
-        showToast('Error setting new due date', 'error');
+        alert('❌ Error setting new due date');
         return;
     }
     
@@ -2310,7 +2259,7 @@ function completeTaskSafe(taskId) {
         console.log('💾 Data saved after task completion');
     } catch (error) {
         console.error('❌ Error saving data after completion:', error);
-        showToast('Error saving task completion', 'error');
+        alert('❌ Error saving task completion');
         return;
     }
     
@@ -2321,7 +2270,8 @@ function completeTaskSafe(taskId) {
     refreshAllDisplays();
     
     // Success message
-   showToast(`"${task.title}" completed! Next due: ${nextDueDate.toLocaleDateString()}`, 'success');}
+    alert(`✅ Task "${task.title}" completed!\nNext due: ${nextDueDate.toLocaleDateString()}`);
+}
 
 /**
  * Helper function to refresh all displays
