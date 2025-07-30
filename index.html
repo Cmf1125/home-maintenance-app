@@ -1135,5 +1135,167 @@ if (window.Casa) {
 
 console.log('✅ EMERGENCY FIXES APPLIED - Try your functions now!');
 </script>
+            <script>
+console.log('📅 FIXING CALENDAR SYNC AND DOTS...');
+
+// Fix 1: Ensure all tasks have proper calendar dates
+function fixTaskCalendarSync() {
+    if (!window.tasks || !Array.isArray(window.tasks)) {
+        console.warn('⚠️ No tasks found for calendar sync');
+        return 0;
+    }
+    
+    let fixedCount = 0;
+    window.tasks.forEach(task => {
+        let needsSync = false;
+        
+        // Ensure both dueDate and nextDue exist and match
+        if (task.dueDate && !task.nextDue) {
+            task.nextDue = new Date(task.dueDate);
+            needsSync = true;
+        }
+        if (task.nextDue && !task.dueDate) {
+            task.dueDate = new Date(task.nextDue);
+            needsSync = true;
+        }
+        
+        // Ensure they're both Date objects
+        if (task.dueDate && typeof task.dueDate === 'string') {
+            task.dueDate = new Date(task.dueDate);
+            needsSync = true;
+        }
+        if (task.nextDue && typeof task.nextDue === 'string') {
+            task.nextDue = new Date(task.nextDue);
+            needsSync = true;
+        }
+        
+        // Ensure dates match (for calendar compatibility)
+        if (task.dueDate && task.nextDue) {
+            const dueTime = new Date(task.dueDate).getTime();
+            const nextTime = new Date(task.nextDue).getTime();
+            if (Math.abs(dueTime - nextTime) > 1000) { // Allow 1 second difference
+                task.nextDue = new Date(task.dueDate); // dueDate is authoritative
+                needsSync = true;
+            }
+        }
+        
+        // Ensure priority exists (for dots)
+        if (!task.priority) {
+            task.priority = 'medium';
+            needsSync = true;
+        }
+        
+        if (needsSync) {
+            fixedCount++;
+            console.log(`📅 Fixed calendar sync for: ${task.title}`);
+        }
+    });
+    
+    console.log(`📅 Calendar sync: Fixed ${fixedCount} tasks`);
+    return fixedCount;
+}
+
+// Fix 2: Force calendar refresh with proper data
+function refreshCalendarWithDots() {
+    // Fix task data first
+    const fixedCount = fixTaskCalendarSync();
+    
+    // Save the fixes
+    if (fixedCount > 0 && typeof saveData === 'function') {
+        saveData();
+        console.log('💾 Saved calendar sync fixes');
+    }
+    
+    // Force calendar refresh
+    if (window.casaCareCalendar) {
+        console.log('📅 Refreshing calendar...');
+        try {
+            if (typeof window.casaCareCalendar.refresh === 'function') {
+                window.casaCareCalendar.refresh();
+            } else if (typeof window.casaCareCalendar.render === 'function') {
+                window.casaCareCalendar.render();
+            } else {
+                // Recreate calendar if methods don't exist
+                console.log('🔄 Recreating calendar...');
+                if (typeof CasaCareCalendar !== 'undefined') {
+                    window.casaCareCalendar = new CasaCareCalendar();
+                }
+            }
+            console.log('✅ Calendar refreshed successfully');
+        } catch (error) {
+            console.error('❌ Error refreshing calendar:', error);
+        }
+    } else {
+        console.log('🆕 Creating new calendar...');
+        if (typeof CasaCareCalendar !== 'undefined') {
+            window.casaCareCalendar = new CasaCareCalendar();
+        }
+    }
+}
+
+// Fix 3: Debug calendar dots
+function debugCalendarDots() {
+    console.log('🔍 CALENDAR DOTS DEBUG:');
+    
+    if (!window.tasks) {
+        console.log('❌ No tasks found');
+        return;
+    }
+    
+    const today = new Date();
+    const tasksWithDates = window.tasks.filter(t => t.nextDue || t.dueDate);
+    console.log(`📊 Tasks with dates: ${tasksWithDates.length}/${window.tasks.length}`);
+    
+    // Check next few days for tasks
+    for (let i = 0; i < 7; i++) {
+        const checkDate = new Date(today);
+        checkDate.setDate(today.getDate() + i);
+        
+        const tasksOnDate = window.tasks.filter(task => {
+            if (!task.nextDue) return false;
+            const taskDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
+            const normalizedTaskDate = new Date(taskDate.getFullYear(), taskDate.getMonth(), taskDate.getDate());
+            const normalizedCheckDate = new Date(checkDate.getFullYear(), checkDate.getMonth(), checkDate.getDate());
+            return normalizedTaskDate.getTime() === normalizedCheckDate.getTime();
+        });
+        
+        if (tasksOnDate.length > 0) {
+            console.log(`📅 ${checkDate.toDateString()}: ${tasksOnDate.length} tasks`);
+            tasksOnDate.forEach(task => {
+                console.log(`  - ${task.title} (priority: ${task.priority})`);
+            });
+        }
+    }
+}
+
+// Fix 4: Enhanced complete task to maintain calendar sync
+const originalCompleteTask = window.completeTask;
+window.completeTask = function(taskId) {
+    console.log(`✅ Completing task ${taskId} with calendar sync...`);
+    
+    // Call original function
+    if (originalCompleteTask) {
+        originalCompleteTask(taskId);
+    }
+    
+    // Force calendar refresh after completion
+    setTimeout(() => {
+        refreshCalendarWithDots();
+    }, 100);
+};
+
+// Run the fixes immediately
+refreshCalendarWithDots();
+debugCalendarDots();
+
+// Make functions available for manual debugging
+window.refreshCalendarWithDots = refreshCalendarWithDots;
+window.debugCalendarDots = debugCalendarDots;
+window.fixTaskCalendarSync = fixTaskCalendarSync;
+
+console.log('✅ CALENDAR SYNC AND DOTS RESTORED!');
+console.log('💡 Run debugCalendarDots() to see what tasks are on which dates');
+console.log('💡 Run refreshCalendarWithDots() to force refresh');
+</script>
   </body>
 </html>
