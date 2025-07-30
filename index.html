@@ -741,7 +741,7 @@
             const description = document.getElementById('edit-task-description').value.trim();
             const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
             const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
-            const priority = document.getElementById('edit-task-priority').value;
+            const priority = getAutoPriority(title, category);
             const category = document.getElementById('edit-task-category').value || 'General';
             const dueDateStr = document.getElementById('edit-task-due-date').value;
             
