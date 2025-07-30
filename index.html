@@ -464,31 +464,21 @@
                         </div>
                     </div>
                     
-         <!-- Category -->
-<div>
-    <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-    <select id="edit-task-category" 
-            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
-        <option value="General">🔧 General</option>
-        <option value="HVAC">🌡️ HVAC</option>
-        <option value="Water Systems">💧 Water Systems</option>
-        <option value="Exterior">🏠 Exterior</option>
-        <option value="Pest Control">🐛 Pest Control</option>
-        <option value="Safety">⚠️ Safety</option>
-        <option value="Seasonal">🌍 Seasonal</option>
-    </select>
-</div>
-
-<!-- Priority Field -->
-<div>
-    <label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-    <select id="edit-task-priority" 
-            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
-        <option value="low">⚪ Low Priority</option>
-        <option value="medium" selected>🟡 Medium Priority</option>
-        <option value="high">🔴 High Priority</option>
-    </select>
-</div>
+                    <!-- Category -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select id="edit-task-category" 
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
+                            <option value="General">🔧 General</option>
+                            <option value="HVAC">🌡️ HVAC</option>
+                            <option value="Water Systems">💧 Water Systems</option>
+                            <option value="Exterior">🏠 Exterior</option>
+                            <option value="Pest Control">🐛 Pest Control</option>
+                            <option value="Safety">⚠️ Safety</option>
+                            <option value="Seasonal">🌍 Seasonal</option>
+                        </select>
+                    </div>
+                </div>
                 
                 <!-- Action Buttons -->
                 <div class="flex gap-3 mt-6">
@@ -678,7 +668,7 @@
             
             const modal = document.getElementById('task-edit-modal');
             if (!modal) {
-                showToast('Modal not found', 'error');
+                alert('❌ Modal not found');
                 return;
             }
             
@@ -729,31 +719,27 @@
         },
         
         saveTask: function() {
-    console.log('💾 Saving task...');
-    
-    if (!this.currentTask) {
-        showToast('No task to save', 'error');
-        return;
-    }
-    
-    // Get values IN THE RIGHT ORDER
-    const title = document.getElementById('edit-task-name').value.trim();
-    const description = document.getElementById('edit-task-description').value.trim();
-    const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
-    const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
-    const category = document.getElementById('edit-task-category').value || 'General';  // ← FIRST
-    const dueDateStr = document.getElementById('edit-task-due-date').value;
-    
-    // NOW we can calculate priority using category
-    const priority = getAutoPriority(title, category);  // ← SECOND
-    
-    // Validate
-    if (!title) {
-        showToast('Title required', 'error');
-        return;
-    }
-    
-    // Rest of your function continues...
+            console.log('💾 Saving task...');
+            
+            if (!this.currentTask) {
+                alert('❌ No task to save');
+                return;
+            }
+            
+            // Get values
+            const title = document.getElementById('edit-task-name').value.trim();
+            const description = document.getElementById('edit-task-description').value.trim();
+            const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
+            const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
+            const priority = document.getElementById('edit-task-priority').value;
+            const category = document.getElementById('edit-task-category').value || 'General';
+            const dueDateStr = document.getElementById('edit-task-due-date').value;
+            
+            // Validate
+            if (!title) {
+                alert('❌ Title required');
+                return;
+            }
 
             
             // Create date
@@ -794,7 +780,7 @@
             // Close modal
             this.closeModal();
             
-            showToast(`Task "${title}" ${isNew ? 'added' : 'updated'}!`);
+            alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
         },
         
         deleteTask: function() {
@@ -810,7 +796,7 @@
                 
                 this.refreshAfterSave();
                 this.closeModal();
-                showToast(`"${title}" deleted!`);
+                alert(`✅ "${title}" deleted!`);
             }
         },
         
@@ -877,7 +863,7 @@
         console.log('✏️ Edit task from setup:', taskId);
         const task = window.tasks?.find(t => t.id === taskId);
         if (!task) {
-            showToast('Task not found', 'error');
+            alert('❌ Task not found');
             return;
         }
         window.Casa.openModal(task, false, 'setup');
@@ -904,7 +890,7 @@
         console.log('✏️ Edit task from dashboard:', taskId);
         const task = window.tasks?.find(t => t.id === taskId);
         if (!task) {
-            showToast('Task not found', 'error');
+            alert('❌ Task not found');
             return;
         }
         window.Casa.openModal(task, false, 'dashboard');
@@ -927,7 +913,7 @@
     window.rescheduleTaskFromDashboard = function(taskId) {
         const task = window.tasks.find(t => t.id === taskId);
         if (!task) {
-            showToast('Task not found', 'error');
+            alert('❌ Task not found');
             return;
         }
         
@@ -969,13 +955,13 @@
     
     window.confirmReschedule = function() {
         if (!window.currentRescheduleTask) {
-            showToast('No task selected', 'error');
+            alert('❌ No task selected');
             return;
         }
         
         const input = document.getElementById('new-due-date');
         if (!input?.value) {
-            showToast('Please select a date', 'error');
+            alert('❌ Please select a date');
             return;
         }
         
@@ -995,7 +981,7 @@
         }
         
         window.closeDatePickerModal();
-        showToast(`Task rescheduled to ${newDate.toLocaleDateString()}`);
+        alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
     };
 
     // Test function with calendar sync testing
@@ -1031,385 +1017,6 @@
     console.log('✅ CLEAN SLATE: Modal system loaded!');
     console.log('💡 Run testCleanSlate() to test the system');
     </script>
-     <script>
-console.log('🚑 EMERGENCY FIXES LOADING...');
-
-// Fix 1: Ensure showToast works
-window.showToast = window.showToast || function(message, type = 'success') {
-    console.log(`${type.toUpperCase()}: ${message}`);
-    // Simple visual feedback
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-        position: fixed; top: 20px; right: 20px; z-index: 9999;
-        background: ${type === 'error' ? '#ef4444' : '#10b981'}; 
-        color: white; padding: 12px 20px; border-radius: 8px;
-        font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    `;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-};
-
-// Fix 2: Ensure well water toggle works
-window.toggleWellWaterOptions = function() {
-    const checkbox = document.getElementById('well-water');
-    const options = document.getElementById('well-water-options');
-    if (checkbox && options) {
-        if (checkbox.checked) {
-            options.classList.remove('hidden');
-        } else {
-            options.classList.add('hidden');
-            ['sediment-filter', 'uv-filter', 'water-softener', 'whole-house-filter'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.checked = false;
-            });
-        }
-    }
-};
-
-// Fix 3: Ensure create plan works
-window.createMaintenancePlan = window.createMaintenancePlan || function() {
-    showToast('Loading...', 'info');
-    setTimeout(() => {
-        if (typeof window.createMaintenancePlan === 'function') {
-            window.createMaintenancePlan();
-        } else {
-            showToast('Please refresh the page and try again', 'error');
-        }
-    }, 500);
-};
-
-// Fix 4: Simple reschedule function
-window.rescheduleTaskFromDashboard = function(taskId) {
-    const task = window.tasks?.find(t => t.id === taskId);
-    if (!task) {
-        showToast('Task not found', 'error');
-        return;
-    }
-    
-    const currentDate = task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-    const newDateStr = prompt(`Reschedule "${task.title}" to (YYYY-MM-DD):`, currentDate);
-    
-    if (newDateStr && newDateStr !== currentDate) {
-        const newDate = new Date(newDateStr + 'T12:00:00');
-        if (!isNaN(newDate.getTime())) {
-            task.dueDate = newDate;
-            task.nextDue = newDate; // Calendar compatibility
-            
-            // Save and refresh
-            if (typeof saveData === 'function') saveData();
-            if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
-            if (window.casaCareCalendar?.refresh) window.casaCareCalendar.refresh();
-            
-            showToast(`Task rescheduled to ${newDate.toLocaleDateString()}`, 'success');
-        } else {
-            showToast('Invalid date format', 'error');
-        }
-    }
-};
-
-// Fix 5: Remove priority from Casa system (you don't need it!)
-if (window.Casa) {
-    const originalSaveTask = window.Casa.saveTask;
-    window.Casa.saveTask = function() {
-        // Remove priority requirement
-        const priorityElement = document.getElementById('edit-task-priority');
-        if (!priorityElement) {
-            // Create temporary element to prevent errors
-            const temp = document.createElement('select');
-            temp.id = 'edit-task-priority';
-            temp.value = 'medium';
-            temp.style.display = 'none';
-            document.body.appendChild(temp);
-            
-            // Call original function
-            if (originalSaveTask) originalSaveTask.call(this);
-            
-            // Remove temp element
-            temp.remove();
-        } else {
-            if (originalSaveTask) originalSaveTask.call(this);
-        }
-    };
-}
-
-console.log('✅ EMERGENCY FIXES APPLIED - Try your functions now!');
-</script>
-            <script>
-console.log('📅 FIXING CALENDAR SYNC AND DOTS...');
-
-// Fix 1: Ensure all tasks have proper calendar dates
-function fixTaskCalendarSync() {
-    if (!window.tasks || !Array.isArray(window.tasks)) {
-        console.warn('⚠️ No tasks found for calendar sync');
-        return 0;
-    }
-    
-    let fixedCount = 0;
-    window.tasks.forEach(task => {
-        let needsSync = false;
-        
-        // Ensure both dueDate and nextDue exist and match
-        if (task.dueDate && !task.nextDue) {
-            task.nextDue = new Date(task.dueDate);
-            needsSync = true;
-        }
-        if (task.nextDue && !task.dueDate) {
-            task.dueDate = new Date(task.nextDue);
-            needsSync = true;
-        }
-        
-        // Ensure they're both Date objects
-        if (task.dueDate && typeof task.dueDate === 'string') {
-            task.dueDate = new Date(task.dueDate);
-            needsSync = true;
-        }
-        if (task.nextDue && typeof task.nextDue === 'string') {
-            task.nextDue = new Date(task.nextDue);
-            needsSync = true;
-        }
-        
-        // Ensure dates match (for calendar compatibility)
-        if (task.dueDate && task.nextDue) {
-            const dueTime = new Date(task.dueDate).getTime();
-            const nextTime = new Date(task.nextDue).getTime();
-            if (Math.abs(dueTime - nextTime) > 1000) { // Allow 1 second difference
-                task.nextDue = new Date(task.dueDate); // dueDate is authoritative
-                needsSync = true;
-            }
-        }
-        
-        // Ensure priority exists (for dots)
-        if (!task.priority) {
-            task.priority = 'medium';
-            needsSync = true;
-        }
-        
-        if (needsSync) {
-            fixedCount++;
-            console.log(`📅 Fixed calendar sync for: ${task.title}`);
-        }
-    });
-    
-    console.log(`📅 Calendar sync: Fixed ${fixedCount} tasks`);
-    return fixedCount;
-}
-
-// Fix 2: Force calendar refresh with proper data
-function refreshCalendarWithDots() {
-    // Fix task data first
-    const fixedCount = fixTaskCalendarSync();
-    
-    // Save the fixes
-    if (fixedCount > 0 && typeof saveData === 'function') {
-        saveData();
-        console.log('💾 Saved calendar sync fixes');
-    }
-    
-    // Force calendar refresh
-    if (window.casaCareCalendar) {
-        console.log('📅 Refreshing calendar...');
-        try {
-            if (typeof window.casaCareCalendar.refresh === 'function') {
-                window.casaCareCalendar.refresh();
-            } else if (typeof window.casaCareCalendar.render === 'function') {
-                window.casaCareCalendar.render();
-            } else {
-                // Recreate calendar if methods don't exist
-                console.log('🔄 Recreating calendar...');
-                if (typeof CasaCareCalendar !== 'undefined') {
-                    window.casaCareCalendar = new CasaCareCalendar();
-                }
-            }
-            console.log('✅ Calendar refreshed successfully');
-        } catch (error) {
-            console.error('❌ Error refreshing calendar:', error);
-        }
-    } else {
-        console.log('🆕 Creating new calendar...');
-        if (typeof CasaCareCalendar !== 'undefined') {
-            window.casaCareCalendar = new CasaCareCalendar();
-        }
-    }
-}
-
-// Fix 3: Debug calendar dots
-function debugCalendarDots() {
-    console.log('🔍 CALENDAR DOTS DEBUG:');
-    
-    if (!window.tasks) {
-        console.log('❌ No tasks found');
-        return;
-    }
-    
-    const today = new Date();
-    const tasksWithDates = window.tasks.filter(t => t.nextDue || t.dueDate);
-    console.log(`📊 Tasks with dates: ${tasksWithDates.length}/${window.tasks.length}`);
-    
-    // Check next few days for tasks
-    for (let i = 0; i < 7; i++) {
-        const checkDate = new Date(today);
-        checkDate.setDate(today.getDate() + i);
-        
-        const tasksOnDate = window.tasks.filter(task => {
-            if (!task.nextDue) return false;
-            const taskDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
-            const normalizedTaskDate = new Date(taskDate.getFullYear(), taskDate.getMonth(), taskDate.getDate());
-            const normalizedCheckDate = new Date(checkDate.getFullYear(), checkDate.getMonth(), checkDate.getDate());
-            return normalizedTaskDate.getTime() === normalizedCheckDate.getTime();
-        });
-        
-        if (tasksOnDate.length > 0) {
-            console.log(`📅 ${checkDate.toDateString()}: ${tasksOnDate.length} tasks`);
-            tasksOnDate.forEach(task => {
-                console.log(`  - ${task.title} (priority: ${task.priority})`);
-            });
-        }
-    }
-}
-
-// Fix 4: Enhanced complete task to maintain calendar sync
-const originalCompleteTask = window.completeTask;
-window.completeTask = function(taskId) {
-    console.log(`✅ Completing task ${taskId} with calendar sync...`);
-    
-    // Call original function
-    if (originalCompleteTask) {
-        originalCompleteTask(taskId);
-    }
-    
-    // Force calendar refresh after completion
-    setTimeout(() => {
-        refreshCalendarWithDots();
-    }, 100);
-};
-
-// Run the fixes immediately
-refreshCalendarWithDots();
-debugCalendarDots();
-
-// Make functions available for manual debugging
-window.refreshCalendarWithDots = refreshCalendarWithDots;
-window.debugCalendarDots = debugCalendarDots;
-window.fixTaskCalendarSync = fixTaskCalendarSync;
-
-console.log('✅ CALENDAR SYNC AND DOTS RESTORED!');
-console.log('💡 Run debugCalendarDots() to see what tasks are on which dates');
-console.log('💡 Run refreshCalendarWithDots() to force refresh');
-</script>
-            <script>
-console.log('🎨 FORCING CALENDAR DOTS TO APPEAR...');
-
-// Force calendar to re-render with dots
-function forceCalendarDotsRefresh() {
-    // First, let's see if calendar is on the right month
-    if (window.casaCareCalendar) {
-        console.log('📅 Current calendar month:', window.casaCareCalendar.currentMonth + 1, window.casaCareCalendar.currentYear);
-        
-        // Jump to a month that definitely has tasks
-        const firstTaskWithDate = window.tasks.find(t => t.nextDue);
-        if (firstTaskWithDate) {
-            const taskDate = new Date(firstTaskWithDate.nextDue);
-            console.log('📅 Jumping to month with tasks:', taskDate.toDateString());
-            
-            window.casaCareCalendar.currentMonth = taskDate.getMonth();
-            window.casaCareCalendar.currentYear = taskDate.getFullYear();
-            window.casaCareCalendar.renderCalendar();
-        }
-    } else {
-        console.log('📅 Calendar not found, creating new one...');
-        if (typeof CasaCareCalendar !== 'undefined') {
-            window.casaCareCalendar = new CasaCareCalendar();
-        }
-    }
-}
-
-// Enhanced debug to check specific calendar rendering
-function debugCalendarRendering() {
-    console.log('🔍 CALENDAR RENDERING DEBUG:');
-    
-    // Check if calendar view is visible
-    const calendarView = document.getElementById('calendar-view');
-    console.log('📱 Calendar view exists:', !!calendarView);
-    console.log('📱 Calendar view visible:', calendarView && !calendarView.classList.contains('hidden'));
-    
-    // Check if calendar HTML exists
-    const calendarDays = document.getElementById('calendar-days');
-    console.log('📅 Calendar days container:', !!calendarDays);
-    
-    if (calendarDays) {
-        const dayElements = calendarDays.querySelectorAll('.calendar-day');
-        console.log('📅 Day elements found:', dayElements.length);
-        
-        // Check for task dots
-        const dotsFound = calendarDays.querySelectorAll('.task-dot').length;
-        console.log('🔵 Task dots found:', dotsFound);
-        
-        // Check a specific day with tasks
-        const today = new Date();
-        const todayStr = today.toISOString().split('T')[0];
-        const todayElement = document.querySelector(`[data-date="${todayStr}"]`);
-        if (todayElement) {
-            console.log('📅 Today element found:', !!todayElement);
-            console.log('📅 Today element content:', todayElement.innerHTML);
-        }
-    }
-    
-    // Check calendar object
-    if (window.casaCareCalendar) {
-        console.log('📅 Calendar object exists:', true);
-        console.log('📅 Calendar methods available:', {
-            render: typeof window.casaCareCalendar.renderCalendar === 'function',
-            refresh: typeof window.casaCareCalendar.refresh === 'function',
-            getTasksForDate: typeof window.casaCareCalendar.getTasksForDate === 'function'
-        });
-        
-        // Test getTasksForDate for today
-        const today = new Date();
-        const tasksToday = window.casaCareCalendar.getTasksForDate(today);
-        console.log(`📅 Tasks for today (${today.toDateString()}):`, tasksToday.length);
-    }
-}
-
-// Quick fix: Recreate calendar completely
-function recreateCalendar() {
-    console.log('🔄 RECREATING CALENDAR COMPLETELY...');
-    
-    // Switch to calendar tab first
-    showTab('calendar');
-    
-    // Wait a moment for tab to switch
-    setTimeout(() => {
-        // Recreate calendar object
-        if (typeof CasaCareCalendar !== 'undefined') {
-            window.casaCareCalendar = new CasaCareCalendar();
-            console.log('✅ Calendar recreated');
-            
-            // Force it to current month with tasks
-            const firstTask = window.tasks.find(t => t.nextDue);
-            if (firstTask) {
-                const taskDate = new Date(firstTask.nextDue);
-                window.casaCareCalendar.currentMonth = taskDate.getMonth();
-                window.casaCareCalendar.currentYear = taskDate.getFullYear();
-                window.casaCareCalendar.renderCalendar();
-                console.log('✅ Calendar set to month with tasks');
-            }
-        }
-    }, 100);
-}
-
-// Run the fixes
-debugCalendarRendering();
-forceCalendarDotsRefresh();
-
-// Make functions available
-window.forceCalendarDotsRefresh = forceCalendarDotsRefresh;
-window.debugCalendarRendering = debugCalendarRendering;
-window.recreateCalendar = recreateCalendar;
-
-console.log('✅ Calendar debugging complete');
-console.log('💡 Try: recreateCalendar() if dots still missing');
-console.log('💡 Try: debugCalendarRendering() to see what is rendered');
-</script>
+     
   </body>
 </html>
