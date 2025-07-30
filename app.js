@@ -1769,7 +1769,8 @@ if (!title) {
     // Close modal
     closeTaskEditModal();
     
-   showToast(`Task "${title}" ${isNew ? 'added' : 'updated'} successfully!`)
+   showToast(`Task "${title}" ${isNew ? 'added' : 'updated'} successfully!`, 'success');
+
 }
 
 // Delete task from edit modal
@@ -2288,7 +2289,7 @@ function completeTaskSafe(taskId) {
     // Calculate next due date using enhanced system
     const nextDueDate = calculateNextDueDate(task, oldDueDate);
     if (!nextDueDate) {
-        showToast('Error calculating next due date', 'error);
+        showToast('Error calculating next due date', 'error');
         return;
     }
     
@@ -2321,8 +2322,7 @@ function completeTaskSafe(taskId) {
     refreshAllDisplays();
     
     // Success message
-   showToast(`"${task.title}" completed! Next due: ${nextDueDate.toLocaleDateString()}`);
-}
+   showToast(`"${task.title}" completed! Next due: ${nextDueDate.toLocaleDateString()}`, 'success');}
 
 /**
  * Helper function to refresh all displays
