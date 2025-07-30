@@ -1336,7 +1336,7 @@ function showTab(tabName) {
 function showAllTasks() {
     console.log('📋 Switching to All Tasks view...');
     
-    // Hide all other views (copy pattern from showTab)
+    // Hide all other views
     const dashboardView = document.getElementById('dashboard-view');
     const calendarView = document.getElementById('calendar-view');
     const documentsView = document.getElementById('documents-view');
@@ -1356,17 +1356,16 @@ function showAllTasks() {
         return;
     }
     
-    // Update tab styling (clear all active states)
+    // Update tab styling
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('bg-blue-100', 'text-blue-700');
         btn.classList.add('text-gray-600');
     });
     
-    // No specific tab gets active styling since this is in secondary nav
+    // 🚀 THE MISSING LINE - Actually render the content!
+    renderAllTasksView();
     
-    console.log('✅ All Tasks view displayed');
-    
-    // Later we'll add: renderAllTasksView();
+    console.log('✅ All Tasks view displayed with content');
 }
 
 function renderAllTasksView() {
