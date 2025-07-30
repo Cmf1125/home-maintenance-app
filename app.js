@@ -1350,6 +1350,199 @@ function showAllTasks() {
         console.error('❌ All tasks view not found');
         return;
     }
+function renderAllTasksView() {
+    const allTasksView = document.getElementById('all-tasks-view');
+    if (!allTasksView) return;
+    
+    // Calculate stats
+    const now = new Date();
+    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    let overdueCount = 0;
+    let weekCount = 0;
+    let totalCost = 0;
+    
+    window.tasks.forEach(task => {
+        if (!task.isCompleted && task.dueDate) {
+            const taskDate = new Date(task.dueDate);
+            if (taskDate < now) overdueCount++;
+            if (taskDate <= oneWeek && taskDate >= now) weekCount++;
+        }
+        totalCost += task.cost * (365 / task.frequency);
+    });
+    
+    const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
+    
+    // Beautiful interface (copying your task generation page style)
+    allTasksView.innerHTML = `
+        <div class="p-4">
+            <div class="bg-white rounded-xl p-6 shadow-lg max-w-4xl mx-auto">
+                <div class="text-center mb-6">
+                    <div class="text-4xl mb-4">📋</div>
+                    <h2 class="text-xl font-bold text-gray-900 mb-2">Manage All Tasks</h2>
+                    <p class="text-gray-600 text-sm">Edit, complete, or reschedule your maintenance tasks</p>
+                </div>
+                
+                <!-- Quick Stats (copying dashboard style) -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <h3 class="font-semibold text-gray-900 mb-3">📊 Task Overview</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-red-600">${overdueCount}</div>
+                            <div class="text-xs text-gray-600">Overdue</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-orange-600">${weekCount}</div>
+                            <div class="text-xs text-gray-600">This Week</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-blue-600">${totalTasks}</div>
+                            <div class="text-xs text-gray-600">Total Active</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
+                            <div class="text-xs text-gray-600">Annual Cost</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Add Custom Task Button -->
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-900">Your Maintenance Tasks</h3>
+                    <button onclick="addTaskFromDashboard()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
+                        ➕ Add Task
+                    </button>
+                </div>
+                
+                <!-- Task Categories (copying task generation page style) -->
+                <div id="all-tasks-categories" class="space-y-6">
+                    ${renderAllTaskCategories()}
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex gap-3 mt-8">
+                    <button onclick="showTab('dashboard')" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition-colors touch-btn">
+                        ← Back to Dashboard
+                    </button>
+                    <button onclick="exportTaskList()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors touch-btn">
+                        📋 Export Tasks
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderAllTaskCategories() {
+    if (!window.tasks || window.tasks.length === 0) {
+        return '<div class="text-center text-gray-500 py-8">No tasks found.</div>';
+    }
+
+    // Group active tasks by category (copying your existing logic)
+    const activeTasks = window.tasks.filter(task => !task.isCompleted && task.dueDate);
+    const tasksByCategory = {};
+    
+    activeTasks.forEach(task => {
+        const category = task.category || 'General';
+        if (!tasksByCategory[category]) tasksByCategory[category] = [];
+        tasksByCategory[category].push(task);
+    });
+
+    if (Object.keys(tasksByCategory).length === 0) {
+        return '<div class="text-center text-gray-500 py-8">🎉 All tasks completed!</div>';
+    }
+
+    return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
+        const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
+        
+        return `
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                <div class="p-4 border-b border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <span class="text-xl">${categoryInfo.icon}</span>
+                        ${categoryId}
+                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs ml-2">
+                            ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
+                        </span>
+                    </h3>
+                </div>
+                <div class="p-4">
+                    <div class="space-y-2">
+                        ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderAllTasksTaskItem(task) {
+    const now = new Date();
+    const taskDate = new Date(task.dueDate);
+    const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
+    const isOverdue = daysUntilDue < 0;
+    
+    // Status styling
+    let statusClass = 'bg-gray-50';
+    let urgencyDot = '⚪';
+    
+    if (isOverdue) {
+        statusClass = 'bg-red-50 border-l-4 border-red-400';
+        urgencyDot = '🔴';
+    } else if (daysUntilDue <= 7) {
+        statusClass = 'bg-orange-50 border-l-4 border-orange-400';
+        urgencyDot = '🟡';
+    } else if (task.category === 'Safety') {
+        urgencyDot = '🟠';
+    }
+    
+    // Due date display
+    let dueDateDisplay;
+    if (isOverdue) {
+        dueDateDisplay = `<span class="text-red-600 font-semibold">${Math.abs(daysUntilDue)}d overdue</span>`;
+    } else if (daysUntilDue === 0) {
+        dueDateDisplay = `<span class="text-orange-600 font-semibold">Due today</span>`;
+    } else if (daysUntilDue <= 7) {
+        dueDateDisplay = `<span class="text-orange-600">Due in ${daysUntilDue}d</span>`;
+    } else {
+        dueDateDisplay = `<span class="text-gray-700">Due ${taskDate.toLocaleDateString()}</span>`;
+    }
+
+    return `
+        <div class="flex items-center justify-between py-3 px-4 ${statusClass} rounded-lg hover:bg-gray-100 transition-colors">
+            <div class="flex items-center gap-3 flex-1">
+                <span class="text-sm">${urgencyDot}</span>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="font-medium text-gray-900 text-sm">${task.title}</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs text-gray-500">
+                        <span>Every ${task.frequency} days</span>
+                        ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
+                        <span>${dueDateDisplay}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="editTaskFromSetup(${task.id})" 
+                        class="text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded transition-colors" 
+                        title="Edit task">
+                    ✏️ Edit
+                </button>
+                <button onclick="completeTask(${task.id})" 
+                        class="text-green-600 hover:text-green-800 text-sm px-2 py-1 rounded transition-colors" 
+                        title="Complete task">
+                    ✅ Complete
+                </button>
+                <button onclick="rescheduleTaskFromDashboard(${task.id})" 
+                        class="text-orange-600 hover:text-orange-800 text-sm px-2 py-1 rounded transition-colors" 
+                        title="Reschedule task">
+                    📅 Reschedule
+                </button>
+            </div>
+        </div>
+    `;
+}
 
 // Basic dashboard fallback function
 function updateDashboard() {
