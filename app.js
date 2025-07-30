@@ -1675,22 +1675,25 @@ function saveTaskFromEdit() {
     // Use either local or global currentEditingTask
     const editingTask = currentEditingTask || window.currentEditingTask;
     
-    // Get form values
+    // Get form values - FIXED ORDER: Get category BEFORE using it for priority
     const title = document.getElementById('edit-task-name').value.trim();
     const description = document.getElementById('edit-task-description').value.trim();
     const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
     const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
-    const priority = getAutoPriority(title, category);
-    const category = document.getElementById('edit-task-category')?.value || 'General';
+    const category = document.getElementById('edit-task-category')?.value || 'General'; // GET CATEGORY FIRST
+    const priority = getAutoPriority(title, category); // NOW use it for priority
     const dueDateInput = document.getElementById('edit-task-due-date');
     
+    console.log('📝 Form values:', { title, description, cost, frequency, category, priority });
+    
     // Validate inputs
-if (!title) {
-    alert('❌ Title required');
-    return;
-}
-
-// Description is now optional - no validation needed
+    if (!title) {
+        alert('❌ Task name is required');
+        document.getElementById('edit-task-name').focus();
+        return;
+    }
+    
+    // Description is optional now
     
     if (frequency <= 0) {
         alert('❌ Frequency must be greater than 0');
@@ -1708,12 +1711,14 @@ if (!title) {
             return;
         }
     } else {
-        // Use current date if no date provided
         dueDate = new Date();
     }
     
+    console.log('📅 Due date:', dueDate.toLocaleDateString());
+    
     // Check if this is a new task
     const isNewTask = !tasks.find(t => t.id === editingTask.id);
+    console.log('🆕 Is new task:', isNewTask);
     
     // Update task properties
     editingTask.title = title;
@@ -1728,11 +1733,12 @@ if (!title) {
     if (isNewTask) {
         // Add to tasks array
         tasks.push(editingTask);
-        // Update global reference
-        window.tasks = tasks;
-        console.log('✅ New task added to array:', editingTask);
+        window.tasks = tasks; // Update global reference
+        console.log('✅ New task added to global array');
     } else {
-        console.log('✅ Existing task updated:', editingTask);
+        // Update global reference to ensure changes are reflected
+        window.tasks = tasks;
+        console.log('✅ Existing task updated');
     }
     
     // Determine if we're in setup or main app by checking which screen is visible
@@ -1741,13 +1747,15 @@ if (!title) {
     
     if (taskSetupVisible) {
         // We're in task setup, re-render categories
+        console.log('🔄 Refreshing task setup categories...');
         renderTaskCategories();
     } else if (mainAppVisible) {
         // We're in main app, save and refresh
+        console.log('🔄 Saving data and refreshing main app...');
         saveData();
         
         // Refresh dashboard
-        if (window.enhancedDashboard) {
+        if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
             window.enhancedDashboard.render();
         } else {
             updateDashboard();
@@ -1758,9 +1766,10 @@ if (!title) {
             window.casaCareCalendar.refresh();
         }
     } else {
-        // Default behavior
+        // Default behavior - save everything
+        console.log('🔄 Default save and refresh...');
         saveData();
-        if (window.enhancedDashboard) {
+        if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
             window.enhancedDashboard.render();
         } else {
             updateDashboard();
@@ -1771,8 +1780,8 @@ if (!title) {
     closeTaskEditModal();
     
     alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
+    console.log('✅ Task save completed successfully');
 }
-
 // Delete task from edit modal
 function deleteTaskFromEdit() {
     if (!currentEditingTask) {
