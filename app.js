@@ -2108,6 +2108,7 @@ function initializeApp() {
 }
 
 // Export functions to global scope
+window.showToast = showToast;
 window.createMaintenancePlan = createMaintenancePlan;
 window.finishTaskSetup = finishTaskSetup;
 window.goBackToHomeSetup = goBackToHomeSetup;
@@ -2174,8 +2175,6 @@ function showToast(message, type = 'success') {
         }
     }, 4000);
 }
-// 👇 ADD THIS LINE:
-window.showToast = showToast;
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', initializeApp);
