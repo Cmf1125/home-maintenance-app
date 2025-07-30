@@ -1404,37 +1404,73 @@ function updateDashboard() {
 // FIXED: Enhanced Add Task function for setup with better modal handling
 function addTaskFromSetup() {
     console.log('➕ Adding custom task from setup...');
-    
-    // Verify modal is available
-    const modal = document.getElementById('task-edit-modal');
-    if (!modal) {
-        console.error('❌ Task edit modal not found');
-        alert('❌ Cannot add task: Edit modal not available. Please check that you are on the correct page.');
-        return;
+
+    try {
+        // Verify modal exists
+        const modal = document.getElementById('task-edit-modal');
+        if (!modal) {
+            console.error('❌ Task edit modal not found');
+            alert('❌ Cannot add task: Edit modal not available. Please check that you are on the correct page.');
+            return;
+        }
+
+        // Find next available ID
+        const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+
+        // Create new task object with defaults
+        const newTask = {
+            id: maxId + 1,
+            title: '',
+            description: '',
+            category: 'General',
+            frequency: 365,
+            cost: 0,
+            priority: 'medium',
+            dueDate: new Date(),  // Default to today
+            nextDue: new Date(),
+            lastCompleted: null,
+            isCompleted: false
+        };
+
+        // Track it as the task being edited
+        window.currentEditingTask = newTask;
+
+        // Open modal
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+
+        // Pre-fill modal fields
+        document.getElementById('edit-task-name').value = '';
+        document.getElementById('edit-task-description').value = '';
+        document.getElementById('edit-task-cost').value = 0;
+        document.getElementById('edit-task-frequency').value = 365;
+        document.getElementById('edit-task-category').value = 'General';
+
+        const dateField = document.getElementById('edit-task-due-date');
+        if (dateField) {
+            dateField.value = newTask.dueDate.toISOString().split('T')[0];
+        }
+
+        // Modal title
+        const title = document.getElementById('task-edit-title');
+        if (title) title.textContent = 'Add Custom Task';
+
+        // Hide delete button for new tasks
+        const deleteBtn = modal.querySelector('[onclick*="deleteTaskFromEdit"]');
+        if (deleteBtn) deleteBtn.style.display = 'none';
+
+        // Focus on name field
+        setTimeout(() => {
+            const nameField = document.getElementById('edit-task-name');
+            if (nameField) nameField.focus();
+        }, 100);
+
+        console.log('📋 New task initialized:', newTask);
+
+    } catch (error) {
+        console.error('❌ Error in addTaskFromSetup:', error);
+        alert('❌ Error opening add task modal: ' + error.message);
     }
-    
-    // Find next available ID
-    const maxId = Math.max(...tasks.map(t => t.id), 0);
-    
-    // Create new task object
-    const newTask = {
-        id: maxId + 1,
-        title: '',
-        description: '',
-        category: 'General',
-        frequency: 365,
-        cost: 0,
-        priority: 'medium',
-        dueDate: new Date(),
-        lastCompleted: null,
-        isCompleted: false,
-        isTemplate: true // Important: mark as template so it gets processed correctly
-    };
-    
-    console.log('📋 New task created:', newTask);
-    
-    // Open modal for new task
-    openTaskEditModal(newTask, true);
 }
 
 // FIXED: Enhanced task completion with better calendar sync
@@ -1691,42 +1727,44 @@ function closeTaskEditModal() {
 // Save task from edit modal
 function saveTaskFromEdit() {
     console.log('💾 Saving task from edit modal...');
-    
+
     try {
         if (!window.currentEditingTask) {
             console.error('❌ No currentEditingTask set');
             alert('❌ No task selected for editing. Please try again.');
             return;
         }
-        
+
         const title = document.getElementById('edit-task-name')?.value?.trim();
         const description = document.getElementById('edit-task-description')?.value?.trim();
         const cost = parseFloat(document.getElementById('edit-task-cost')?.value) || 0;
         const frequency = parseInt(document.getElementById('edit-task-frequency')?.value) || 365;
         const category = document.getElementById('edit-task-category')?.value || 'General';
         const dueDateStr = document.getElementById('edit-task-due-date')?.value;
-        
+
         if (!title) {
             alert('❌ Task name is required');
             document.getElementById('edit-task-name')?.focus();
             return;
         }
-        
+
         if (frequency <= 0) {
             alert('❌ Frequency must be greater than 0');
             document.getElementById('edit-task-frequency')?.focus();
             return;
         }
-        
-        // ✅ FIXED: Use getAutoPriority instead of reading from dropdown
+
+        // ✅ FIX: Use auto-priority calculation instead of relying on dropdown
         const priority = getAutoPriority(title, category);
-        
+
+        // Set due date
         const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
         if (isNaN(dueDate.getTime())) {
             alert('❌ Invalid due date');
             return;
         }
-        
+
+        // Update currentEditingTask
         window.currentEditingTask.title = title;
         window.currentEditingTask.description = description;
         window.currentEditingTask.cost = cost;
@@ -1735,44 +1773,42 @@ function saveTaskFromEdit() {
         window.currentEditingTask.category = category;
         window.currentEditingTask.dueDate = dueDate;
         window.currentEditingTask.nextDue = dueDate;
-        
+
+        // Remove template flag so it doesn't get filtered
         delete window.currentEditingTask.isTemplate;
-        
+
+        // Push or update in tasks array
         if (!window.tasks) window.tasks = [];
-        
         const existingIndex = window.tasks.findIndex(t => t.id === window.currentEditingTask.id);
         const isNew = existingIndex === -1;
-        
+
         if (isNew) {
             window.tasks.push(window.currentEditingTask);
         } else {
             window.tasks[existingIndex] = window.currentEditingTask;
         }
-        
+
+        // Save immediately
         saveData();
-        
-        const taskSetupVisible = !document.getElementById('task-setup')?.classList.contains('hidden');
-        
-        if (taskSetupVisible) {
-            if (typeof renderTaskCategories === 'function') {
-                renderTaskCategories();
-            }
+
+        // Refresh UI depending on screen
+        const isSetupVisible = !document.getElementById('task-setup')?.classList.contains('hidden');
+        if (isSetupVisible) {
+            renderTaskCategories();
         } else {
             if (window.enhancedDashboard?.render) {
                 window.enhancedDashboard.render();
             } else if (typeof updateDashboard === 'function') {
                 updateDashboard();
             }
-            
             if (window.casaCareCalendar?.refresh) {
                 window.casaCareCalendar.refresh();
             }
         }
-        
+
         closeTaskEditModal();
-        
         alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'} with ${priority} priority!`);
-        
+
     } catch (error) {
         console.error('❌ Error in saveTaskFromEdit:', error);
         alert('❌ Error saving task: ' + error.message);
@@ -2012,29 +2048,22 @@ function exportData() {
 }
 
 function saveData() {
-    // Ensure calendar compatibility before saving
-    if (window.tasks) {
-        window.tasks.forEach(task => {
-            if (task.dueDate && !task.nextDue) {
-                task.nextDue = task.dueDate;
-            }
-        });
-    }
-    
-    const data = { 
-        homeData: homeData, 
-        tasks: tasks,
-        version: '2.1'
-    };
-    
     try {
+        const data = {
+            homeData: window.homeData,
+            tasks: window.tasks,
+            savedAt: new Date().toISOString()
+        };
+
         localStorage.setItem('casaCareData', JSON.stringify(data));
-        console.log('✅ Data saved to browser storage with calendar compatibility');
+        console.log('💾 Data saved:', data);
+
     } catch (error) {
-        console.error('❌ Failed to save data:', error);
-        throw error; // Re-throw so caller can handle
+        console.error('❌ Error saving data to localStorage:', error);
+        alert('❌ Failed to save data. Please try again.');
     }
 }
+
 
 function loadData() {
     try {
