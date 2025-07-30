@@ -538,7 +538,7 @@ handleAddFormSubmit(event) {
     // Show success message and return to overview
     const photoCount = newAppliance.photos.length;
     const photoText = photoCount > 0 ? ` with ${photoCount} photo${photoCount !== 1 ? 's' : ''}` : '';
-   showToast(`Appliance "${name}" added successfully!`);
+  showToast(`Appliance "${name}" added successfully!`, 'success');
     this.showOverview();
     
     console.log('✅ New appliance added:', newAppliance);
@@ -990,7 +990,7 @@ handleEditFormSubmit(event) {
     this.saveAppliances();
     
     // Show success message and return to overview
-   showToast(`Appliance "${name}" updated successfully!`);
+showToast(`Appliance "${name}" updated successfully!`, 'success');
     this.showOverview();
     
     console.log('✅ Appliance updated:', this.currentAppliance);
@@ -1008,7 +1008,7 @@ deleteAppliance(applianceId) {
         this.appliances = this.appliances.filter(a => a.id != applianceId);
         this.saveAppliances();
         
-       showToast(`Appliance "${appliance.name}" deleted successfully!`);
+       showToast(`Appliance "${appliance.name}" deleted successfully!`, 'success');
         this.showOverview();
         
         console.log('🗑️ Appliance deleted:', appliance.name);
