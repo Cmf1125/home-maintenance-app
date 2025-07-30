@@ -204,26 +204,19 @@ scrollToTaskList() {
     const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
     const isOverdue = daysUntilDue < 0;
     
-    // FIXED: Proper visual urgency system with correct precedence
+    // Simplified status styling - focus on urgency, not arbitrary priority
     let statusClass = 'bg-white';
-    let urgencyDot = '⚪';  // Default: Normal (white)
+    let urgencyDot = '⚪';
     
-    // 🔴 HIGHEST PRIORITY: Overdue tasks (any category)
     if (isOverdue) {
         statusClass = 'bg-red-50 border-l-4 border-red-400';
         urgencyDot = '🔴';
-    } 
-    // 🟠 SAFETY PRIORITY: Safety tasks (when not overdue)
-    else if (task.category === 'Safety') {
+    } else if (daysUntilDue <= 7) {
         statusClass = 'bg-orange-50 border-l-4 border-orange-400';
-        urgencyDot = '🟠';
-    }
-    // 🟡 TIME PRIORITY: Due soon (when not safety or overdue)
-    else if (daysUntilDue <= 7) {
-        statusClass = 'bg-yellow-50 border-l-4 border-yellow-400';
         urgencyDot = '🟡';
+    } else if (task.category === 'Safety') {
+        urgencyDot = '🟠'; // Safety tasks get orange dot even when not due soon
     }
-    // ⚪ NORMAL: Everything else stays white
     
     // Clean due date display
     let dueDateDisplay;
@@ -265,12 +258,12 @@ scrollToTaskList() {
                     </div>
                     
                     <div class="flex items-center gap-3 text-xs flex-wrap">
-                        <span class="category-badge px-2 py-1 rounded-full bg-${this.categoryConfig[task.category]?.color || 'gray'}-50 text-${this.categoryConfig[task.category]?.color || 'gray'}-700 font-medium">
-                            ${this.categoryConfig[task.category]?.icon || '📋'} ${task.category}
-                        </span>
-                        ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
-                        <span class="text-gray-500">Every ${task.frequency}d</span>
-                    </div>
+    <span class="category-badge px-2 py-1 rounded-full bg-${this.categoryConfig[task.category]?.color || 'gray'}-50 text-${this.categoryConfig[task.category]?.color || 'gray'}-700 font-medium">
+        ${this.categoryConfig[task.category]?.icon || '📋'} ${task.category}
+    </span>
+    ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
+    <span class="text-gray-500">Every ${task.frequency}d</span>
+</div>
                     
                     ${lastCompletedDisplay}
                 </div>
@@ -289,17 +282,6 @@ scrollToTaskList() {
         </div>
     `;
 }
-
-// OPTIONAL: Add this CSS to styles.css for the yellow styling
-/*
-.bg-yellow-50 {
-    background-color: #fefce8;
-}
-
-.border-yellow-400 {
-    border-color: #facc15;
-}
-*/
 
     render() {
         this.updateStats();
