@@ -64,12 +64,6 @@ function getAutoPriority(title, category) {
     // Everything else is normal priority
     return 'normal';
 }
-// Add this right after your getAutoPriority function in app.js:
-
-function getAutoPriority(title, category) {
-    // ... your existing getAutoPriority code ...
-    return 'normal';
-}
 
 // Global category configuration (shared between setup and dashboard)
 const categoryConfig = {
