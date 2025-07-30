@@ -1563,6 +1563,8 @@ function renderAllTasksTaskItem(task) {
     `;
 }
 
+// Make it globally available
+window.showAllTasks = showAllTasks;
 
 // Basic dashboard fallback function
 function updateDashboard() {
