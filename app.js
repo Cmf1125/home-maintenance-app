@@ -1501,19 +1501,25 @@ function renderAllTasksTaskItem(task) {
     const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
     const isOverdue = daysUntilDue < 0;
     
-    // Simple status styling
+    // FIXED: Apply correct 4-tier visual priority system (same as dashboard)
     let statusClass = 'bg-gray-50';
     let urgencyDot = '⚪';
     
     if (isOverdue) {
         statusClass = 'bg-red-50 border-l-4 border-red-400';
-        urgencyDot = '🔴';
-    } else if (daysUntilDue <= 7) {
-        statusClass = 'bg-orange-50 border-l-4 border-orange-400';
-        urgencyDot = '🟡';
+        urgencyDot = '🔴';  // Red: Overdue tasks (any category)
     } else if (task.category === 'Safety') {
-        urgencyDot = '🟠';
+        statusClass = 'bg-orange-50 border-l-4 border-orange-400';
+        urgencyDot = '🟠';  // Orange: Safety tasks (when not overdue)
+    } else if (daysUntilDue <= 7) {
+        statusClass = 'bg-yellow-50 border-l-4 border-yellow-400';
+        urgencyDot = '🟡';  // Yellow: Due within 7 days (when not safety/overdue)
+    } else {
+        statusClass = 'bg-white';
+        urgencyDot = '⚪';  // Gray: Normal tasks
     }
+    
+    // ... rest of the function stays the same ...
     
     // Clean due date display
     let dueDateDisplay;
