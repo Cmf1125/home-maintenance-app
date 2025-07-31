@@ -567,7 +567,7 @@
                             class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 touch-btn">
                         Cancel
                     </button>
-                    <button onclick="confirmReschedule()" 
+                    <button type="button" onclick="confirmReschedule()" 
                             class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 touch-btn">
                         📅 Reschedule
                     </button>
@@ -905,5 +905,158 @@ alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
         console.log('✅ Task system override loaded (cleaned up version)');
     </script>
  
-  </body>
+  
+    <!-- ========================================= -->
+    <!-- Reschedule modal overrides (robust open/close & fast confirm) -->
+    <!-- ========================================= -->
+    <script>
+    // Prevent double-opens across Dashboard/Calendar
+    let __RS_OPENING = false;
+
+    function __closeOtherModals() {
+      const edit = document.getElementById('task-edit-modal');
+      if (edit) {
+        edit.classList.add('hidden');
+        edit.style.display = 'none';
+      }
+    }
+
+    function __showRescheduleModal(task) {
+      if (__RS_OPENING) return;
+      __RS_OPENING = true;
+
+      try {
+        if (!task) {
+          alert('❌ Task not found');
+          return;
+        }
+
+        // Close other modals first to avoid z-index/focus collisions
+        __closeOtherModals();
+
+        const modal = document.getElementById('date-picker-modal');
+        const nameEl = document.getElementById('reschedule-task-name');
+        const currentEl = document.getElementById('current-due-date');
+        const inputEl = document.getElementById('new-due-date');
+
+        const d = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+        if (nameEl) nameEl.textContent = `"${task.title}"`;
+        if (currentEl) currentEl.textContent = d.toLocaleDateString();
+        if (inputEl) inputEl.value = d.toISOString().split('T')[0];
+
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.style.display = 'flex';     // force visible immediately
+          requestAnimationFrame(() => { if (inputEl) inputEl.focus(); });
+        }
+
+        window.currentRescheduleTask = task;
+      } finally {
+        // Release lock next tick
+        setTimeout(() => { __RS_OPENING = false; }, 0);
+      }
+    }
+
+    // Override Dashboard entry to use robust opener
+    window.rescheduleTaskFromDashboard = function(taskId) {
+      const task = window.tasks?.find(t => t.id === taskId);
+      __showRescheduleModal(task);
+    };
+
+    // Add/override Calendar entry to use robust opener
+    window.rescheduleFromCalendar = function(taskId) {
+      const task = window.tasks?.find(t => t.id === taskId);
+      __showRescheduleModal(task);
+    };
+
+    // Fast, responsive confirm: update/save, close immediately, then refresh next frame
+    window.confirmReschedule = function() {
+      // Make sure the button never acts like a form submit
+      const confirmBtn = document.querySelector('#date-picker-modal [onclick="confirmReschedule()"]');
+      if (confirmBtn) {
+        confirmBtn.disabled = true;
+        if (!confirmBtn.getAttribute('type')) confirmBtn.setAttribute('type','button');
+      }
+
+      try {
+        if (!window.currentRescheduleTask) {
+          alert('❌ No task selected');
+          return;
+        }
+
+        const input = document.getElementById('new-due-date');
+        if (!input?.value) {
+          alert('❌ Please select a date');
+          return;
+        }
+
+        const newDate = new Date(input.value + 'T12:00:00'); // normalize at noon local
+        const t = window.currentRescheduleTask;
+        t.dueDate = newDate;
+        t.nextDue = newDate; // calendar compatibility
+
+        if (typeof saveData === 'function') saveData();
+
+        // Close first so the UI feels instant
+        if (typeof closeDatePickerModal === 'function') closeDatePickerModal();
+
+        // Defer heavier UI work to the next frame
+        requestAnimationFrame(() => {
+          try {
+            if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
+            if (window.casaCareCalendar?.refresh) window.casaCareCalendar.refresh();
+          } finally {
+            alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
+          }
+        });
+      } finally {
+        if (confirmBtn) confirmBtn.disabled = false;
+      }
+    };
+
+    // Immediate close + cleanup + optional focus restore
+    window.closeDatePickerModal = function(returnFocusId) {
+      const modal = document.getElementById('date-picker-modal');
+      if (!modal) return;
+
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+
+      window.currentRescheduleTask = null;
+      if (typeof window.__RS_OPENING !== 'undefined') {
+        window.__RS_OPENING = false;
+      }
+
+      if (returnFocusId) {
+        const el = document.getElementById(returnFocusId);
+        if (el) requestAnimationFrame(() => el.focus());
+      }
+    };
+
+    // One-time wiring: ESC to close, click backdrop to close
+    (function setupRescheduleModalWiring(){
+      const modal = document.getElementById('date-picker-modal');
+      if (!modal) return;
+
+      // Backdrop click
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeDatePickerModal();
+      });
+
+      // ESC key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+          closeDatePickerModal();
+        }
+      });
+
+      // Ensure the confirm button isn't treated as submit if it lacked a type
+      const confirmBtn = document.querySelector('#date-picker-modal [onclick="confirmReschedule()"]');
+      if (confirmBtn && !confirmBtn.getAttribute('type')) {
+        confirmBtn.setAttribute('type','button');
+      }
+    })();
+    </script>
+</body>
 </html>
