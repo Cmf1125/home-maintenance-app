@@ -2656,6 +2656,31 @@ function initializeDateManagement() {
     console.log('✅ Calendar-safe date management initialized');
 }
 
+// Settings dropdown functions
+function toggleSettingsDropdown() {
+    const dropdown = document.getElementById('settings-dropdown');
+    if (dropdown) {
+        dropdown.classList.toggle('hidden');
+    }
+}
+
+function closeSettingsDropdown() {
+    const dropdown = document.getElementById('settings-dropdown');
+    if (dropdown) {
+        dropdown.classList.add('hidden');
+    }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const settingsBtn = document.getElementById('settings-btn');
+    const dropdown = document.getElementById('settings-dropdown');
+    
+    if (settingsBtn && dropdown && !settingsBtn.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.classList.add('hidden');
+    }
+});
+
 // Export the new functions for debugging and future use
 window.setTaskDate = setTaskDate;
 window.calculateNextDueDate = calculateNextDueDate;
