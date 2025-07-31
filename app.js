@@ -1160,18 +1160,18 @@ function showTab(tabName) {
     window.tasks = tasks;
     window.homeData = homeData;
     
-    // Hide ALL views including All Tasks (THIS WAS MISSING!)
+    // Hide ALL views
     const dashboardView = document.getElementById('dashboard-view');
     const calendarView = document.getElementById('calendar-view');
     const documentsView = document.getElementById('documents-view');
     const appliancesView = document.getElementById('appliances-view');
-    const allTasksView = document.getElementById('all-tasks-view'); // ← ADDED THIS!
+    const allTasksView = document.getElementById('all-tasks-view');
 
     if (dashboardView) dashboardView.classList.add('hidden');
     if (calendarView) calendarView.classList.add('hidden');
     if (documentsView) documentsView.classList.add('hidden');
     if (appliancesView) appliancesView.classList.add('hidden');
-    if (allTasksView) allTasksView.classList.add('hidden'); // ← ADDED THIS!
+    if (allTasksView) allTasksView.classList.add('hidden');
     
     // Update tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1194,7 +1194,7 @@ function showTab(tabName) {
         
         console.log('🏠 Initializing enhanced dashboard...');
         
-        // Enhanced dashboard initialization with fallback
+        // Enhanced dashboard initialization
         try {
             if (typeof EnhancedDashboard !== 'undefined') {
                 if (!window.enhancedDashboard) {
@@ -1310,7 +1310,7 @@ function showTab(tabName) {
         }
     }
     
-    console.log(`✅ Switched to ${tabName} tab (All Tasks properly hidden)`);
+    console.log(`✅ Switched to ${tabName} tab`);
 }
 
 // Add a debug function to check view states
@@ -2680,6 +2680,10 @@ document.addEventListener('click', function(event) {
         dropdown.classList.add('hidden');
     }
 });
+
+// ADD THESE MISSING EXPORTS:
+window.toggleSettingsDropdown = toggleSettingsDropdown;
+window.closeSettingsDropdown = closeSettingsDropdown;
 
 // Export the new functions for debugging and future use
 window.setTaskDate = setTaskDate;
