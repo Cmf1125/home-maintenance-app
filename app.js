@@ -1160,24 +1160,16 @@ function showTab(tabName) {
     window.tasks = tasks;
     window.homeData = homeData;
     
-    // Hide all main views (GENTLE approach - only use classList)
+    // Hide all views
     const dashboardView = document.getElementById('dashboard-view');
     const calendarView = document.getElementById('calendar-view');
     const documentsView = document.getElementById('documents-view');
-    const appliancesView = document.getElementById('appliances-view');
-    const allTasksView = document.getElementById('all-tasks-view'); // ADDED: Make sure All Tasks gets hidden
+    const appliancesView = document.getElementById('appliances-view'); 
 
     if (dashboardView) dashboardView.classList.add('hidden');
     if (calendarView) calendarView.classList.add('hidden');
     if (documentsView) documentsView.classList.add('hidden');
-    if (appliancesView) appliancesView.classList.add('hidden');
-    
-    // ADDED: Forcefully hide All Tasks when switching to main tabs
-    if (allTasksView) {
-        allTasksView.classList.add('hidden');
-        allTasksView.style.display = 'none';  // Extra force for All Tasks
-        allTasksView.style.visibility = 'hidden';
-    }
+    if (appliancesView) appliancesView.classList.add('hidden'); 
     
     // Update tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1186,10 +1178,9 @@ function showTab(tabName) {
     });
     
     if (tabName === 'dashboard') {
-        // Show dashboard (GENTLE - don't mess with working dashboard)
+        // Show dashboard
         if (dashboardView) {
             dashboardView.classList.remove('hidden');
-            // DON'T set style properties - let dashboard handle its own display
         }
         
         // Update tab styling
@@ -1201,7 +1192,7 @@ function showTab(tabName) {
         
         console.log('🏠 Initializing enhanced dashboard...');
         
-        // Enhanced dashboard initialization (original logic)
+        // Enhanced dashboard initialization with fallback
         try {
             if (typeof EnhancedDashboard !== 'undefined') {
                 if (!window.enhancedDashboard) {
@@ -1236,7 +1227,7 @@ function showTab(tabName) {
         
         console.log('📅 Initializing calendar...');
         
-        // Initialize calendar (original logic)
+        // Initialize calendar
         try {
             if (!window.casaCareCalendar && typeof CasaCareCalendar !== 'undefined') {
                 window.casaCareCalendar = new CasaCareCalendar();
@@ -1262,7 +1253,7 @@ function showTab(tabName) {
         
         console.log('📄 Initializing documents...');
         
-        // Initialize documents module (original logic)
+        // Initialize documents module
         try {
             if (!window.casaCareDocuments && typeof CasaCareDocuments !== 'undefined') {
                 console.log('📄 Creating new documents instance...');
@@ -1290,7 +1281,7 @@ function showTab(tabName) {
         
         console.log('⚙️ Switching to appliances tab...');
         
-        // Initialize appliances (original logic)
+        // Initialize or refresh appliances module
         try {
             if (!window.applianceManager) {
                 console.log('⚙️ Appliance manager not found, initializing...');
@@ -1308,6 +1299,8 @@ function showTab(tabName) {
             if (window.applianceManager && typeof window.applianceManager.render === 'function') {
                 console.log('⚙️ Rendering appliances view...');
                 window.applianceManager.render();
+            } else {
+                console.error('❌ Appliance manager render method not available');
             }
             
         } catch (error) {
@@ -1340,38 +1333,29 @@ window.debugViewStates = function() {
 };
 
 function showAllTasks() {
-    console.log('📋 FORCE switching to All Tasks view...');
+    console.log('📋 Switching to All Tasks view...');
     
-    // Get all possible views
-    const views = [
-        'dashboard-view',
-        'calendar-view', 
-        'documents-view',
-        'appliances-view',
-        'all-tasks-view'
-    ];
+    // Hide all other views (including dashboard)
+    const dashboardView = document.getElementById('dashboard-view');
+    const calendarView = document.getElementById('calendar-view');
+    const documentsView = document.getElementById('documents-view');
+    const appliancesView = document.getElementById('appliances-view');
+    const allTasksView = document.getElementById('all-tasks-view');
+
+    if (dashboardView) dashboardView.classList.add('hidden');  // ← THE FIX: Hide dashboard!
+    if (calendarView) calendarView.classList.add('hidden');
+    if (documentsView) documentsView.classList.add('hidden');
+    if (appliancesView) appliancesView.classList.add('hidden');
     
-    // FORCEFULLY hide everything except All Tasks
-    views.forEach(viewId => {
-        const viewElement = document.getElementById(viewId);
-        if (viewElement) {
-            if (viewId === 'all-tasks-view') {
-                // Show All Tasks view
-                viewElement.classList.remove('hidden');
-                viewElement.style.display = 'block';
-                viewElement.style.visibility = 'visible';
-                console.log('✅ Showing:', viewId);
-            } else {
-                // Hide everything else
-                viewElement.classList.add('hidden');
-                viewElement.style.display = 'none';
-                viewElement.style.visibility = 'hidden';
-                console.log('❌ Hiding:', viewId);
-            }
-        }
-    });
+    // Show all tasks view
+    if (allTasksView) {
+        allTasksView.classList.remove('hidden');
+    } else {
+        console.error('❌ All tasks view not found');
+        return;
+    }
     
-    // Clear all tab highlighting
+    // Update tab styling
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('bg-blue-100', 'text-blue-700');
         btn.classList.add('text-gray-600');
@@ -1380,7 +1364,7 @@ function showAllTasks() {
     // Render the content
     renderAllTasksView();
     
-    console.log('✅ All Tasks view should now be the ONLY visible view');
+    console.log('✅ All Tasks view displayed');
 }
 
 function renderAllTasksView() {
@@ -1515,7 +1499,7 @@ function renderAllTasksTaskItem(task) {
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <!-- FIXED: Use a custom edit function that refreshes All Tasks view -->
+                <!-- FIXED: Use editTaskFromAllTasks for proper refresh -->
                 <button onclick="editTaskFromAllTasks(${task.id})" 
                         class="text-blue-600 hover:text-blue-800 text-sm px-3 py-2 rounded-lg transition-colors border border-blue-200 hover:bg-blue-50" 
                         title="Edit task">
