@@ -305,7 +305,6 @@
 
                     <!-- Interactive Stats Grid -->
                     <div class="grid grid-cols-3 gap-4 mb-6">
-    <!-- Overdue - Clickable -->
     <div id="overdue-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
         <div class="flex items-center gap-3">
             <div class="p-2 bg-red-100 rounded-lg text-lg">⚠️</div>
@@ -317,7 +316,6 @@
         <div class="text-xs text-gray-500 mt-2">Click to view overdue</div>
     </div>
     
-    <!-- This Week - Clickable -->
     <div id="week-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
         <div class="flex items-center gap-3">
             <div class="p-2 bg-orange-100 rounded-lg text-lg">📅</div>
@@ -328,7 +326,19 @@
         </div>
         <div class="text-xs text-gray-500 mt-2">Click to view week's tasks</div>
     </div>
-
+    
+    <div id="total-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-blue-100 rounded-lg text-lg">📋</div>
+            <div>
+                <p class="text-xs text-gray-600">Total Tasks</p>
+                <p id="total-count" class="text-xl font-bold text-gray-900">0</p>
+            </div>
+        </div>
+        <div class="text-xs text-gray-500 mt-2">Click to manage all</div>
+    </div>
+</div>
+                    
                  <!-- Enhanced Tasks Section -->
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
                 <div class="p-4 border-b border-gray-100 flex items-center justify-between">
