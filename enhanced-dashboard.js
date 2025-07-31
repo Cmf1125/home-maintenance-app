@@ -22,40 +22,41 @@ class EnhancedDashboard {
         this.render();
     }
 
-    // UPDATE: Enhanced Dashboard bindEvents() - Remove cost handler
-bindEvents() {
-    // Make stat cards clickable for filtering
-    const overdueCard = document.getElementById('overdue-card');
-    if (overdueCard) {
-        overdueCard.addEventListener('click', () => {
-            console.log('📊 Overdue card clicked');
-            this.setFilter('overdue');
-        });
-    },
+    // FIXED: Enhanced Dashboard bindEvents() - Remove cost handler and fix syntax errors
+    bindEvents() {
+        // Make stat cards clickable for filtering
+        const overdueCard = document.getElementById('overdue-card');
+        if (overdueCard) {
+            overdueCard.addEventListener('click', () => {
+                console.log('📊 Overdue card clicked');
+                this.setFilter('overdue');
+            });
+        }
 
-    const weekCard = document.getElementById('week-card');
-    if (weekCard) {
-        weekCard.addEventListener('click', () => {
-            console.log('📊 Week card clicked');
-            this.setFilter('week');
-        });
-    },
+        const weekCard = document.getElementById('week-card');
+        if (weekCard) {
+            weekCard.addEventListener('click', () => {
+                console.log('📊 Week card clicked');
+                this.setFilter('week');
+            });
+        }
 
-    // Total Tasks card navigates to All Tasks view
-    const totalCard = document.getElementById('total-card');
-    if (totalCard) {
-        totalCard.addEventListener('click', () => {
-            console.log('📋 Total Tasks clicked - navigating to All Tasks view');
-            if (typeof showAllTasks === 'function') {
-                showAllTasks();
-            } else {
-                console.error('❌ showAllTasks function not found');
-            }
-        });
-    },
+        // Total Tasks card navigates to All Tasks view
+        const totalCard = document.getElementById('total-card');
+        if (totalCard) {
+            totalCard.addEventListener('click', () => {
+                console.log('📋 Total Tasks clicked - navigating to All Tasks view');
+                if (typeof showAllTasks === 'function') {
+                    showAllTasks();
+                } else {
+                    console.error('❌ showAllTasks function not found');
+                }
+            });
+        }
 
-    console.log('✅ Enhanced dashboard events bound successfully');
-}
+        console.log('✅ Enhanced dashboard events bound successfully');
+    }
+
     setFilter(filterType) {
     this.currentFilter = filterType;
     this.updateFilterUI();
@@ -63,121 +64,122 @@ bindEvents() {
     
     // 🎯 NEW: Smooth scroll to task list with visual feedback
     this.scrollToTaskList();
-},
-    // Add this method to your EnhancedDashboard class:
+}
 
-scrollToTaskList() {
-    const tasksList = document.getElementById('tasks-list');
-    const tasksSection = tasksList?.closest('.bg-white.rounded-2xl.shadow-lg');
-    
-    if (tasksSection) {
-        // Add a subtle flash effect to show something happened
-        tasksSection.style.transition = 'all 0.3s ease';
-        tasksSection.style.boxShadow = '0 0 20px rgba(14, 165, 233, 0.4)';
-        tasksSection.style.transform = 'scale(1.01)';
+    // Add this method to your EnhancedDashboard class:
+    scrollToTaskList() {
+        const tasksList = document.getElementById('tasks-list');
+        const tasksSection = tasksList?.closest('.bg-white.rounded-2xl.shadow-lg');
         
-        // Smooth scroll to the tasks section with some offset
-        const rect = tasksSection.getBoundingClientRect();
-        const offset = window.pageYOffset + rect.top - 20; // 20px offset from top
-        
-        window.scrollTo({
-            top: offset,
-            behavior: 'smooth'
-        });
-        
-        // Remove the flash effect after animation
-        setTimeout(() => {
-            tasksSection.style.boxShadow = '';
-            tasksSection.style.transform = '';
-        }, 800);
-        
-        // Add a brief highlight to the tasks list content
-        if (tasksList) {
-            tasksList.style.transition = 'background-color 0.3s ease';
-            tasksList.style.backgroundColor = '#f0f9ff';
+        if (tasksSection) {
+            // Add a subtle flash effect to show something happened
+            tasksSection.style.transition = 'all 0.3s ease';
+            tasksSection.style.boxShadow = '0 0 20px rgba(14, 165, 233, 0.4)';
+            tasksSection.style.transform = 'scale(1.01)';
+            
+            // Smooth scroll to the tasks section with some offset
+            const rect = tasksSection.getBoundingClientRect();
+            const offset = window.pageYOffset + rect.top - 20; // 20px offset from top
+            
+            window.scrollTo({
+                top: offset,
+                behavior: 'smooth'
+            });
+            
+            // Remove the flash effect after animation
             setTimeout(() => {
-                tasksList.style.backgroundColor = '';
-            }, 600);
+                tasksSection.style.boxShadow = '';
+                tasksSection.style.transform = '';
+            }, 800);
+            
+            // Add a brief highlight to the tasks list content
+            if (tasksList) {
+                tasksList.style.transition = 'background-color 0.3s ease';
+                tasksList.style.backgroundColor = '#f0f9ff';
+                setTimeout(() => {
+                    tasksList.style.backgroundColor = '';
+                }, 600);
+            }
         }
     }
-}
+
     // UPDATE: updateFilterUI() - Remove cost filter title
-updateFilterUI() {
-    // Remove active class from all cards
-    document.querySelectorAll('.stat-card').forEach(card => {
-        card.classList.remove('active-filter');
-    });
+    updateFilterUI() {
+        // Remove active class from all cards
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.classList.remove('active-filter');
+        });
 
-    // Add active class to selected card (overdue, week only)
-    const activeCard = document.getElementById(`${this.currentFilter}-card`);
-    if (activeCard && ['overdue', 'week'].includes(this.currentFilter)) {
-        activeCard.classList.add('active-filter');
-        
-        // Add a subtle pulse effect to show it was clicked
-        activeCard.style.transition = 'transform 0.2s ease';
-        activeCard.style.transform = 'scale(1.05)';
-        setTimeout(() => {
-            activeCard.style.transform = '';
-        }, 200);
+        // Add active class to selected card (overdue, week only)
+        const activeCard = document.getElementById(`${this.currentFilter}-card`);
+        if (activeCard && ['overdue', 'week'].includes(this.currentFilter)) {
+            activeCard.classList.add('active-filter');
+            
+            // Add a subtle pulse effect to show it was clicked
+            activeCard.style.transition = 'transform 0.2s ease';
+            activeCard.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                activeCard.style.transform = '';
+            }, 200);
+        }
+
+        // Update filter title - simplified
+        const filterTitles = {
+            'all': '📋 Upcoming Tasks',
+            'overdue': '⚠️ Overdue Tasks',
+            'week': '📅 This Week\'s Tasks'
+            // REMOVED: 'cost' title
+        };
+
+        const titleElement = document.getElementById('tasks-list-title');
+        if (titleElement) {
+            const newTitle = filterTitles[this.currentFilter] || 'Upcoming Tasks';
+            titleElement.textContent = newTitle;
+            
+            // Add a subtle animation to the title change
+            titleElement.style.opacity = '0.7';
+            setTimeout(() => {
+                titleElement.style.opacity = '1';
+            }, 150);
+        }
     }
-
-    // Update filter title - simplified
-    const filterTitles = {
-        'all': '📋 Upcoming Tasks',
-        'overdue': '⚠️ Overdue Tasks',
-        'week': '📅 This Week\'s Tasks'
-        // REMOVED: 'cost' title
-    };
-
-    const titleElement = document.getElementById('tasks-list-title');
-    if (titleElement) {
-        const newTitle = filterTitles[this.currentFilter] || 'Upcoming Tasks';
-        titleElement.textContent = newTitle;
-        
-        // Add a subtle animation to the title change
-        titleElement.style.opacity = '0.7';
-        setTimeout(() => {
-            titleElement.style.opacity = '1';
-        }, 150);
-    }
-}
 
     // UPDATE: getFilteredTasks() - Remove cost case
-getFilteredTasks() {
-    if (!window.tasks) {
-        console.warn('⚠️ No tasks data available');
-        return [];
+    getFilteredTasks() {
+        if (!window.tasks) {
+            console.warn('⚠️ No tasks data available');
+            return [];
+        }
+
+        const now = new Date();
+        const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+        switch (this.currentFilter) {
+            case 'overdue':
+                return window.tasks.filter(task => 
+                    !task.isCompleted && 
+                    task.dueDate && 
+                    new Date(task.dueDate) < now
+                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+            case 'week':
+                return window.tasks.filter(task => 
+                    !task.isCompleted && 
+                    task.dueDate && 
+                    new Date(task.dueDate) <= oneWeek &&
+                    new Date(task.dueDate) >= now
+                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+            // REMOVED: 'cost' case - moved to All Tasks
+
+            default: // 'all' case - show next 8 upcoming tasks
+                return window.tasks.filter(task => 
+                    !task.isCompleted && 
+                    task.dueDate
+                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+                .slice(0, 8);
+        }
     }
-
-    const now = new Date();
-    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-
-    switch (this.currentFilter) {
-        case 'overdue':
-            return window.tasks.filter(task => 
-                !task.isCompleted && 
-                task.dueDate && 
-                new Date(task.dueDate) < now
-            ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-
-        case 'week':
-            return window.tasks.filter(task => 
-                !task.isCompleted && 
-                task.dueDate && 
-                new Date(task.dueDate) <= oneWeek &&
-                new Date(task.dueDate) >= now
-            ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-
-        // REMOVED: 'cost' case - moved to All Tasks
-
-        default: // 'all' case - show next 8 upcoming tasks
-            return window.tasks.filter(task => 
-                !task.isCompleted && 
-                task.dueDate
-            ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-            .slice(0, 8);
-    }
-}
 
     renderFilteredTasks() {
         const tasksList = document.getElementById('tasks-list');
@@ -342,6 +344,8 @@ getFilteredTasks() {
     
     console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
 }
+}
+
 // NEW: Edit task from dashboard
 function editTaskFromDashboard(taskId) {
     const task = window.tasks.find(t => t.id === taskId);
@@ -775,43 +779,6 @@ function saveTaskFromEdit() {
     alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
 }
 
-// Delete task from edit modal
-function deleteTaskFromEdit() {
-    if (!window.currentEditingTask) {
-        console.error('❌ No task being edited');
-        return;
-    }
-    
-    if (confirm(`Are you sure you want to delete "${window.currentEditingTask.title}"?`)) {
-        const taskIndex = window.tasks.findIndex(t => t.id === window.currentEditingTask.id);
-        if (taskIndex > -1) {
-            const deletedTask = window.tasks.splice(taskIndex, 1)[0];
-            console.log(`🗑️ Deleted task: ${deletedTask.title}`);
-            
-            // Save data
-            if (typeof window.saveData === 'function') {
-                window.saveData();
-            } else if (typeof saveData === 'function') {
-                saveData();
-            }
-            
-            // Refresh dashboard
-            if (window.enhancedDashboard) {
-                window.enhancedDashboard.render();
-            }
-            
-            // Refresh calendar if it exists
-            if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-                window.casaCareCalendar.refresh();
-            }
-            
-            // Close modal
-            closeTaskEditModal();
-            
-            alert(`✅ Task "${deletedTask.title}" deleted successfully!`);
-        }
-    }
-}
 // FIXED: Date picker modal functions for new date system
 function closeDatePickerModal() {
     const modal = document.getElementById('date-picker-modal');
