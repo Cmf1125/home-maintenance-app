@@ -480,10 +480,37 @@ function rescheduleTaskFromDashboard(taskId) {
         console.log(`📅 Date picker opened for task: ${task.title}`);
     } else {
         console.warn('⚠️ Date picker modal elements not found, using simple prompt');
-        // Your existing fallback code here...
-        delete window[debounceKey];
+                // ADD THIS COMPLETE FALLBACK CODE:
+        const currentDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+        const newDateStr = prompt(`Reschedule "${task.title}" to (YYYY-MM-DD):`, 
+                                 currentDate.toISOString().split('T')[0]);
+        
+        if (newDateStr) {
+            const newDate = new Date(newDateStr + 'T12:00:00');
+            if (!isNaN(newDate.getTime())) {
+                task.dueDate = newDate;
+                task.nextDue = newDate;
+                saveData();
+                
+                if (window.enhancedDashboard) {
+                    window.enhancedDashboard.render();
+                }
+                
+                if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+                    window.casaCareCalendar.refresh();
+                }
+                
+                console.log(`✅ Task ${task.title} rescheduled to ${newDate.toLocaleDateString()}`);
+                alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
+            } else {
+                alert('❌ Invalid date format. Please use YYYY-MM-DD format.');
+            }
+        }
+        
+        delete window[debounceKey]; // Clear debounce for fallback case
     }
 }
+
 // UPDATED: Function to add task (replaces show all tasks)
 function addTaskFromDashboard() {
     console.log('➕ Adding new task from dashboard...');
@@ -774,10 +801,16 @@ function closeDatePickerModal() {
     if (modal) {
         modal.classList.add('hidden');
     }
+    
+    // Clear debounce if task was being rescheduled
+    if (window.currentRescheduleTask) {
+        const debounceKey = `reschedule_${window.currentRescheduleTask.id}`;
+        delete window[debounceKey];
+    }
+    
     window.currentRescheduleTask = null;
     console.log('📅 Date picker modal closed');
 }
-
 function setQuickDate(daysFromNow) {
     const newDueDateInput = document.getElementById('new-due-date');
     if (!newDueDateInput) return;
