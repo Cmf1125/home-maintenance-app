@@ -425,28 +425,45 @@ function editTaskFromDashboard(taskId) {
 // FIXED: Enhanced reschedule function with proper fallbacks
 // FIXED: Prevent double-calls with debounce mechanism
 function rescheduleTaskFromDashboard(taskId) {
-    // Prevent double-calls
+    // IMPROVED: More robust debounce mechanism
     const debounceKey = `reschedule_${taskId}`;
-    if (window[debounceKey]) {
-        console.log('⚠️ Reschedule already in progress for task:', taskId);
-        return;
+    const now = Date.now();
+    
+    // Check if we recently called this function
+    if (window.rescheduleDebounce && window.rescheduleDebounce[debounceKey]) {
+        const timeSinceLastCall = now - window.rescheduleDebounce[debounceKey];
+        if (timeSinceLastCall < 1000) { // Less than 1 second ago
+            console.log('⚠️ Reschedule debounced for task:', taskId);
+            return;
+        }
     }
-    window[debounceKey] = true;
     
-    // Clear the debounce after a short delay
+    // Initialize debounce object if needed
+    if (!window.rescheduleDebounce) window.rescheduleDebounce = {};
+    window.rescheduleDebounce[debounceKey] = now;
+    
+    // Clear old debounce entries periodically
     setTimeout(() => {
-        delete window[debounceKey];
-    }, 1000);
+        if (window.rescheduleDebounce && window.rescheduleDebounce[debounceKey]) {
+            delete window.rescheduleDebounce[debounceKey];
+        }
+    }, 2000);
     
+    // ... rest of your existing reschedule function code stays the same ...
     const task = window.tasks.find(t => t.id === taskId);
     if (!task) {
         console.error('❌ Task not found:', taskId);
-        delete window[debounceKey];
         return;
     }
-
+    
     console.log('📅 Rescheduling task from dashboard:', task.title);
     window.currentRescheduleTask = task;
+    
+    // Close any existing modals first
+    const taskEditModal = document.getElementById('task-edit-modal');
+    if (taskEditModal && !taskEditModal.classList.contains('hidden')) {
+        taskEditModal.classList.add('hidden');
+    }
     
     const datePickerModal = document.getElementById('date-picker-modal');
     const taskNameElement = document.getElementById('reschedule-task-name');
@@ -479,8 +496,8 @@ function rescheduleTaskFromDashboard(taskId) {
         
         console.log(`📅 Date picker opened for task: ${task.title}`);
     } else {
-        console.warn('⚠️ Date picker modal elements not found, using simple prompt');
-                // ADD THIS COMPLETE FALLBACK CODE:
+        console.warn('⚠️ Date picker modal elements not found');
+       // ADD THIS COMPLETE FALLBACK CODE:
         const currentDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
         const newDateStr = prompt(`Reschedule "${task.title}" to (YYYY-MM-DD):`, 
                                  currentDate.toISOString().split('T')[0]);
