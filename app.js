@@ -170,7 +170,7 @@ function generateTaskTemplates() {
         {
             id: id++,
             title: 'Dryer Vent Cleaning',
-            category: 'General',
+            category: 'Safety',
             frequency: 365,
             cost: 100,
            priority: getAutoPriority('Dryer Vent Cleaning', 'Safety'), // ← ADD THIS LINE
