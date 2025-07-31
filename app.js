@@ -170,10 +170,10 @@ function generateTaskTemplates() {
         {
             id: id++,
             title: 'Dryer Vent Cleaning',
-            category: 'General',
+            category: 'Safety',
             frequency: 365,
             cost: 100,
-           priority: getAutoPriority('Dryer Vent Cleaning', 'General'), // ← ADD THIS LINE
+           priority: getAutoPriority('Dryer Vent Cleaning', 'Safety'), // ← ADD THIS LINE
             description: 'Clean dryer vent to prevent fire hazard',
             dueDate: null,
             lastCompleted: null,
@@ -833,7 +833,7 @@ function renderTaskCategories() {
     // Generate summary stats
     const totalTasks = tasks.length;
     const totalCost = tasks.reduce((sum, task) => sum + (task.cost * (365 / task.frequency)), 0);
-    const highPriorityTasks = tasks.filter(t => t.priority === 'high').length;
+   const safetyTasks = tasks.filter(t => t.category === 'Safety').length;
     const seasonalTasksCount = tasks.filter(t => t.category === 'Seasonal').length;
 
     taskSummaryStats.innerHTML = `
@@ -846,8 +846,8 @@ function renderTaskCategories() {
             <div class="text-xs text-gray-600">Annual Cost</div>
         </div>
         <div class="text-center">
-            <div class="text-lg font-bold text-red-600">${highPriorityTasks}</div>
-            <div class="text-xs text-gray-600">High Priority</div>
+           <div class="text-lg font-bold text-red-600">${safetyTasks}</div>
+            <div class="text-xs text-gray-600">Safety Tasks</div>
         </div>
         <div class="text-center">
             <div class="text-lg font-bold text-purple-600">${seasonalTasksCount}</div>
