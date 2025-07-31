@@ -1397,28 +1397,20 @@ window.tasks.forEach(task => {
                     <p class="text-gray-600 text-sm">Edit your maintenance tasks and view annual costs</p>
                 </div>
                 
-                <!-- Enhanced Stats with Annual Cost -->
-                <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                    <h3 class="font-semibold text-gray-900 mb-3">📊 Complete Overview</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        <div class="text-center">
-                            <div class="text-lg font-bold text-red-600">${overdueCount}</div>
-                            <div class="text-xs text-gray-600">Overdue</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-lg font-bold text-orange-600">${weekCount}</div>
-                            <div class="text-xs text-gray-600">This Week</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-lg font-bold text-blue-600">${totalTasks}</div>
-                            <div class="text-xs text-gray-600">Total Active</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
-                            <div class="text-xs text-gray-600">Annual Cost</div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Simplified Complete Overview -->
+<div class="bg-gray-50 p-4 rounded-lg mb-6">
+    <h3 class="font-semibold text-gray-900 mb-3">📊 Complete Overview</h3>
+    <div class="grid grid-cols-2 gap-6 text-sm max-w-md mx-auto">
+        <div class="text-center">
+            <div class="text-2xl font-bold text-blue-600">${totalTasks}</div>
+            <div class="text-sm text-gray-600">Total Active Tasks</div>
+        </div>
+        <div class="text-center">
+            <div class="text-2xl font-bold text-green-600">$${Math.round(totalCost)}</div>
+            <div class="text-sm text-gray-600">Annual Cost</div>
+        </div>
+    </div>
+</div>
                 
                 <!-- Add Custom Task Button -->
                 <div class="flex items-center justify-between mb-4">
