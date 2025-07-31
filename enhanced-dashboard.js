@@ -440,12 +440,13 @@ function rescheduleTaskFromDashboard(taskId) {
     if (datePickerModal && taskNameElement && currentDueDateElement && newDueDateInput) {
         console.log('✅ Using date picker modal');
         
-        // CRITICAL FIX: Close any other open modals first
-        const taskEditModal = document.getElementById('task-edit-modal');
-        if (taskEditModal && !taskEditModal.classList.contains('hidden')) {
-            console.log('🔄 Closing task edit modal first');
-            taskEditModal.classList.add('hidden');
-        }
+// CRITICAL FIX: Close any other open modals first (really hide it)
+const taskEditModal = document.getElementById('task-edit-modal');
+if (taskEditModal) {
+  console.log('🔄 Closing task edit modal first');
+  taskEditModal.classList.add('hidden');
+  taskEditModal.style.display = 'none';   // ✅ ensure the inline display is off
+}
         
         // Set task info
         taskNameElement.textContent = `"${task.title}"`;
@@ -463,11 +464,14 @@ function rescheduleTaskFromDashboard(taskId) {
         newDueDateInput.value = currentDate.toISOString().split('T')[0];
         
         // CRITICAL FIX: Ensure modal is properly displayed
-        datePickerModal.classList.remove('hidden');
         datePickerModal.style.display = 'flex';
+        datePickerModal.classList.remove('hidden', 'invisible', 'opacity-0', 'pointer-events-none');
+        datePickerModal.style.visibility = 'visible';
+        datePickerModal.style.opacity = '1';
+        datePickerModal.style.zIndex = '2147483647'; // on top of everything
         datePickerModal.style.position = 'fixed';
         datePickerModal.style.inset = '0';
-        datePickerModal.style.zIndex = '9999';
+        datePickerModal.style.zIndex = '2147483647'; // on top of everything
         
         // Focus on date input
         setTimeout(() => {
