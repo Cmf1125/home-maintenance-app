@@ -666,6 +666,17 @@
     <script>
         console.log('🚨 Loading task system override...');
 
+        // Add this helper function to prevent modal conflicts
+function closeAllModals() {
+    const modals = ['task-edit-modal', 'date-picker-modal', 'home-info-modal'];
+    modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal && !modal.classList.contains('hidden')) {
+            modal.classList.add('hidden');
+        }
+    });
+}
+
         // Complete override system (keep this exactly as is - it's working!)
         window.openTaskEditModal = function(task, isNew) {
             window.TaskManager.openModal(task, isNew);
@@ -685,6 +696,8 @@
             
             openModal: function(task, isNew) {
                 console.log('📝 Opening modal for:', task.title || 'New Task');
+
+                closeAllModals(); // ← ADD THIS LINE
                 
                 this.currentTask = {...task};
                 window.currentEditingTask = this.currentTask;
