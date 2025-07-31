@@ -42,18 +42,14 @@ class EnhancedDashboard {
         }
 
         // Total Tasks card navigates to All Tasks view
-        const totalCard = document.getElementById('total-card');
-        if (totalCard) {
-            totalCard.addEventListener('click', () => {
-                console.log('📋 Total Tasks clicked - navigating to All Tasks view');
-                if (typeof showAllTasks === 'function') {
-                    showAllTasks();
-                } else {
-                    console.error('❌ showAllTasks function not found');
-                }
-            });
-        }
-
+        // All Tasks card shows categorized view
+        const allTasksCard = document.getElementById('all-tasks-card');
+        if (allTasksCard) {
+            allTasksCard.addEventListener('click', () => {
+                console.log('📋 All Tasks clicked - showing categorized view');
+                this.setFilter('all-tasks');
+    });
+}
         console.log('✅ Enhanced dashboard events bound successfully');
     }
 
@@ -105,45 +101,51 @@ class EnhancedDashboard {
 
     // UPDATE: updateFilterUI() - Remove cost filter title
     updateFilterUI() {
-        // Remove active class from all cards
-        document.querySelectorAll('.stat-card').forEach(card => {
-            card.classList.remove('active-filter');
-        });
+    // Remove active class from all cards
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.classList.remove('active-filter');
+    });
 
-        // Add active class to selected card (overdue, week only)
-        const activeCard = document.getElementById(`${this.currentFilter}-card`);
-        if (activeCard && ['overdue', 'week'].includes(this.currentFilter)) {
-            activeCard.classList.add('active-filter');
-            
-            // Add a subtle pulse effect to show it was clicked
-            activeCard.style.transition = 'transform 0.2s ease';
-            activeCard.style.transform = 'scale(1.05)';
-            setTimeout(() => {
-                activeCard.style.transform = '';
-            }, 200);
-        }
-
-        // Update filter title - simplified
-        const filterTitles = {
-            'all': '📋 Upcoming Tasks',
-            'overdue': '⚠️ Overdue Tasks',
-            'week': '📅 This Week\'s Tasks'
-            // REMOVED: 'cost' title
-        };
-
-        const titleElement = document.getElementById('tasks-list-title');
-        if (titleElement) {
-            const newTitle = filterTitles[this.currentFilter] || 'Upcoming Tasks';
-            titleElement.textContent = newTitle;
-            
-            // Add a subtle animation to the title change
-            titleElement.style.opacity = '0.7';
-            setTimeout(() => {
-                titleElement.style.opacity = '1';
-            }, 150);
-        }
+    // Add active class to selected card
+    const cardMap = {
+        'overdue': 'overdue-card',
+        'week': 'week-card', 
+        'all-tasks': 'all-tasks-card'
+    };
+    
+    const activeCardId = cardMap[this.currentFilter];
+    const activeCard = document.getElementById(activeCardId);
+    if (activeCard) {
+        activeCard.classList.add('active-filter');
+        
+        // Add a subtle pulse effect
+        activeCard.style.transition = 'transform 0.2s ease';
+        activeCard.style.transform = 'scale(1.05)';
+        setTimeout(() => {
+            activeCard.style.transform = '';
+        }, 200);
     }
 
+    // Update filter title
+    const filterTitles = {
+        'all': '📋 Upcoming Tasks',
+        'overdue': '⚠️ Overdue Tasks',
+        'week': '📅 This Week\'s Tasks',
+        'all-tasks': '📋 All Tasks by Category'
+    };
+
+    const titleElement = document.getElementById('tasks-list-title');
+    if (titleElement) {
+        const newTitle = filterTitles[this.currentFilter] || 'Upcoming Tasks';
+        titleElement.textContent = newTitle;
+        
+        // Add a subtle animation to the title change
+        titleElement.style.opacity = '0.7';
+        setTimeout(() => {
+            titleElement.style.opacity = '1';
+        }, 150);
+    }
+}
     // UPDATE: getFilteredTasks() - Remove cost case
     getFilteredTasks() {
         if (!window.tasks) {
@@ -182,30 +184,33 @@ class EnhancedDashboard {
     }
 
     renderFilteredTasks() {
-        const tasksList = document.getElementById('tasks-list');
-        if (!tasksList) {
-            console.error('❌ Tasks list container not found');
-            return;
-        }
-
-        const filteredTasks = this.getFilteredTasks();
-
-        if (filteredTasks.length === 0) {
-            const emptyMessages = {
-                'overdue': '🎉 No overdue tasks!',
-                'week': '📅 No tasks due this week!',
-                'total': '✅ All tasks complete!',
-                'cost': '💰 No tasks found!',
-                'all': '🎉 All tasks complete!'
-            };
-            
-            tasksList.innerHTML = `<div class="p-6 text-center text-gray-500">${emptyMessages[this.currentFilter]}</div>`;
-            return;
-        }
-
-        tasksList.innerHTML = filteredTasks.map(task => this.renderEnhancedTaskCard(task)).join('');
+    const tasksList = document.getElementById('tasks-list');
+    if (!tasksList) {
+        console.error('❌ Tasks list container not found');
+        return;
     }
 
+    if (this.currentFilter === 'all-tasks') {
+        // Show categorized view inline
+        tasksList.innerHTML = this.renderCategorizedTasks();
+        return;
+    }
+
+    const filteredTasks = this.getFilteredTasks();
+
+    if (filteredTasks.length === 0) {
+        const emptyMessages = {
+            'overdue': '🎉 No overdue tasks!',
+            'week': '📅 No tasks due this week!',
+            'all': '🎉 All tasks complete!'
+        };
+        
+        tasksList.innerHTML = `<div class="p-6 text-center text-gray-500">${emptyMessages[this.currentFilter]}</div>`;
+        return;
+    }
+
+    tasksList.innerHTML = filteredTasks.map(task => this.renderEnhancedTaskCard(task)).join('');
+}
     renderEnhancedTaskCard(task) {
     const now = new Date();
     const taskDate = new Date(task.dueDate);
