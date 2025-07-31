@@ -824,6 +824,19 @@
                 this.saveAndRefresh();
                 this.close();
                 
+if (window.editingFromAllTasks) {
+    console.log('🔄 Refreshing All Tasks view after edit...');
+    setTimeout(() => {
+        if (typeof renderAllTasksView === 'function') {
+            renderAllTasksView();
+            console.log('✅ All Tasks view refreshed');
+        }
+        window.editingFromAllTasks = false;
+    }, 100);
+}
+
+alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
+                
                 alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
             },
             
