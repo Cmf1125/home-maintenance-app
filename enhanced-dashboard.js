@@ -52,8 +52,6 @@ bindEvents() {
                 console.error('❌ showAllTasks function not found');
             }
         });
-    } else {
-        console.warn('⚠️ total-card element not found');
     }
 
     console.log('✅ Enhanced dashboard events bound successfully');
