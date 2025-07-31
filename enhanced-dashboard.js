@@ -296,6 +296,59 @@ class EnhancedDashboard {
     `;
 }
 
+    // ADD THE NEW METHOD RIGHT HERE:
+renderCategorizedTasks() {
+    if (!window.tasks || window.tasks.length === 0) {
+        return '<div class="text-center text-gray-500 py-8">No tasks found.</div>';
+    }
+
+    // Group active tasks by category
+    const activeTasks = window.tasks.filter(task => !task.isCompleted && task.dueDate);
+    const tasksByCategory = {};
+    
+    activeTasks.forEach(task => {
+        const category = task.category || 'General';
+        if (!tasksByCategory[category]) tasksByCategory[category] = [];
+        tasksByCategory[category].push(task);
+    });
+
+    if (Object.keys(tasksByCategory).length === 0) {
+        return '<div class="text-center text-gray-500 py-8">🎉 All tasks completed!</div>';
+    }
+
+    return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
+        const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
+        
+        // Calculate annual cost for this category
+        const categoryCost = tasks.reduce((total, task) => {
+            return total + (task.cost * (365 / task.frequency));
+        }, 0);
+        
+        return `
+            <div class="bg-gray-50 rounded-xl overflow-hidden border border-gray-200 mb-4">
+                <div class="p-3 border-b border-gray-200 bg-white">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <h4 class="font-semibold text-gray-900 flex items-center gap-2">
+                            <span class="text-lg">${categoryInfo.icon}</span>
+                            <span>${categoryId}</span>
+                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                                ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
+                            </span>
+                        </h4>
+                        <div class="text-right">
+                            <div class="text-sm font-bold text-green-600">$${Math.round(categoryCost)}</div>
+                            <div class="text-xs text-gray-500">annual</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-0">
+                    ${tasks.map(task => this.renderEnhancedTaskCard(task)).join('')}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
     render() {
         this.updateStats();
         this.renderFilteredTasks();
