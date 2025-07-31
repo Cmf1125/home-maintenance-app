@@ -445,7 +445,7 @@ const taskEditModal = document.getElementById('task-edit-modal');
 if (taskEditModal) {
   console.log('🔄 Closing task edit modal first');
   taskEditModal.classList.add('hidden');
-  taskEditModal.style.display = 'none';   // ✅ ensure the inline display is off
+  taskEditModal.style.display = 'none';  // ✅ ensure inline display is off
 }
         
         // Set task info
@@ -463,15 +463,14 @@ if (taskEditModal) {
         // Set default new date to current due date
         newDueDateInput.value = currentDate.toISOString().split('T')[0];
         
-        // CRITICAL FIX: Ensure modal is properly displayed
-        datePickerModal.style.display = 'flex';
-        datePickerModal.classList.remove('hidden', 'invisible', 'opacity-0', 'pointer-events-none');
-        datePickerModal.style.visibility = 'visible';
-        datePickerModal.style.opacity = '1';
-        datePickerModal.style.zIndex = '2147483647'; // on top of everything
-        datePickerModal.style.position = 'fixed';
-        datePickerModal.style.inset = '0';
-        datePickerModal.style.zIndex = '2147483647'; // on top of everything
+        // Ensure modal is properly displayed
+            datePickerModal.classList.remove('hidden', 'invisible', 'opacity-0', 'pointer-events-none');
+            datePickerModal.style.display = 'flex';
+            datePickerModal.style.position = 'fixed';
+            datePickerModal.style.inset = '0';
+            datePickerModal.style.zIndex = '2147483647'; // higher than anything else
+            datePickerModal.style.opacity = '1';
+            datePickerModal.style.visibility = 'visible';
         
         // Focus on date input
         setTimeout(() => {
