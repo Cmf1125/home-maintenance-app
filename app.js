@@ -1336,92 +1336,52 @@ function showTab(tabName) {
 function showAllTasks() {
     console.log('📋 Switching to All Tasks view...');
     
-    // Hide all other views
+    // Hide ALL other views (including dashboard)
     const dashboardView = document.getElementById('dashboard-view');
     const calendarView = document.getElementById('calendar-view');
     const documentsView = document.getElementById('documents-view');
     const appliancesView = document.getElementById('appliances-view');
     const allTasksView = document.getElementById('all-tasks-view');
 
+    // Hide everything first
     if (dashboardView) dashboardView.classList.add('hidden');
     if (calendarView) calendarView.classList.add('hidden');
     if (documentsView) documentsView.classList.add('hidden');
     if (appliancesView) appliancesView.classList.add('hidden');
     
-    // Show all tasks view
+    // Show ONLY all tasks view
     if (allTasksView) {
         allTasksView.classList.remove('hidden');
+        allTasksView.style.display = 'block'; // Force display
     } else {
         console.error('❌ All tasks view not found');
         return;
     }
     
-    // Update tab styling
+    // Clear all tab highlighting (since this isn't a main tab)
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('bg-blue-100', 'text-blue-700');
         btn.classList.add('text-gray-600');
     });
     
-    // 🚀 THE MISSING LINE - Actually render the content!
+    // Render the simplified content
     renderAllTasksView();
     
-    console.log('✅ All Tasks view displayed with content');
+    console.log('✅ All Tasks view displayed (simplified)');
 }
 
 function renderAllTasksView() {
     const allTasksView = document.getElementById('all-tasks-view');
     if (!allTasksView) return;
     
-    // Calculate stats
-    const now = new Date();
-    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    
-    let overdueCount = 0;
-    let weekCount = 0;
-    let totalCost = 0;
-    
-    window.tasks.forEach(task => {
-        if (!task.isCompleted && task.dueDate) {
-            const taskDate = new Date(task.dueDate);
-            if (taskDate < now) overdueCount++;
-            if (taskDate <= oneWeek && taskDate >= now) weekCount++;
-        }
-        totalCost += task.cost * (365 / task.frequency);
-    });
-    
-    const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
-    
-    // Beautiful interface (copying your task generation page style)
+    // SIMPLIFIED: No stats section, just header and tasks
     allTasksView.innerHTML = `
         <div class="p-4">
             <div class="bg-white rounded-xl p-6 shadow-lg max-w-4xl mx-auto">
                 <div class="text-center mb-6">
                     <div class="text-4xl mb-4">📋</div>
                     <h2 class="text-xl font-bold text-gray-900 mb-2">Manage All Tasks</h2>
-                    <p class="text-gray-600 text-sm">Edit, complete, or reschedule your maintenance tasks</p>
-                </div>
-                
-                <!-- Quick Stats (copying dashboard style) -->
-                <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                    <h3 class="font-semibold text-gray-900 mb-3">📊 Task Overview</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        <div class="text-center">
-                            <div class="text-lg font-bold text-red-600">${overdueCount}</div>
-                            <div class="text-xs text-gray-600">Overdue</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-lg font-bold text-orange-600">${weekCount}</div>
-                            <div class="text-xs text-gray-600">This Week</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-lg font-bold text-blue-600">${totalTasks}</div>
-                            <div class="text-xs text-gray-600">Total Active</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
-                            <div class="text-xs text-gray-600">Annual Cost</div>
-                        </div>
-                    </div>
+                    <p class="text-gray-600 text-sm">Edit your maintenance tasks</p>
                 </div>
                 
                 <!-- Add Custom Task Button -->
@@ -1432,7 +1392,7 @@ function renderAllTasksView() {
                     </button>
                 </div>
                 
-                <!-- Task Categories (copying task generation page style) -->
+                <!-- Task Categories (simplified) -->
                 <div id="all-tasks-categories" class="space-y-6">
                     ${renderAllTaskCategories()}
                 </div>
@@ -1500,7 +1460,7 @@ function renderAllTasksTaskItem(task) {
     const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
     const isOverdue = daysUntilDue < 0;
     
-    // Status styling
+    // Simple status styling
     let statusClass = 'bg-gray-50';
     let urgencyDot = '⚪';
     
@@ -1514,7 +1474,7 @@ function renderAllTasksTaskItem(task) {
         urgencyDot = '🟠';
     }
     
-    // Due date display
+    // Clean due date display
     let dueDateDisplay;
     if (isOverdue) {
         dueDateDisplay = `<span class="text-red-600 font-semibold">${Math.abs(daysUntilDue)}d overdue</span>`;
@@ -1542,20 +1502,11 @@ function renderAllTasksTaskItem(task) {
                 </div>
             </div>
             <div class="flex items-center gap-2">
+                <!-- SIMPLIFIED: Only Edit button -->
                 <button onclick="editTaskFromSetup(${task.id})" 
-                        class="text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded transition-colors" 
+                        class="text-blue-600 hover:text-blue-800 text-sm px-3 py-2 rounded-lg transition-colors border border-blue-200 hover:bg-blue-50" 
                         title="Edit task">
                     ✏️ Edit
-                </button>
-                <button onclick="completeTask(${task.id})" 
-                        class="text-green-600 hover:text-green-800 text-sm px-2 py-1 rounded transition-colors" 
-                        title="Complete task">
-                    ✅ Complete
-                </button>
-                <button onclick="rescheduleTaskFromDashboard(${task.id})" 
-                        class="text-orange-600 hover:text-orange-800 text-sm px-2 py-1 rounded transition-colors" 
-                        title="Reschedule task">
-                    📅 Reschedule
                 </button>
             </div>
         </div>
