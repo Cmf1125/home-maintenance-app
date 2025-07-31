@@ -24,24 +24,40 @@ class EnhancedDashboard {
 
     // UPDATE: Enhanced Dashboard bindEvents() - Remove cost handler
 bindEvents() {
-    // Make stat cards clickable - focused on urgency only
-    document.getElementById('overdue-card')?.addEventListener('click', () => {
-        this.setFilter('overdue');
-    });
+    // Make stat cards clickable for filtering
+    const overdueCard = document.getElementById('overdue-card');
+    if (overdueCard) {
+        overdueCard.addEventListener('click', () => {
+            console.log('📊 Overdue card clicked');
+            this.setFilter('overdue');
+        });
+    }
 
-    document.getElementById('week-card')?.addEventListener('click', () => {
-        this.setFilter('week');
-    });
+    const weekCard = document.getElementById('week-card');
+    if (weekCard) {
+        weekCard.addEventListener('click', () => {
+            console.log('📊 Week card clicked');
+            this.setFilter('week');
+        });
+    }
 
-    // Total Tasks navigates to All Tasks view
-    document.getElementById('total-card')?.addEventListener('click', () => {
-        console.log('📋 Total Tasks clicked - navigating to All Tasks view');
-        showAllTasks();
-    });
+    // Total Tasks card navigates to All Tasks view
+    const totalCard = document.getElementById('total-card');
+    if (totalCard) {
+        totalCard.addEventListener('click', () => {
+            console.log('📋 Total Tasks clicked - navigating to All Tasks view');
+            if (typeof showAllTasks === 'function') {
+                showAllTasks();
+            } else {
+                console.error('❌ showAllTasks function not found');
+            }
+        });
+    } else {
+        console.warn('⚠️ total-card element not found');
+    }
 
-    // REMOVED: Annual cost click handler - moved to All Tasks
+    console.log('✅ Enhanced dashboard events bound successfully');
 }
-
     setFilter(filterType) {
     this.currentFilter = filterType;
     this.updateFilterUI();
