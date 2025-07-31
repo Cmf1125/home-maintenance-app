@@ -282,44 +282,52 @@ getFilteredTasks() {
     }
 
     updateStats() {
-        if (!window.tasks) return;
+    if (!window.tasks) return;
 
-        const now = new Date();
-        const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-        
-        let overdueCount = 0;
-        let weekCount = 0;
-        let totalCost = 0;
+    const now = new Date();
+    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    let overdueCount = 0;
+    let weekCount = 0;
+    let totalCost = 0;
 
-        window.tasks.forEach(task => {
-            if (!task.isCompleted && task.dueDate) {
-                const taskDate = new Date(task.dueDate);
-                if (taskDate < now) {
-                    overdueCount++;
-                }
-                if (taskDate <= oneWeek && taskDate >= now) {
-                    weekCount++;
-                }
+    window.tasks.forEach(task => {
+        if (!task.isCompleted && task.dueDate) {
+            const taskDate = new Date(task.dueDate);
+            if (taskDate < now) {
+                overdueCount++;
             }
-            totalCost += task.cost * (365 / task.frequency);
-        });
+            if (taskDate <= oneWeek && taskDate >= now) {
+                weekCount++;
+            }
+        }
+        totalCost += task.cost * (365 / task.frequency);
+    });
 
-        const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
+    const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
 
-        // Update stat displays
-        document.getElementById('overdue-count').textContent = overdueCount;
-        document.getElementById('week-count').textContent = weekCount;
-        document.getElementById('total-count').textContent = totalTasks;
-        document.getElementById('annual-cost').textContent = '$' + Math.round(totalCost);
- // ADD THIS: Update home address in enhanced dashboard too
+    // Update stat displays - ONLY update elements that exist
+    const overdueElement = document.getElementById('overdue-count');
+    if (overdueElement) overdueElement.textContent = overdueCount;
+    
+    const weekElement = document.getElementById('week-count');
+    if (weekElement) weekElement.textContent = weekCount;
+    
+    const totalElement = document.getElementById('total-count');
+    if (totalElement) totalElement.textContent = totalTasks;
+    
+    // REMOVED: annual-cost update since it's no longer on dashboard
+    // const annualCostElement = document.getElementById('annual-cost');
+    // if (annualCostElement) annualCostElement.textContent = '$' + Math.round(totalCost);
+
+    // Update home address
     const homeAddressElement = document.getElementById('home-address');
     if (homeAddressElement && window.homeData?.fullAddress) {
         homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
     }
-        console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
-    }
+    
+    console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
 }
-
 // NEW: Edit task from dashboard
 function editTaskFromDashboard(taskId) {
     const task = window.tasks.find(t => t.id === taskId);
