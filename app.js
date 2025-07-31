@@ -1375,14 +1375,56 @@ function renderAllTasksView() {
     const allTasksView = document.getElementById('all-tasks-view');
     if (!allTasksView) return;
     
-    // SIMPLIFIED: No stats section, just header and tasks
+    // Calculate stats including annual cost
+    const now = new Date();
+    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    let overdueCount = 0;
+    let weekCount = 0;
+    let totalCost = 0;
+    
+    window.tasks.forEach(task => {
+        if (!task.isCompleted && task.dueDate) {
+            const taskDate = new Date(task.dueDate);
+            if (taskDate < now) overdueCount++;
+            if (taskDate <= oneWeek && taskDate >= now) weekCount++;
+        }
+        totalCost += task.cost * (365 / task.frequency);
+    });
+    
+    const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
+    
+    // Enhanced All Tasks interface with annual cost
     allTasksView.innerHTML = `
         <div class="p-4">
             <div class="bg-white rounded-xl p-6 shadow-lg max-w-4xl mx-auto">
                 <div class="text-center mb-6">
                     <div class="text-4xl mb-4">📋</div>
                     <h2 class="text-xl font-bold text-gray-900 mb-2">Manage All Tasks</h2>
-                    <p class="text-gray-600 text-sm">Edit your maintenance tasks</p>
+                    <p class="text-gray-600 text-sm">Edit your maintenance tasks and view annual costs</p>
+                </div>
+                
+                <!-- Enhanced Stats with Annual Cost -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <h3 class="font-semibold text-gray-900 mb-3">📊 Complete Overview</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-red-600">${overdueCount}</div>
+                            <div class="text-xs text-gray-600">Overdue</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-orange-600">${weekCount}</div>
+                            <div class="text-xs text-gray-600">This Week</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-blue-600">${totalTasks}</div>
+                            <div class="text-xs text-gray-600">Total Active</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
+                            <div class="text-xs text-gray-600">Annual Cost</div>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Add Custom Task Button -->
@@ -1393,7 +1435,7 @@ function renderAllTasksView() {
                     </button>
                 </div>
                 
-                <!-- Task Categories (simplified) -->
+                <!-- Task Categories -->
                 <div id="all-tasks-categories" class="space-y-6">
                     ${renderAllTaskCategories()}
                 </div>
