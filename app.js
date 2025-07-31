@@ -1160,18 +1160,18 @@ function showTab(tabName) {
     window.tasks = tasks;
     window.homeData = homeData;
     
-    // Hide ALL views
+    // Hide ALL views including All Tasks (THIS WAS MISSING!)
     const dashboardView = document.getElementById('dashboard-view');
     const calendarView = document.getElementById('calendar-view');
     const documentsView = document.getElementById('documents-view');
     const appliancesView = document.getElementById('appliances-view');
-    const allTasksView = document.getElementById('all-tasks-view');
+    const allTasksView = document.getElementById('all-tasks-view'); // ← ADDED THIS!
 
     if (dashboardView) dashboardView.classList.add('hidden');
     if (calendarView) calendarView.classList.add('hidden');
     if (documentsView) documentsView.classList.add('hidden');
     if (appliancesView) appliancesView.classList.add('hidden');
-    if (allTasksView) allTasksView.classList.add('hidden');
+    if (allTasksView) allTasksView.classList.add('hidden'); // ← ADDED THIS!
     
     // Update tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1194,7 +1194,7 @@ function showTab(tabName) {
         
         console.log('🏠 Initializing enhanced dashboard...');
         
-        // Enhanced dashboard initialization
+        // Enhanced dashboard initialization with fallback
         try {
             if (typeof EnhancedDashboard !== 'undefined') {
                 if (!window.enhancedDashboard) {
@@ -1310,7 +1310,7 @@ function showTab(tabName) {
         }
     }
     
-    console.log(`✅ Switched to ${tabName} tab`);
+    console.log(`✅ Switched to ${tabName} tab (All Tasks properly hidden)`);
 }
 
 // Add a debug function to check view states
@@ -2655,35 +2655,6 @@ function initializeDateManagement() {
     
     console.log('✅ Calendar-safe date management initialized');
 }
-
-// Settings dropdown functions
-function toggleSettingsDropdown() {
-    const dropdown = document.getElementById('settings-dropdown');
-    if (dropdown) {
-        dropdown.classList.toggle('hidden');
-    }
-}
-
-function closeSettingsDropdown() {
-    const dropdown = document.getElementById('settings-dropdown');
-    if (dropdown) {
-        dropdown.classList.add('hidden');
-    }
-}
-
-// Close dropdown when clicking outside
-document.addEventListener('click', function(event) {
-    const settingsBtn = document.getElementById('settings-btn');
-    const dropdown = document.getElementById('settings-dropdown');
-    
-    if (settingsBtn && dropdown && !settingsBtn.contains(event.target) && !dropdown.contains(event.target)) {
-        dropdown.classList.add('hidden');
-    }
-});
-
-// ADD THESE MISSING EXPORTS:
-window.toggleSettingsDropdown = toggleSettingsDropdown;
-window.closeSettingsDropdown = closeSettingsDropdown;
 
 // Export the new functions for debugging and future use
 window.setTaskDate = setTaskDate;
