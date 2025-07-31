@@ -1461,45 +1461,36 @@ function renderAllTaskCategories() {
     }
 
     return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
-    const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
-    
-    // Calculate annual cost for this category
-    const categoryCost = tasks.reduce((total, task) => {
-        return total + (task.cost * (365 / task.frequency));
-    }, 0);
-    
-    return `
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-            <div class="p-4 border-b border-gray-100">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                        <span class="text-xl">${categoryInfo.icon}</span>
-                        ${categoryId}
-                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs ml-2">
-                            ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
-                        </span>
-                    </h3>
-                    <div class="text-right">
-                        <div class="text-lg font-bold text-green-600">$${Math.round(categoryCost)}</div>
-                        <div class="text-xs text-gray-500">annual cost</div>
+        const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
+        
+        // Calculate annual cost for this category
+        const categoryCost = tasks.reduce((total, task) => {
+            return total + (task.cost * (365 / task.frequency));
+        }, 0);
+        
+        return `
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 flex-1 min-w-0">
+                            <span class="text-xl">${categoryInfo.icon}</span>
+                            <span class="truncate">${categoryId}</span>
+                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">
+                                ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
+                            </span>
+                        </h3>
+                        <div class="text-right flex-shrink-0">
+                            <div class="text-lg font-bold text-green-600">$${Math.round(categoryCost)}</div>
+                            <div class="text-xs text-gray-500">annual cost</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="space-y-2">
+                        ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
                     </div>
                 </div>
             </div>
-                <div class="p-4 border-b border-gray-100">
-    <div class="flex items-center justify-between flex-wrap gap-2">
-        <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 flex-1 min-w-0">
-            <span class="text-xl">${categoryInfo.icon}</span>
-            <span class="truncate">${categoryId}</span>
-            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">
-                ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
-            </span>
-        </h3>
-        <div class="text-right flex-shrink-0">
-            <div class="text-lg font-bold text-green-600">$${Math.round(categoryCost)}</div>
-            <div class="text-xs text-gray-500">annual cost</div>
-        </div>
-    </div>
-</div>
         `;
     }).join('');
 }
