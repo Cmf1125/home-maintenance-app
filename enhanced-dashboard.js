@@ -22,24 +22,25 @@ class EnhancedDashboard {
         this.render();
     }
 
-    bindEvents() {
-        // Make stat cards clickable
-        document.getElementById('overdue-card')?.addEventListener('click', () => {
-            this.setFilter('overdue');
-        });
+    // UPDATE: Enhanced Dashboard bindEvents() - Remove cost handler
+bindEvents() {
+    // Make stat cards clickable - focused on urgency only
+    document.getElementById('overdue-card')?.addEventListener('click', () => {
+        this.setFilter('overdue');
+    });
 
-        document.getElementById('week-card')?.addEventListener('click', () => {
-            this.setFilter('week');
-        });
+    document.getElementById('week-card')?.addEventListener('click', () => {
+        this.setFilter('week');
+    });
 
-        document.getElementById('total-card')?.addEventListener('click', () => {
-            this.setFilter('total');
-        });
+    // Total Tasks navigates to All Tasks view
+    document.getElementById('total-card')?.addEventListener('click', () => {
+        console.log('📋 Total Tasks clicked - navigating to All Tasks view');
+        showAllTasks();
+    });
 
-        document.getElementById('cost-card')?.addEventListener('click', () => {
-            this.setFilter('cost');
-        });
-    }
+    // REMOVED: Annual cost click handler - moved to All Tasks
+}
 
     setFilter(filterType) {
     this.currentFilter = filterType;
@@ -86,15 +87,16 @@ scrollToTaskList() {
         }
     }
 }
-    updateFilterUI() {
+    // UPDATE: updateFilterUI() - Remove cost filter title
+updateFilterUI() {
     // Remove active class from all cards
     document.querySelectorAll('.stat-card').forEach(card => {
         card.classList.remove('active-filter');
     });
 
-    // Add active class to selected card
+    // Add active class to selected card (overdue, week only)
     const activeCard = document.getElementById(`${this.currentFilter}-card`);
-    if (activeCard) {
+    if (activeCard && ['overdue', 'week'].includes(this.currentFilter)) {
         activeCard.classList.add('active-filter');
         
         // Add a subtle pulse effect to show it was clicked
@@ -105,18 +107,17 @@ scrollToTaskList() {
         }, 200);
     }
 
-    // Update filter title with better descriptions and emojis
+    // Update filter title - simplified
     const filterTitles = {
         'all': '📋 Upcoming Tasks',
         'overdue': '⚠️ Overdue Tasks',
-        'week': '📅 This Week\'s Tasks',
-        'total': '📋 All Active Tasks',
-        'cost': '💰 Tasks by Cost'
+        'week': '📅 This Week\'s Tasks'
+        // REMOVED: 'cost' title
     };
 
     const titleElement = document.getElementById('tasks-list-title');
     if (titleElement) {
-        const newTitle = filterTitles[this.currentFilter] || 'Tasks';
+        const newTitle = filterTitles[this.currentFilter] || 'Upcoming Tasks';
         titleElement.textContent = newTitle;
         
         // Add a subtle animation to the title change
@@ -127,51 +128,42 @@ scrollToTaskList() {
     }
 }
 
-    getFilteredTasks() {
-        if (!window.tasks) {
-            console.warn('⚠️ No tasks data available');
-            return [];
-        }
-
-        const now = new Date();
-        const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-
-        switch (this.currentFilter) {
-            case 'overdue':
-                return window.tasks.filter(task => 
-                    !task.isCompleted && 
-                    task.dueDate && 
-                    new Date(task.dueDate) < now
-                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-
-            case 'week':
-                return window.tasks.filter(task => 
-                    !task.isCompleted && 
-                    task.dueDate && 
-                    new Date(task.dueDate) <= oneWeek &&
-                    new Date(task.dueDate) >= now
-                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-
-            case 'total':
-                return window.tasks.filter(task => 
-                    !task.isCompleted && 
-                    task.dueDate
-                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-
-            case 'cost':
-                return window.tasks.filter(task => 
-                    !task.isCompleted && 
-                    task.dueDate
-                ).sort((a, b) => b.cost - a.cost);
-
-            default:
-                return window.tasks.filter(task => 
-                    !task.isCompleted && 
-                    task.dueDate
-                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-                .slice(0, 8);
-        }
+    // UPDATE: getFilteredTasks() - Remove cost case
+getFilteredTasks() {
+    if (!window.tasks) {
+        console.warn('⚠️ No tasks data available');
+        return [];
     }
+
+    const now = new Date();
+    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    switch (this.currentFilter) {
+        case 'overdue':
+            return window.tasks.filter(task => 
+                !task.isCompleted && 
+                task.dueDate && 
+                new Date(task.dueDate) < now
+            ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+        case 'week':
+            return window.tasks.filter(task => 
+                !task.isCompleted && 
+                task.dueDate && 
+                new Date(task.dueDate) <= oneWeek &&
+                new Date(task.dueDate) >= now
+            ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+        // REMOVED: 'cost' case - moved to All Tasks
+
+        default: // 'all' case - show next 8 upcoming tasks
+            return window.tasks.filter(task => 
+                !task.isCompleted && 
+                task.dueDate
+            ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+            .slice(0, 8);
+    }
+}
 
     renderFilteredTasks() {
         const tasksList = document.getElementById('tasks-list');
