@@ -1373,7 +1373,10 @@ function showAllTasks() {
 
 function renderAllTasksView() {
     const allTasksView = document.getElementById('all-tasks-view');
-    if (!allTasksView) return;
+    if (!allTasksView) {
+        console.error('❌ All tasks view element not found');
+        return;
+    }
     
     // Calculate stats including annual cost
     const now = new Date();
@@ -1452,6 +1455,8 @@ function renderAllTasksView() {
             </div>
         </div>
     `;
+    
+    console.log('✅ All Tasks view rendered successfully');
 }
 
 function renderAllTaskCategories() {
@@ -1641,18 +1646,20 @@ function updateDashboard() {
     
     const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
     
-    // Update DOM elements safely
+    // Update DOM elements safely - ONLY update elements that exist
     const elements = {
         'overdue-count': overdueCount,
         'week-count': weekCount,
-        'total-count': totalTasks,
-        'annual-cost': '$' + Math.round(totalCost)
+        'total-count': totalTasks
+        // REMOVED: 'annual-cost': '$' + Math.round(totalCost)
     };
     
     Object.entries(elements).forEach(([id, value]) => {
         const element = document.getElementById(id);
         if (element) {
             element.textContent = value;
+        } else {
+            console.warn(`⚠️ Element not found: ${id}`);
         }
     });
     
