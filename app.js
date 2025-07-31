@@ -1378,22 +1378,12 @@ function renderAllTasksView() {
         return;
     }
     
-    // Calculate stats including annual cost
-    const now = new Date();
-    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    
-    let overdueCount = 0;
-    let weekCount = 0;
-    let totalCost = 0;
-    
-    window.tasks.forEach(task => {
-        if (!task.isCompleted && task.dueDate) {
-            const taskDate = new Date(task.dueDate);
-            if (taskDate < now) overdueCount++;
-            if (taskDate <= oneWeek && taskDate >= now) weekCount++;
-        }
-        totalCost += task.cost * (365 / task.frequency);
-    });
+   // Calculate stats for All Tasks overview
+let totalCost = 0;
+
+window.tasks.forEach(task => {
+    totalCost += task.cost * (365 / task.frequency);
+});
     
     const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
     
