@@ -49,19 +49,7 @@
                        <h1 class="text-xl font-bold text-gray-900">The Home Keeper</h1>
                         <p class="text-sm text-gray-600" id="header-subtitle">Smart home maintenance</p>
                     </div>
-                   <div class="relative">
-    <button id="settings-btn" onclick="toggleSettingsDropdown()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn">⚙️</button>
-    <div id="settings-dropdown" class="hidden absolute right-0 top-12 bg-white border border-gray-200 rounded-lg shadow-lg min-w-48 z-50">
-        <div class="py-2">
-            <button onclick="showHomeInfo(); closeSettingsDropdown()" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2">
-                🏠 <span>Home Info</span>
-            </button>
-            <button onclick="clearData(); closeSettingsDropdown()" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600 flex items-center gap-2">
-                🗑️ <span>Reset App</span>
-            </button>
-        </div>
-    </div>
-</div>            
+                    <button onclick="showHomeInfo()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn">🏠</button>
                 </div>
             </div>
         </div>
@@ -339,15 +327,16 @@
         <div class="text-xs text-gray-500 mt-2">Click to view week's tasks</div>
     </div>
     
-    <div id="all-tasks-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
-    <div class="flex items-center gap-3">
-        <div class="p-2 bg-blue-100 rounded-lg text-lg">📋</div>
-        <div>
-            <p class="text-xs text-gray-600">All Tasks</p>
-            <p id="total-count" class="text-xl font-bold text-gray-900">0</p>
+    <div id="total-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-blue-100 rounded-lg text-lg">📋</div>
+            <div>
+                <p class="text-xs text-gray-600">Total Tasks</p>
+                <p id="total-count" class="text-xl font-bold text-gray-900">0</p>
+            </div>
         </div>
+        <div class="text-xs text-gray-500 mt-2">Click to manage all</div>
     </div>
-    <div class="text-xs text-gray-500 mt-2">Click to view all by category</div>
 </div>
                     
                  <!-- Enhanced Tasks Section -->
@@ -423,11 +412,14 @@
     </div>
     
     <!-- UPDATED: Replace Export Tasks with All Tasks -->
-    <div class="px-2 pb-2">
-    <button onclick="exportData()" class="w-full tab-btn flex items-center justify-center p-2 rounded-lg text-gray-600 hover:text-gray-900 touch-btn text-xs">
-        📤 Export Data
-    </button>
-</div>
+    <div class="grid grid-cols-2 gap-1 px-2 pb-2">
+        <button onclick="showAllTasks()" class="tab-btn flex items-center justify-center p-2 rounded-lg text-gray-600 hover:text-gray-900 touch-btn text-xs">
+            📋 All Tasks
+        </button>
+        <button onclick="clearData()" class="tab-btn flex items-center justify-center p-2 rounded-lg text-red-600 hover:text-red-800 touch-btn text-xs">
+            🗑️ Reset App
+        </button>
+    </div>
 </div>
         </div>
     </div>
