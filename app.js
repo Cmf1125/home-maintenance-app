@@ -1614,7 +1614,7 @@ window.editTaskFromAllTasks = editTaskFromAllTasks;
 // Make it globally available
 window.showAllTasks = showAllTasks;
 
-// Basic dashboard fallback function
+// UPDATE your updateDashboard function to call this setup:
 function updateDashboard() {
     console.log('🔄 Running basic dashboard update...');
     
@@ -1629,7 +1629,6 @@ function updateDashboard() {
     // Calculate stats
     let overdueCount = 0;
     let weekCount = 0;
-    let totalCost = 0;
     
     window.tasks.forEach(task => {
         if (!task.isCompleted && task.dueDate) {
@@ -1641,25 +1640,21 @@ function updateDashboard() {
                 weekCount++;
             }
         }
-        totalCost += task.cost * (365 / task.frequency);
     });
     
     const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
     
-    // Update DOM elements safely - ONLY update elements that exist
+    // Update DOM elements safely
     const elements = {
         'overdue-count': overdueCount,
         'week-count': weekCount,
         'total-count': totalTasks
-        // REMOVED: 'annual-cost': '$' + Math.round(totalCost)
     };
     
     Object.entries(elements).forEach(([id, value]) => {
         const element = document.getElementById(id);
         if (element) {
             element.textContent = value;
-        } else {
-            console.warn(`⚠️ Element not found: ${id}`);
         }
     });
     
@@ -1669,8 +1664,34 @@ function updateDashboard() {
         homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
     }
     
+    // ADD THIS LINE: Set up click handlers for basic dashboard
+    setupBasicDashboardClicks();
+    
     console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
 }
+
+// Basic dashboard click handler for Total Tasks card
+function setupBasicDashboardClicks() {
+    const totalCard = document.getElementById('total-card');
+    if (totalCard) {
+        // Remove any existing click handlers
+        totalCard.replaceWith(totalCard.cloneNode(true));
+        const newTotalCard = document.getElementById('total-card');
+        
+        if (newTotalCard) {
+            newTotalCard.addEventListener('click', () => {
+                console.log('📋 Total Tasks clicked (basic dashboard) - navigating to All Tasks');
+                if (typeof showAllTasks === 'function') {
+                    showAllTasks();
+                } else {
+                    console.error('❌ showAllTasks function not found');
+                }
+            });
+            console.log('✅ Basic dashboard Total Tasks click handler added');
+        }
+    }
+}
+
 
 // FIXED: Enhanced Add Task function for setup with better modal handling
 function addTaskFromSetup() {
