@@ -666,17 +666,6 @@
     <script>
         console.log('🚨 Loading task system override...');
 
-        // Add this helper function to prevent modal conflicts
-function closeAllModals() {
-    const modals = ['task-edit-modal', 'date-picker-modal', 'home-info-modal'];
-    modals.forEach(modalId => {
-        const modal = document.getElementById(modalId);
-        if (modal && !modal.classList.contains('hidden')) {
-            modal.classList.add('hidden');
-        }
-    });
-}
-
         // Complete override system (keep this exactly as is - it's working!)
         window.openTaskEditModal = function(task, isNew) {
             window.TaskManager.openModal(task, isNew);
@@ -696,8 +685,6 @@ function closeAllModals() {
             
             openModal: function(task, isNew) {
                 console.log('📝 Opening modal for:', task.title || 'New Task');
-
-                closeAllModals(); // ← ADD THIS LINE
                 
                 this.currentTask = {...task};
                 window.currentEditingTask = this.currentTask;
@@ -884,36 +871,15 @@ alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
             window.TaskManager.openModal(newTask, true);
         };
 
-       // ENHANCED: Add task with All Tasks view refresh support
-window.addTaskFromDashboard = function() {
-    console.log('➕ Adding new task from dashboard...');
-    
-    // Detect if we're in All Tasks view - IMPROVED detection
-    const allTasksView = document.getElementById('all-tasks-view');
-    const dashboardView = document.getElementById('dashboard-view');
-    const isInAllTasksView = allTasksView && !allTasksView.classList.contains('hidden');
-    const isInDashboard = dashboardView && !dashboardView.classList.contains('hidden');
-    
-    if (isInAllTasksView) {
-        window.editingFromAllTasks = true; // Set flag for refresh
-        console.log('📋 Adding from All Tasks view - will refresh after save');
-    }
-    
-    const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
-    const newTask = {
-        id: maxId + 1, 
-        title: '', 
-        description: '', 
-        category: 'General',
-        frequency: 365, 
-        cost: 0, 
-        priority: 'medium', 
-        dueDate: new Date(),
-        nextDue: new Date() // Add this for calendar compatibility
-    };
-    
-    window.TaskManager.openModal(newTask, true);
-};
+        window.addTaskFromDashboard = function() {
+            const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+            const newTask = {
+                id: maxId + 1, title: '', description: '', category: 'General',
+                frequency: 365, cost: 0, priority: 'medium', dueDate: new Date()
+            };
+            window.TaskManager.openModal(newTask, true);
+        };
+
         window.editTaskFromSetup = function(taskId) {
             const task = window.tasks?.find(t => t.id === taskId);
             if (task) {
