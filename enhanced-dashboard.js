@@ -802,13 +802,15 @@ function closeDatePickerModal() {
         modal.classList.add('hidden');
     }
     
-    // Clear debounce if task was being rescheduled
+    // Only clear debounce and task reference after a delay to ensure confirmReschedule can access it
     if (window.currentRescheduleTask) {
         const debounceKey = `reschedule_${window.currentRescheduleTask.id}`;
-        delete window[debounceKey];
+        setTimeout(() => {
+            delete window[debounceKey];
+            window.currentRescheduleTask = null;
+        }, 100);
     }
     
-    window.currentRescheduleTask = null;
     console.log('📅 Date picker modal closed');
 }
 function setQuickDate(daysFromNow) {
@@ -830,8 +832,12 @@ function setQuickDate(daysFromNow) {
 }
 
 function confirmReschedule() {
+    console.log('🔧 Confirm reschedule called, currentRescheduleTask:', window.currentRescheduleTask);
+    
     if (!window.currentRescheduleTask) {
         console.error('❌ No task selected for rescheduling');
+        alert('❌ Error: No task selected for rescheduling. Please try again.');
+        closeDatePickerModal();
         return;
     }
     
@@ -857,20 +863,38 @@ function confirmReschedule() {
         }
     }
     
-    // Update the task
-    const oldDate = window.currentRescheduleTask.dueDate instanceof Date ? 
-        window.currentRescheduleTask.dueDate : new Date(window.currentRescheduleTask.dueDate);
+    // Store task reference before we lose it
+    const taskToUpdate = window.currentRescheduleTask;
+    const taskTitle = taskToUpdate.title;
+    const oldDate = taskToUpdate.dueDate instanceof Date ? 
+        taskToUpdate.dueDate : new Date(taskToUpdate.dueDate);
     
-    window.currentRescheduleTask.dueDate = newDate;
+    // Update the task in the global tasks array
+    const taskIndex = window.tasks.findIndex(t => t.id === taskToUpdate.id);
+    if (taskIndex === -1) {
+        alert('❌ Task not found in tasks array');
+        closeDatePickerModal();
+        return;
+    }
     
-    // CRITICAL: Update nextDue for calendar compatibility
-    window.currentRescheduleTask.nextDue = newDate;
+    // Update both the reference and the array
+    window.tasks[taskIndex].dueDate = newDate;
+    window.tasks[taskIndex].nextDue = newDate; // Calendar compatibility
+    taskToUpdate.dueDate = newDate;
+    taskToUpdate.nextDue = newDate;
     
     // Save data
-    if (typeof window.saveData === 'function') {
-        window.saveData();
-    } else if (typeof saveData === 'function') {
-        saveData();
+    try {
+        if (typeof window.saveData === 'function') {
+            window.saveData();
+        } else if (typeof saveData === 'function') {
+            saveData();
+        }
+        console.log('💾 Data saved after reschedule');
+    } catch (error) {
+        console.error('❌ Error saving data:', error);
+        alert('❌ Error saving changes');
+        return;
     }
     
     // Refresh dashboard
@@ -887,7 +911,7 @@ function confirmReschedule() {
     closeDatePickerModal();
     
     // Show success message
-    const message = `✅ "${window.currentRescheduleTask.title}" rescheduled from ${oldDate.toLocaleDateString()} to ${newDate.toLocaleDateString()}`;
+    const message = `✅ "${taskTitle}" rescheduled from ${oldDate.toLocaleDateString()} to ${newDate.toLocaleDateString()}`;
     console.log(message);
     
     // Show a nice success notification
