@@ -509,6 +509,11 @@ function rescheduleTaskFromDashboard(taskId) {
         }
     }
 }
+
+window.rescheduleTaskFromDashboard = rescheduleTaskFromDashboard;
+window.rescheduleTask = rescheduleTaskFromDashboard;
+
+
 // UPDATED: Function to add task (replaces show all tasks)
 function addTaskFromDashboard() {
     console.log('➕ Adding new task from dashboard...');
