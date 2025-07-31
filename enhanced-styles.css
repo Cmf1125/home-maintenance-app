@@ -333,3 +333,17 @@ body.install-banner-visible {
         padding-top: 50px;
     }
 }
+
+/* Fix modal z-index conflicts */
+#date-picker-modal {
+    z-index: 10000 !important; /* Higher than task edit modal */
+}
+
+#task-edit-modal {
+    z-index: 9999 !important;
+}
+
+/* Ensure modals appear above everything */
+.modal-backdrop {
+    z-index: 9998 !important;
+}
