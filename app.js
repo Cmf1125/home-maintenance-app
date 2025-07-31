@@ -1160,16 +1160,18 @@ function showTab(tabName) {
     window.tasks = tasks;
     window.homeData = homeData;
     
-    // Hide all views
+    // Hide ALL views including All Tasks (THIS WAS MISSING!)
     const dashboardView = document.getElementById('dashboard-view');
     const calendarView = document.getElementById('calendar-view');
     const documentsView = document.getElementById('documents-view');
-    const appliancesView = document.getElementById('appliances-view'); 
+    const appliancesView = document.getElementById('appliances-view');
+    const allTasksView = document.getElementById('all-tasks-view'); // ← ADDED THIS!
 
     if (dashboardView) dashboardView.classList.add('hidden');
     if (calendarView) calendarView.classList.add('hidden');
     if (documentsView) documentsView.classList.add('hidden');
-    if (appliancesView) appliancesView.classList.add('hidden'); 
+    if (appliancesView) appliancesView.classList.add('hidden');
+    if (allTasksView) allTasksView.classList.add('hidden'); // ← ADDED THIS!
     
     // Update tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1307,6 +1309,8 @@ function showTab(tabName) {
             console.error('❌ Error initializing appliances:', error);
         }
     }
+    
+    console.log(`✅ Switched to ${tabName} tab (All Tasks properly hidden)`);
 }
 
 // Add a debug function to check view states
