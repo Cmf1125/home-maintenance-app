@@ -1502,8 +1502,8 @@ function renderAllTasksTaskItem(task) {
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <!-- SIMPLIFIED: Only Edit button -->
-                <button onclick="editTaskFromSetup(${task.id})" 
+                <!-- FIXED: Use a custom edit function that refreshes All Tasks view -->
+                <button onclick="editTaskFromAllTasks(${task.id})" 
                         class="text-blue-600 hover:text-blue-800 text-sm px-3 py-2 rounded-lg transition-colors border border-blue-200 hover:bg-blue-50" 
                         title="Edit task">
                     ✏️ Edit
@@ -1512,6 +1512,56 @@ function renderAllTasksTaskItem(task) {
         </div>
     `;
 }
+
+// NEW FUNCTION: Edit task specifically from All Tasks view
+function editTaskFromAllTasks(taskId) {
+    console.log('✏️ Editing task from All Tasks view:', taskId);
+    
+    const task = window.tasks.find(t => t.id === taskId);
+    if (!task) {
+        console.error('❌ Task not found:', taskId);
+        alert('❌ Task not found');
+        return;
+    }
+    
+    // Store that we're editing from All Tasks view
+    window.editingFromAllTasks = true;
+    
+    // Open the modal using the existing system
+    if (window.TaskManager && window.TaskManager.openModal) {
+        window.TaskManager.openModal(task, false);
+    } else {
+        console.error('❌ TaskManager not available');
+        alert('❌ Task editor not available');
+    }
+}
+
+// ENHANCED: Override the TaskManager save to refresh All Tasks view
+const originalTaskManagerSave = window.TaskManager?.save;
+if (originalTaskManagerSave && window.TaskManager) {
+    window.TaskManager.save = function() {
+        // Call the original save function
+        const result = originalTaskManagerSave.apply(this, arguments);
+        
+        // If we were editing from All Tasks, refresh that view
+        if (window.editingFromAllTasks) {
+            console.log('🔄 Refreshing All Tasks view after edit...');
+            setTimeout(() => {
+                if (typeof renderAllTasksView === 'function') {
+                    renderAllTasksView();
+                    console.log('✅ All Tasks view refreshed');
+                }
+                window.editingFromAllTasks = false; // Clear the flag
+            }, 100);
+        }
+        
+        return result;
+    };
+    console.log('✅ TaskManager.save enhanced for All Tasks refresh');
+}
+
+// Make the function globally available
+window.editTaskFromAllTasks = editTaskFromAllTasks;
 
 // Make it globally available
 window.showAllTasks = showAllTasks;
