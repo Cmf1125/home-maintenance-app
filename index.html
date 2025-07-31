@@ -49,7 +49,19 @@
                        <h1 class="text-xl font-bold text-gray-900">The Home Keeper</h1>
                         <p class="text-sm text-gray-600" id="header-subtitle">Smart home maintenance</p>
                     </div>
-                    <button onclick="showHomeInfo()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn">🏠</button>
+                   <div class="relative">
+    <button id="settings-btn" onclick="toggleSettingsDropdown()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn">⚙️</button>
+    <div id="settings-dropdown" class="hidden absolute right-0 top-12 bg-white border border-gray-200 rounded-lg shadow-lg min-w-48 z-50">
+        <div class="py-2">
+            <button onclick="showHomeInfo(); closeSettingsDropdown()" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2">
+                🏠 <span>Home Info</span>
+            </button>
+            <button onclick="clearData(); closeSettingsDropdown()" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600 flex items-center gap-2">
+                🗑️ <span>Reset App</span>
+            </button>
+        </div>
+    </div>
+</div>            
                 </div>
             </div>
         </div>
