@@ -495,72 +495,24 @@ function rescheduleTaskFromDashboard(taskId) {
     }
 }
 
-// UPDATED: Function to add task (replaces show all tasks)
+// Function to add task - placeholder that will be overridden by better TaskManager version
 function addTaskFromDashboard() {
     console.log('➕ Adding new task from dashboard...');
     
-    const title = prompt('Task Title:');
-    if (!title) return;
-    
-    const description = prompt('Task Description:');
-    if (!description) return;
-    
-    const frequency = parseInt(prompt('How often (in days):', '365'));
-    if (!frequency || frequency <= 0) return;
-    
-    const cost = parseFloat(prompt('Estimated cost ($):', '0'));
-    if (isNaN(cost)) return;
-    
-    const priority = prompt('Priority (high, medium, low):', 'medium');
-    if (!['high', 'medium', 'low'].includes(priority)) {
-        alert('Invalid priority. Please use: high, medium, or low');
-        return;
-    }
-    
-    const dueDateStr = prompt('Due date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-    if (!dueDateStr) return;
-    
-    const dueDate = new Date(dueDateStr + 'T12:00:00');
-    if (isNaN(dueDate.getTime())) {
-        alert('Invalid date format');
-        return;
-    }
-    
-    // Find next available ID
-    const maxId = Math.max(...window.tasks.map(t => t.id), 0);
-    
+    // This will be overridden by the TaskManager version in index.html
+    // which uses a proper modal instead of prompts
+    const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
     const newTask = {
-        id: maxId + 1,
-        title: title,
-        description: description,
-        category: 'General',
-        frequency: frequency,
-        cost: cost,
-        priority: priority,
-        dueDate: dueDate,
-        lastCompleted: null,
-        isCompleted: false
+        id: maxId + 1, title: '', description: '', category: 'General',
+        frequency: 365, cost: 0, priority: 'medium', dueDate: new Date()
     };
     
-    window.tasks.push(newTask);
-    
-    // Save data
-    saveData();
-    
-    // Refresh dashboard
-    if (window.enhancedDashboard) {
-        window.enhancedDashboard.render();
+    if (window.TaskManager && window.TaskManager.openModal) {
+        window.TaskManager.openModal(newTask, true);
     } else {
-        updateDashboard();
+        console.error('❌ TaskManager not available');
+        alert('❌ Unable to open task editor');
     }
-    
-    // Refresh calendar if it exists
-    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-        window.casaCareCalendar.refresh();
-    }
-    
-    console.log('✅ New task added:', newTask);
-    alert(`✅ Task "${title}" added successfully!`);
 }
 
 // Function to export task list
@@ -898,6 +850,17 @@ function showSuccessNotification(message) {
 
 // Ensure enhanced dashboard is available globally
 window.EnhancedDashboard = EnhancedDashboard;
+
+// Expose functions to global scope for onclick handlers
+window.addTaskFromDashboard = addTaskFromDashboard;
+window.rescheduleTaskFromDashboard = rescheduleTaskFromDashboard;
+window.confirmReschedule = confirmReschedule;
+window.closeDatePickerModal = closeDatePickerModal;
+window.setQuickDate = setQuickDate;
+window.editTaskFromDashboard = editTaskFromDashboard;
+window.closeTaskEditModal = closeTaskEditModal;
+window.saveTaskFromEdit = saveTaskFromEdit;
+window.deleteTaskFromEdit = deleteTaskFromEdit;
 
 // Debug function to check function status
 window.debugDashboardFunctions = function() {
