@@ -61,13 +61,7 @@ function getAutoPriority(title, category) {
         return 'high';
     }
     
-    // Everything else is normal priority
-    return 'normal';
-}
-// Add this right after your getAutoPriority function in app.js:
-
-function getAutoPriority(title, category) {
-    // ... your existing getAutoPriority code ...
+    // Everything else is normal priority (CORRECTED)
     return 'normal';
 }
 
