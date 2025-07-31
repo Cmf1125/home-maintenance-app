@@ -1157,41 +1157,39 @@ function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
     
     // Ensure global references are current
-    window.tasks = window.tasks || [];
-    window.homeData = window.homeData || {};
+    window.tasks = tasks;
+    window.homeData = homeData;
     
-    // Get all views
-    const views = [
-        'dashboard-view',
-        'calendar-view', 
-        'documents-view',
-        'appliances-view',
-        'all-tasks-view'  // Make sure this gets hidden when switching tabs
-    ];
+    // Hide all main views (GENTLE approach - only use classList)
+    const dashboardView = document.getElementById('dashboard-view');
+    const calendarView = document.getElementById('calendar-view');
+    const documentsView = document.getElementById('documents-view');
+    const appliancesView = document.getElementById('appliances-view');
+    const allTasksView = document.getElementById('all-tasks-view'); // ADDED: Make sure All Tasks gets hidden
+
+    if (dashboardView) dashboardView.classList.add('hidden');
+    if (calendarView) calendarView.classList.add('hidden');
+    if (documentsView) documentsView.classList.add('hidden');
+    if (appliancesView) appliancesView.classList.add('hidden');
     
-    // Hide ALL views first
-    views.forEach(viewId => {
-        const viewElement = document.getElementById(viewId);
-        if (viewElement) {
-            viewElement.classList.add('hidden');
-            viewElement.style.display = 'none';
-            viewElement.style.visibility = 'hidden';
-        }
-    });
+    // ADDED: Forcefully hide All Tasks when switching to main tabs
+    if (allTasksView) {
+        allTasksView.classList.add('hidden');
+        allTasksView.style.display = 'none';  // Extra force for All Tasks
+        allTasksView.style.visibility = 'hidden';
+    }
     
-    // Clear all tab styling
+    // Update tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('bg-blue-100', 'text-blue-700');
         btn.classList.add('text-gray-600');
     });
     
-    // Show the requested view
     if (tabName === 'dashboard') {
-        const dashboardView = document.getElementById('dashboard-view');
+        // Show dashboard (GENTLE - don't mess with working dashboard)
         if (dashboardView) {
             dashboardView.classList.remove('hidden');
-            dashboardView.style.display = 'block';
-            dashboardView.style.visibility = 'visible';
+            // DON'T set style properties - let dashboard handle its own display
         }
         
         // Update tab styling
@@ -1201,27 +1199,32 @@ function showTab(tabName) {
             dashboardTab.classList.remove('text-gray-600');
         }
         
-        // Initialize dashboard
+        console.log('🏠 Initializing enhanced dashboard...');
+        
+        // Enhanced dashboard initialization (original logic)
         try {
-            if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-                window.enhancedDashboard.render();
-                console.log('✅ Enhanced dashboard rendered');
-            } else {
-                console.log('⚠️ Enhanced dashboard not available, using basic');
-                if (typeof updateDashboard === 'function') {
-                    updateDashboard();
+            if (typeof EnhancedDashboard !== 'undefined') {
+                if (!window.enhancedDashboard) {
+                    console.log('🆕 Creating new enhanced dashboard instance...');
+                    window.enhancedDashboard = new EnhancedDashboard();
+                } else {
+                    console.log('🔄 Refreshing existing enhanced dashboard...');
+                    window.enhancedDashboard.render();
                 }
+                console.log('✅ Enhanced dashboard ready');
+            } else {
+                console.warn('⚠️ EnhancedDashboard class not available, using basic dashboard');
+                updateDashboard();
             }
         } catch (error) {
-            console.error('❌ Error rendering dashboard:', error);
+            console.error('❌ Error with enhanced dashboard, falling back to basic:', error);
+            updateDashboard();
         }
         
     } else if (tabName === 'calendar') {
-        const calendarView = document.getElementById('calendar-view');
+        // Show calendar
         if (calendarView) {
             calendarView.classList.remove('hidden');
-            calendarView.style.display = 'block';
-            calendarView.style.visibility = 'visible';
         }
         
         // Update tab styling
@@ -1231,11 +1234,13 @@ function showTab(tabName) {
             calendarTab.classList.remove('text-gray-600');
         }
         
-        // Initialize calendar
+        console.log('📅 Initializing calendar...');
+        
+        // Initialize calendar (original logic)
         try {
             if (!window.casaCareCalendar && typeof CasaCareCalendar !== 'undefined') {
                 window.casaCareCalendar = new CasaCareCalendar();
-            } else if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+            } else if (window.casaCareCalendar) {
                 window.casaCareCalendar.refresh();
             }
         } catch (error) {
@@ -1243,11 +1248,9 @@ function showTab(tabName) {
         }
         
     } else if (tabName === 'documents') {
-        const documentsView = document.getElementById('documents-view');
+        // Show documents
         if (documentsView) {
             documentsView.classList.remove('hidden');
-            documentsView.style.display = 'block';
-            documentsView.style.visibility = 'visible';
         }
         
         // Update tab styling
@@ -1257,11 +1260,15 @@ function showTab(tabName) {
             documentsTab.classList.remove('text-gray-600');
         }
         
-        // Initialize documents
+        console.log('📄 Initializing documents...');
+        
+        // Initialize documents module (original logic)
         try {
             if (!window.casaCareDocuments && typeof CasaCareDocuments !== 'undefined') {
+                console.log('📄 Creating new documents instance...');
                 window.casaCareDocuments = new CasaCareDocuments();
-            } else if (window.casaCareDocuments && typeof window.casaCareDocuments.render === 'function') {
+            } else if (window.casaCareDocuments) {
+                console.log('📄 Refreshing documents...');
                 window.casaCareDocuments.render();
             }
         } catch (error) {
@@ -1269,39 +1276,44 @@ function showTab(tabName) {
         }
         
     } else if (tabName === 'appliances') {
-        const appliancesView = document.getElementById('appliances-view');
+        // Show appliances view
         if (appliancesView) {
             appliancesView.classList.remove('hidden');
-            appliancesView.style.display = 'block';
-            appliancesView.style.visibility = 'visible';
         }
         
-        // Update tab styling
+        // Update tab styling  
         const appliancesTab = document.getElementById('tab-appliances');
         if (appliancesTab) {
             appliancesTab.classList.add('bg-blue-100', 'text-blue-700');
             appliancesTab.classList.remove('text-gray-600');
         }
         
-        // Initialize appliances
+        console.log('⚙️ Switching to appliances tab...');
+        
+        // Initialize appliances (original logic)
         try {
             if (!window.applianceManager) {
+                console.log('⚙️ Appliance manager not found, initializing...');
                 if (typeof window.initializeApplianceManager === 'function') {
                     window.applianceManager = window.initializeApplianceManager();
                 } else if (typeof ApplianceManager !== 'undefined') {
+                    console.log('⚙️ Creating appliance manager directly...');
                     window.applianceManager = new ApplianceManager();
+                } else {
+                    console.error('❌ ApplianceManager class not available');
+                    return;
                 }
             }
             
             if (window.applianceManager && typeof window.applianceManager.render === 'function') {
+                console.log('⚙️ Rendering appliances view...');
                 window.applianceManager.render();
             }
+            
         } catch (error) {
             console.error('❌ Error initializing appliances:', error);
         }
     }
-    
-    console.log(`✅ Switched to ${tabName} tab`);
 }
 
 // Add a debug function to check view states
@@ -1367,16 +1379,6 @@ function showAllTasks() {
     
     // Render the content
     renderAllTasksView();
-    
-    // Double-check that only All Tasks is visible
-    setTimeout(() => {
-        const allTasksView = document.getElementById('all-tasks-view');
-        const dashboardView = document.getElementById('dashboard-view');
-        
-        console.log('🔍 View visibility check:');
-        console.log('Dashboard hidden?', dashboardView?.classList.contains('hidden'), dashboardView?.style.display);
-        console.log('All Tasks visible?', !allTasksView?.classList.contains('hidden'), allTasksView?.style.display);
-    }, 100);
     
     console.log('✅ All Tasks view should now be the ONLY visible view');
 }
