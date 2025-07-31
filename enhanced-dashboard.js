@@ -31,7 +31,7 @@ bindEvents() {
             console.log('📊 Overdue card clicked');
             this.setFilter('overdue');
         });
-    }
+    },
 
     const weekCard = document.getElementById('week-card');
     if (weekCard) {
@@ -39,7 +39,7 @@ bindEvents() {
             console.log('📊 Week card clicked');
             this.setFilter('week');
         });
-    }
+    },
 
     // Total Tasks card navigates to All Tasks view
     const totalCard = document.getElementById('total-card');
@@ -52,7 +52,7 @@ bindEvents() {
                 console.error('❌ showAllTasks function not found');
             }
         });
-    }
+    },
 
     console.log('✅ Enhanced dashboard events bound successfully');
 }
@@ -63,7 +63,7 @@ bindEvents() {
     
     // 🎯 NEW: Smooth scroll to task list with visual feedback
     this.scrollToTaskList();
-}
+},
     // Add this method to your EnhancedDashboard class:
 
 scrollToTaskList() {
