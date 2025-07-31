@@ -1378,22 +1378,12 @@ function renderAllTasksView() {
         return;
     }
     
-    // Calculate stats including annual cost
-    const now = new Date();
-    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    
-    let overdueCount = 0;
-    let weekCount = 0;
-    let totalCost = 0;
-    
-    window.tasks.forEach(task => {
-        if (!task.isCompleted && task.dueDate) {
-            const taskDate = new Date(task.dueDate);
-            if (taskDate < now) overdueCount++;
-            if (taskDate <= oneWeek && taskDate >= now) weekCount++;
-        }
-        totalCost += task.cost * (365 / task.frequency);
-    });
+   // Calculate stats for All Tasks overview
+let totalCost = 0;
+
+window.tasks.forEach(task => {
+    totalCost += task.cost * (365 / task.frequency);
+});
     
     const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
     
@@ -1407,28 +1397,20 @@ function renderAllTasksView() {
                     <p class="text-gray-600 text-sm">Edit your maintenance tasks and view annual costs</p>
                 </div>
                 
-                <!-- Enhanced Stats with Annual Cost -->
-                <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                    <h3 class="font-semibold text-gray-900 mb-3">📊 Complete Overview</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        <div class="text-center">
-                            <div class="text-lg font-bold text-red-600">${overdueCount}</div>
-                            <div class="text-xs text-gray-600">Overdue</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-lg font-bold text-orange-600">${weekCount}</div>
-                            <div class="text-xs text-gray-600">This Week</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-lg font-bold text-blue-600">${totalTasks}</div>
-                            <div class="text-xs text-gray-600">Total Active</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
-                            <div class="text-xs text-gray-600">Annual Cost</div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Simplified Complete Overview -->
+<div class="bg-gray-50 p-4 rounded-lg mb-6">
+    <h3 class="font-semibold text-gray-900 mb-3">📊 Complete Overview</h3>
+    <div class="grid grid-cols-2 gap-6 text-sm max-w-md mx-auto">
+        <div class="text-center">
+            <div class="text-2xl font-bold text-blue-600">${totalTasks}</div>
+            <div class="text-sm text-gray-600">Total Active Tasks</div>
+        </div>
+        <div class="text-center">
+            <div class="text-2xl font-bold text-green-600">$${Math.round(totalCost)}</div>
+            <div class="text-sm text-gray-600">Annual Cost</div>
+        </div>
+    </div>
+</div>
                 
                 <!-- Add Custom Task Button -->
                 <div class="flex items-center justify-between mb-4">
@@ -1481,16 +1463,27 @@ function renderAllTaskCategories() {
     return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
         const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
         
+        // Calculate annual cost for this category
+        const categoryCost = tasks.reduce((total, task) => {
+            return total + (task.cost * (365 / task.frequency));
+        }, 0);
+        
         return `
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
                 <div class="p-4 border-b border-gray-100">
-                    <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                        <span class="text-xl">${categoryInfo.icon}</span>
-                        ${categoryId}
-                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs ml-2">
-                            ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
-                        </span>
-                    </h3>
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 flex-1 min-w-0">
+                            <span class="text-xl">${categoryInfo.icon}</span>
+                            <span class="truncate">${categoryId}</span>
+                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">
+                                ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
+                            </span>
+                        </h3>
+                        <div class="text-right flex-shrink-0">
+                            <div class="text-lg font-bold text-green-600">$${Math.round(categoryCost)}</div>
+                            <div class="text-xs text-gray-500">annual cost</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="p-4">
                     <div class="space-y-2">
