@@ -897,20 +897,36 @@
             }
         };
 
-        window.deleteTaskFromEdit = function() {
-            if (!window.TaskManager.currentTask) return;
+       window.deleteTaskFromEdit = function() {
+    if (!window.TaskManager.currentTask) return;
+    
+    const taskTitle = window.TaskManager.currentTask.title || 'Untitled';
+    if (confirm(`Delete "${taskTitle}"?`)) {
+        const index = window.tasks.findIndex(t => t.id === window.TaskManager.currentTask.id);
+        if (index > -1) {
+            window.tasks.splice(index, 1);
+            window.TaskManager.saveAndRefresh();
+            window.TaskManager.close();
             
-            const taskTitle = window.TaskManager.currentTask.title || 'Untitled';
-            if (confirm(`Delete "${taskTitle}"?`)) {
-                const index = window.tasks.findIndex(t => t.id === window.TaskManager.currentTask.id);
-                if (index > -1) {
-                    window.tasks.splice(index, 1);
-                    window.TaskManager.saveAndRefresh();
-                    window.TaskManager.close();
-                    alert(`✅ "${taskTitle}" deleted!`);
-                }
+            // ENHANCED: Refresh All Tasks view after deletion
+            const allTasksView = document.getElementById('all-tasks-view');
+            const isAllTasksVisible = allTasksView && !allTasksView.classList.contains('hidden');
+            
+            if (window.editingFromAllTasks || isAllTasksVisible) {
+                console.log('🔄 Refreshing All Tasks view after task deletion...');
+                setTimeout(() => {
+                    if (typeof renderAllTasksView === 'function') {
+                        renderAllTasksView();
+                        console.log('✅ All Tasks view refreshed after deletion');
+                    }
+                    window.editingFromAllTasks = false;
+                }, 100);
             }
-        };
+            
+            alert(`✅ "${taskTitle}" deleted!`);
+        }
+    }
+};
 
        console.log('✅ Task system override loaded (cleaned up version)');
     </script>
