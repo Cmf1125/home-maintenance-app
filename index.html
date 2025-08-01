@@ -778,10 +778,17 @@
                     return;
                 }
                 
-                // Auto-calculate priority
+               // Auto-calculate priority using the proper function
                 let priority = 'medium';
-                if (category === 'Safety' || title.toLowerCase().includes('smoke') || title.toLowerCase().includes('detector')) {
-                    priority = 'high';
+                if (typeof getAutoPriority === 'function') {
+                    priority = getAutoPriority(title, category);
+                    console.log(`🎯 Auto-priority for "${title}" (${category}): ${priority}`);
+                } else {
+                    // Fallback logic if function not available
+                    if (category === 'Safety' || title.toLowerCase().includes('smoke') || title.toLowerCase().includes('detector')) {
+                        priority = 'high';
+                    }
+                    console.log(`⚠️ Using fallback priority for "${title}": ${priority}`);
                 }
                 
                 const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
