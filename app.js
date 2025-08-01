@@ -1155,6 +1155,12 @@ function finishTaskSetup() {
 
 function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
+
+    // NEW: Hide back arrow when leaving All Tasks
+    const backButton = document.getElementById('back-to-dashboard');
+    if (backButton) {
+        backButton.classList.add('hidden');
+    }
     
     // Ensure global references are current
     window.tasks = tasks;
@@ -1354,6 +1360,11 @@ function showAllTasks() {
     // Show all tasks view
     if (allTasksView) {
         allTasksView.classList.remove('hidden');
+    // NEW: Show back arrow in header
+        const backButton = document.getElementById('back-to-dashboard');
+        if (backButton) {
+            backButton.classList.remove('hidden');
+        }
     } else {
         console.error('❌ All tasks view not found');
         return;
@@ -1425,12 +1436,9 @@ window.tasks.forEach(task => {
                     ${renderAllTaskCategories()}
                 </div>
 
-                <!-- Navigation Buttons -->
-                <div class="flex gap-3 mt-8">
-                    <button onclick="showTab('dashboard')" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition-colors touch-btn">
-                        ← Back to Dashboard
-                    </button>
-                    <button onclick="exportTaskList()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors touch-btn">
+               <!-- Export Button -->
+                <div class="flex justify-center mt-8">
+                    <button onclick="exportTaskList()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors touch-btn">
                         📋 Export Tasks
                     </button>
                 </div>
