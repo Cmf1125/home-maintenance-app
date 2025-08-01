@@ -281,7 +281,7 @@ class EnhancedDashboard {
                             class="task-action-btn bg-green-100 text-green-700 hover:bg-green-200 px-3 py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap">
                         ✅ Complete
                     </button>
-                    <button onclick="rescheduleTaskFromDashboard(${task.id})" 
+                    <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
                             class="task-action-btn bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap">
                         📅 Reschedule
                     </button>
