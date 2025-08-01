@@ -45,10 +45,19 @@
         <div class="bg-white shadow-sm border-b sticky top-0 z-40">
             <div class="px-4 py-4">
                 <div class="flex items-center justify-between">
-                    <div>
-                       <h1 class="text-xl font-bold text-gray-900">The Home Keeper</h1>
-                        <p class="text-sm text-gray-600" id="header-subtitle">Smart home maintenance</p>
+                    <!-- Left side: Back arrow (hidden by default) -->
+                    <div class="flex items-center gap-3">
+                        <button id="back-to-dashboard" onclick="showTab('dashboard')" 
+                                class="hidden text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn" 
+                                title="Back to Dashboard">
+                            ←
+                        </button>
+                        <div>
+                           <h1 class="text-xl font-bold text-gray-900">The Home Keeper</h1>
+                            <p class="text-sm text-gray-600" id="header-subtitle">Smart home maintenance</p>
+                        </div>
                     </div>
+                    <!-- Right side: Home info -->
                     <button onclick="showHomeInfo()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn">🏠</button>
                 </div>
             </div>
