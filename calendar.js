@@ -427,48 +427,15 @@ class CasaCareCalendar {
 }
 
 // Function to reschedule a task (called from calendar)
-// Function to reschedule a task (called from calendar)
 function rescheduleTask(taskId) {
     console.log('📅 Calendar reschedule button clicked for task:', taskId);
     
-    // Make sure the dashboard reschedule function exists
-    if (typeof rescheduleTaskFromDashboard === 'function') {
-        rescheduleTaskFromDashboard(taskId);
-    } else if (typeof window.rescheduleTaskFromDashboard === 'function') {
+    // Use the fixed reschedule function
+    if (typeof window.rescheduleTaskFromDashboard === 'function') {
         window.rescheduleTaskFromDashboard(taskId);
     } else {
-        console.error('❌ Reschedule function not found, using fallback');
-        // Fallback - simple prompt
-        const task = window.tasks.find(t => t.id === taskId);
-        if (!task) {
-            alert('❌ Task not found');
-            return;
-        }
-        
-        const currentDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
-        const newDateStr = prompt(`Reschedule "${task.title}" to (YYYY-MM-DD):`, 
-                                 currentDate.toISOString().split('T')[0]);
-        
-        if (newDateStr) {
-            const newDate = new Date(newDateStr + 'T12:00:00');
-            if (!isNaN(newDate.getTime())) {
-                task.dueDate = newDate;
-                task.nextDue = newDate; // CRITICAL: Calendar sync
-                
-                if (typeof saveData === 'function') {
-                    saveData();
-                }
-                
-                // Refresh calendar
-                if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-                    window.casaCareCalendar.refresh();
-                }
-                
-                alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
-            } else {
-                alert('❌ Invalid date format');
-            }
-        }
+        console.error('❌ Fixed reschedule function not available');
+        alert('❌ Reschedule function not available');
     }
 }
 
