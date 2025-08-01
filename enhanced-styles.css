@@ -190,12 +190,16 @@ input[type="checkbox"]:checked::after {
     display: none !important;
 }
 
-/* Hide Main Header on Dashboard */
-.bg-white.shadow-sm.border-b.sticky,
+/* FIXED: Smart header visibility control */
+body.hide-header .bg-white.shadow-sm.border-b.sticky,
 .header-pro {
     display: none !important;
 }
 
+/* Show header when viewing all tasks */
+body.show-header .bg-white.shadow-sm.border-b.sticky {
+    display: block !important;
+}
 /* Add Home Info Button */
 .gradient-bg {
     position: relative;
