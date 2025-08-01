@@ -87,7 +87,6 @@ window.categoryConfig = categoryConfig;
 
 // Create maintenance plan
 function createMaintenancePlan() {
-   
     
     try {
         // Collect home data
