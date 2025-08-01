@@ -50,6 +50,7 @@ function getClimateRegion(state) {
     }
     return 'GENERAL';
 }
+
 // 👇 ADD THE FUNCTION RIGHT HERE 👇
 function getAutoPriority(title, category) {
     // Safety tasks are always high priority
