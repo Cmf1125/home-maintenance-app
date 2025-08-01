@@ -1156,6 +1156,22 @@ function finishTaskSetup() {
 // FIXED: Enhanced showTab function that respects All Tasks view
 function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
+
+    // 🎯 NEW: Control header visibility based on tab
+    if (tabName === 'dashboard') {
+        document.body.classList.add('hide-header');
+        document.body.classList.remove('show-header');
+    } else {
+        document.body.classList.remove('hide-header');
+        document.body.classList.add('show-header');
+    }
+    
+    // 🎯 EXISTING: Hide back arrow when switching to normal tabs
+    const backButton = document.getElementById('back-to-dashboard');
+    if (backButton) {
+        backButton.classList.add('hidden');
+        backButton.style.display = 'none';
+    }
     
     // 🎯 CRITICAL FIX: Only hide back arrow if we're actually switching away from All Tasks
     const allTasksView = document.getElementById('all-tasks-view');
@@ -1331,6 +1347,10 @@ function showTab(tabName) {
 function showAllTasks() {
     console.log('📋 Switching to All Tasks view...');
     
+    // 🎯 NEW: Show header for All Tasks view
+    document.body.classList.remove('hide-header');
+    document.body.classList.add('show-header');
+    
     // Hide all other views (including dashboard)
     const dashboardView = document.getElementById('dashboard-view');
     const calendarView = document.getElementById('calendar-view');
@@ -1347,26 +1367,19 @@ function showAllTasks() {
     if (allTasksView) {
         allTasksView.classList.remove('hidden');
         
-        // 🎯 ENHANCED: Show back arrow with delay to ensure it sticks
+        // Show back arrow
         setTimeout(() => {
             const backButton = document.getElementById('back-to-dashboard');
             console.log('🔍 Looking for back button...', !!backButton);
             
             if (backButton) {
-                console.log('🔍 Back button classes before:', backButton.className);
-                
-                // Remove hidden class and force visibility
                 backButton.classList.remove('hidden');
                 backButton.style.display = 'flex';
                 backButton.style.visibility = 'visible';
                 backButton.style.opacity = '1';
-                
-                console.log('🔍 Back button classes after:', backButton.className);
                 console.log('✅ Back arrow should now be visible!');
-            } else {
-                console.error('❌ Back button element not found in DOM');
             }
-        }, 50); // Small delay to ensure DOM updates are complete
+        }, 50);
         
     } else {
         console.error('❌ All tasks view not found');
@@ -1382,7 +1395,7 @@ function showAllTasks() {
     // Render the content
     renderAllTasksView();
     
-    console.log('✅ All Tasks view displayed with back arrow');
+    console.log('✅ All Tasks view displayed with header and back arrow');
 }
 
 // Add a debug function to check view states
