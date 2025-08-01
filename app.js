@@ -1153,36 +1153,39 @@ function finishTaskSetup() {
 // Enhanced showTab function with better error handling
 // In your app.js, find the showTab function and make it look like this:
 
+// FIXED: Enhanced showTab function that respects All Tasks view
 function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
     
-   // DEBUG: Hide back arrow when leaving All Tasks
-    console.log('🔍 Hiding back arrow...');
-    const backButton = document.getElementById('back-to-dashboard');
-    console.log('🔍 Back button found for hiding:', !!backButton);
+    // 🎯 CRITICAL FIX: Only hide back arrow if we're actually switching away from All Tasks
+    const allTasksView = document.getElementById('all-tasks-view');
+    const isLeavingAllTasks = allTasksView && !allTasksView.classList.contains('hidden');
     
-    if (backButton) {
-        backButton.classList.add('hidden');
-        backButton.style.display = 'none';
-        console.log('✅ Back arrow hidden');
+    if (isLeavingAllTasks) {
+        console.log('🔍 Leaving All Tasks view - hiding back arrow...');
+        const backButton = document.getElementById('back-to-dashboard');
+        if (backButton) {
+            backButton.classList.add('hidden');
+            backButton.style.display = 'none';
+            console.log('✅ Back arrow hidden when leaving All Tasks');
+        }
     }
     
     // Ensure global references are current
     window.tasks = tasks;
     window.homeData = homeData;
     
-    // Hide ALL views including All Tasks (THIS WAS MISSING!)
+    // Hide ALL views including All Tasks
     const dashboardView = document.getElementById('dashboard-view');
     const calendarView = document.getElementById('calendar-view');
     const documentsView = document.getElementById('documents-view');
     const appliancesView = document.getElementById('appliances-view');
-    const allTasksView = document.getElementById('all-tasks-view'); // ← ADDED THIS!
 
     if (dashboardView) dashboardView.classList.add('hidden');
     if (calendarView) calendarView.classList.add('hidden');
     if (documentsView) documentsView.classList.add('hidden');
     if (appliancesView) appliancesView.classList.add('hidden');
-    if (allTasksView) allTasksView.classList.add('hidden'); // ← ADDED THIS!
+    if (allTasksView) allTasksView.classList.add('hidden'); // This is important!
     
     // Update tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1321,7 +1324,65 @@ function showTab(tabName) {
         }
     }
     
-    console.log(`✅ Switched to ${tabName} tab (All Tasks properly hidden)`);
+    console.log(`✅ Switched to ${tabName} tab`);
+}
+
+// 🎯 ENHANCED: showAllTasks function with better back arrow handling
+function showAllTasks() {
+    console.log('📋 Switching to All Tasks view...');
+    
+    // Hide all other views (including dashboard)
+    const dashboardView = document.getElementById('dashboard-view');
+    const calendarView = document.getElementById('calendar-view');
+    const documentsView = document.getElementById('documents-view');
+    const appliancesView = document.getElementById('appliances-view');
+    const allTasksView = document.getElementById('all-tasks-view');
+
+    if (dashboardView) dashboardView.classList.add('hidden');
+    if (calendarView) calendarView.classList.add('hidden');
+    if (documentsView) documentsView.classList.add('hidden');
+    if (appliancesView) appliancesView.classList.add('hidden');
+    
+    // Show all tasks view
+    if (allTasksView) {
+        allTasksView.classList.remove('hidden');
+        
+        // 🎯 ENHANCED: Show back arrow with delay to ensure it sticks
+        setTimeout(() => {
+            const backButton = document.getElementById('back-to-dashboard');
+            console.log('🔍 Looking for back button...', !!backButton);
+            
+            if (backButton) {
+                console.log('🔍 Back button classes before:', backButton.className);
+                
+                // Remove hidden class and force visibility
+                backButton.classList.remove('hidden');
+                backButton.style.display = 'flex';
+                backButton.style.visibility = 'visible';
+                backButton.style.opacity = '1';
+                
+                console.log('🔍 Back button classes after:', backButton.className);
+                console.log('✅ Back arrow should now be visible!');
+            } else {
+                console.error('❌ Back button element not found in DOM');
+            }
+        }, 50); // Small delay to ensure DOM updates are complete
+        
+    } else {
+        console.error('❌ All tasks view not found');
+        return;
+    }
+    
+    // Update tab styling to show no tab is selected
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-blue-100', 'text-blue-700');
+        btn.classList.add('text-gray-600');
+    });
+    
+    // Render the content
+    renderAllTasksView();
+    
+    console.log('✅ All Tasks view displayed with back arrow');
 }
 
 // Add a debug function to check view states
