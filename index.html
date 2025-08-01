@@ -41,27 +41,55 @@
     </div>
 </div>
     <div id="app">
-        <!-- Header -->
-        <div class="bg-white shadow-sm border-b sticky top-0 z-40">
-            <div class="px-4 py-4">
-                <div class="flex items-center justify-between">
-                    <!-- Left side: Back arrow (hidden by default) -->
-                    <div class="flex items-center gap-3">
-                        <button id="back-to-dashboard" onclick="showTab('dashboard')" 
-                                class="hidden text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn" 
-                                title="Back to Dashboard">
-                            ←
+<!-- Header -->
+<div class="bg-white shadow-sm border-b sticky top-0 z-40">
+    <div class="px-4 py-4">
+        <div class="flex items-center justify-between">
+            <!-- Left side: Back arrow (hidden by default) -->
+            <div class="flex items-center gap-3">
+                <button id="back-to-dashboard" onclick="showTab('dashboard')" 
+                        class="hidden text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn" 
+                        title="Back to Dashboard">
+                    ←
+                </button>
+                <div>
+                   <h1 class="text-xl font-bold text-gray-900">The Home Keeper</h1>
+                    <p class="text-sm text-gray-600" id="header-subtitle">Smart home maintenance</p>
+                </div>
+            </div>
+            
+            <!-- Right side: Settings Dropdown -->
+            <div class="relative">
+                <button id="settings-btn" onclick="toggleSettingsDropdown()" 
+                        class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn relative">
+                    ⚙️
+                </button>
+                
+                <!-- Settings Dropdown Menu -->
+                <div id="settings-dropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                    <div class="py-2">
+                        <button onclick="showHomeInfo(); closeSettingsDropdown()" 
+                                class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
+                            <span>🏠</span>
+                            <span>Home Info</span>
                         </button>
-                        <div>
-                           <h1 class="text-xl font-bold text-gray-900">The Home Keeper</h1>
-                            <p class="text-sm text-gray-600" id="header-subtitle">Smart home maintenance</p>
-                        </div>
+                        <button onclick="exportTaskList(); closeSettingsDropdown()" 
+                                class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
+                            <span>📋</span>
+                            <span>Export Tasks</span>
+                        </button>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <button onclick="clearData(); closeSettingsDropdown()" 
+                                class="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 flex items-center gap-3">
+                            <span>🗑️</span>
+                            <span>Reset App</span>
+                        </button>
                     </div>
-                    <!-- Right side: Home info -->
-                    <button onclick="showHomeInfo()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn">🏠</button>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
         <!-- Simplified Setup Form -->
         <div id="setup-form" class="p-4 main-content">
@@ -399,7 +427,7 @@
         </div>
     </div>
 
-           <!-- Bottom Navigation -->
+<!-- Bottom Navigation - Simplified -->
 <div class="bottom-nav">
     <div class="grid grid-cols-4 gap-1 p-2">
         <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn flex flex-col items-center p-3 rounded-lg bg-blue-100 text-blue-700 touch-btn">
@@ -419,16 +447,8 @@
             <div class="text-xs">Documents</div>
         </button>
     </div>
-    
-   <!-- Simplified bottom actions -->
-    <div class="px-2 pb-2">
-        <button onclick="clearData()" class="w-full tab-btn flex items-center justify-center p-3 rounded-lg text-red-600 hover:text-red-800 touch-btn text-sm">
-            🗑️ Reset App
-        </button>
-    </div>
 </div>
-        </div>
-    </div>
+            
  <!-- Task Edit Modal -->
         <div id="task-edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
@@ -1182,6 +1202,43 @@
         
         console.log('✅ NEW working reschedule modal created and ready!');
     </script>
+
+    <!-- Settings Dropdown Functions -->
+    <script>
+        // Settings Dropdown Functions
+        function toggleSettingsDropdown() {
+            const dropdown = document.getElementById('settings-dropdown');
+            const isHidden = dropdown.classList.contains('hidden');
+            
+            if (isHidden) {
+                dropdown.classList.remove('hidden');
+                // Close dropdown when clicking outside
+                setTimeout(() => {
+                    document.addEventListener('click', closeSettingsOnClickOutside);
+                }, 100);
+            } else {
+                closeSettingsDropdown();
+            }
+        }
+
+        function closeSettingsDropdown() {
+            const dropdown = document.getElementById('settings-dropdown');
+            dropdown.classList.add('hidden');
+            document.removeEventListener('click', closeSettingsOnClickOutside);
+        }
+
+        function closeSettingsOnClickOutside(event) {
+            const dropdown = document.getElementById('settings-dropdown');
+            const settingsBtn = document.getElementById('settings-btn');
+            
+            if (!dropdown.contains(event.target) && !settingsBtn.contains(event.target)) {
+                closeSettingsDropdown();
+            }
+        }
+
+        // Make functions globally available
+        window.toggleSettingsDropdown = toggleSettingsDropdown;
+        window.closeSettingsDropdown = closeSettingsDropdown;
+    </script>
 </body>
 </html>
-
