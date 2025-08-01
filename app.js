@@ -1366,7 +1366,7 @@ function showAllTasks() {
     if (allTasksView) {
         allTasksView.classList.remove('hidden');
         
-        // DEBUG: Show back arrow in header
+       // AGGRESSIVE: Show back arrow in header
         console.log('🔍 Looking for back button...');
         const backButton = document.getElementById('back-to-dashboard');
         console.log('🔍 Back button found:', !!backButton);
@@ -1375,8 +1375,17 @@ function showAllTasks() {
             console.log('🔍 Back button classes before:', backButton.className);
             backButton.classList.remove('hidden');
             console.log('🔍 Back button classes after:', backButton.className);
-            backButton.style.display = 'block';
-            console.log('✅ Back arrow should now be visible');
+            
+            // FORCE show with multiple methods
+            backButton.style.display = 'flex';
+            backButton.style.visibility = 'visible';
+            backButton.style.opacity = '1';
+            backButton.style.fontSize = '1.5rem';
+            backButton.style.padding = '0.5rem';
+            backButton.style.backgroundColor = '#f3f4f6';
+            backButton.style.border = '1px solid #000';
+            
+            console.log('✅ Back arrow FORCED to be visible');
         } else {
             console.error('❌ Back button element not found in DOM');
         }
