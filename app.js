@@ -1874,17 +1874,38 @@ function addTaskFromDashboard() {
     if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
         window.casaCareCalendar.refresh();
     }
-
-    // NEW: Refresh All Tasks view if it's currently visible
+    
+    // ENHANCED DEBUG: Refresh All Tasks view if it's currently visible
+    console.log('🔍 DEBUG: Checking if All Tasks view needs refresh...');
+    
     const allTasksView = document.getElementById('all-tasks-view');
-    if (allTasksView && !allTasksView.classList.contains('hidden')) {
-        console.log('🔄 Refreshing All Tasks view after adding task...');
-        setTimeout(() => {
-            if (typeof renderAllTasksView === 'function') {
-                renderAllTasksView();
-                console.log('✅ All Tasks view refreshed');
-            }
-        }, 100);
+    console.log('🔍 All Tasks view element found:', !!allTasksView);
+    
+    if (allTasksView) {
+        const hasHiddenClass = allTasksView.classList.contains('hidden');
+        const computedDisplay = window.getComputedStyle(allTasksView).display;
+        const isVisible = !hasHiddenClass && computedDisplay !== 'none';
+        
+        console.log('🔍 All Tasks view has hidden class:', hasHiddenClass);
+        console.log('🔍 All Tasks view computed display:', computedDisplay);
+        console.log('🔍 All Tasks view is visible:', isVisible);
+        console.log('🔍 renderAllTasksView function exists:', typeof renderAllTasksView === 'function');
+        
+        if (!hasHiddenClass) {
+            console.log('🔄 Refreshing All Tasks view after adding task...');
+            setTimeout(() => {
+                if (typeof renderAllTasksView === 'function') {
+                    renderAllTasksView();
+                    console.log('✅ All Tasks view refreshed');
+                } else {
+                    console.error('❌ renderAllTasksView function not found!');
+                }
+            }, 100);
+        } else {
+            console.log('⏭️ All Tasks view is hidden, skipping refresh');
+        }
+    } else {
+        console.error('❌ All Tasks view element not found!');
     }
     
     console.log('✅ New task added:', newTask);
