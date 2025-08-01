@@ -905,196 +905,251 @@ alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
        console.log('✅ Task system override loaded (cleaned up version)');
     </script>
 
-  <!-- AGGRESSIVE FIX for Date Picker Modal -->
+  <!-- WORKING MODAL SOLUTION -->
     <script>
-        console.log('🔧 Loading AGGRESSIVE date picker modal fixes...');
+        console.log('🔧 Creating NEW working reschedule modal...');
         
-        // Function to debug modal visibility
-        function debugModal() {
-            const modal = document.getElementById('date-picker-modal');
-            if (modal) {
-                const styles = window.getComputedStyle(modal);
-                console.log('🔍 Modal debug info:');
-                console.log('  - display:', styles.display);
-                console.log('  - visibility:', styles.visibility);
-                console.log('  - opacity:', styles.opacity);
-                console.log('  - z-index:', styles.zIndex);
-                console.log('  - position:', styles.position);
-                console.log('  - classes:', modal.className);
-                console.log('  - style attribute:', modal.style.cssText);
-            }
+        // Create a completely new, simple modal that definitely works
+        function createWorkingRescheduleModal() {
+            // Remove any existing working modal
+            const existing = document.getElementById('working-reschedule-modal');
+            if (existing) existing.remove();
+            
+            // Create new modal HTML
+            const modalHTML = `
+                <div id="working-reschedule-modal" style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: none;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 99999;
+                    font-family: Inter, sans-serif;
+                ">
+                    <div style="
+                        background: white;
+                        border-radius: 12px;
+                        padding: 24px;
+                        max-width: 400px;
+                        width: 90%;
+                        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                    ">
+                        <div style="text-align: center; margin-bottom: 24px;">
+                            <h3 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 600;">📅 Reschedule Task</h3>
+                            <p id="working-task-name" style="margin: 0; color: #666; font-size: 14px;"></p>
+                        </div>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 14px;">Current Due Date</label>
+                            <div id="working-current-date" style="padding: 12px; background: #f3f4f6; border-radius: 8px; font-weight: 600;"></div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 14px;">New Due Date</label>
+                            <input type="date" id="working-new-date" style="
+                                width: 100%;
+                                padding: 12px;
+                                border: 2px solid #e5e7eb;
+                                border-radius: 8px;
+                                font-size: 16px;
+                                box-sizing: border-box;
+                            ">
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 14px;">Quick Options</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                <button onclick="setWorkingQuickDate(1)" style="
+                                    padding: 8px 12px;
+                                    background: #dbeafe;
+                                    color: #1e40af;
+                                    border: none;
+                                    border-radius: 6px;
+                                    font-size: 13px;
+                                    cursor: pointer;
+                                ">Tomorrow</button>
+                                <button onclick="setWorkingQuickDate(7)" style="
+                                    padding: 8px 12px;
+                                    background: #dcfce7;
+                                    color: #166534;
+                                    border: none;
+                                    border-radius: 6px;
+                                    font-size: 13px;
+                                    cursor: pointer;
+                                ">Next Week</button>
+                                <button onclick="setWorkingQuickDate(30)" style="
+                                    padding: 8px 12px;
+                                    background: #fef3c7;
+                                    color: #92400e;
+                                    border: none;
+                                    border-radius: 6px;
+                                    font-size: 13px;
+                                    cursor: pointer;
+                                ">Next Month</button>
+                                <button onclick="setWorkingQuickDate(90)" style="
+                                    padding: 8px 12px;
+                                    background: #f3e8ff;
+                                    color: #7c3aed;
+                                    border: none;
+                                    border-radius: 6px;
+                                    font-size: 13px;
+                                    cursor: pointer;
+                                ">3 Months</button>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px;">
+                            <button onclick="closeWorkingModal()" style="
+                                flex: 1;
+                                padding: 12px;
+                                background: #f3f4f6;
+                                color: #374151;
+                                border: none;
+                                border-radius: 8px;
+                                font-weight: 500;
+                                cursor: pointer;
+                            ">Cancel</button>
+                            <button onclick="confirmWorkingReschedule()" style="
+                                flex: 1;
+                                padding: 12px;
+                                background: #2563eb;
+                                color: white;
+                                border: none;
+                                border-radius: 8px;
+                                font-weight: 500;
+                                cursor: pointer;
+                            ">📅 Reschedule</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add to page
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
         }
         
-        // AGGRESSIVE reschedule function
+        // Main reschedule function using new modal
         window.rescheduleTaskFromDashboard = function(taskId) {
-            console.log('📅 FIXED: Rescheduling task from dashboard:', taskId);
+            console.log('📅 Opening WORKING reschedule modal for task:', taskId);
             
             const task = window.tasks.find(t => t.id === taskId);
             if (!task) {
                 console.error('❌ Task not found:', taskId);
                 return;
             }
-
-            // Store the task
+            
+            // Store current task
             window.currentRescheduleTask = task;
             
-            // Get ALL modal elements
-            const datePickerModal = document.getElementById('date-picker-modal');
-            const taskNameElement = document.getElementById('reschedule-task-name');
-            const currentDueDateElement = document.getElementById('current-due-date');
-            const newDueDateInput = document.getElementById('new-due-date');
+            // Ensure modal exists
+            createWorkingRescheduleModal();
             
-            if (!datePickerModal || !taskNameElement || !currentDueDateElement || !newDueDateInput) {
-                console.error('❌ Date picker modal elements missing');
-                debugModal();
-                alert('❌ Date picker not available - check console');
-                return;
-            }
+            // Get modal and elements
+            const modal = document.getElementById('working-reschedule-modal');
+            const taskNameEl = document.getElementById('working-task-name');
+            const currentDateEl = document.getElementById('working-current-date');
+            const newDateEl = document.getElementById('working-new-date');
             
-            console.log('✅ All date picker elements found, setting up modal...');
+            // Set content
+            taskNameEl.textContent = `"${task.title}"`;
             
-            // AGGRESSIVELY hide any other modals first
-            document.querySelectorAll('.fixed.inset-0').forEach(modal => {
-                if (modal.id !== 'date-picker-modal') {
-                    modal.classList.add('hidden');
-                    modal.style.display = 'none';
-                }
-            });
-            
-            // Set task info
-            taskNameElement.textContent = `"${task.title}"`;
-            
-            // Set current due date
             const currentDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
-            currentDueDateElement.textContent = currentDate.toLocaleDateString('en-US', {
+            currentDateEl.textContent = currentDate.toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             });
             
-            // Set default new date
-            newDueDateInput.value = currentDate.toISOString().split('T')[0];
+            newDateEl.value = currentDate.toISOString().split('T')[0];
             
-            // AGGRESSIVELY FORCE SHOW the modal
-            console.log('🚀 FORCING modal to show...');
-            
-            // Remove ALL hiding classes and attributes
-            datePickerModal.classList.remove('hidden');
-            datePickerModal.removeAttribute('hidden');
-            
-            // FORCE all display properties
-            datePickerModal.style.display = 'flex !important';
-            datePickerModal.style.visibility = 'visible !important';
-            datePickerModal.style.opacity = '1 !important';
-            datePickerModal.style.zIndex = '99999 !important';
-            datePickerModal.style.position = 'fixed !important';
-            datePickerModal.style.top = '0 !important';
-            datePickerModal.style.left = '0 !important';
-            datePickerModal.style.right = '0 !important';
-            datePickerModal.style.bottom = '0 !important';
-            datePickerModal.style.backgroundColor = 'rgba(0, 0, 0, 0.5) !important';
-            
-            // Debug what happened
-            debugModal();
+            // SHOW the modal
+            modal.style.display = 'flex';
             
             // Focus on date input
             setTimeout(() => {
-                newDueDateInput.focus();
-                console.log('📅 Date picker modal SHOULD NOW BE VISIBLE!');
-                
-                // Final check
-                const isVisible = datePickerModal.offsetWidth > 0 && datePickerModal.offsetHeight > 0;
-                console.log('👁️ Modal actually visible:', isVisible);
-                
-                if (!isVisible) {
-                    console.error('❌ MODAL STILL NOT VISIBLE - USING FALLBACK');
-                    alert('❌ Modal not showing - using simple prompt instead');
-                    
-                    // Fallback to prompt
-                    const newDateStr = prompt(`Reschedule "${task.title}" to (YYYY-MM-DD):`, 
-                                             currentDate.toISOString().split('T')[0]);
-                    
-                    if (newDateStr) {
-                        const newDate = new Date(newDateStr + 'T12:00:00');
-                        if (!isNaN(newDate.getTime())) {
-                            task.dueDate = newDate;
-                            task.nextDue = newDate;
-                            
-                            if (typeof saveData === 'function') saveData();
-                            if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
-                            if (window.casaCareCalendar?.refresh) window.casaCareCalendar.refresh();
-                            
-                            alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
-                        }
-                    }
-                }
-            }, 200);
+                newDateEl.focus();
+                console.log('✅ Working modal should now be visible!');
+            }, 100);
         };
         
-        // Enhanced close function
-        window.closeDatePickerModal = function() {
-            console.log('📅 Closing date picker modal...');
-            const modal = document.getElementById('date-picker-modal');
-            if (modal) {
-                modal.classList.add('hidden');
-                modal.style.display = 'none';
-                modal.style.visibility = 'hidden';
-                modal.style.opacity = '0';
-            }
-            window.currentRescheduleTask = null;
-            console.log('✅ Date picker modal closed');
-        };
-        
-        // Quick date function
-        window.setQuickDate = function(daysFromNow) {
-            const newDueDateInput = document.getElementById('new-due-date');
-            if (!newDueDateInput) return;
+        // Quick date setter for new modal
+        window.setWorkingQuickDate = function(daysFromNow) {
+            const newDateEl = document.getElementById('working-new-date');
+            if (!newDateEl) return;
             
             const newDate = new Date();
             newDate.setDate(newDate.getDate() + daysFromNow);
-            newDueDateInput.value = newDate.toISOString().split('T')[0];
+            newDateEl.value = newDate.toISOString().split('T')[0];
             
             // Visual feedback
-            newDueDateInput.style.backgroundColor = '#dbeafe';
-            setTimeout(() => newDueDateInput.style.backgroundColor = '', 300);
+            newDateEl.style.background = '#dbeafe';
+            setTimeout(() => newDateEl.style.background = '', 300);
         };
         
-        // Confirm reschedule function
-        window.confirmReschedule = function() {
+        // Close working modal
+        window.closeWorkingModal = function() {
+            const modal = document.getElementById('working-reschedule-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            window.currentRescheduleTask = null;
+        };
+        
+        // Confirm reschedule with new modal
+        window.confirmWorkingReschedule = function() {
             if (!window.currentRescheduleTask) {
                 alert('❌ No task selected');
                 return;
             }
             
-            const newDueDateInput = document.getElementById('new-due-date');
-            if (!newDueDateInput?.value) {
+            const newDateEl = document.getElementById('working-new-date');
+            if (!newDateEl?.value) {
                 alert('❌ Please select a new due date');
                 return;
             }
             
-            const newDate = new Date(newDueDateInput.value + 'T12:00:00');
+            const newDate = new Date(newDateEl.value + 'T12:00:00');
             if (isNaN(newDate.getTime())) {
                 alert('❌ Invalid date');
                 return;
             }
             
+            const taskTitle = window.currentRescheduleTask.title;
+            
             // Update task
             window.currentRescheduleTask.dueDate = newDate;
-            window.currentRescheduleTask.nextDue = newDate;
+            window.currentRescheduleTask.nextDue = newDate; // Calendar sync
+            
+            console.log('✅ Task updated:', taskTitle, 'to', newDate.toLocaleDateString());
             
             // Save and refresh
-            if (typeof saveData === 'function') saveData();
-            if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
-            if (window.casaCareCalendar?.refresh) window.casaCareCalendar.refresh();
+            if (typeof saveData === 'function') {
+                saveData();
+                console.log('💾 Data saved');
+            }
             
-            // Close and notify
-            window.closeDatePickerModal();
-            alert(`✅ "${window.currentRescheduleTask.title}" rescheduled to ${newDate.toLocaleDateString()}`);
+            if (window.enhancedDashboard?.render) {
+                window.enhancedDashboard.render();
+                console.log('🔄 Dashboard refreshed');
+            }
+            
+            if (window.casaCareCalendar?.refresh) {
+                window.casaCareCalendar.refresh();
+                console.log('📅 Calendar refreshed');
+            }
+            
+            // Close modal and show success
+            window.closeWorkingModal();
+            alert(`✅ "${taskTitle}" rescheduled to ${newDate.toLocaleDateString()}`);
         };
         
-        console.log('✅ AGGRESSIVE date picker modal fixes loaded');
-    </script> 
+        console.log('✅ NEW working reschedule modal created and ready!');
+    </script>
 </body>
 </html>
 
