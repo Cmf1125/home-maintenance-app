@@ -270,7 +270,10 @@ class EnhancedDashboard {
                     <div class="flex items-start gap-3 mb-2">
                         <span class="text-lg mt-0.5 flex-shrink-0">${urgencyDot}</span>
                         <div class="flex-1 min-w-0">
-                            <h4 class="font-semibold text-gray-900 text-sm leading-tight">${task.title}</h4>
+                           <h4 class="font-semibold text-gray-900 text-sm leading-tight">
+                                ${task.title}
+                                ${isSafetyTask ? '<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-medium ml-2">🟠 Safety</span>' : ''}
+                            </h4>
                             <p class="text-xs text-gray-600 mt-1 leading-relaxed">${task.description}</p>
                         </div>
                         <div class="text-right text-xs flex-shrink-0">
