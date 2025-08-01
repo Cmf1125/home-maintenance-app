@@ -65,12 +65,6 @@ function getAutoPriority(title, category) {
     // Everything else is normal priority
     return 'normal';
 }
-// Add this right after your getAutoPriority function in app.js:
-
-function getAutoPriority(title, category) {
-    // ... your existing getAutoPriority code ...
-    return 'normal';
-}
 
 // Global category configuration (shared between setup and dashboard)
 const categoryConfig = {
@@ -1166,13 +1160,6 @@ function showTab(tabName) {
         document.body.classList.add('show-header');
     }
     
-    // 🎯 EXISTING: Hide back arrow when switching to normal tabs
-    const backButton = document.getElementById('back-to-dashboard');
-    if (backButton) {
-        backButton.classList.add('hidden');
-        backButton.style.display = 'none';
-    }
-    
     // 🎯 CRITICAL FIX: Only hide back arrow if we're actually switching away from All Tasks
     const allTasksView = document.getElementById('all-tasks-view');
     const isLeavingAllTasks = allTasksView && !allTasksView.classList.contains('hidden');
@@ -1201,7 +1188,7 @@ function showTab(tabName) {
     if (calendarView) calendarView.classList.add('hidden');
     if (documentsView) documentsView.classList.add('hidden');
     if (appliancesView) appliancesView.classList.add('hidden');
-    if (allTasksView) allTasksView.classList.add('hidden'); // This is important!
+    if (allTasksView) allTasksView.classList.add('hidden');
     
     // Update tab buttons
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1396,88 +1383,6 @@ function showAllTasks() {
     renderAllTasksView();
     
     console.log('✅ All Tasks view displayed with header and back arrow');
-}
-
-// Add a debug function to check view states
-window.debugViewStates = function() {
-    console.log('🔍 CURRENT VIEW STATES:');
-    const views = ['dashboard-view', 'calendar-view', 'documents-view', 'appliances-view', 'all-tasks-view'];
-    
-    views.forEach(viewId => {
-        const element = document.getElementById(viewId);
-        if (element) {
-            const isHidden = element.classList.contains('hidden');
-            const displayStyle = element.style.display;
-            const computedDisplay = window.getComputedStyle(element).display;
-            
-            console.log(`${viewId}:`);
-            console.log(`  - has 'hidden' class: ${isHidden}`);
-            console.log(`  - style.display: "${displayStyle}"`);
-            console.log(`  - computed display: "${computedDisplay}"`);
-            console.log(`  - effectively visible: ${computedDisplay !== 'none' && !isHidden}`);
-        } else {
-            console.log(`${viewId}: NOT FOUND`);
-        }
-    });
-};
-
-function showAllTasks() {
-    console.log('📋 Switching to All Tasks view...');
-    
-    // Hide all other views (including dashboard)
-    const dashboardView = document.getElementById('dashboard-view');
-    const calendarView = document.getElementById('calendar-view');
-    const documentsView = document.getElementById('documents-view');
-    const appliancesView = document.getElementById('appliances-view');
-    const allTasksView = document.getElementById('all-tasks-view');
-
-    if (dashboardView) dashboardView.classList.add('hidden');
-    if (calendarView) calendarView.classList.add('hidden');
-    if (documentsView) documentsView.classList.add('hidden');
-    if (appliancesView) appliancesView.classList.add('hidden');
-    
-    // Show all tasks view
-    if (allTasksView) {
-        allTasksView.classList.remove('hidden');
-        
-       // AGGRESSIVE: Show back arrow in header
-        console.log('🔍 Looking for back button...');
-        const backButton = document.getElementById('back-to-dashboard');
-        console.log('🔍 Back button found:', !!backButton);
-        
-        if (backButton) {
-            console.log('🔍 Back button classes before:', backButton.className);
-            backButton.classList.remove('hidden');
-            console.log('🔍 Back button classes after:', backButton.className);
-            
-            // FORCE show with multiple methods
-            backButton.style.display = 'flex';
-            backButton.style.visibility = 'visible';
-            backButton.style.opacity = '1';
-            backButton.style.fontSize = '1.5rem';
-            backButton.style.padding = '0.5rem';
-            backButton.style.backgroundColor = '#f3f4f6';
-            backButton.style.border = '1px solid #000';
-            
-            console.log('✅ Back arrow FORCED to be visible');
-        } else {
-            console.error('❌ Back button element not found in DOM');
-        }
-    } else {
-        console.error('❌ All tasks view not found');
-        return;
-    }
-    
-    // Update tab styling
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-blue-100', 'text-blue-700');
-        btn.classList.add('text-gray-600');
-    });
-    
-    // Render the content
-    renderAllTasksView();
-    
-    console.log('✅ All Tasks view displayed');
 }
 
 function renderAllTasksView() {
