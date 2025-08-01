@@ -1155,11 +1155,16 @@ function finishTaskSetup() {
 
 function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
-
-    // NEW: Hide back arrow when leaving All Tasks
+    
+   // DEBUG: Hide back arrow when leaving All Tasks
+    console.log('🔍 Hiding back arrow...');
     const backButton = document.getElementById('back-to-dashboard');
+    console.log('🔍 Back button found for hiding:', !!backButton);
+    
     if (backButton) {
         backButton.classList.add('hidden');
+        backButton.style.display = 'none';
+        console.log('✅ Back arrow hidden');
     }
     
     // Ensure global references are current
@@ -1352,7 +1357,7 @@ function showAllTasks() {
     const appliancesView = document.getElementById('appliances-view');
     const allTasksView = document.getElementById('all-tasks-view');
 
-    if (dashboardView) dashboardView.classList.add('hidden');  // ← THE FIX: Hide dashboard!
+    if (dashboardView) dashboardView.classList.add('hidden');
     if (calendarView) calendarView.classList.add('hidden');
     if (documentsView) documentsView.classList.add('hidden');
     if (appliancesView) appliancesView.classList.add('hidden');
@@ -1360,10 +1365,23 @@ function showAllTasks() {
     // Show all tasks view
     if (allTasksView) {
         allTasksView.classList.remove('hidden');
-    // NEW: Show back arrow in header
+        
+        // DEBUG: Show back arrow in header
+        console.log('🔍 Looking for back button...');
         const backButton = document.getElementById('back-to-dashboard');
+        console.log('🔍 Back button found:', !!backButton);
+        
         if (backButton) {
+            console.log('🔍 Back button classes before:', backButton.className);
             backButton.classList.remove('hidden');
+            console.log('🔍 Back button classes after:', backButton.className);
+            console.log('🔍 Back button style display:', backButton.style.display);
+            
+            // Force show if still hidden
+            backButton.style.display = 'block';
+            console.log('✅ Back arrow should now be visible');
+        } else {
+            console.error('❌ Back button element not found in DOM');
         }
     } else {
         console.error('❌ All tasks view not found');
@@ -1381,7 +1399,6 @@ function showAllTasks() {
     
     console.log('✅ All Tasks view displayed');
 }
-
 function renderAllTasksView() {
     const allTasksView = document.getElementById('all-tasks-view');
     if (!allTasksView) {
