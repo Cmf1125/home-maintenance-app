@@ -1874,6 +1874,18 @@ function addTaskFromDashboard() {
     if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
         window.casaCareCalendar.refresh();
     }
+
+    // NEW: Refresh All Tasks view if it's currently visible
+    const allTasksView = document.getElementById('all-tasks-view');
+    if (allTasksView && !allTasksView.classList.contains('hidden')) {
+        console.log('🔄 Refreshing All Tasks view after adding task...');
+        setTimeout(() => {
+            if (typeof renderAllTasksView === 'function') {
+                renderAllTasksView();
+                console.log('✅ All Tasks view refreshed');
+            }
+        }, 100);
+    }
     
     console.log('✅ New task added:', newTask);
     alert(`✅ Task "${title}" added successfully!`);
