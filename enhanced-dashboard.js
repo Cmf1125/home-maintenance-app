@@ -212,18 +212,31 @@ class EnhancedDashboard {
     const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
     const isOverdue = daysUntilDue < 0;
     
-    // Simplified status styling - focus on urgency, not arbitrary priority
+    // Enhanced Safety task detection (same as All Tasks)
+    const isSafetyTask = task.category === 'Safety' || task.priority === 'high' || 
+                        task.title.toLowerCase().includes('smoke') || 
+                        task.title.toLowerCase().includes('detector') ||
+                        task.title.toLowerCase().includes('fire') ||
+                        task.title.toLowerCase().includes('carbon');
+    
+    // Debug log for Dashboard Safety tasks
+    if (isSafetyTask) {
+        console.log(`🟠 Dashboard Safety task: "${task.title}" (category: ${task.category}, priority: ${task.priority})`);
+    }
+    
+    // Enhanced status styling with proper Safety priority
     let statusClass = 'bg-white';
     let urgencyDot = '⚪';
     
     if (isOverdue) {
         statusClass = 'bg-red-50 border-l-4 border-red-400';
         urgencyDot = '🔴';
-    } else if (daysUntilDue <= 7) {
+    } else if (isSafetyTask) {
         statusClass = 'bg-orange-50 border-l-4 border-orange-400';
+        urgencyDot = '🟠';
+    } else if (daysUntilDue <= 7) {
+        statusClass = 'bg-yellow-50 border-l-4 border-yellow-400';
         urgencyDot = '🟡';
-    } else if (task.category === 'Safety') {
-        urgencyDot = '🟠'; // Safety tasks get orange dot even when not due soon
     }
     
     // Clean due date display
