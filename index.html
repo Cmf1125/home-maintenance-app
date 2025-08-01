@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -813,19 +813,22 @@
                 this.saveAndRefresh();
                 this.close();
                 
-if (window.editingFromAllTasks) {
-    console.log('🔄 Refreshing All Tasks view after edit...');
-    setTimeout(() => {
-        if (typeof renderAllTasksView === 'function') {
-            renderAllTasksView();
-            console.log('✅ All Tasks view refreshed');
-        }
-        window.editingFromAllTasks = false;
-    }, 100);
-}
+                // ENHANCED: Refresh All Tasks view for both edits AND new tasks
+                const allTasksView = document.getElementById('all-tasks-view');
+                const isAllTasksVisible = allTasksView && !allTasksView.classList.contains('hidden');
+                
+                if (window.editingFromAllTasks || isAllTasksVisible) {
+                    console.log('🔄 Refreshing All Tasks view after task save...');
+                    setTimeout(() => {
+                        if (typeof renderAllTasksView === 'function') {
+                            renderAllTasksView();
+                            console.log('✅ All Tasks view refreshed after TaskManager save');
+                        }
+                        window.editingFromAllTasks = false;
+                    }, 100);
+                }
 
-alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
-            },
+                alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);            },
             
             saveAndRefresh: function() {
                 const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
