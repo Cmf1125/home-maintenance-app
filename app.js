@@ -1375,9 +1375,6 @@ function showAllTasks() {
             console.log('🔍 Back button classes before:', backButton.className);
             backButton.classList.remove('hidden');
             console.log('🔍 Back button classes after:', backButton.className);
-            console.log('🔍 Back button style display:', backButton.style.display);
-            
-            // Force show if still hidden
             backButton.style.display = 'block';
             console.log('✅ Back arrow should now be visible');
         } else {
@@ -1399,6 +1396,7 @@ function showAllTasks() {
     
     console.log('✅ All Tasks view displayed');
 }
+
 function renderAllTasksView() {
     const allTasksView = document.getElementById('all-tasks-view');
     if (!allTasksView) {
