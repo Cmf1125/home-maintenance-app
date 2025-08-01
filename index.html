@@ -902,8 +902,86 @@ alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
             }
         };
 
-        console.log('✅ Task system override loaded (cleaned up version)');
+       console.log('✅ Task system override loaded (cleaned up version)');
+    </script>
+
+    <!-- Fix for Date Picker Modal -->
+    <script>
+        console.log('🔧 Loading date picker modal fixes...');
+        
+        // Ensure the date picker modal functions are available
+        window.closeDatePickerModal = function() {
+            const modal = document.getElementById('date-picker-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            window.currentRescheduleTask = null;
+            console.log('📅 Date picker modal closed');
+        };
+        
+        window.setQuickDate = function(daysFromNow) {
+            const newDueDateInput = document.getElementById('new-due-date');
+            if (!newDueDateInput) return;
+            
+            const newDate = new Date();
+            newDate.setDate(newDate.getDate() + daysFromNow);
+            
+            newDueDateInput.value = newDate.toISOString().split('T')[0];
+            
+            // Add visual feedback
+            newDueDateInput.style.backgroundColor = '#dbeafe';
+            setTimeout(() => {
+                newDueDateInput.style.backgroundColor = '';
+            }, 300);
+        };
+        
+        window.confirmReschedule = function() {
+            if (!window.currentRescheduleTask) {
+                console.error('❌ No task selected for rescheduling');
+                return;
+            }
+            
+            const newDueDateInput = document.getElementById('new-due-date');
+            if (!newDueDateInput || !newDueDateInput.value) {
+                alert('❌ Please select a new due date');
+                return;
+            }
+            
+            const newDate = new Date(newDueDateInput.value + 'T12:00:00');
+            if (isNaN(newDate.getTime())) {
+                alert('❌ Invalid date selected');
+                return;
+            }
+            
+            // Update the task
+            window.currentRescheduleTask.dueDate = newDate;
+            window.currentRescheduleTask.nextDue = newDate; // CRITICAL: Calendar sync
+            
+            // Save data
+            if (typeof saveData === 'function') {
+                saveData();
+            }
+            
+            // Refresh dashboard
+            if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                window.enhancedDashboard.render();
+            }
+            
+            // Refresh calendar
+            if (window.casaCareCalendar && window.casaCareCalendar.refresh) {
+                window.casaCareCalendar.refresh();
+            }
+            
+            // Close modal
+            window.closeDatePickerModal();
+            
+            // Success message
+            alert(`✅ Task rescheduled to ${newDate.toLocaleDateString()}`);
+        };
+        
+        console.log('✅ Date picker modal fixes loaded');
     </script>
  
   </body>
 </html>
+
