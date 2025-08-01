@@ -1501,18 +1501,31 @@ function renderAllTasksTaskItem(task) {
     const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
     const isOverdue = daysUntilDue < 0;
     
-    // Simple status styling
+    // Enhanced Safety task detection
+    const isSafetyTask = task.category === 'Safety' || task.priority === 'high' || 
+                        task.title.toLowerCase().includes('smoke') || 
+                        task.title.toLowerCase().includes('detector') ||
+                        task.title.toLowerCase().includes('fire') ||
+                        task.title.toLowerCase().includes('carbon');
+    
+    // Debug log for Safety tasks
+    if (isSafetyTask) {
+        console.log(`🟠 Safety task detected: "${task.title}" (category: ${task.category}, priority: ${task.priority})`);
+    }
+    
+    // Enhanced status styling
     let statusClass = 'bg-gray-50';
     let urgencyDot = '⚪';
     
     if (isOverdue) {
         statusClass = 'bg-red-50 border-l-4 border-red-400';
         urgencyDot = '🔴';
-    } else if (daysUntilDue <= 7) {
+    } else if (isSafetyTask) {
         statusClass = 'bg-orange-50 border-l-4 border-orange-400';
-        urgencyDot = '🟡';
-    } else if (task.category === 'Safety') {
         urgencyDot = '🟠';
+    } else if (daysUntilDue <= 7) {
+        statusClass = 'bg-yellow-50 border-l-4 border-yellow-400';
+        urgencyDot = '🟡';
     }
     
     // Clean due date display
@@ -1526,7 +1539,7 @@ function renderAllTasksTaskItem(task) {
     } else {
         dueDateDisplay = `<span class="text-gray-700">Due ${taskDate.toLocaleDateString()}</span>`;
     }
-
+    
     return `
         <div class="flex items-center justify-between py-3 px-4 ${statusClass} rounded-lg hover:bg-gray-100 transition-colors">
             <div class="flex items-center gap-3 flex-1">
@@ -1534,6 +1547,7 @@ function renderAllTasksTaskItem(task) {
                 <div class="flex-1">
                     <div class="flex items-center gap-2 mb-1">
                         <span class="font-medium text-gray-900 text-sm">${task.title}</span>
+                        ${isSafetyTask ? '<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-medium">🟠 Safety</span>' : ''}
                     </div>
                     <div class="flex items-center gap-3 text-xs text-gray-500">
                         <span>Every ${task.frequency} days</span>
@@ -1543,7 +1557,6 @@ function renderAllTasksTaskItem(task) {
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <!-- FIXED: Use editTaskFromAllTasks for proper refresh -->
                 <button onclick="editTaskFromAllTasks(${task.id})" 
                         class="text-blue-600 hover:text-blue-800 text-sm px-3 py-2 rounded-lg transition-colors border border-blue-200 hover:bg-blue-50" 
                         title="Edit task">
