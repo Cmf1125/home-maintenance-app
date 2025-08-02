@@ -1151,11 +1151,8 @@ function finishTaskSetup() {
 function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
 
-    // 🎯 NEW: Control header visibility based on tab
-    if (tabName === 'dashboard') {
-        document.body.classList.add('hide-header');
-        document.body.classList.remove('show-header');
-    } else {
+    // Show header on all main tabs (dashboard, calendar, etc.)
+    if (['dashboard', 'calendar', 'appliances', 'documents'].includes(tabName)) {
         document.body.classList.remove('hide-header');
         document.body.classList.add('show-header');
     }
