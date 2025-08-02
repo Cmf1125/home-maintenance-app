@@ -2325,41 +2325,6 @@ window.closeHomeInfoModal = closeHomeInfoModal;
 window.saveHomeInfo = saveHomeInfo;
 window.populateHomeInfoForm = populateHomeInfoForm;
 
-function clearData() {
-    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
-        homeData = {};
-        tasks = [];
-        
-        localStorage.removeItem('casaCareData');
-        
-        document.getElementById('setup-form').style.display = 'block';
-        document.getElementById('task-setup').classList.add('hidden');
-        document.getElementById('main-app').classList.add('hidden');
-        document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
-        
-        alert('✅ All data cleared. Starting fresh!');
-    }
-}
-
-function exportData() {
-    const data = {
-        homeData: homeData,
-        tasks: tasks,
-        exportDate: new Date().toISOString(),
-        version: '2.1'
-    };
-
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
-    const link = document.createElement("a");
-    link.setAttribute("href", dataStr);
-    link.setAttribute("download", "casa_care_backup.json");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    alert('📄 Data exported successfully!');
-}
-
 // Function to export task list (moved from All Tasks to Settings)
 function exportTaskList() {
     if (!window.tasks || window.tasks.length === 0) {
@@ -2390,67 +2355,6 @@ function exportTaskList() {
     
     console.log('📋 Task list exported from Settings');
     alert('📋 Task list exported successfully!');
-}
-
-function saveData() {
-    // Ensure calendar compatibility before saving
-    if (window.tasks) {
-        window.tasks.forEach(task => {
-            if (task.dueDate && !task.nextDue) {
-                task.nextDue = task.dueDate;
-            }
-        });
-    }
-    
-    const data = { 
-        homeData: homeData, 
-        tasks: tasks,
-        version: '2.1'
-    };
-    
-    try {
-        localStorage.setItem('casaCareData', JSON.stringify(data));
-        console.log('✅ Data saved to browser storage with calendar compatibility');
-    } catch (error) {
-        console.error('❌ Failed to save data:', error);
-        throw error; // Re-throw so caller can handle
-    }
-}
-
-function loadData() {
-    try {
-        const savedData = localStorage.getItem('casaCareData');
-        if (savedData) {
-            const data = JSON.parse(savedData);
-            
-            homeData = data.homeData || {};
-            tasks = data.tasks || [];
-            
-            // Restore dates - handle both old nextDue and new dueDate formats
-            tasks.forEach(task => {
-                if (task.nextDue) {
-                    task.dueDate = new Date(task.nextDue);
-                    // Keep nextDue for calendar compatibility
-                    task.nextDue = new Date(task.nextDue);
-                } else if (task.dueDate) {
-                    task.dueDate = new Date(task.dueDate);
-                    // Set nextDue for calendar compatibility
-                    task.nextDue = new Date(task.dueDate);
-                }
-                if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
-            });
-            
-            console.log('✅ Data loaded from browser storage with calendar compatibility');
-            return true;
-        }
-    } catch (error) {
-        console.error('❌ Failed to load data:', error);
-    }
-    return false;
-}
-
-function hasExistingData() {
-    return loadData() && homeData.fullAddress;
 }
 
 // Enhanced initialization
