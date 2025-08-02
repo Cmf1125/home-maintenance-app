@@ -302,4 +302,9 @@ window.exportData = function() {
     alert('📄 Data exported successfully!');
 };
 
+window.hasExistingData = function() {
+    const result = window.dataManager.loadData();
+    return !!(result.homeData && result.homeData.address);
+};
+
 console.log('✅ Data management module loaded');
