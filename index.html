@@ -326,26 +326,20 @@
         <!-- Main App (Dashboard & Calendar) -->
         <div id="main-app" class="hidden">
             <div class="main-content">
-               <!-- Enhanced Dashboard View -->
-                <div id="dashboard-view" class="p-4">
-                    <!-- Welcome -->
-                  <div class="gradient-bg text-white rounded-2xl p-6 shadow-2xl mb-6">
-                    <h2 class="text-xl font-bold mb-2">The Home Keeper</h2>
-                    <p class="text-blue-100 text-sm" id="home-address">Managing maintenance for your home</p>
-                </div>
-
-                    <!-- Interactive Stats Grid -->
+            <!-- Enhanced Dashboard View -->
+            <div id="dashboard-view" class="p-4">
+                 <!-- Interactive Stats Grid -->
                     <div class="grid grid-cols-3 gap-4 mb-6">
-    <div id="overdue-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
-        <div class="flex items-center gap-3">
-            <div class="p-2 bg-red-100 rounded-lg text-lg">⚠️</div>
-            <div>
-                <p class="text-xs text-gray-600">Overdue</p>
-                <p id="overdue-count" class="text-xl font-bold text-gray-900">0</p>
-            </div>
+                    <div id="overdue-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+                    <div class="flex items-center gap-3">
+                    <div class="p-2 bg-red-100 rounded-lg text-lg">⚠️</div>
+                    <div>
+                        <p class="text-xs text-gray-600">Overdue</p>
+                        <p id="overdue-count" class="text-xl font-bold text-gray-900">0</p>
+                    </div>
+                </div>
+            <div class="text-xs text-gray-500 mt-2">Click to view overdue</div>
         </div>
-        <div class="text-xs text-gray-500 mt-2">Click to view overdue</div>
-    </div>
     
     <div id="week-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
         <div class="flex items-center gap-3">
