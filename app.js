@@ -1439,12 +1439,7 @@ window.tasks.forEach(task => {
                     ${renderAllTaskCategories()}
                 </div>
 
-               <!-- Export Button -->
-                <div class="flex justify-center mt-8">
-                    <button onclick="exportTaskList()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors touch-btn">
-                        📋 Export Tasks
-                    </button>
-                </div>
+               <!-- Tasks managed through Settings dropdown -->
             </div>
         </div>
     `;
@@ -2368,6 +2363,38 @@ function exportData() {
     alert('📄 Data exported successfully!');
 }
 
+// Function to export task list (moved from All Tasks to Settings)
+function exportTaskList() {
+    if (!window.tasks || window.tasks.length === 0) {
+        alert('❌ No tasks to export');
+        return;
+    }
+    
+    const activeTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate);
+    
+    let csvContent = "Task,Description,Category,Priority,Due Date,Cost,Frequency,Last Completed\n";
+    
+    activeTasks.forEach(task => {
+        const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'Not set';
+        const lastCompleted = task.lastCompleted ? new Date(task.lastCompleted).toLocaleDateString() : 'Never';
+        
+        csvContent += `"${task.title}","${task.description}","${task.category}","${task.priority}","${dueDate}","$${task.cost}","${task.frequency} days","${lastCompleted}"\n`;
+    });
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `casa_care_tasks_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    
+    console.log('📋 Task list exported from Settings');
+    alert('📋 Task list exported successfully!');
+}
+
 function saveData() {
     // Ensure calendar compatibility before saving
     if (window.tasks) {
@@ -2488,6 +2515,7 @@ window.showHomeInfo = showHomeInfo;
 window.clearData = clearData;
 window.exportData = exportData;
 window.showAllTasks = showAllTasks;
+window.exportTaskList = exportTaskList;
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', initializeApp);
