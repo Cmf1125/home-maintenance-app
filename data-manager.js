@@ -275,16 +275,21 @@ window.saveData = function() {
 window.loadData = function() {
     const result = window.dataManager.loadData();
     
-    // Set global variables
+    // CRITICAL: Actually set the global variables
     window.homeData = result.homeData || {};
     window.tasks = result.tasks || [];
     
-    console.log('🔄 Global variables set:', {
-        homeDataKeys: Object.keys(window.homeData),
+    console.log('🔄 loadData: Set globals:', {
+        homeDataAddress: window.homeData.address,
         tasksLength: window.tasks.length
     });
     
     return !!(result.homeData && result.homeData.address);
+};
+
+window.hasExistingData = function() {
+    // CRITICAL: Always call loadData to ensure globals are set
+    return window.loadData();
 };
 
 window.clearData = function() {
@@ -308,11 +313,6 @@ window.clearData = function() {
 window.exportData = function() {
     window.dataManager.exportData();
     alert('📄 Data exported successfully!');
-};
-
-window.hasExistingData = function() {
-    const result = window.dataManager.loadData();
-    return !!(result.homeData && result.homeData.address);
 };
 
 console.log('✅ Data management module loaded');
