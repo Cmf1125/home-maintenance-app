@@ -2364,10 +2364,6 @@ function initializeApp() {
     // Make well water function available globally ASAP
     window.toggleWellWaterOptions = toggleWellWaterOptions;
     
-    // Make tasks and homeData available globally for other scripts
-    window.tasks = tasks;
-    window.homeData = homeData;
-    
     if (hasExistingData()) {
         
         // Hide setup screens
@@ -2377,10 +2373,6 @@ function initializeApp() {
         
         // Update header
         document.getElementById('header-subtitle').textContent = homeData.fullAddress;
-        
-        // Update global references
-        window.tasks = tasks;
-        window.homeData = homeData;
         
         // Show dashboard
         showTab('dashboard');
@@ -2392,7 +2384,6 @@ function initializeApp() {
         document.getElementById('main-app').classList.add('hidden');
     }
     
-   // ADD THIS LINE at the end:
     initializeDateManagement();
     
     console.log('✅ The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initialized successfully!');
