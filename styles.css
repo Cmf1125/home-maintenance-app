@@ -691,3 +691,51 @@
         width: 100%;
     }
 }
+/* Settings Dropdown Styles */
+#settings-dropdown {
+    animation: slideDown 0.2s ease-out;
+    transform-origin: top right;
+}
+
+#settings-dropdown.hidden {
+    animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+}
+
+/* Simplified bottom nav with reduced padding */
+.main-content {
+    padding-bottom: 100px; /* Reduced from 140px */
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding-bottom: 120px; /* Reduced from 160px */
+    }
+    
+    /* Mobile settings dropdown adjustments */
+    #settings-dropdown {
+        right: -0.5rem;
+        width: 12rem;
+    }
+}
