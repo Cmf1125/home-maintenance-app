@@ -1702,7 +1702,7 @@ function setupBasicDashboardClicks() {
 }
 
 
-// FIXED: Enhanced Add Task function for setup with better modal handling
+// FIXED: Enhanced Add Task function for setup with forced timing
 function addTaskFromSetup() {
     console.log('➕ Adding custom task from setup...');
     
@@ -1710,7 +1710,7 @@ function addTaskFromSetup() {
     const modal = document.getElementById('task-edit-modal');
     if (!modal) {
         console.error('❌ Task edit modal not found');
-        alert('❌ Cannot add task: Edit modal not available. Please check that you are on the correct page.');
+        alert('❌ Cannot add task: Edit modal not available.');
         return;
     }
     
@@ -1729,13 +1729,30 @@ function addTaskFromSetup() {
         dueDate: new Date(),
         lastCompleted: null,
         isCompleted: false,
-        isTemplate: true // Important: mark as template so it gets processed correctly
+        isTemplate: true
     };
     
-    console.log('📋 New task created:', newTask);
+    console.log('📋 New task created for setup:', newTask);
     
-    // Open modal for new task
-    openTaskEditModal(newTask, true);
+    // FORCE IMMEDIATE DISPLAY with timeout
+    setTimeout(() => {
+        if (window.TaskManager && window.TaskManager.openModal) {
+            console.log('🚀 Opening modal with forced timing...');
+            window.TaskManager.openModal(newTask, true);
+            
+            // FORCE the modal to show immediately
+            const modal = document.getElementById('task-edit-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.remove('hidden');
+                modal.style.zIndex = '99999';
+                console.log('✅ Modal forced to display');
+            }
+        } else {
+            console.error('❌ TaskManager not available');
+            alert('❌ Task editor not available');
+        }
+    }, 100); // Small delay to ensure DOM is ready
 }
 
 // FIXED: Enhanced task completion with better calendar sync
