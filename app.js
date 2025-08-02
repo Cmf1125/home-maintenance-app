@@ -1737,9 +1737,10 @@ function addTaskFromSetup() {
     // Open modal for new task
     openTaskEditModal(newTask, true);
     
-    // Fix for modal parent visibility on setup page
-    document.getElementById('task-edit-modal').parentElement.style.display = 'block';
-}
+   // Fix for modal parent visibility on setup page
+setTimeout(() => {
+    document.getElementById('task-edit-modal').parentElement.style.setProperty('display', 'block', 'important');
+}, 50);
 
 // FIXED: Enhanced task completion with better calendar sync
 function completeTask(taskId) {
