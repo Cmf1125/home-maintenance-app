@@ -2325,6 +2325,41 @@ window.closeHomeInfoModal = closeHomeInfoModal;
 window.saveHomeInfo = saveHomeInfo;
 window.populateHomeInfoForm = populateHomeInfoForm;
 
+function clearData() {
+    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+        homeData = {};
+        tasks = [];
+        
+        localStorage.removeItem('casaCareData');
+        
+        document.getElementById('setup-form').style.display = 'block';
+        document.getElementById('task-setup').classList.add('hidden');
+        document.getElementById('main-app').classList.add('hidden');
+        document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
+        
+        alert('✅ All data cleared. Starting fresh!');
+    }
+}
+
+function exportData() {
+    const data = {
+        homeData: homeData,
+        tasks: tasks,
+        exportDate: new Date().toISOString(),
+        version: '2.1'
+    };
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+    const link = document.createElement("a");
+    link.setAttribute("href", dataStr);
+    link.setAttribute("download", "casa_care_backup.json");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    alert('📄 Data exported successfully!');
+}
+
 // Function to export task list (moved from All Tasks to Settings)
 function exportTaskList() {
     if (!window.tasks || window.tasks.length === 0) {
@@ -2357,12 +2392,77 @@ function exportTaskList() {
     alert('📋 Task list exported successfully!');
 }
 
+function saveData() {
+    // Ensure calendar compatibility before saving
+    if (window.tasks) {
+        window.tasks.forEach(task => {
+            if (task.dueDate && !task.nextDue) {
+                task.nextDue = task.dueDate;
+            }
+        });
+    }
+    
+    const data = { 
+        homeData: homeData, 
+        tasks: tasks,
+        version: '2.1'
+    };
+    
+    try {
+        localStorage.setItem('casaCareData', JSON.stringify(data));
+        console.log('✅ Data saved to browser storage with calendar compatibility');
+    } catch (error) {
+        console.error('❌ Failed to save data:', error);
+        throw error; // Re-throw so caller can handle
+    }
+}
+
+function loadData() {
+    try {
+        const savedData = localStorage.getItem('casaCareData');
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            
+            homeData = data.homeData || {};
+            tasks = data.tasks || [];
+            
+            // Restore dates - handle both old nextDue and new dueDate formats
+            tasks.forEach(task => {
+                if (task.nextDue) {
+                    task.dueDate = new Date(task.nextDue);
+                    // Keep nextDue for calendar compatibility
+                    task.nextDue = new Date(task.nextDue);
+                } else if (task.dueDate) {
+                    task.dueDate = new Date(task.dueDate);
+                    // Set nextDue for calendar compatibility
+                    task.nextDue = new Date(task.dueDate);
+                }
+                if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
+            });
+            
+            console.log('✅ Data loaded from browser storage with calendar compatibility');
+            return true;
+        }
+    } catch (error) {
+        console.error('❌ Failed to load data:', error);
+    }
+    return false;
+}
+
+function hasExistingData() {
+    return loadData() && homeData.fullAddress;
+}
+
 // Enhanced initialization
 function initializeApp() {
     console.log('🏠 The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initializing...');
     
     // Make well water function available globally ASAP
     window.toggleWellWaterOptions = toggleWellWaterOptions;
+    
+    // Make tasks and homeData available globally for other scripts
+    window.tasks = tasks;
+    window.homeData = homeData;
     
     if (hasExistingData()) {
         
@@ -2372,18 +2472,23 @@ function initializeApp() {
         document.getElementById('main-app').classList.remove('hidden');
         
         // Update header
-       document.getElementById('header-subtitle').textContent = window.homeData.fullAddress;
+        document.getElementById('header-subtitle').textContent = homeData.fullAddress;
+        
+        // Update global references
+        window.tasks = tasks;
+        window.homeData = homeData;
         
         // Show dashboard
         showTab('dashboard');
         
-       console.log(`👋 Welcome back! Loaded ${window.tasks.length} tasks for ${window.homeData.fullAddress}`);
+        console.log(`👋 Welcome back! Loaded ${tasks.length} tasks for ${homeData.fullAddress}`);
     } else {
         document.getElementById('setup-form').style.display = 'block';
         document.getElementById('task-setup').classList.add('hidden');
         document.getElementById('main-app').classList.add('hidden');
     }
     
+   // ADD THIS LINE at the end:
     initializeDateManagement();
     
     console.log('✅ The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initialized successfully!');
@@ -2416,7 +2521,232 @@ if (document.readyState !== 'loading') {
 }
 
 console.log('🏠 The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES script loaded successfully!');
+// ========================================
+// STEP 3: CALENDAR-SAFE DATE MANAGEMENT SYSTEM
+// Enhances existing calendar sync with utilities and safety checks
+// ========================================
 
+/**
+ * Unified date setter - ensures calendar sync
+ * This enhances your existing date logic with consistency checks
+ */
+function setTaskDate(task, date) {
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+        console.error('❌ Invalid date provided to setTaskDate:', date);
+        return false;
+    }
+    
+    // Set both properties for maximum compatibility (enhances your existing system)
+    task.dueDate = new Date(date);
+    task.nextDue = new Date(date); // Critical for calendar display
+
+    return true;
+}
+
+/**
+ * Unified recurring date calculator - enhances your existing logic
+ */
+function calculateNextDueDate(task, completionDate = new Date()) {
+    if (!task.frequency || task.frequency <= 0) {
+        console.error('❌ Invalid frequency for task:', task.title);
+        return null;
+    }
+    
+    // Use existing due date or completion date as base (same as your current logic)
+    const baseDate = task.dueDate ? new Date(task.dueDate) : completionDate;
+    const nextDate = new Date(baseDate.getTime() + (task.frequency * 24 * 60 * 60 * 1000));
+    
+    return nextDate;
+}
+
+/**
+ * Ensure all tasks have consistent date properties
+ * This fixes any data inconsistencies that might exist
+ */
+function ensureTaskDateConsistency(tasks) {
+    let fixedCount = 0;
+    
+    tasks.forEach(task => {
+        let needsSync = false;
+        
+        // Fix missing dueDate
+        if (!task.dueDate && task.nextDue) {
+            task.dueDate = new Date(task.nextDue);
+            needsSync = true;
+        }
+        
+        // Fix missing nextDue (critical for calendar)
+        if (!task.nextDue && task.dueDate) {
+            task.nextDue = new Date(task.dueDate);
+            needsSync = true;
+        }
+        
+        // Fix date mismatches
+        if (task.dueDate && task.nextDue) {
+            const dueTime = new Date(task.dueDate).getTime();
+            const nextTime = new Date(task.nextDue).getTime();
+            
+            if (Math.abs(dueTime - nextTime) > 1000) { // Allow 1 second difference
+                task.nextDue = new Date(task.dueDate); // dueDate is authoritative
+                needsSync = true;
+            }
+        }
+        
+        if (needsSync) {
+            fixedCount++;
+        }
+    });
+    
+    if (fixedCount > 0) {
+    }
+    
+    return fixedCount;
+}
+
+/**
+ * Enhanced completeTask function that uses the new utilities
+ * This enhances your existing completeTask with better error handling
+ */
+function completeTaskSafe(taskId) {
+    console.log(`✅ Completing task ${taskId} (calendar-safe version)...`);
+    
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) {
+        console.error('❌ Task not found:', taskId);
+        alert('❌ Task not found');
+        return;
+    }
+
+    const oldDueDate = task.dueDate ? new Date(task.dueDate) : new Date();
+    
+    // Mark as completed with timestamp (same as your existing logic)
+    task.lastCompleted = new Date();
+    task.isCompleted = false; // Will be due again in the future
+    
+    // Calculate next due date using enhanced system
+    const nextDueDate = calculateNextDueDate(task, oldDueDate);
+    if (!nextDueDate) {
+        alert('❌ Error calculating next due date');
+        return;
+    }
+    
+    // Use unified date setter (ensures calendar sync)
+    if (!setTaskDate(task, nextDueDate)) {
+        alert('❌ Error setting new due date');
+        return;
+    }
+    
+    console.log(`📅 Task "${task.title}" completed!`);
+    console.log(`  Old due date: ${oldDueDate.toLocaleDateString()}`);
+    console.log(`  Next due date: ${nextDueDate.toLocaleDateString()}`);
+    console.log(`  Frequency: ${task.frequency} days`);
+    console.log(`  ✅ Calendar sync confirmed: dueDate=${task.dueDate.toLocaleDateString()}, nextDue=${task.nextDue.toLocaleDateString()}`);
+    
+    // Save and refresh (same as your existing logic)
+    try {
+        saveData();
+        console.log('💾 Data saved after task completion');
+    } catch (error) {
+        console.error('❌ Error saving data after completion:', error);
+        alert('❌ Error saving task completion');
+        return;
+    }
+    
+    // Update global references
+    window.tasks = tasks;
+    
+    // Refresh all displays
+    refreshAllDisplays();
+    
+    // Success message
+    alert(`✅ Task "${task.title}" completed!\nNext due: ${nextDueDate.toLocaleDateString()}`);
+}
+
+/**
+ * Helper function to refresh all displays
+ */
+function refreshAllDisplays() {
+    // Refresh enhanced dashboard
+    if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
+        console.log('🔄 Refreshing enhanced dashboard...');
+        window.enhancedDashboard.render();
+    } else {
+        console.log('🔄 Refreshing basic dashboard...');
+        updateDashboard();
+    }
+    
+    // CRITICAL: Force calendar refresh with verification
+    if (window.casaCareCalendar) {
+        console.log('📅 Forcing calendar refresh...');
+        try {
+            if (typeof window.casaCareCalendar.refresh === 'function') {
+                window.casaCareCalendar.refresh();
+                console.log('✅ Calendar refresh called successfully');
+            } else if (typeof window.casaCareCalendar.render === 'function') {
+                window.casaCareCalendar.render();
+                console.log('✅ Calendar render called successfully');
+            } else {
+                console.warn('⚠️ Calendar refresh method not found, trying to recreate...');
+                if (typeof CasaCareCalendar !== 'undefined') {
+                    window.casaCareCalendar = new CasaCareCalendar();
+                    console.log('✅ Calendar recreated successfully');
+                }
+            }
+        } catch (error) {
+            console.error('❌ Error refreshing calendar:', error);
+        }
+    }
+}
+
+/**
+ * Migration function to fix any existing data
+ */
+function migrateTaskDates() {
+    
+    if (!window.tasks || !Array.isArray(window.tasks)) {
+        return;
+    }
+    
+    const fixedCount = ensureTaskDateConsistency(window.tasks);
+    
+    if (fixedCount > 0) {
+        // Save the fixes
+        try {
+            saveData();
+            console.log('💾 Date migration saved successfully');
+        } catch (error) {
+            console.error('❌ Error saving date migration:', error);
+        }
+    }
+
+}
+
+/**
+ * Initialize the enhanced date management system
+ */
+function initializeDateManagement() {
+    console.log('📅 Initializing calendar-safe date management...');
+    
+    // Run migration for existing data
+    migrateTaskDates();
+    
+    // Make the enhanced complete task function available
+    // But keep your original as backup
+    window.completeTaskOriginal = window.completeTask;
+    window.completeTask = completeTaskSafe;
+    
+    console.log('✅ Calendar-safe date management initialized');
+}
+
+// Export the new functions for debugging and future use
+window.setTaskDate = setTaskDate;
+window.calculateNextDueDate = calculateNextDueDate;
+window.ensureTaskDateConsistency = ensureTaskDateConsistency;
+window.migrateTaskDates = migrateTaskDates;
+window.completeTaskSafe = completeTaskSafe;
+window.initializeDateManagement = initializeDateManagement;
+
+console.log('✅ Step 3: Calendar-safe date management system loaded');
 // ========================================
 // STEP 4: ORGANIZED NAMESPACE SYSTEM
 // Keeps calendar-critical functions global, organizes UI functions under namespace
@@ -2484,6 +2814,11 @@ CasaCare.utils = {
     saveHomeInfo: typeof saveHomeInfo !== 'undefined' ? saveHomeInfo : function() { console.warn('saveHomeInfo not defined'); },
     populateHomeInfoForm: typeof populateHomeInfoForm !== 'undefined' ? populateHomeInfoForm : function() { console.warn('populateHomeInfoForm not defined'); },
     
+    // Date management utilities (from Step 3)
+    setTaskDate: setTaskDate,
+    calculateNextDueDate: calculateNextDueDate,
+    ensureTaskDateConsistency: ensureTaskDateConsistency,
+    migrateTaskDates: migrateTaskDates
 };
 
 // Component instances (these stay global for inter-component communication)
