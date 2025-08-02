@@ -301,8 +301,8 @@
                 <!-- Add Custom Task Button -->
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-900">Your Maintenance Schedule</h3>
-                    <button onclick="addTaskFromSetup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-                        ➕ Add Custom Task
+                   <button onclick="event.stopPropagation(); event.preventDefault(); addTaskFromSetup(); return false;" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
+                    ➕ Add Custom Task
                     </button>
                 </div>
                 
@@ -699,39 +699,49 @@
             currentTask: null,
             
             openModal: function(task, isNew) {
-                console.log('📝 Opening modal for:', task.title || 'New Task');
-                
-                this.currentTask = {...task};
-                window.currentEditingTask = this.currentTask;
-                
-                const modal = document.getElementById('task-edit-modal');
-                if (!modal) {
-                    alert('❌ Modal not found');
-                    return;
-                }
-                
-                // Set title
-                const titleElement = document.getElementById('task-edit-title');
-                if (titleElement) {
-                    titleElement.textContent = isNew ? 'Add Task' : 'Edit Task';
-                }
-                
-                // Show/hide delete button
-                const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
-                if (deleteBtn) {
-                    deleteBtn.style.display = isNew ? 'none' : 'block';
-                }
-                
-                this.fillForm(task);
-                
-                modal.classList.remove('hidden');
-                modal.style.display = 'flex';
-                
-                setTimeout(() => {
-                    const nameField = document.getElementById('edit-task-name');
-                    if (nameField) nameField.focus();
-                }, 100);
-            },
+    console.log('📝 Opening modal for:', task.title || 'New Task');
+    
+    this.currentTask = {...task};
+    window.currentEditingTask = this.currentTask;
+    
+    const modal = document.getElementById('task-edit-modal');
+    if (!modal) {
+        alert('❌ Modal not found');
+        return;
+    }
+    
+    // Set title
+    const titleElement = document.getElementById('task-edit-title');
+    if (titleElement) {
+        titleElement.textContent = isNew ? 'Add Task' : 'Edit Task';
+    }
+    
+    // Show/hide delete button
+    const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
+    if (deleteBtn) {
+        deleteBtn.style.display = isNew ? 'none' : 'block';
+    }
+    
+    this.fillForm(task);
+    
+    // FORCE MODAL TO SHOW ABOVE EVERYTHING
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    modal.style.zIndex = '999999';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.background = 'rgba(0, 0, 0, 0.8)';
+    
+    console.log('✅ Modal forced to display with highest z-index');
+    
+    setTimeout(() => {
+        const nameField = document.getElementById('edit-task-name');
+        if (nameField) nameField.focus();
+    }, 100);
+},
             
             fillForm: function(task) {
                 const fields = [
