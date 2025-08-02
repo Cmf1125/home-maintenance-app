@@ -887,14 +887,28 @@
         };
 
         // Override functions
-        window.addTaskFromSetup = function() {
-            const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
-            const newTask = {
-                id: maxId + 1, title: '', description: '', category: 'General',
-                frequency: 365, cost: 0, priority: 'medium', dueDate: new Date(), isTemplate: true
-            };
-            window.TaskManager.openModal(newTask, true);
-        };
+window.addTaskFromSetup = function() {
+    console.log('➕ Adding custom task from setup (override)...');
+    
+    const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+    const newTask = {
+        id: maxId + 1, title: '', description: '', category: 'General',
+        frequency: 365, cost: 0, priority: 'medium', dueDate: new Date(), isTemplate: true
+    };
+    
+    // FORCE IMMEDIATE DISPLAY
+    setTimeout(() => {
+        window.TaskManager.openModal(newTask, true);
+        
+        // Ensure modal shows immediately
+        const modal = document.getElementById('task-edit-modal');
+        if (modal) {
+            modal.style.display = 'flex';
+            modal.classList.remove('hidden');
+            modal.style.zIndex = '99999';
+        }
+    }, 50);
+};
 
         window.addTaskFromDashboard = function() {
             const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
