@@ -888,62 +888,22 @@
 
         // Override functions
         window.addTaskFromSetup = function() {
-    console.log('➕ Add Task clicked from Setup screen...');
-    
-    // Check if we're in the setup screen context
-    const taskSetup = document.getElementById('task-setup');
-    const isSetupVisible = taskSetup && !taskSetup.classList.contains('hidden');
-    
-    if (isSetupVisible) {
-        console.log('📋 Using setup-specific add task logic...');
-        
-        // Verify modal is available
-        const modal = document.getElementById('task-edit-modal');
-        if (!modal) {
-            console.error('❌ Task edit modal not found');
-            alert('❌ Cannot add task: Edit modal not available.');
-            return;
-        }
-        
-        // Find next available ID
-        const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
-        
-        // Create new task object for SETUP screen
-        const newTask = {
-            id: maxId + 1,
-            title: '',
-            description: '',
-            category: 'General',
-            frequency: 365,
-            cost: 0,
-            priority: 'medium',
-            dueDate: new Date(),
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true // CRITICAL: This tells setup to process it properly
-        };
-        
-        console.log('📋 Created setup task:', newTask);
-        
-        // Use the original modal opening function for setup
-        if (typeof openTaskEditModal === 'function') {
-            openTaskEditModal(newTask, true);
-        } else {
-            // Fallback to TaskManager
+            const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+            const newTask = {
+                id: maxId + 1, title: '', description: '', category: 'General',
+                frequency: 365, cost: 0, priority: 'medium', dueDate: new Date(), isTemplate: true
+            };
             window.TaskManager.openModal(newTask, true);
-        }
-    } else {
-        console.log('📋 Using dashboard add task logic...');
-        // Use TaskManager for dashboard context
-        const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
-        const newTask = {
-            id: maxId + 1, title: '', description: '', category: 'General',
-            frequency: 365, cost: 0, priority: 'medium', dueDate: new Date()
-            // NOTE: No isTemplate flag for dashboard tasks
         };
-        window.TaskManager.openModal(newTask, true);
-    }
-};
+
+        window.addTaskFromDashboard = function() {
+            const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+            const newTask = {
+                id: maxId + 1, title: '', description: '', category: 'General',
+                frequency: 365, cost: 0, priority: 'medium', dueDate: new Date()
+            };
+            window.TaskManager.openModal(newTask, true);
+        };
 
         window.editTaskFromSetup = function(taskId) {
             const task = window.tasks?.find(t => t.id === taskId);
