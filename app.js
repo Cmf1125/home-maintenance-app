@@ -2372,12 +2372,12 @@ function initializeApp() {
         document.getElementById('main-app').classList.remove('hidden');
         
         // Update header
-        document.getElementById('header-subtitle').textContent = homeData.fullAddress;
+       document.getElementById('header-subtitle').textContent = window.homeData.fullAddress;
         
         // Show dashboard
         showTab('dashboard');
         
-        console.log(`👋 Welcome back! Loaded ${tasks.length} tasks for ${homeData.fullAddress}`);
+       console.log(`👋 Welcome back! Loaded ${window.tasks.length} tasks for ${window.homeData.fullAddress}`);
     } else {
         document.getElementById('setup-form').style.display = 'block';
         document.getElementById('task-setup').classList.add('hidden');
