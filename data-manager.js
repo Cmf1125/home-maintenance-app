@@ -274,9 +274,17 @@ window.saveData = function() {
 
 window.loadData = function() {
     const result = window.dataManager.loadData();
-    window.homeData = result.homeData;
-    window.tasks = result.tasks;
-    return !!result.homeData.address; // Return true if has data
+    
+    // Set global variables
+    window.homeData = result.homeData || {};
+    window.tasks = result.tasks || [];
+    
+    console.log('🔄 Global variables set:', {
+        homeDataKeys: Object.keys(window.homeData),
+        tasksLength: window.tasks.length
+    });
+    
+    return !!(result.homeData && result.homeData.address);
 };
 
 window.clearData = function() {
