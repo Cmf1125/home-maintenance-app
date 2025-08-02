@@ -301,8 +301,8 @@
                 <!-- Add Custom Task Button -->
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-900">Your Maintenance Schedule</h3>
-                   <button onclick="event.stopPropagation(); event.preventDefault(); addTaskFromSetup(); return false;" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-                    ➕ Add Custom Task
+                    <button onclick="addTaskFromSetup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
+                        ➕ Add Custom Task
                     </button>
                 </div>
                 
@@ -416,7 +416,29 @@
     </div>
 </div>
 
-             <!-- Task Edit Modal -->
+<!-- Bottom Navigation - Simplified -->
+<div class="bottom-nav">
+    <div class="grid grid-cols-4 gap-1 p-2">
+        <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn flex flex-col items-center p-3 rounded-lg bg-blue-100 text-blue-700 touch-btn">
+            <div class="text-lg mb-1">🏠</div>
+            <div class="text-xs">Home</div>
+        </button>
+        <button onclick="showTab('calendar')" id="tab-calendar" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
+            <div class="text-lg mb-1">📅</div>
+            <div class="text-xs">Calendar</div>
+        </button>
+        <button onclick="showTab('appliances')" id="tab-appliances" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
+            <div class="text-lg mb-1">⚙️</div>
+            <div class="text-xs">Appliances</div>
+        </button>
+        <button onclick="showTab('documents')" id="tab-documents" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
+            <div class="text-lg mb-1">📄</div>
+            <div class="text-xs">Documents</div>
+        </button>
+    </div>
+</div>
+            
+ <!-- Task Edit Modal -->
         <div id="task-edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
                 <div class="flex items-center justify-between mb-4">
@@ -507,7 +529,7 @@
                 </div>
             </div>
         </div>
-            
+
         <!-- Date Picker Modal -->
         <div id="date-picker-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-xl w-full max-w-sm p-6 shadow-2xl">
@@ -567,29 +589,6 @@
                 </div>
             </div>
               </div> 
-
-            <!-- Bottom Navigation - Simplified -->
-<div class="bottom-nav">
-    <div class="grid grid-cols-4 gap-1 p-2">
-        <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn flex flex-col items-center p-3 rounded-lg bg-blue-100 text-blue-700 touch-btn">
-            <div class="text-lg mb-1">🏠</div>
-            <div class="text-xs">Home</div>
-        </button>
-        <button onclick="showTab('calendar')" id="tab-calendar" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-            <div class="text-lg mb-1">📅</div>
-            <div class="text-xs">Calendar</div>
-        </button>
-        <button onclick="showTab('appliances')" id="tab-appliances" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-            <div class="text-lg mb-1">⚙️</div>
-            <div class="text-xs">Appliances</div>
-        </button>
-        <button onclick="showTab('documents')" id="tab-documents" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-            <div class="text-lg mb-1">📄</div>
-            <div class="text-xs">Documents</div>
-        </button>
-    </div>
-</div>
-            
             <!-- Editable Home Info Modal -->
 <div id="home-info-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
@@ -701,49 +700,39 @@
             currentTask: null,
             
             openModal: function(task, isNew) {
-    console.log('📝 Opening modal for:', task.title || 'New Task');
-    
-    this.currentTask = {...task};
-    window.currentEditingTask = this.currentTask;
-    
-    const modal = document.getElementById('task-edit-modal');
-    if (!modal) {
-        alert('❌ Modal not found');
-        return;
-    }
-    
-    // Set title
-    const titleElement = document.getElementById('task-edit-title');
-    if (titleElement) {
-        titleElement.textContent = isNew ? 'Add Task' : 'Edit Task';
-    }
-    
-    // Show/hide delete button
-    const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
-    if (deleteBtn) {
-        deleteBtn.style.display = isNew ? 'none' : 'block';
-    }
-    
-    this.fillForm(task);
-    
-    // FORCE MODAL TO SHOW ABOVE EVERYTHING
-    modal.classList.remove('hidden');
-    modal.style.display = 'flex';
-    modal.style.zIndex = '999999';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100vw';
-    modal.style.height = '100vh';
-    modal.style.background = 'rgba(0, 0, 0, 0.8)';
-    
-    console.log('✅ Modal forced to display with highest z-index');
-    
-    setTimeout(() => {
-        const nameField = document.getElementById('edit-task-name');
-        if (nameField) nameField.focus();
-    }, 100);
-},
+                console.log('📝 Opening modal for:', task.title || 'New Task');
+                
+                this.currentTask = {...task};
+                window.currentEditingTask = this.currentTask;
+                
+                const modal = document.getElementById('task-edit-modal');
+                if (!modal) {
+                    alert('❌ Modal not found');
+                    return;
+                }
+                
+                // Set title
+                const titleElement = document.getElementById('task-edit-title');
+                if (titleElement) {
+                    titleElement.textContent = isNew ? 'Add Task' : 'Edit Task';
+                }
+                
+                // Show/hide delete button
+                const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
+                if (deleteBtn) {
+                    deleteBtn.style.display = isNew ? 'none' : 'block';
+                }
+                
+                this.fillForm(task);
+                
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+                
+                setTimeout(() => {
+                    const nameField = document.getElementById('edit-task-name');
+                    if (nameField) nameField.focus();
+                }, 100);
+            },
             
             fillForm: function(task) {
                 const fields = [
@@ -899,28 +888,14 @@
         };
 
         // Override functions
-window.addTaskFromSetup = function() {
-    console.log('➕ Adding custom task from setup (override)...');
-    
-    const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
-    const newTask = {
-        id: maxId + 1, title: '', description: '', category: 'General',
-        frequency: 365, cost: 0, priority: 'medium', dueDate: new Date(), isTemplate: true
-    };
-    
-    // FORCE IMMEDIATE DISPLAY
-    setTimeout(() => {
-        window.TaskManager.openModal(newTask, true);
-        
-        // Ensure modal shows immediately
-        const modal = document.getElementById('task-edit-modal');
-        if (modal) {
-            modal.style.display = 'flex';
-            modal.classList.remove('hidden');
-            modal.style.zIndex = '99999';
-        }
-    }, 50);
-};
+        window.addTaskFromSetup = function() {
+            const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+            const newTask = {
+                id: maxId + 1, title: '', description: '', category: 'General',
+                frequency: 365, cost: 0, priority: 'medium', dueDate: new Date(), isTemplate: true
+            };
+            window.TaskManager.openModal(newTask, true);
+        };
 
         window.addTaskFromDashboard = function() {
             const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
