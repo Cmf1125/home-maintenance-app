@@ -337,3 +337,25 @@ body.install-banner-visible {
         padding-top: 50px;
     }
 }
+
+
+/* --- Mobile enhancements (added) --- */
+:root {
+  --safe-inset-bottom: env(safe-area-inset-bottom);
+}
+.bottom-nav { padding-bottom: max(0px, var(--safe-inset-bottom)); }
+
+.touch-btn {
+  min-width: 48px;
+  min-height: 48px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card { border-radius: 0.75rem; }
+.card * { word-wrap: break-word; }
+
+/* Reduce motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
