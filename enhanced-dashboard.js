@@ -208,6 +208,8 @@ class EnhancedDashboard {
 
     // Replace the renderEnhancedTaskCard function in enhanced-dashboard.js with this compact version
 
+// Replace the renderEnhancedTaskCard function with this ultra-compact version
+
 renderEnhancedTaskCard(task) {
     const now = new Date();
     const taskDate = new Date(task.dueDate);
@@ -226,71 +228,64 @@ renderEnhancedTaskCard(task) {
     let urgencyDot = '⚪';
     
     if (isOverdue) {
-        statusClass = 'bg-red-50 border-l-4 border-red-400';
+        statusClass = 'bg-red-50 border-l-2 border-red-400';
         urgencyDot = '🔴';
     } else if (isSafetyTask) {
-        statusClass = 'bg-orange-50 border-l-4 border-orange-400';
+        statusClass = 'bg-orange-50 border-l-2 border-orange-400';
         urgencyDot = '🟠';
     } else if (daysUntilDue <= 7) {
-        statusClass = 'bg-yellow-50 border-l-4 border-yellow-400';
+        statusClass = 'bg-yellow-50 border-l-2 border-yellow-400';
         urgencyDot = '🟡';
     }
     
-    // Clean due date display
+    // Ultra-compact due date display
     let dueDateDisplay;
     if (isOverdue) {
-        dueDateDisplay = `<span class="text-red-600 font-semibold text-xs">${Math.abs(daysUntilDue)}d overdue</span>`;
+        dueDateDisplay = `${Math.abs(daysUntilDue)}d overdue`;
     } else if (daysUntilDue === 0) {
-        dueDateDisplay = `<span class="text-orange-600 font-semibold text-xs">Due today</span>`;
+        dueDateDisplay = `Due today`;
     } else if (daysUntilDue <= 7) {
-        dueDateDisplay = `<span class="text-orange-600 text-xs">Due in ${daysUntilDue}d</span>`;
+        dueDateDisplay = `${daysUntilDue}d`;
     } else if (daysUntilDue <= 30) {
-        dueDateDisplay = `<span class="text-gray-700 text-xs">Due in ${daysUntilDue}d</span>`;
+        dueDateDisplay = `${daysUntilDue}d`;
     } else {
-        dueDateDisplay = `<span class="text-gray-600 text-xs">Due ${taskDate.toLocaleDateString()}</span>`;
+        dueDateDisplay = taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
     // Get category info
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
     return `
-        <div class="p-3 border-b ${statusClass} enhanced-task-card transition-all duration-200 mobile-compact-task">
-            <!-- Mobile: Single line with all key info -->
-            <div class="flex justify-between items-center mb-2">
+        <div class="px-3 py-2 border-b ${statusClass} enhanced-task-card transition-all duration-200 ultra-compact-task">
+            <!-- Single line with everything -->
+            <div class="flex items-center justify-between gap-2">
+                <!-- Left: Dot + Title + Category -->
                 <div class="flex items-center gap-2 flex-1 min-w-0">
                     <span class="text-sm flex-shrink-0">${urgencyDot}</span>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-1 mb-1 flex-wrap">
-                            <h4 class="font-semibold text-gray-900 text-sm leading-tight truncate flex-shrink">${task.title}</h4>
-                            ${isSafetyTask ? '<span class="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-xs font-medium flex-shrink-0">Safety</span>' : ''}
-                        </div>
-                        <!-- Mobile: Compact meta info on one line -->
-                        <div class="flex items-center gap-2 text-xs text-gray-600 flex-wrap">
-                            <span class="px-1.5 py-0.5 rounded-full bg-${categoryInfo.color}-50 text-${categoryInfo.color}-700 font-medium flex-shrink-0">
-                                ${categoryInfo.icon} ${task.category}
-                            </span>
-                            ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
-                            <span class="text-gray-500">${task.frequency}d</span>
-                            <span class="ml-auto">${dueDateDisplay}</span>
-                        </div>
-                    </div>
+                    <span class="font-medium text-gray-900 text-sm truncate">${task.title}</span>
+                    <span class="px-1.5 py-0.5 rounded text-xs bg-${categoryInfo.color}-100 text-${categoryInfo.color}-700 flex-shrink-0">
+                        ${categoryInfo.icon}
+                    </span>
+                    ${task.cost > 0 ? `<span class="text-green-600 font-medium text-xs">$${task.cost}</span>` : ''}
                 </div>
-            </div>
-            
-            <!-- Mobile: Compact action buttons -->
-            <div class="flex gap-2">
-                <button onclick="completeTask(${task.id})" 
-                        class="flex-1 bg-green-100 text-green-700 hover:bg-green-200 px-3 py-2 rounded-lg text-xs font-medium transition-colors">
-                    ✅ Complete
-                </button>
-                <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
-                        class="flex-1 bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-2 rounded-lg text-xs font-medium transition-colors">
-                    📅 Reschedule
-                </button>
+                
+                <!-- Right: Due Date + Actions -->
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <span class="text-xs ${isOverdue ? 'text-red-600 font-semibold' : daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600'}">${dueDateDisplay}</span>
+                    <button onclick="completeTask(${task.id})" 
+                            class="bg-green-100 text-green-700 hover:bg-green-200 px-2 py-1 rounded text-xs font-medium transition-colors">
+                        ✅
+                    </button>
+                    <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
+                            class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 rounded text-xs font-medium transition-colors">
+                        📅
+                    </button>
+                </div>
             </div>
         </div>
     `;
 }
+    
     render() {
         this.updateStats();
         this.renderFilteredTasks();
