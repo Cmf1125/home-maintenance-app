@@ -203,8 +203,15 @@ class EnhancedDashboard {
             return;
         }
 
-        tasksList.innerHTML = filteredTasks.map(task => this.renderEnhancedTaskCard(task)).join('');
-    }
+        try {
+    tasksList.innerHTML = filteredTasks.map(task => {
+        try { return this.renderEnhancedTaskCard(task); } catch (e) { console.error('Task render error', task, e); return ''; }
+    }).join('');
+} catch (e) {
+    console.error('Render list error', e);
+    tasksList.innerHTML = `<div class="p-6 text-center text-red-500">There was an error rendering tasks.</div>`;
+}
+}
 
 renderEnhancedTaskCard(task) {
     const now = new Date();
@@ -259,7 +266,7 @@ renderEnhancedTaskCard(task) {
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
     return `
-        <div class="p-3 border-b ${statusClass} enhanced-task-card transition-all duration-200 simple-horizontal-task cursor-pointer hover:bg-gray-50" onclick="openTaskEditModal(${task.id})">
+        <div class="p-3 border-b ${statusClass} enhanced-task-card transition-all duration-200 simple-horizontal-task cursor-pointer hover:bg-gray-50" onclick="(window.openTaskEditModal ? openTaskEditModal(${task.id}) : (window.editTaskFromDashboard ? editTaskFromDashboard(${task.id}) : console.error(\'No modal function found\')))\">
             <div class="flex items-center justify-between gap-2">
                 <!-- Left: Dot + Title + Category + Cost -->
                 <div class="flex items-center gap-2 flex-1 min-w-0">
