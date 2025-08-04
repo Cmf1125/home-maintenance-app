@@ -1126,6 +1126,9 @@ function finishTaskSetup() {
     document.getElementById('task-setup').classList.add('hidden');
     document.getElementById('main-app').classList.remove('hidden');
     document.getElementById('header-subtitle').textContent = homeData.fullAddress;
+
+    // Show bottom navigation
+    document.body.classList.add('main-app-active');
     
     // Initialize dashboard with error handling
     try {
