@@ -883,3 +883,17 @@ body.main-app-active .main-content {
         border-radius: 12px;
     }
 }
+
+
+/* Mobile touch targets */
+button, .btn, .touch-btn {
+  min-height: 48px;
+  min-width: 48px;
+}
+/* Prevent horizontal overflow on small screens */
+html, body {
+  overflow-x: hidden;
+}
+.container, .main-content {
+  max-width: 100%;
+}
