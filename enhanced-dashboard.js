@@ -239,19 +239,21 @@ renderEnhancedTaskCard(task) {
     let dueDateColor = 'text-gray-600';
     
     if (isOverdue) {
-        dueDateDisplay = `${Math.abs(daysUntilDue)}d overdue`;
-        dueDateColor = 'text-red-600 font-semibold';
-    } else if (daysUntilDue === 0) {
-        dueDateDisplay = 'Due today';
-        dueDateColor = 'text-orange-600 font-semibold';
-    } else if (daysUntilDue <= 7) {
-        dueDateDisplay = `${daysUntilDue}d`;
-        dueDateColor = 'text-orange-600';
-    } else if (daysUntilDue <= 30) {
-        dueDateDisplay = `${daysUntilDue}d`;
-    } else {
-        dueDateDisplay = taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    }
+    const overdueDays = Math.abs(daysUntilDue);
+    dueDateDisplay = overdueDays === 1 ? '1 day overdue' : `${overdueDays} days overdue`;
+    dueDateColor = 'text-red-600 font-semibold';
+} else if (daysUntilDue === 0) {
+    dueDateDisplay = 'Due today';
+    dueDateColor = 'text-orange-600 font-semibold';
+} else if (daysUntilDue === 1) {
+    dueDateDisplay = 'Due tomorrow';
+    dueDateColor = 'text-orange-600';
+} else if (daysUntilDue <= 14) {
+    dueDateDisplay = `Due in ${daysUntilDue} days`;
+    dueDateColor = daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600';
+} else {
+    dueDateDisplay = `Due ${taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+}
 
     // Get category info
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
@@ -263,7 +265,7 @@ renderEnhancedTaskCard(task) {
                 <div class="flex items-center gap-2 flex-1 min-w-0">
                     <span class="text-sm flex-shrink-0">${urgencyDot}</span>
                     <span class="font-semibold text-gray-900 text-sm truncate">${task.title}</span>
-                    <span class="text-sm flex-shrink-0">${categoryInfo.icon}</span>
+                    <span class="text-xs text-gray-500">${categoryInfo.icon} ${task.category}</span>
                     ${task.cost > 0 ? `<span class="text-green-600 font-medium text-xs">$${task.cost}</span>` : ''}
                 </div>
                 
