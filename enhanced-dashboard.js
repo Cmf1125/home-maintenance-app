@@ -206,8 +206,6 @@ class EnhancedDashboard {
         tasksList.innerHTML = filteredTasks.map(task => this.renderEnhancedTaskCard(task)).join('');
     }
 
-// Replace the renderEnhancedTaskCard function with this true single-row version
-
 renderEnhancedTaskCard(task) {
     const now = new Date();
     const taskDate = new Date(task.dueDate);
@@ -226,17 +224,17 @@ renderEnhancedTaskCard(task) {
     let urgencyDot = '⚪';
     
     if (isOverdue) {
-        statusClass = 'bg-red-50 border-l-2 border-red-400';
+        statusClass = 'bg-red-50 border-l-4 border-red-400';
         urgencyDot = '🔴';
     } else if (isSafetyTask) {
-        statusClass = 'bg-orange-50 border-l-2 border-orange-400';
+        statusClass = 'bg-orange-50 border-l-4 border-orange-400';
         urgencyDot = '🟠';
     } else if (daysUntilDue <= 7) {
-        statusClass = 'bg-yellow-50 border-l-2 border-yellow-400';
+        statusClass = 'bg-yellow-50 border-l-4 border-yellow-400';
         urgencyDot = '🟡';
     }
     
-    // Compact due date display
+    // Clean due date display
     let dueDateDisplay;
     let dueDateColor = 'text-gray-600';
     
@@ -255,30 +253,32 @@ renderEnhancedTaskCard(task) {
         dueDateDisplay = taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
-    // Get category info - just emoji for compactness
+    // Get category info
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
     return `
-        <div class="px-2 py-2 border-b ${statusClass} enhanced-task-card transition-all duration-200 single-row-task">
-            <div class="flex items-center gap-1 w-full">
-                <!-- Dot + Title + Category (left side) -->
-                <span class="text-sm flex-shrink-0">${urgencyDot}</span>
-                <span class="font-medium text-gray-900 text-sm truncate min-w-0 flex-1 max-w-32">${task.title}</span>
-                <span class="text-xs flex-shrink-0">${categoryInfo.icon}</span>
-                ${task.cost > 0 ? `<span class="text-green-600 font-medium text-xs flex-shrink-0">${task.cost}</span>` : ''}
+        <div class="p-3 border-b ${statusClass} enhanced-task-card transition-all duration-200 simple-horizontal-task">
+            <div class="flex items-center justify-between gap-2">
+                <!-- Left: Dot + Title + Category + Cost -->
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <span class="text-sm flex-shrink-0">${urgencyDot}</span>
+                    <span class="font-semibold text-gray-900 text-sm truncate">${task.title}</span>
+                    <span class="text-sm flex-shrink-0">${categoryInfo.icon}</span>
+                    ${task.cost > 0 ? `<span class="text-green-600 font-medium text-xs">$${task.cost}</span>` : ''}
+                </div>
                 
-                <!-- Due date -->
-                <span class="text-xs ${dueDateColor} flex-shrink-0 ml-1 min-w-16 text-right">${dueDateDisplay}</span>
-                
-                <!-- Action buttons -->
-                <button onclick="completeTask(${task.id})" 
-                        class="bg-green-100 text-green-700 hover:bg-green-200 px-1.5 py-1 rounded text-xs font-medium transition-colors flex-shrink-0 ml-1">
-                    ✅
-                </button>
-                <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
-                        class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-1.5 py-1 rounded text-xs font-medium transition-colors flex-shrink-0">
-                    📅
-                </button>
+                <!-- Right: Due Date + Actions -->
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <span class="text-xs ${dueDateColor} whitespace-nowrap">${dueDateDisplay}</span>
+                    <button onclick="completeTask(${task.id})" 
+                            class="bg-green-100 text-green-700 hover:bg-green-200 px-2 py-1 rounded text-xs font-medium transition-colors">
+                        Complete
+                    </button>
+                    <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
+                            class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 rounded text-xs font-medium transition-colors">
+                        Reschedule
+                    </button>
+                </div>
             </div>
         </div>
     `;
