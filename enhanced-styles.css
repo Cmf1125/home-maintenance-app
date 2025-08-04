@@ -359,3 +359,45 @@ body.install-banner-visible {
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+/* --- Compact horizontal task card layout (added) --- */
+.enhanced-task-card.simple-horizontal-task {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.enhanced-task-card .text-sm.truncate {
+  max-width: 60vw; /* keep titles from wrapping too early */
+}
+@media (min-width: 640px) {
+  .enhanced-task-card .text-sm.truncate { max-width: 40vw; }
+}
+
+/* --- Larger Complete/Reschedule buttons for mobile --- */
+.enhanced-task-card.simple-horizontal-task button {
+  min-height: 36px;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+@media (max-width: 640px) {
+  .enhanced-task-card.simple-horizontal-task button {
+    font-size: 0.8rem;
+  }
+}
+
+/* --- Pressed state feedback for Complete/Reschedule buttons --- */
+.enhanced-task-card.simple-horizontal-task button:active {
+  transform: scale(0.96);
+  filter: brightness(0.95);
+  transition: transform 0.05s ease, filter 0.05s ease;
+}
+
+/* --- Tap feedback effect on action buttons --- */
+.enhanced-task-card.simple-horizontal-task button:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+.enhanced-task-card.simple-horizontal-task button {
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
