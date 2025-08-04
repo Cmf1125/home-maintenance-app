@@ -1408,8 +1408,7 @@ window.tasks.forEach(task => {
                 <div class="text-center mb-6">
                     <div class="text-4xl mb-4">📋</div>
                     <h2 class="text-xl font-bold text-gray-900 mb-2">Manage All Tasks</h2>
-                    <p class="text-gray-600 text-sm">Edit your maintenance tasks and view annual costs</p>
-                </div>
+    
                 
                 <!-- Simplified Complete Overview -->
 <div class="bg-gray-50 p-4 rounded-lg mb-6">
