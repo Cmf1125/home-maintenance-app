@@ -1424,9 +1424,9 @@ window.tasks.forEach(task => {
 </div>
                 
                 <!-- Add Custom Task Button -->
-                <div class="flex items-right justify-between mb-4">
+                <div class="flex items-center justify-between mb-4">
                    <button onclick="event.stopPropagation(); window.closeDatePickerModal(); addTaskFromDashboard()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-                        ➕ Add Task
+                        Add Task
                     </button>
                 </div>
                 
