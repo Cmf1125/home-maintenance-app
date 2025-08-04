@@ -259,7 +259,7 @@ renderEnhancedTaskCard(task) {
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
     return `
-        <div class="p-3 border-b ${statusClass} enhanced-task-card transition-all duration-200 simple-horizontal-task">
+        <div class="p-3 border-b ${statusClass} enhanced-task-card transition-all duration-200 simple-horizontal-task cursor-pointer hover:bg-gray-50" onclick="editTaskFromDashboard(${task.id})">
             <div class="flex items-center justify-between gap-2">
                 <!-- Left: Dot + Title + Category + Cost -->
                 <div class="flex items-center gap-2 flex-1 min-w-0">
@@ -272,7 +272,7 @@ renderEnhancedTaskCard(task) {
                 <!-- Right: Due Date + Actions -->
                 <div class="flex items-center gap-2 flex-shrink-0">
                     <span class="text-xs ${dueDateColor} whitespace-nowrap">${dueDateDisplay}</span>
-                    <button onclick="completeTask(${task.id})" 
+                    <button onclick="event.stopPropagation(); completeTask(${task.id})" 
                             class="bg-green-100 text-green-700 hover:bg-green-200 px-2 py-1 rounded text-xs font-medium transition-colors">
                         Complete
                     </button>
