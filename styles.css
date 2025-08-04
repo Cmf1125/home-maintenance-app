@@ -857,58 +857,42 @@ body.main-app-active .main-content {
     }
 }
 
-/* True single-row task cards */
+/* True single-row task cards - ULTRA COMPACT */
 @media (max-width: 768px) {
     .single-row-task {
-        padding: 0.625rem 0.75rem !important;
-        min-height: 44px; /* Touch-friendly but compact */
-        border-radius: 8px;
+        padding: 0.5rem 0.5rem !important;
+        min-height: 40px;
+        border-radius: 6px;
         margin-bottom: 0.25rem;
     }
     
-    /* Ensure everything stays on one line */
-    .single-row-task .flex.items-center.justify-between {
-        min-height: 32px;
+    /* Single flex row - everything inline */
+    .single-row-task .flex.items-center.gap-1 {
+        min-height: 28px;
         align-items: center;
     }
     
-    /* Left section spacing */
-    .single-row-task .flex.items-center.gap-2.flex-1 {
-        gap: 0.5rem;
-        overflow: hidden;
+    /* Task title - limited width */
+    .single-row-task .max-w-32 {
+        max-width: 8rem; /* 128px */
     }
     
-    /* Task title truncation */
-    .single-row-task .truncate {
-        max-width: 140px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    
-    /* Right section spacing */
-    .single-row-task .flex.items-center.gap-2.flex-shrink-0 {
-        gap: 0.375rem;
-    }
-    
-    /* Action buttons */
+    /* Action buttons - just icons */
     .single-row-task button {
-        min-height: 32px;
-        padding: 0.375rem 0.5rem !important;
+        min-height: 28px;
+        min-width: 28px;
+        padding: 0.25rem 0.375rem !important;
         font-size: 0.75rem !important;
         border-radius: 4px;
-        white-space: nowrap;
-        font-weight: 500;
     }
     
-    /* Due date column */
-    .single-row-task .text-right {
-        text-align: right;
-        white-space: nowrap;
+    /* Due date spacing */
+    .single-row-task .min-w-16 {
+        min-width: 4rem; /* 64px for due date */
     }
     
     /* Less padding in task container */
-    .bg-white.rounded-2xl.shadow-lg .p-4:last-child {
-        padding: 0.5rem !important;
+    .bg-white.rounded-2xl.shadow-lg > div:last-child {
+        padding: 0.25rem !important;
     }
 }
