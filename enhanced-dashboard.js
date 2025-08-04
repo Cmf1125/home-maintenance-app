@@ -206,9 +206,7 @@ class EnhancedDashboard {
         tasksList.innerHTML = filteredTasks.map(task => this.renderEnhancedTaskCard(task)).join('');
     }
 
-    // Replace the renderEnhancedTaskCard function in enhanced-dashboard.js with this compact version
-
-// Replace the renderEnhancedTaskCard function with this ultra-compact version
+// Replace the renderEnhancedTaskCard function with this true single-row version
 
 renderEnhancedTaskCard(task) {
     const now = new Date();
@@ -223,7 +221,7 @@ renderEnhancedTaskCard(task) {
                         task.title.toLowerCase().includes('fire') ||
                         task.title.toLowerCase().includes('carbon');
     
-    // Enhanced status styling with proper Safety priority
+    // Enhanced status styling
     let statusClass = 'bg-white';
     let urgencyDot = '⚪';
     
@@ -238,47 +236,49 @@ renderEnhancedTaskCard(task) {
         urgencyDot = '🟡';
     }
     
-    // Ultra-compact due date display
+    // Compact due date display
     let dueDateDisplay;
+    let dueDateColor = 'text-gray-600';
+    
     if (isOverdue) {
         dueDateDisplay = `${Math.abs(daysUntilDue)}d overdue`;
+        dueDateColor = 'text-red-600 font-semibold';
     } else if (daysUntilDue === 0) {
-        dueDateDisplay = `Due today`;
+        dueDateDisplay = 'Due today';
+        dueDateColor = 'text-orange-600 font-semibold';
     } else if (daysUntilDue <= 7) {
         dueDateDisplay = `${daysUntilDue}d`;
+        dueDateColor = 'text-orange-600';
     } else if (daysUntilDue <= 30) {
         dueDateDisplay = `${daysUntilDue}d`;
     } else {
         dueDateDisplay = taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
-    // Get category info
+    // Get category info - just emoji for compactness
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
     return `
-        <div class="px-3 py-2 border-b ${statusClass} enhanced-task-card transition-all duration-200 ultra-compact-task">
-            <!-- Single line with everything -->
+        <div class="px-3 py-2.5 border-b ${statusClass} enhanced-task-card transition-all duration-200 single-row-task">
             <div class="flex items-center justify-between gap-2">
-                <!-- Left: Dot + Title + Category -->
+                <!-- Left section: Dot + Title + Category + Cost -->
                 <div class="flex items-center gap-2 flex-1 min-w-0">
-                    <span class="text-sm flex-shrink-0">${urgencyDot}</span>
-                    <span class="font-medium text-gray-900 text-sm truncate">${task.title}</span>
-                    <span class="px-1.5 py-0.5 rounded text-xs bg-${categoryInfo.color}-100 text-${categoryInfo.color}-700 flex-shrink-0">
-                        ${categoryInfo.icon}
-                    </span>
-                    ${task.cost > 0 ? `<span class="text-green-600 font-medium text-xs">$${task.cost}</span>` : ''}
+                    <span class="text-sm flex-shrink-0" style="line-height: 1;">${urgencyDot}</span>
+                    <span class="font-medium text-gray-900 text-sm truncate flex-shrink">${task.title}</span>
+                    <span class="text-sm flex-shrink-0" title="${task.category}">${categoryInfo.icon}</span>
+                    ${task.cost > 0 ? `<span class="text-green-600 font-medium text-xs flex-shrink-0">$${task.cost}</span>` : ''}
                 </div>
                 
-                <!-- Right: Due Date + Actions -->
+                <!-- Right section: Due Date + Actions -->
                 <div class="flex items-center gap-2 flex-shrink-0">
-                    <span class="text-xs ${isOverdue ? 'text-red-600 font-semibold' : daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600'}">${dueDateDisplay}</span>
+                    <span class="text-xs ${dueDateColor} text-right min-w-0" style="min-width: 60px;">${dueDateDisplay}</span>
                     <button onclick="completeTask(${task.id})" 
-                            class="bg-green-100 text-green-700 hover:bg-green-200 px-2 py-1 rounded text-xs font-medium transition-colors">
-                        ✅
+                            class="bg-green-100 text-green-700 hover:bg-green-200 px-2 py-1 rounded text-xs font-medium transition-colors flex-shrink-0">
+                        Complete
                     </button>
                     <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
-                            class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 rounded text-xs font-medium transition-colors">
-                        📅
+                            class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 rounded text-xs font-medium transition-colors flex-shrink-0">
+                        Reschedule
                     </button>
                 </div>
             </div>
