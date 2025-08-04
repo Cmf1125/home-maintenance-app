@@ -1412,7 +1412,6 @@ window.tasks.forEach(task => {
                 
                 <!-- Simplified Complete Overview -->
 <div class="bg-gray-50 p-4 rounded-lg mb-6">
-    <h3 class="font-semibold text-gray-900 mb-3">📊 Complete Overview</h3>
     <div class="grid grid-cols-2 gap-6 text-sm max-w-md mx-auto">
         <div class="text-center">
             <div class="text-2xl font-bold text-blue-600">${totalTasks}</div>
