@@ -772,3 +772,46 @@ body.main-app-active .main-content {
         padding-bottom: 120px;
     }
 }
+
+/* Mobile-optimized stat cards */
+@media (max-width: 768px) {
+    .stat-card {
+        padding: 0.75rem;
+        min-height: 70px;
+    }
+    
+    .stat-card .flex.items-center.gap-3 {
+        gap: 0.5rem;
+    }
+    
+    /* Hide the "Click to view" text on mobile */
+    .stat-card .text-xs.text-gray-500 {
+        display: none;
+    }
+    
+    /* Make numbers more prominent */
+    .stat-card .text-xl {
+        font-size: 1.75rem;
+        font-weight: 800;
+    }
+    
+    /* Smaller icons */
+    .stat-card .p-2 {
+        padding: 0.375rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .stat-card .text-lg {
+        font-size: 1rem;
+    }
+    
+    /* Tighter text spacing */
+    .stat-card .text-xs.text-gray-600 {
+        font-size: 0.6875rem;
+        line-height: 1;
+    }
+}
