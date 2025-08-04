@@ -369,46 +369,60 @@
     }
 }
 
-/* Mobile Task Cards */
+/* Simple horizontal task cards that actually work */
 @media (max-width: 768px) {
-    .enhanced-task-card {
-        padding: 1rem;
+    .simple-horizontal-task {
+        padding: 0.75rem !important;
+        min-height: 50px;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
     }
     
-    .enhanced-task-card .flex {
-        flex-direction: column;
+    /* Main flex container */
+    .simple-horizontal-task .flex.items-center.justify-between {
+        align-items: center;
         gap: 0.75rem;
     }
     
-    .task-dates {
-        align-items: flex-start !important;
-        text-align: left !important;
-        margin-top: 0.5rem;
-    }
-    
-    .task-actions {
-        flex-direction: row !important;
+    /* Left section - flexible */
+    .simple-horizontal-task .flex.items-center.gap-2.flex-1 {
         gap: 0.5rem;
-        justify-content: stretch;
-    }
-    
-    .task-actions button {
+        min-width: 0;
         flex: 1;
-        text-align: center;
     }
     
-    .task-meta-row {
-        flex-wrap: wrap;
+    /* Task title - allow more space */
+    .simple-horizontal-task .truncate {
+        max-width: none;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Right section - fixed */
+    .simple-horizontal-task .flex.items-center.gap-2.flex-shrink-0 {
         gap: 0.5rem;
+        flex-shrink: 0;
     }
     
-    /* Larger touch targets for task buttons */
-    .task-action-btn {
-        padding: 0.75rem 1rem;
-        font-size: 0.875rem;
-        min-height: 44px;
+    /* Action buttons */
+    .simple-horizontal-task button {
+        min-height: 32px;
+        padding: 0.375rem 0.75rem !important;
+        font-size: 0.75rem !important;
+        border-radius: 6px;
+        white-space: nowrap;
+    }
+    
+    /* Due date */
+    .simple-horizontal-task .whitespace-nowrap {
+        white-space: nowrap;
+        min-width: fit-content;
     }
 }
+
+/* Remove the old single-row-task CSS completely */
 
 /* Mobile Bottom Navigation */
 @media (max-width: 768px) {
