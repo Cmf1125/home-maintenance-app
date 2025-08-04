@@ -401,7 +401,3 @@ body.install-banner-visible {
 .enhanced-task-card.simple-horizontal-task button {
   transition: transform 0.1s ease, opacity 0.1s ease;
 }
-
-/* Sticky Stats Tabs */
-.stat-tab { border: 1px solid transparent; }
-.stat-tab.active { background: #EFF6FF; border-color: #BFDBFE; }
