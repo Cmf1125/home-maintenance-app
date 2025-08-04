@@ -206,23 +206,20 @@ class EnhancedDashboard {
         tasksList.innerHTML = filteredTasks.map(task => this.renderEnhancedTaskCard(task)).join('');
     }
 
-    renderEnhancedTaskCard(task) {
+    // Replace the renderEnhancedTaskCard function in enhanced-dashboard.js with this compact version
+
+renderEnhancedTaskCard(task) {
     const now = new Date();
     const taskDate = new Date(task.dueDate);
     const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
     const isOverdue = daysUntilDue < 0;
     
-    // Enhanced Safety task detection (same as All Tasks)
+    // Enhanced Safety task detection
     const isSafetyTask = task.category === 'Safety' || task.priority === 'high' || 
                         task.title.toLowerCase().includes('smoke') || 
                         task.title.toLowerCase().includes('detector') ||
                         task.title.toLowerCase().includes('fire') ||
                         task.title.toLowerCase().includes('carbon');
-    
-    // Debug log for Dashboard Safety tasks
-    if (isSafetyTask) {
-        console.log(`🟠 Dashboard Safety task: "${task.title}" (category: ${task.category}, priority: ${task.priority})`);
-    }
     
     // Enhanced status styling with proper Safety priority
     let statusClass = 'bg-white';
@@ -242,71 +239,58 @@ class EnhancedDashboard {
     // Clean due date display
     let dueDateDisplay;
     if (isOverdue) {
-        dueDateDisplay = `<span class="text-red-600 font-semibold">${Math.abs(daysUntilDue)}d overdue</span>`;
+        dueDateDisplay = `<span class="text-red-600 font-semibold text-xs">${Math.abs(daysUntilDue)}d overdue</span>`;
     } else if (daysUntilDue === 0) {
-        dueDateDisplay = `<span class="text-orange-600 font-semibold">Due today</span>`;
+        dueDateDisplay = `<span class="text-orange-600 font-semibold text-xs">Due today</span>`;
     } else if (daysUntilDue <= 7) {
-        dueDateDisplay = `<span class="text-orange-600">Due in ${daysUntilDue}d</span>`;
+        dueDateDisplay = `<span class="text-orange-600 text-xs">Due in ${daysUntilDue}d</span>`;
     } else if (daysUntilDue <= 30) {
-        dueDateDisplay = `<span class="text-gray-700">Due in ${daysUntilDue}d</span>`;
+        dueDateDisplay = `<span class="text-gray-700 text-xs">Due in ${daysUntilDue}d</span>`;
     } else {
-        dueDateDisplay = `<span class="text-gray-600">Due ${taskDate.toLocaleDateString()}</span>`;
+        dueDateDisplay = `<span class="text-gray-600 text-xs">Due ${taskDate.toLocaleDateString()}</span>`;
     }
 
-    // Last completed display
-    let lastCompletedDisplay = '';
-    if (task.lastCompleted) {
-        const lastDate = new Date(task.lastCompleted);
-        const daysSince = Math.floor((now - lastDate) / (24 * 60 * 60 * 1000));
-        lastCompletedDisplay = `<div class="text-xs text-gray-500 mt-1">
-            ✅ Completed ${daysSince}d ago
-        </div>`;
-    }
+    // Get category info
+    const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
     return `
-        <div class="p-4 border-b ${statusClass} enhanced-task-card transition-all duration-200">
-            <div class="flex justify-between items-start">
-                <div class="flex-1 pr-3">
-                    <div class="flex items-start gap-3 mb-2">
-                        <span class="text-lg mt-0.5 flex-shrink-0">${urgencyDot}</span>
-                        <div class="flex-1 min-w-0">
-                           <h4 class="font-semibold text-gray-900 text-sm leading-tight">
-                                ${task.title}
-                                ${isSafetyTask ? '<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-medium ml-2">🟠 Safety</span>' : ''}
-                            </h4>
-                            <p class="text-xs text-gray-600 mt-1 leading-relaxed">${task.description}</p>
+        <div class="p-3 border-b ${statusClass} enhanced-task-card transition-all duration-200 mobile-compact-task">
+            <!-- Mobile: Single line with all key info -->
+            <div class="flex justify-between items-center mb-2">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <span class="text-sm flex-shrink-0">${urgencyDot}</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-1 mb-1 flex-wrap">
+                            <h4 class="font-semibold text-gray-900 text-sm leading-tight truncate flex-shrink">${task.title}</h4>
+                            ${isSafetyTask ? '<span class="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-xs font-medium flex-shrink-0">Safety</span>' : ''}
                         </div>
-                        <div class="text-right text-xs flex-shrink-0">
-                            <div class="days-until">${dueDateDisplay}</div>
+                        <!-- Mobile: Compact meta info on one line -->
+                        <div class="flex items-center gap-2 text-xs text-gray-600 flex-wrap">
+                            <span class="px-1.5 py-0.5 rounded-full bg-${categoryInfo.color}-50 text-${categoryInfo.color}-700 font-medium flex-shrink-0">
+                                ${categoryInfo.icon} ${task.category}
+                            </span>
+                            ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
+                            <span class="text-gray-500">${task.frequency}d</span>
+                            <span class="ml-auto">${dueDateDisplay}</span>
                         </div>
                     </div>
-                    
-                    <div class="flex items-center gap-3 text-xs flex-wrap">
-    <span class="category-badge px-2 py-1 rounded-full bg-${this.categoryConfig[task.category]?.color || 'gray'}-50 text-${this.categoryConfig[task.category]?.color || 'gray'}-700 font-medium">
-        ${this.categoryConfig[task.category]?.icon || '📋'} ${task.category}
-    </span>
-    ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
-    <span class="text-gray-500">Every ${task.frequency}d</span>
-</div>
-                    
-                    ${lastCompletedDisplay}
                 </div>
-                
-                <div class="task-actions flex flex-col gap-2 ml-3">
-                    <button onclick="completeTask(${task.id})" 
-                            class="task-action-btn bg-green-100 text-green-700 hover:bg-green-200 px-3 py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap">
-                        ✅ Complete
-                    </button>
-                    <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
-                            class="task-action-btn bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap">
-                        📅 Reschedule
-                    </button>
-                </div>
+            </div>
+            
+            <!-- Mobile: Compact action buttons -->
+            <div class="flex gap-2">
+                <button onclick="completeTask(${task.id})" 
+                        class="flex-1 bg-green-100 text-green-700 hover:bg-green-200 px-3 py-2 rounded-lg text-xs font-medium transition-colors">
+                    ✅ Complete
+                </button>
+                <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
+                        class="flex-1 bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-2 rounded-lg text-xs font-medium transition-colors">
+                    📅 Reschedule
+                </button>
             </div>
         </div>
     `;
 }
-
     render() {
         this.updateStats();
         this.renderFilteredTasks();
