@@ -1,3 +1,18 @@
+
+// Helper: parse 'YYYY-MM-DD' into a local Date at midnight to avoid timezone drift
+function parseLocalDate(isoDateStr) {
+    if (!isoDateStr) return null;
+    // If it's already a Date, return as-is
+    if (isoDateStr instanceof Date) return isoDateStr;
+    // Ensure we handle 'YYYY-MM-DD' safely in all browsers
+    var m = String(isoDateStr).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) {
+        return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    }
+    // Fallback to native parsing
+    return new Date(isoDateStr);
+}
+
 // Enhanced Dashboard functionality for The Home Keeper - Updated for Simplified Date System
 class EnhancedDashboard {
     constructor() {
@@ -152,22 +167,24 @@ class EnhancedDashboard {
         }
 
         const now = new Date();
-        const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const oneWeek = new Date(startOfDay.getTime() + 7 * 24 * 60 * 60 * 1000);
+        const endOfWeek = new Date(oneWeek.getFullYear(), oneWeek.getMonth(), oneWeek.getDate(), 23, 59, 59, 999);
 
         switch (this.currentFilter) {
             case 'overdue':
                 return window.tasks.filter(task => 
                     !task.isCompleted && 
                     task.dueDate && 
-                    new Date(task.dueDate) < now
+                    parseLocalDate(task.dueDate) < now
                 ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
             case 'week':
                 return window.tasks.filter(task => 
                     !task.isCompleted && 
                     task.dueDate && 
-                    new Date(task.dueDate) <= oneWeek &&
-                    new Date(task.dueDate) >= now
+                    parseLocalDate(task.dueDate) <= oneWeek &&
+                    parseLocalDate(task.dueDate) >= now
                 ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
             // REMOVED: 'cost' case - moved to All Tasks
@@ -189,6 +206,7 @@ class EnhancedDashboard {
         }
 
         const filteredTasks = this.getFilteredTasks();
+        console.log("🔎 Filtered tasks for", this.currentFilter, filteredTasks.length);
 
         if (filteredTasks.length === 0) {
             const emptyMessages = {
@@ -215,7 +233,7 @@ class EnhancedDashboard {
 
 renderEnhancedTaskCard(task) {
     const now = new Date();
-    const taskDate = new Date(task.dueDate);
+    const taskDate = parseLocalDate(task.dueDate);
     const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
     const isOverdue = daysUntilDue < 0;
     
@@ -303,7 +321,9 @@ renderEnhancedTaskCard(task) {
     if (!window.tasks) return;
 
     const now = new Date();
-    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const oneWeek = new Date(startOfDay.getTime() + 7 * 24 * 60 * 60 * 1000);
+        const endOfWeek = new Date(oneWeek.getFullYear(), oneWeek.getMonth(), oneWeek.getDate(), 23, 59, 59, 999);
     
     let overdueCount = 0;
     let weekCount = 0;
@@ -311,7 +331,7 @@ renderEnhancedTaskCard(task) {
 
     window.tasks.forEach(task => {
         if (!task.isCompleted && task.dueDate) {
-            const taskDate = new Date(task.dueDate);
+            const taskDate = parseLocalDate(task.dueDate);
             if (taskDate < now) {
                 overdueCount++;
             }
@@ -378,7 +398,7 @@ function editTaskFromDashboard(taskId) { if (typeof openTaskEditModal === "funct
     
     const currentDueDateStr = task.dueDate instanceof Date ? 
         task.dueDate.toISOString().split('T')[0] : 
-        new Date(task.dueDate).toISOString().split('T')[0];
+        parseLocalDate(task.dueDate).toISOString().split('T')[0];
     
     const newDueDateStr = prompt('Due Date (YYYY-MM-DD):', currentDueDateStr);
     if (newDueDateStr === null) return;
@@ -514,7 +534,7 @@ function exportTaskList() {
     let csvContent = "Task,Description,Category,Priority,Due Date,Cost,Frequency,Last Completed\n";
     
     filteredTasks.forEach(task => {
-        const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'Not set';
+        const dueDate = task.dueDate ? parseLocalDate(task.dueDate).toLocaleDateString() : 'Not set';
         const lastCompleted = task.lastCompleted ? new Date(task.lastCompleted).toLocaleDateString() : 'Never';
         
         csvContent += `"${task.title}","${task.description}","${task.category}","${task.priority}","${dueDate}","$${task.cost}","${task.frequency} days","${lastCompleted}"\n`;
