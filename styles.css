@@ -739,3 +739,36 @@
         width: 12rem;
     }
 }
+
+/* Hide bottom nav during setup by default */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    z-index: 50;
+    padding-bottom: env(safe-area-inset-bottom);
+    display: none; /* Hidden by default */
+}
+
+/* Show bottom nav when main app is active */
+body.main-app-active .bottom-nav {
+    display: block;
+}
+
+/* Adjust main content padding only when nav is visible */
+body.main-app-active .main-content {
+    padding-bottom: 100px;
+}
+
+.main-content {
+    padding-bottom: 20px; /* Minimal padding during setup */
+}
+
+@media (max-width: 768px) {
+    body.main-app-active .main-content {
+        padding-bottom: 120px;
+    }
+}
