@@ -2339,6 +2339,9 @@ function clearData() {
         document.getElementById('task-setup').classList.add('hidden');
         document.getElementById('main-app').classList.add('hidden');
         document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
+
+        // Hide bottom navigation during reset
+        document.body.classList.remove('main-app-active');
         
         alert('✅ All data cleared. Starting fresh!');
     }
@@ -2468,7 +2471,6 @@ function initializeApp() {
     window.homeData = homeData;
     
     if (hasExistingData()) {
-        
         // Hide setup screens
         document.getElementById('setup-form').style.display = 'none';
         document.getElementById('task-setup').classList.add('hidden');
@@ -2476,6 +2478,9 @@ function initializeApp() {
         
         // Update header
         document.getElementById('header-subtitle').textContent = homeData.fullAddress;
+
+        // Show bottom navigation for returning users
+        document.body.classList.add('main-app-active');
         
         // Update global references
         window.tasks = tasks;
