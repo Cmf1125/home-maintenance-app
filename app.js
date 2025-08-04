@@ -1409,7 +1409,6 @@ window.tasks.forEach(task => {
                     <div class="text-4xl mb-4">📋</div>
                     <h2 class="text-xl font-bold text-gray-900 mb-2">Manage All Tasks</h2>
     
-                
                 <!-- Simplified Complete Overview -->
 <div class="bg-gray-50 p-4 rounded-lg mb-6">
     <div class="grid grid-cols-2 gap-6 text-sm max-w-md mx-auto">
@@ -1426,7 +1425,6 @@ window.tasks.forEach(task => {
                 
                 <!-- Add Custom Task Button -->
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-bold text-gray-900">Your Maintenance Tasks</h3>
                    <button onclick="event.stopPropagation(); window.closeDatePickerModal(); addTaskFromDashboard()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
                         ➕ Add Task
                     </button>
