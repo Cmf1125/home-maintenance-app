@@ -54,6 +54,14 @@ class EnhancedDashboard {
             });
         }
 
+        // Sticky tab buttons (v4-safe)
+        const stOverdue = document.getElementById('sticky-overdue');
+        const stWeek = document.getElementById('sticky-week');
+        const stAll = document.getElementById('sticky-all');
+        if (stOverdue) stOverdue.addEventListener('click', () => this.setFilter('overdue'));
+        if (stWeek) stWeek.addEventListener('click', () => this.setFilter('week'));
+        if (stAll) stAll.addEventListener('click', () => this.setFilter('all'));
+        
         console.log('✅ Enhanced dashboard events bound successfully');
     }
 
@@ -123,6 +131,12 @@ class EnhancedDashboard {
             }, 200);
         }
 
+        // Sticky tab active state (v4-safe)
+        document.querySelectorAll('#sticky-stats .stat-tab').forEach(btn => btn.classList.remove('active'));
+        const activeId = this.currentFilter === 'overdue' ? 'sticky-overdue' : (this.currentFilter === 'week' ? 'sticky-week' : 'sticky-all');
+        const activeBtn = document.getElementById(activeId);
+        if (activeBtn) activeBtn.classList.add('active');
+        
         // Update filter title - simplified
         const filterTitles = {
             'all': '📋 Upcoming Tasks',
@@ -337,6 +351,13 @@ renderEnhancedTaskCard(task) {
         homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
     }
     
+    // Update sticky counts if present
+    const so = document.getElementById('sticky-overdue-count');
+    const sw = document.getElementById('sticky-week-count');
+    const sa = document.getElementById('sticky-total-count');
+    if (so) so.textContent = overdueCount;
+    if (sw) sw.textContent = weekCount;
+    if (sa) sa.textContent = totalTasks;
     console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
 }
 }
