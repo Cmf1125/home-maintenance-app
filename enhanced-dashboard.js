@@ -259,7 +259,7 @@ renderEnhancedTaskCard(task) {
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
     return `
-        <div class="p-3 border-b ${statusClass} enhanced-task-card transition-all duration-200 simple-horizontal-task cursor-pointer hover:bg-gray-50" onclick="editTaskFromDashboard(${task.id})">
+        <div class="p-3 border-b ${statusClass} enhanced-task-card transition-all duration-200 simple-horizontal-task cursor-pointer hover:bg-gray-50" onclick="openTaskEditModal(${task.id})">
             <div class="flex items-center justify-between gap-2">
                 <!-- Left: Dot + Title + Category + Cost -->
                 <div class="flex items-center gap-2 flex-1 min-w-0">
@@ -342,12 +342,7 @@ renderEnhancedTaskCard(task) {
 }
 
 // NEW: Edit task from dashboard
-function editTaskFromDashboard(taskId) {
-    const task = window.tasks.find(t => t.id === taskId);
-    if (!task) {
-        console.error('❌ Task not found:', taskId);
-        return;
-    }
+function editTaskFromDashboard(taskId) { if (typeof openTaskEditModal === "function") { openTaskEditModal(taskId); } else { console.error("❌ openTaskEditModal not found"); } }
 
     // Create a simple edit dialog
     const newTitle = prompt('Task Title:', task.title);
