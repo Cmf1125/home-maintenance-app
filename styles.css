@@ -773,40 +773,41 @@ body.main-app-active .main-content {
     }
 }
 
-/* Alternative: Ultra-compact stat cards */
+/* Mobile-optimized stat cards */
 @media (max-width: 768px) {
-    .stat-card-ultra-compact {
+    .stat-card {
         padding: 0.75rem;
-        text-align: center;
-        min-height: 60px;
+        min-height: 70px;
     }
     
-    .stat-card-ultra-compact .stat-number {
-        font-size: 2rem;
+    .stat-card .flex.items-center.gap-3 {
+        gap: 0.5rem;
+    }
+    
+    /* Make numbers more prominent */
+    .stat-card .text-xl {
+        font-size: 1.75rem;
         font-weight: 800;
-        line-height: 1;
-        margin-bottom: 0.25rem;
     }
     
-    .stat-card-ultra-compact .stat-label {
+    /* Smaller icons */
+    .stat-card .p-2 {
+        padding: 0.375rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .stat-card .text-lg {
+        font-size: 1rem;
+    }
+    
+    /* Tighter text spacing */
+    .stat-card .text-xs.text-gray-600 {
         font-size: 0.6875rem;
-        color: #6b7280;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.025em;
-    }
-    
-    /* Color-coded numbers */
-    .stat-card-ultra-compact.overdue .stat-number {
-        color: #ef4444;
-    }
-    
-    .stat-card-ultra-compact.week .stat-number {
-        color: #f59e0b;
-    }
-    
-    .stat-card-ultra-compact.total .stat-number {
-        color: #2563eb;
+        line-height: 1;
     }
 }
 
@@ -871,5 +872,71 @@ body.main-app-active .main-content {
 @media (max-width: 768px) {
     .stat-card .text-xs.text-gray-500 {
         display: none !important;
+    }
+}
+/* Ultra-compact task cards */
+@media (max-width: 768px) {
+    .ultra-compact-task {
+        padding: 0.5rem 0.75rem !important;
+        min-height: auto;
+        border-radius: 6px;
+        margin-bottom: 0.25rem;
+    }
+    
+    .ultra-compact-task .flex.items-center.justify-between {
+        min-height: 32px;
+    }
+    
+    /* Compact action buttons - just icons */
+    .ultra-compact-task button {
+        min-height: 28px;
+        min-width: 28px;
+        padding: 0.25rem 0.375rem !important;
+        font-size: 0.75rem !important;
+        border-radius: 4px;
+    }
+    
+    /* Ensure text doesn't wrap */
+    .ultra-compact-task .truncate {
+        max-width: 120px;
+    }
+    
+    /* Category icon badge */
+    .ultra-compact-task .rounded {
+        border-radius: 3px;
+        font-size: 0.6875rem;
+        line-height: 1;
+    }
+}
+
+/* Make tasks list even tighter */
+@media (max-width: 768px) {
+    #tasks-list .border-b:last-child {
+        border-bottom: none;
+    }
+    
+    .bg-white.rounded-2xl.shadow-lg {
+        border-radius: 12px;
+    }
+}
+
+/* Completely hide the "Click to view" text */
+.stat-card .text-xs.text-gray-500.mt-2 {
+    display: none !important;
+}
+
+/* Mobile dashboard spacing */
+@media (max-width: 768px) {
+    #dashboard-view {
+        padding: 0.75rem;
+    }
+    
+    #dashboard-view .mb-6 {
+        margin-bottom: 1rem;
+    }
+    
+    /* Tighter grid spacing */
+    .grid.grid-cols-3.gap-4 {
+        gap: 0.75rem;
     }
 }
