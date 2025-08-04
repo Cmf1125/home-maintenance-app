@@ -341,13 +341,21 @@ renderEnhancedTaskCard(task) {
 }
 }
 
-// NEW: Edit task from dashboard
-function editTaskFromDashboard(taskId) {
-    const task = window.tasks.find(t => t.id === taskId);
-    if (!task) {
-        console.error('❌ Task not found:', taskId);
-        return;
-    }
+   function editTaskFromDashboard(taskId) {
+  // Prefer the modal if it exists
+  if (typeof openTaskEditModal === 'function') {
+    openTaskEditModal(taskId);
+    return;
+  }
+  // Fallback (keeps old behavior if modal isn’t available)
+  const task = window.tasks.find(t => t.id === taskId);
+  if (!task) { console.error('❌ Task not found:', taskId); return; }
+
+  // (Optional) keep your previous prompt-based flow here as a fallback,
+  // or just log an error:
+  console.error('❌ openTaskEditModal not found; modal could not be opened.');
+}
+
 
     // Create a simple edit dialog
     const newTitle = prompt('Task Title:', task.title);
