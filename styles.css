@@ -861,3 +861,15 @@ body.main-app-active .main-content {
         gap: 0.75rem;
     }
 }
+
+/* Completely hide the "Click to view" text */
+.stat-card .text-xs.text-gray-500.mt-2 {
+    display: none !important;
+}
+
+/* Also hide on mobile specifically */
+@media (max-width: 768px) {
+    .stat-card .text-xs.text-gray-500 {
+        display: none !important;
+    }
+}
