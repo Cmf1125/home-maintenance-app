@@ -144,7 +144,6 @@ class EnhancedDashboard {
         }
     }
 
-    // UPDATE: getFilteredTasks() - Remove cost case
     getFilteredTasks() {
         if (!window.tasks) {
             console.warn('⚠️ No tasks data available');
@@ -179,6 +178,11 @@ class EnhancedDashboard {
                 ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
                 .slice(0, 8);
         }
+    }
+
+    getApplianceTasks() {
+        if (!window.tasks) return [];
+        return window.tasks.filter(task => task.isApplianceTask || task.applianceId);
     }
 
     renderFilteredTasks() {
@@ -746,5 +750,20 @@ function showSuccessNotification(message) {
 // Ensure enhanced dashboard is available globally
 window.EnhancedDashboard = EnhancedDashboard;
 
+// Add this function to navigate to appliance details:
+function viewAppliance(applianceId) {
+    console.log('🔧 Viewing appliance:', applianceId);
+    
+    // Switch to appliances tab and show specific appliance
+    showTab('appliances');
+    
+    // Tell appliance manager to show this specific appliance
+    if (window.applianceManager && typeof window.applianceManager.showApplianceDetail === 'function') {
+        window.applianceManager.showApplianceDetail(applianceId);
+    }
+}
+
+// Make globally available
+window.viewAppliance = viewAppliance;
 
 console.log('📋 Enhanced Dashboard script loaded with simplified date system');
