@@ -807,6 +807,17 @@ handleAddFormSubmit(event) {
     
     // Save to storage
     this.saveAppliances();
+
+    // In your handleAddFormSubmit method, add this after saving the appliance:
+    const askForTasks = confirm(
+        `✅ Appliance "${newAppliance.name}" added successfully!\n\n` +
+        `Would you like to generate automatic maintenance tasks for this appliance?`
+    );
+
+    if (askForTasks) {
+        const result = this.addApplianceWithTasks(newAppliance);
+        alert(`🔧 Generated ${result.tasksCreated} maintenance tasks!`);
+    }
     
     // Clear temporary photos
     window.tempAppliancePhotos = [];
@@ -926,6 +937,8 @@ renderApplianceCard(appliance) {
             </div>
         </div>
     `;
+    // Add this to your renderApplianceCard method after the existing content:
+${this.renderApplianceTasksSection(appliance)}
 }
     // Add these methods to your ApplianceManager class:
 
