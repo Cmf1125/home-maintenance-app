@@ -58,7 +58,7 @@ class ApplianceManager {
     updateMainAppData() {
         if (typeof window.saveData === 'function') {
             // Make appliances available to main app
-            window.applianceData = this.appliances;
+            windowapplianceData = this.appliances;
             window.saveData();
         }
     }
@@ -936,9 +936,9 @@ renderApplianceCard(appliance) {
                 </div>
             </div>
         </div>
-    `;
+    
+ `;
     // Add this to your renderApplianceCard method after the existing content:
-${this.renderApplianceTasksSection(appliance)}
 }
     // Add these methods to your ApplianceManager class:
 
