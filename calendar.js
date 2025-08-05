@@ -372,18 +372,18 @@ showDayPanel(date, dayTasks) {
     
     const overdueClass = isOverdue ? 'overdue' : '';
 
-    return `
+   return `
     <div class="day-panel-task ${priorityClass} ${overdueClass}">
         <div class="task-info">
             <div class="flex items-center justify-between mb-2">
                 <h4 class="task-title flex-1">${priorityDot} ${task.title}</h4>
                 ${task.cost > 0 ? `<span class="task-cost-inline text-green-600 font-semibold">$${task.cost}</span>` : ''}
             </div>
-            <p class="task-description">${task.description}</p>
-            <div class="task-meta">
+            <div class="task-meta mb-2">
                 <span class="task-category">${task.category}</span>
                 ${isOverdue ? '<span class="overdue-badge">OVERDUE</span>' : ''}
             </div>
+            <p class="task-description text-sm text-gray-600">${task.description}</p>
         </div>
         <div class="task-actions">
             <button onclick="completeTask(${task.id})" class="complete-task-btn">✅ Complete</button>
