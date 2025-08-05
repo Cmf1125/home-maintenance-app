@@ -64,10 +64,10 @@
 }
 
 .calendar-day {
-    min-height: 100px;
+    min-height: 130px;
     border-right: 1px solid #e2e8f0;
     border-bottom: 1px solid #e2e8f0;
-    padding: 0.5rem;
+    padding: 0.75rem;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
@@ -333,8 +333,8 @@
     }
     
     .calendar-day {
-        min-height: 90px;
-        padding: 0.5rem 0.25rem;
+        min-height: 120px;
+        padding: 0.75rem 0.5rem;
     }
     
     .calendar-day-header {
