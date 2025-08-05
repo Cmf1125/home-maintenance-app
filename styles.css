@@ -960,4 +960,9 @@ html, body {
     
     /* Button sizing */
     .mobile-task-card-simple button {
-        min-height: 32px !im
+        min-height: 32px !important;
+        padding: 0.25rem 0.75rem !important;
+        font-size: 0.75rem !important;
+        white-space: nowrap !important;
+    }
+}
