@@ -68,14 +68,16 @@ class CasaCareCalendar {
                     <div id="calendar-days" class="calendar-days-container"></div>
                 </div>
 
-                <!-- Selected Day Panel -->
-                <div id="selected-day-panel" class="selected-day-panel hidden">
-                    <div class="selected-day-header">
-                        <h3 id="selected-day-title">Selected Day</h3>
-                        <button id="close-day-panel" class="close-panel-btn">×</button>
-                    </div>
-                    <div id="selected-day-tasks" class="selected-day-tasks">
-                        <!-- Tasks for selected day will appear here -->
+                <!-- Selected Day Modal -->
+                <div id="selected-day-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+                    <div class="bg-white rounded-xl w-full max-w-md max-h-[80vh] overflow-hidden shadow-2xl">
+                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                            <h3 id="selected-day-title" class="text-lg font-bold text-gray-900">Selected Day</h3>
+                            <button id="close-day-modal" class="text-gray-500 hover:text-gray-700 text-xl w-8 h-8 flex items-center justify-center rounded">×</button>
+                        </div>
+                        <div id="selected-day-tasks" class="p-4 max-h-[60vh] overflow-y-auto">
+                            <!-- Tasks for selected day will appear here -->
+                        </div>
                     </div>
                 </div>
             </div>
