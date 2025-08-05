@@ -1405,20 +1405,19 @@ window.tasks.forEach(task => {
     allTasksView.innerHTML = `
         <div class="p-4">
             <div class="bg-white rounded-xl p-6 shadow-lg max-w-4xl mx-auto">
-                <div class="text-center mb-6">
-                    <div class="text-4xl mb-4">📋</div>
-                    <h2 class="text-xl font-bold text-gray-900 mb-2">Manage All Tasks</h2>
-    
-                <!-- Simplified Complete Overview -->
-<div class="bg-gray-50 p-4 rounded-lg mb-6">
-    <div class="grid grid-cols-2 gap-6 text-sm max-w-md mx-auto">
+<div class="text-center mb-4">
+    <h2 class="text-lg font-bold text-gray-900 mb-3">📋 Manage All Tasks</h2>
+
+<!-- Compact Overview -->
+<div class="bg-gray-50 p-3 rounded-lg mb-4">
+    <div class="flex justify-center gap-8 text-sm">
         <div class="text-center">
-            <div class="text-2xl font-bold text-blue-600">${totalTasks}</div>
-            <div class="text-sm text-gray-600">Total Active Tasks</div>
+            <div class="text-lg font-bold text-blue-600">${totalTasks}</div>
+            <div class="text-xs text-gray-600">Tasks</div>
         </div>
         <div class="text-center">
-            <div class="text-2xl font-bold text-green-600">$${Math.round(totalCost)}</div>
-            <div class="text-sm text-gray-600">Annual Cost</div>
+            <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
+            <div class="text-xs text-gray-600">Annual</div>
         </div>
     </div>
 </div>
