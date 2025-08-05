@@ -531,6 +531,18 @@ handleAddFormSubmit(event) {
     
     // Save to storage
     this.saveAppliances();
+
+    // ⬇️ Ask if they want to generate automatic tasks
+const askForTasks = confirm(
+    `✅ Appliance "${newAppliance.name}" added successfully!\n\n` +
+    `Would you like to generate automatic maintenance tasks for this appliance?`
+);
+
+if (askForTasks) {
+    const result = this.addApplianceWithTasks(newAppliance);
+    alert(`🔧 Generated ${result.tasksCreated} maintenance tasks!`);
+}
+
     
     // Clear temporary photos
     window.tempAppliancePhotos = [];
