@@ -897,48 +897,25 @@ html, body {
 .container, .main-content {
   max-width: 100%;
 }
-/* Mobile Horizontal Task Cards */
+
+/* Mobile Simple Task Cards */
 @media (max-width: 768px) {
-    .mobile-task-card {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
+    .mobile-task-card-simple {
         padding: 0.75rem;
-        gap: 1rem;
     }
     
-    .task-left {
-        flex: 1;
-        min-width: 0;
+    .mobile-task-card-simple .flex:first-child {
+        margin-bottom: 0.5rem;
     }
     
-    .task-right {
-        flex-shrink: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        align-items: flex-end;
-    }
-    
-    .task-row-1 {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 0.25rem;
-    }
-    
-    .task-row-2 {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+    .mobile-task-card-simple button {
+        min-height: 32px;
+        padding: 0.25rem 0.75rem;
         font-size: 0.75rem;
+        white-space: nowrap;
     }
     
-    .task-right .task-row-1 {
-        justify-content: flex-end;
-    }
-    
-    .task-right .task-row-2 {
-        justify-content: flex-end;
+    .mobile-task-card-simple .truncate {
+        min-width: 0;
     }
 }
