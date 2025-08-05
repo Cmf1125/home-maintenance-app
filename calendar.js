@@ -382,18 +382,19 @@ showDayPanel(date, dayTasks) {
     `;
 }
 
-    closeDayPanel() {
-        const panel = document.getElementById('selected-day-panel');
-        if (panel) {
-            panel.classList.add('hidden');
-        }
-        
-        // Clear selection
-        this.selectedDate = null;
-        document.querySelectorAll('.calendar-day').forEach(day => {
-            day.classList.remove('selected');
-        });
+closeDayPanel() {
+    const modal = document.getElementById('selected-day-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
     }
+    
+    // Clear selection
+    this.selectedDate = null;
+    document.querySelectorAll('.calendar-day').forEach(day => {
+        day.classList.remove('selected');
+    });
+}
 
     previousMonth() {
         this.currentMonth--;
