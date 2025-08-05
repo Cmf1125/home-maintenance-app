@@ -94,9 +94,16 @@ class CasaCareCalendar {
             this.nextMonth();
         });
 
-        // Close day panel
-        document.getElementById('close-day-panel')?.addEventListener('click', () => {
+        // Close day modal
+        document.getElementById('close-day-modal')?.addEventListener('click', () => {
             this.closeDayPanel();
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('selected-day-modal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'selected-day-modal') {
+                this.closeDayPanel();
+            }
         });
     }
 
