@@ -196,7 +196,6 @@ renderAddForm() {
                     </button>
                     <div>
                         <h2 class="text-2xl font-bold text-gray-900">Add Appliance</h2>
-                        <p class="text-gray-600 text-sm">Add a new appliance to your home inventory</p>
                     </div>
                 </div>
                 
@@ -314,7 +313,7 @@ renderAddForm() {
                             </button>
                             <button type="submit"
                                     class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
-                                💾 Save Appliance
+                                💾 Save 
                             </button>
                         </div>
                     </form>
