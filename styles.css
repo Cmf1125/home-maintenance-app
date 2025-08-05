@@ -982,10 +982,34 @@ html, body {
         flex-wrap: nowrap !important;
     }
 }
-/* More spacing between task cards */
+
+/* More spacing between task cards with priority styling */
 .enhanced-task-card {
     margin-bottom: 0.75rem;
     border-bottom: none !important;
-    border: 1px solid #e5e7eb;
     border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Default task cards */
+.enhanced-task-card:not(.bg-red-50):not(.bg-orange-50):not(.bg-yellow-50) {
+    border: 1px solid #e5e7eb;
+}
+
+/* Safety tasks (orange) */
+.enhanced-task-card.bg-orange-50 {
+    border: 1px solid #fb923c;
+    box-shadow: 0 4px 6px rgba(251, 146, 60, 0.2);
+}
+
+/* Overdue tasks (red) */
+.enhanced-task-card.bg-red-50 {
+    border: 1px solid #f87171;
+    box-shadow: 0 4px 6px rgba(248, 113, 113, 0.2);
+}
+
+/* Due soon tasks (yellow) */
+.enhanced-task-card.bg-yellow-50 {
+    border: 1px solid #fbbf24;
+    box-shadow: 0 4px 6px rgba(251, 191, 36, 0.2);
 }
