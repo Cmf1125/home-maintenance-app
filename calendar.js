@@ -81,8 +81,6 @@ class CasaCareCalendar {
                     </div>
                 </div>  
             </div>
-         </div>
-     </div>
         `;
     }
 
