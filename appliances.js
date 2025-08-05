@@ -38,29 +38,21 @@ class ApplianceManager {
         }
     }
     
-  saveAppliances() {
-    try {
-        localStorage.setItem('homeKeeperAppliances', JSON.stringify(this.appliances));
-        console.log('💾 Appliances: Saved successfully');
-        
-        // Also save to main app data for integration
-        this.updateMainAppData();
-        
-        // NEW: Refresh dashboard appliance filter if dashboard exists
-        if (window.enhancedDashboard && typeof window.enhancedDashboard.populateApplianceFilter === 'function') {
-            setTimeout(() => {
-                window.enhancedDashboard.populateApplianceFilter();
-                console.log('🔄 Dashboard appliance filter refreshed');
-            }, 100);
-        }
-        
-    } catch (error) {
-        console.error('❌ Appliances: Error saving appliances:', error);
-        if (error.name === 'QuotaExceededError') {
-            alert('❌ Storage quota exceeded. Please delete some photos to free up space.');
+    // Save appliances to storage
+    saveAppliances() {
+        try {
+            localStorage.setItem('homeKeeperAppliances', JSON.stringify(this.appliances));
+            console.log('💾 Appliances: Saved successfully');
+            
+            // Also save to main app data for integration
+            this.updateMainAppData();
+        } catch (error) {
+            console.error('❌ Appliances: Error saving appliances:', error);
+            if (error.name === 'QuotaExceededError') {
+                alert('❌ Storage quota exceeded. Please delete some photos to free up space.');
+            }
         }
     }
-}
     
     // Update main app data for integration with tasks/calendar
     updateMainAppData() {
@@ -612,15 +604,9 @@ calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
     
     // Replace your existing renderApplianceCard method with this version:
 
-// UPDATE your renderApplianceCard to include dashboard link
 renderApplianceCard(appliance) {
     const statusInfo = this.getApplianceStatus(appliance);
     const warrantyStatus = this.getWarrantyStatus(appliance);
-    
-    // NEW: Get task count for this appliance
-    const taskCount = window.tasks ? window.tasks.filter(task => 
-        task.applianceId === appliance.id && !task.isCompleted && task.dueDate
-    ).length : 0;
     
     return `
         <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow relative group">
@@ -661,19 +647,6 @@ renderApplianceCard(appliance) {
                             <span class="text-xs text-gray-500">📍 ${appliance.location}</span>
                         </div>
                     ` : ''}
-                    
-                    <!-- NEW: Task count and dashboard link -->
-                    ${taskCount > 0 ? `
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                                📋 ${taskCount} task${taskCount !== 1 ? 's' : ''}
-                            </span>
-                            <button onclick="event.stopPropagation(); window.applianceManager.viewApplianceTasksInDashboard('${appliance.id}')"
-                                    class="text-xs text-blue-600 hover:text-blue-800 underline">
-                                View in Dashboard →
-                            </button>
-                        </div>
-                    ` : ''}
                 </div>
                 
                 <div class="flex gap-2 mt-3 flex-wrap">
@@ -690,30 +663,6 @@ renderApplianceCard(appliance) {
             </div>
         </div>
     `;
-}
-// ADD this method to make functions globally available
-initializeApplianceManagerIntegration() {
-    // Make appliance task generation available globally
-    window.generateApplianceTasks = (applianceId) => {
-        if (this.appliances) {
-            return this.generateTasksForAppliance(applianceId);
-        }
-    };
-    
-    // Make appliance dashboard navigation available
-    window.viewApplianceTasksInDashboard = (applianceId) => {
-        return this.viewApplianceTasksInDashboard(applianceId);
-    };
-    
-    console.log('🔗 Appliance-Dashboard integration initialized');
-}
-
-// Call integration setup in your existing init method
-init() {
-    this.loadAppliances();
-    this.bindEvents();
-    this.initializeApplianceManagerIntegration(); // ADD this line
-    console.log('✅ Appliance Manager: Initialized with dashboard integration');
 }
     // Add these methods to your ApplianceManager class:
 
@@ -1445,7 +1394,7 @@ calculateInitialDueDate(frequency) {
     }
 }
 
-// UPDATE your addApplianceWithTasks method to integrate with dashboard
+// Method to add maintenance tasks when appliance is created
 addApplianceWithTasks(applianceData) {
     // First, add the appliance
     const appliance = {
@@ -1458,64 +1407,26 @@ addApplianceWithTasks(applianceData) {
     this.saveAppliances();
     
     // Then generate and add maintenance tasks
-    if (window.tasks) {
-        const maintenanceTasks = this.generateMaintenanceTasks(appliance);
+    const maintenanceTasks = this.generateMaintenanceTasks(appliance);
+    
+    if (maintenanceTasks.length > 0) {
+        // Add tasks to global task array
+        window.tasks.push(...maintenanceTasks);
         
-        if (maintenanceTasks.length > 0) {
-            // Add tasks to global task array
-            window.tasks.push(...maintenanceTasks);
-            
-            // Save tasks
-            if (typeof window.saveData === 'function') {
-                window.saveData();
-            }
-            
-            // NEW: Refresh dashboard
-            if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-                window.enhancedDashboard.render();
-            }
-            
-            // NEW: Refresh calendar if it exists
-            if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-                window.casaCareCalendar.refresh();
-            }
-            
-            console.log(`✅ Added ${maintenanceTasks.length} maintenance tasks for ${appliance.name}`);
+        // Save tasks
+        if (typeof window.saveData === 'function') {
+            window.saveData();
         }
-    } else {
-        console.warn('⚠️ Task system not available - appliance added without tasks');
+        
+        console.log(`✅ Added ${maintenanceTasks.length} maintenance tasks for ${appliance.name}`);
     }
     
     return {
         appliance,
-        tasksCreated: maintenanceTasks?.length || 0
+        tasksCreated: maintenanceTasks.length
     };
 }
 
-// NEW: Method to show appliance tasks in dashboard
-viewApplianceTasksInDashboard(applianceId) {
-    console.log(`📋 Viewing tasks for appliance ${applianceId} in dashboard`);
-    
-    // Switch to dashboard tab
-    if (typeof showTab === 'function') {
-        showTab('dashboard');
-    }
-    
-    // Set appliance filter after a short delay to ensure dashboard is loaded
-    setTimeout(() => {
-        if (window.enhancedDashboard) {
-            window.enhancedDashboard.setApplianceFilter(applianceId.toString());
-            
-            // Scroll to tasks list
-            const tasksList = document.getElementById('tasks-list');
-            if (tasksList) {
-                tasksList.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-    }, 300);
-}
-
-    
 // Method to get appliance-related tasks
 getApplianceTasks(applianceId) {
     if (!window.tasks) return [];
