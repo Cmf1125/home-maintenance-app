@@ -436,9 +436,10 @@ showEnhancedCameraInterface(stream) {
     });
 }
 
-// Capture photo and scan for QR codes or text
+// MOBILE-FRIENDLY VERSION - Replace your captureAndScan function with this:
+
 async captureAndScan(video, statusDiv, stream, modal) {
-    statusDiv.textContent = 'Capturing image...';
+    statusDiv.innerHTML = 'Capturing image...';
     
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -449,66 +450,77 @@ async captureAndScan(video, statusDiv, stream, modal) {
     
     // IMAGE ENHANCEMENT for better OCR
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    
-    // Apply contrast and brightness enhancement
     this.enhanceImageForOCR(imageData);
     ctx.putImageData(imageData, 0, 0);
     
     try {
         // First try QR code scanning
-        statusDiv.textContent = 'Scanning for QR codes...';
+        statusDiv.innerHTML = 'Scanning for QR codes...';
         const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
         
         if (qrCode) {
-            statusDiv.textContent = '✅ QR Code found!';
+            statusDiv.innerHTML = '✅ QR Code found!<br><small>' + qrCode.data.substring(0, 50) + '</small>';
             this.processQRResult(qrCode.data);
             this.closeCameraModal(stream, modal);
             return;
         }
         
-        // Enhanced OCR with preprocessing
-        statusDiv.textContent = 'Reading text from image...';
+        // If no QR code, do text scanning
+        statusDiv.innerHTML = '📖 No QR code found.<br>Reading text instead...';
         const canvas64 = canvas.toDataURL();
         
         const { data: { text, confidence } } = await Tesseract.recognize(canvas64, 'eng', {
             logger: m => {
                 if (m.status === 'recognizing text') {
-                    statusDiv.textContent = `Reading text... ${Math.round(m.progress * 100)}%`;
+                    statusDiv.innerHTML = `Reading text... ${Math.round(m.progress * 100)}%`;
                 }
             },
             tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
             tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-. :',
         });
         
-        console.log(`OCR confidence: ${confidence}%`);
-        console.log('OCR text:', text);
+        // MOBILE DEBUG - Show what was detected
+        statusDiv.innerHTML = `
+            <div style="font-size: 12px; text-align: left; background: #f0f0f0; padding: 8px; border-radius: 4px; margin: 4px 0;">
+                <strong>OCR Results:</strong><br>
+                Confidence: ${confidence}%<br>
+                Text found: "${text.substring(0, 100)}${text.length > 100 ? '...' : ''}"
+            </div>
+        `;
         
         if (confidence < 30) {
-            statusDiv.textContent = '⚠️ Image quality too low. Try better lighting or closer angle.';
-            setTimeout(() => statusDiv.textContent = 'Ready to scan...', 3000);
+            statusDiv.innerHTML += '<div style="color: orange; margin-top: 8px;">⚠️ Low quality. Try better lighting!</div>';
+            setTimeout(() => statusDiv.innerHTML = 'Ready to scan...', 5000);
             return;
         }
         
         const modelNumbers = this.extractModelNumbers(text);
         
         if (modelNumbers.length > 0) {
-            statusDiv.textContent = `✅ Found: ${modelNumbers[0]}`;
+            statusDiv.innerHTML = `
+                <div style="color: green;">✅ Found model: ${modelNumbers[0]}</div>
+                <div style="font-size: 11px; margin-top: 4px;">All matches: ${modelNumbers.join(', ')}</div>
+            `;
             this.processModelNumber(modelNumbers[0]);
-            this.closeCameraModal(stream, modal);
+            setTimeout(() => this.closeCameraModal(stream, modal), 2000);
         } else {
-            // Show what text was found for debugging
-            const foundText = text.replace(/\s+/g, ' ').trim();
-            statusDiv.textContent = `❌ No model found. Detected: "${foundText.substring(0, 50)}..."`;
+            statusDiv.innerHTML = `
+                <div style="color: red;">❌ No model number found</div>
+                <div style="font-size: 11px; background: #fff3cd; padding: 4px; margin: 4px 0; border-radius: 4px;">
+                    Text detected: "${text.replace(/\s+/g, ' ').trim().substring(0, 80)}..."
+                </div>
+                <div style="font-size: 11px; color: #666;">Try focusing on just the model number area</div>
+            `;
             
-            setTimeout(() => {
-                statusDiv.textContent = 'Try different angle or lighting. Ready to scan...';
-            }, 4000);
+            setTimeout(() => statusDiv.innerHTML = 'Ready to scan...', 6000);
         }
         
     } catch (error) {
-        console.error('Scanning error:', error);
-        statusDiv.textContent = '❌ Scan failed. Check lighting and try again.';
-        setTimeout(() => statusDiv.textContent = 'Ready to scan...', 3000);
+        statusDiv.innerHTML = `
+            <div style="color: red;">❌ Scan failed</div>
+            <div style="font-size: 11px; color: #666;">Error: ${error.message}</div>
+        `;
+        setTimeout(() => statusDiv.innerHTML = 'Ready to scan...', 4000);
     }
 }
     
