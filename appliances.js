@@ -438,7 +438,7 @@ showEnhancedCameraInterface(stream) {
 
 // Capture photo and scan for QR codes or text
 async captureAndScan(video, statusDiv, stream, modal) {
-    statusDiv.textContent = 'Scanning...';
+    statusDiv.textContent = 'Capturing image...';
     
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -447,10 +447,16 @@ async captureAndScan(video, statusDiv, stream, modal) {
     
     ctx.drawImage(video, 0, 0);
     
+    // IMAGE ENHANCEMENT for better OCR
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    
+    // Apply contrast and brightness enhancement
+    this.enhanceImageForOCR(imageData);
+    ctx.putImageData(imageData, 0, 0);
     
     try {
         // First try QR code scanning
+        statusDiv.textContent = 'Scanning for QR codes...';
         const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
         
         if (qrCode) {
@@ -460,57 +466,125 @@ async captureAndScan(video, statusDiv, stream, modal) {
             return;
         }
         
-        // If no QR code, try OCR for model numbers
-        statusDiv.textContent = 'Looking for model numbers...';
+        // Enhanced OCR with preprocessing
+        statusDiv.textContent = 'Reading text from image...';
         const canvas64 = canvas.toDataURL();
         
-        const { data: { text } } = await Tesseract.recognize(canvas64, 'eng', {
+        const { data: { text, confidence } } = await Tesseract.recognize(canvas64, 'eng', {
             logger: m => {
                 if (m.status === 'recognizing text') {
                     statusDiv.textContent = `Reading text... ${Math.round(m.progress * 100)}%`;
                 }
-            }
+            },
+            tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
+            tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-. :',
         });
+        
+        console.log(`OCR confidence: ${confidence}%`);
+        console.log('OCR text:', text);
+        
+        if (confidence < 30) {
+            statusDiv.textContent = '⚠️ Image quality too low. Try better lighting or closer angle.';
+            setTimeout(() => statusDiv.textContent = 'Ready to scan...', 3000);
+            return;
+        }
         
         const modelNumbers = this.extractModelNumbers(text);
         
         if (modelNumbers.length > 0) {
-            statusDiv.textContent = `✅ Found model: ${modelNumbers[0]}`;
+            statusDiv.textContent = `✅ Found: ${modelNumbers[0]}`;
             this.processModelNumber(modelNumbers[0]);
             this.closeCameraModal(stream, modal);
         } else {
-            statusDiv.textContent = '❌ No model number found. Try again or enter manually.';
+            // Show what text was found for debugging
+            const foundText = text.replace(/\s+/g, ' ').trim();
+            statusDiv.textContent = `❌ No model found. Detected: "${foundText.substring(0, 50)}..."`;
+            
             setTimeout(() => {
-                statusDiv.textContent = 'Ready to scan...';
-            }, 3000);
+                statusDiv.textContent = 'Try different angle or lighting. Ready to scan...';
+            }, 4000);
         }
         
     } catch (error) {
         console.error('Scanning error:', error);
-        statusDiv.textContent = '❌ Scan failed. Try again.';
-        setTimeout(() => {
-            statusDiv.textContent = 'Ready to scan...';
-        }, 3000);
+        statusDiv.textContent = '❌ Scan failed. Check lighting and try again.';
+        setTimeout(() => statusDiv.textContent = 'Ready to scan...', 3000);
     }
 }
-
+    
+// IMAGE ENHANCEMENT HELPER - ADD THIS NEW FUNCTION
+enhanceImageForOCR(imageData) {
+    const data = imageData.data;
+    
+    for (let i = 0; i < data.length; i += 4) {
+        // Convert to grayscale for better OCR
+        const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+        
+        // Increase contrast (make text darker, background lighter)
+        const contrast = 1.5;
+        const enhanced = ((gray - 128) * contrast) + 128;
+        
+        // Threshold for better text recognition
+        const final = enhanced > 128 ? 255 : 0;
+        
+        data[i] = final;     // R
+        data[i + 1] = final; // G  
+        data[i + 2] = final; // B
+        // Alpha stays the same
+    }
+}
+    
 // Extract model numbers from scanned text
 extractModelNumbers(text) {
+    console.log('🔍 Raw OCR text:', text);
+    
+    // More comprehensive patterns for appliance model numbers
     const patterns = [
-        /[A-Z]{2,4}-[A-Z0-9]{4,10}/g,
-        /[A-Z]{3,5}\d{3,6}[A-Z]*/g,
-        /\b[A-Z]{2,3}\d{2,4}[A-Z]{0,3}\b/g
+        // Standard formats with hyphens/dashes
+        /(?:Model[\s:]*)?([A-Z]{2,6}[-\s]?[A-Z0-9]{4,12})/gi,
+        
+        // Continuous alphanumeric (most common)
+        /(?:Model[\s:]*)?([A-Z]{2,4}\d{4,8}[A-Z]{0,4})/gi,
+        
+        // With spaces or dots
+        /(?:Model[\s:]*)?([A-Z]{2,4}[\s\.]\d{3,6}[\s\.]?[A-Z]{0,3})/gi,
+        
+        // Pure numbers (some brands use this)
+        /(?:Model[\s:]*)?(\d{8,12})/gi,
+        
+        // Brand-specific patterns
+        /(?:GE|Whirlpool|Samsung|LG)[\s:]([A-Z0-9]{6,15})/gi,
+        
+        // Serial numbers (fallback)
+        /(?:Serial[\s:]*)?([A-Z]{2}\d{8,12})/gi,
+        
+        // Generic word boundaries for standalone codes
+        /\b([A-Z]{3,6}\d{4,8}[A-Z]{0,3})\b/g
     ];
     
     const matches = [];
-    patterns.forEach(pattern => {
+    patterns.forEach((pattern, index) => {
         const found = text.match(pattern) || [];
-        matches.push(...found);
+        console.log(`Pattern ${index + 1} found:`, found);
+        
+        // Clean up matches (remove "Model:" prefix, etc.)
+        const cleaned = found.map(match => {
+            return match.replace(/^(?:Model|Serial)[\s:]+/i, '').trim();
+        });
+        
+        matches.push(...cleaned);
     });
     
-    return [...new Set(matches)];
+    // Remove duplicates and filter out obviously wrong matches
+    const unique = [...new Set(matches)].filter(match => {
+        // Filter out common false positives
+        const falsePositives = /^(MODEL|SERIAL|MADE|USA|CHINA|\d{1,3}V|\d{1,3}HZ)$/i;
+        return match.length >= 5 && !falsePositives.test(match);
+    });
+    
+    console.log('🎯 Final matches:', unique);
+    return unique;
 }
-
 // Process QR code result
 processQRResult(qrData) {
     console.log('QR Code data:', qrData);
@@ -532,8 +606,17 @@ processQRResult(qrData) {
 
 // Process found model number
 processModelNumber(modelNumber) {
+    console.log('📝 Processing model number:', modelNumber);
+    
+    // Validate the model number makes sense
+    if (modelNumber.length < 4 || modelNumber.length > 20) {
+        console.warn('⚠️ Suspicious model number length:', modelNumber);
+    }
+    
     this.fillModelField(modelNumber);
-    alert(`✅ Model number detected: ${modelNumber}\n\nCheck the model field and adjust if needed.`);
+    
+    // More helpful success message
+    alert(`✅ Model number detected: ${modelNumber}\n\n💡 This was automatically scanned from your appliance label. Please verify it's correct and adjust if needed.`);
 }
 
 // Fill the model field in the form
