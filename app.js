@@ -1540,30 +1540,30 @@ function renderAllTasksTaskItem(task) {
     }
     
     return `
-        <div class="flex items-center justify-between py-3 px-4 ${statusClass} rounded-lg hover:bg-gray-100 transition-colors">
-            <div class="flex items-center gap-3 flex-1">
+    <div class="flex flex-col py-3 px-4 ${statusClass} rounded-lg hover:bg-gray-100 transition-colors">
+        <!-- Row 1: Dot + Task Name + Cost -->
+        <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2 flex-1 min-w-0">
                 <span class="text-sm">${urgencyDot}</span>
-                <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="font-medium text-gray-900 text-sm">${task.title}</span>
-                        ${isSafetyTask ? '<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-medium">🟠 Safety</span>' : ''}
-                    </div>
-                    <div class="flex items-center gap-3 text-xs text-gray-500">
-                        <span>Every ${task.frequency} days</span>
-                        ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
-                        <span>${dueDateDisplay}</span>
-                    </div>
-                </div>
+                <span class="font-medium text-gray-900 text-sm truncate">${task.title}</span>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="editTaskFromAllTasks(${task.id})" 
-                        class="text-blue-600 hover:text-blue-800 text-sm px-3 py-2 rounded-lg transition-colors border border-blue-200 hover:bg-blue-50" 
-                        title="Edit task">
-                    ✏️ Edit
-                </button>
-            </div>
+            ${task.cost > 0 ? `<span class="text-green-600 font-medium text-sm">$${task.cost}</span>` : ''}
         </div>
-    `;
+        
+        <!-- Row 2: Due Date + Frequency + Edit Button -->
+        <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-4 text-xs text-gray-500">
+                <span>${dueDateDisplay}</span>
+                <span>Every ${task.frequency} days</span>
+            </div>
+            <button onclick="editTaskFromAllTasks(${task.id})" 
+                    class="text-blue-600 hover:text-blue-800 text-sm px-3 py-1 rounded-lg transition-colors border border-blue-200 hover:bg-blue-50" 
+                    title="Edit task">
+                Edit
+            </button>
+        </div>
+    </div>
+`;
 }
 
 // NEW FUNCTION: Edit task specifically from All Tasks view
