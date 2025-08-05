@@ -190,6 +190,11 @@ input[type="checkbox"]:checked::after {
     display: none !important;
 }
 
+/* Hide header during onboarding */
+body:not(.main-app-active) .bg-white.shadow-sm.border-b.sticky {
+    display: none !important;
+}
+
 /* FIXED: Smart header visibility control */
 body.hide-header .bg-white.shadow-sm.border-b.sticky,
 .header-pro {
@@ -200,6 +205,7 @@ body.hide-header .bg-white.shadow-sm.border-b.sticky,
 body.show-header .bg-white.shadow-sm.border-b.sticky {
     display: block !important;
 }
+
 /* Add Home Info Button */
 .gradient-bg {
     position: relative;
