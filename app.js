@@ -1408,9 +1408,9 @@ window.tasks.forEach(task => {
 <div class="text-center mb-4">
     <h2 class="text-lg font-bold text-gray-900 mb-3">📋 Manage All Tasks</h2>
 
-<!-- Compact Overview -->
+<!-- Compact Overview with Add Button -->
 <div class="bg-gray-50 p-3 rounded-lg mb-4">
-    <div class="flex justify-center gap-8 text-sm">
+    <div class="flex justify-center items-center gap-6 text-sm">
         <div class="text-center">
             <div class="text-lg font-bold text-blue-600">${totalTasks}</div>
             <div class="text-xs text-gray-600">Tasks</div>
@@ -1419,15 +1419,14 @@ window.tasks.forEach(task => {
             <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
             <div class="text-xs text-gray-600">Annual</div>
         </div>
+        <button onclick="event.stopPropagation(); window.closeDatePickerModal(); addTaskFromDashboard()" 
+                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
+            ➕ Add Task
+        </button>
     </div>
 </div>
                 
-                <!-- Add Custom Task Button -->
-                <div class="flex items-center justify-between mb-4">
-                   <button onclick="event.stopPropagation(); window.closeDatePickerModal(); addTaskFromDashboard()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-                        Add Task
-                    </button>
-                </div>
+               
                 
                 <!-- Task Categories -->
                 <div id="all-tasks-categories" class="space-y-6">
