@@ -919,3 +919,45 @@ html, body {
         min-width: 0;
     }
 }
+/* Force Mobile Task Cards to be 2 rows only */
+@media (max-width: 768px) {
+    .mobile-task-card-simple {
+        padding: 0.75rem !important;
+    }
+    
+    /* Force Row 1 to be horizontal */
+    .mobile-task-card-simple > div:first-child {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+        flex-wrap: nowrap !important;
+    }
+    
+    /* Force Row 2 to be horizontal */
+    .mobile-task-card-simple > div:last-child {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 0.5rem !important;
+    }
+    
+    /* Task name should take remaining space */
+    .mobile-task-card-simple .flex-1 {
+        flex: 1 !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+    
+    /* Buttons container */
+    .mobile-task-card-simple .flex.gap-2 {
+        display: flex !important;
+        gap: 0.5rem !important;
+        flex-shrink: 0 !important;
+    }
+    
+    /* Button sizing */
+    .mobile-task-card-simple button {
+        min-height: 32px !im
