@@ -120,7 +120,7 @@ class ApplianceManager {
                     </div>
                     <button onclick="window.applianceManager.showAddForm()" 
                             class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors touch-btn">
-                        ⚙️ Add Appliance
+                        Add Appliance
                     </button>
                 </div>
                 
@@ -314,7 +314,7 @@ renderAddForm() {
                             </button>
                             <button type="submit"
                                     class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
-                                💾 Save Appliance
+                                💾 Save 
                             </button>
                         </div>
                     </form>
