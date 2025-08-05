@@ -383,7 +383,7 @@ showDayPanel(date, dayTasks) {
                 <span class="task-category">${task.category}</span>
                 ${isOverdue ? '<span class="overdue-badge">OVERDUE</span>' : ''}
             </div>
-            <p class="task-description text-base text-gray-700 leading-snug mb-2">${task.description}</p>
+            <p class="task-description text-base text-gray-700 leading-snug mb-1">${task.description}</p>
         </div>
         <div class="task-actions">
             <button onclick="completeTask(${task.id})" class="complete-task-btn text-base font-medium">✅ Complete</button>
