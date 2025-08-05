@@ -373,23 +373,24 @@ showDayPanel(date, dayTasks) {
     const overdueClass = isOverdue ? 'overdue' : '';
 
     return `
-        <div class="day-panel-task ${priorityClass} ${overdueClass}">
-            <div class="task-info">
-                <h4 class="task-title">${priorityDot} ${task.title}</h4>
-                <p class="task-description">${task.description}</p>
-                <div class="task-meta">
-                    <span class="task-category">${task.category}</span>
-                    <span class="task-cost">$${task.cost}</span>
-                    <span class="task-priority">${priorityLabel} priority</span>
-                    ${isOverdue ? '<span class="overdue-badge">OVERDUE</span>' : ''}
-                </div>
+    <div class="day-panel-task ${priorityClass} ${overdueClass}">
+        <div class="task-info">
+            <div class="flex items-center justify-between mb-2">
+                <h4 class="task-title flex-1">${priorityDot} ${task.title}</h4>
+                ${task.cost > 0 ? `<span class="task-cost-inline text-green-600 font-semibold">$${task.cost}</span>` : ''}
             </div>
-            <div class="task-actions">
-                <button onclick="completeTask(${task.id})" class="complete-task-btn">✅ Complete</button>
-                <button onclick="rescheduleTask(${task.id})" class="reschedule-task-btn">📅 Reschedule</button>
+            <p class="task-description">${task.description}</p>
+            <div class="task-meta">
+                <span class="task-category">${task.category}</span>
+                ${isOverdue ? '<span class="overdue-badge">OVERDUE</span>' : ''}
             </div>
         </div>
-    `;
+        <div class="task-actions">
+            <button onclick="completeTask(${task.id})" class="complete-task-btn">✅ Complete</button>
+            <button onclick="rescheduleTask(${task.id})" class="reschedule-task-btn">📅 Reschedule</button>
+        </div>
+    </div>
+`;
 }
 
 closeDayPanel() {
