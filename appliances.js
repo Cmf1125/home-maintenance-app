@@ -58,7 +58,7 @@ class ApplianceManager {
     updateMainAppData() {
         if (typeof window.saveData === 'function') {
             // Make appliances available to main app
-            windowapplianceData = this.appliances;
+            window.applianceData = this.appliances;
             window.saveData();
         }
     }
@@ -168,9 +168,7 @@ class ApplianceManager {
                 </div>
                 
                 <!-- Appliances by Category -->
-                ${this.renderApplianceCategories(appliancesByCategory)}
                 
-                ${totalAppliances === 0 ? this.renderEmptyState() : ''}
             </div>
         `;
     }
@@ -453,7 +451,6 @@ generateTasksForAppliance(applianceId) {
 }
     // Add these methods to your ApplianceManager class (after the renderOverview method)
 
-// Replace your existing renderAddForm method with this version:
 
 renderAddForm() {
     const appliancesView = document.getElementById('appliances-view');
@@ -760,7 +757,6 @@ renderApplianceDetail() {
     `;
 }
 
-// Replace your existing handleAddFormSubmit method with this version:
 
 handleAddFormSubmit(event) {
     event.preventDefault();
@@ -858,7 +854,6 @@ calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
                             <div class="p-4 border-b border-gray-100">
                                 <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
                                     <span class="text-xl">${categoryIcon}</span>
-                                    ${categoryName}
                                     <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs ml-2">
                                         ${appliances.length} appliance${appliances.length !== 1 ? 's' : ''}
                                     </span>
@@ -866,7 +861,6 @@ calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
                             </div>
                             <div class="p-4">
                                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    ${appliances.map(appliance => this.renderApplianceCard(appliance)).join('')}
                                 </div>
                             </div>
                         </div>
@@ -876,7 +870,6 @@ calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
         `;
     }
     
-    // Replace your existing renderApplianceCard method with this version:
 
 renderApplianceCard(appliance) {
     const statusInfo = this.getApplianceStatus(appliance);
@@ -901,7 +894,6 @@ renderApplianceCard(appliance) {
                         <p class="text-xs text-gray-600">${appliance.manufacturer} ${appliance.model || ''}</p>
                     </div>
                     <div class="ml-2">
-                        ${statusInfo.icon}
                     </div>
                 </div>
                 
@@ -936,9 +928,7 @@ renderApplianceCard(appliance) {
                 </div>
             </div>
         </div>
-    
- `;
-    // Add this to your renderApplianceCard method after the existing content:
+    `;
 }
     // Add these methods to your ApplianceManager class:
 
@@ -1374,7 +1364,6 @@ deleteAppliance(applianceId) {
     }
     
     // Enhanced getApplianceStatus method for appliances.js
-// Replace your existing getApplianceStatus method with this enhanced version
 
 getApplianceStatus(appliance) {
     const today = new Date();
@@ -1482,6 +1471,7 @@ getApplianceStatus(appliance) {
     };
 }
 
+}
 // appliances.js - Updated initialization section (replace the bottom part of your file)
 
 // Make ApplianceManager available globally
