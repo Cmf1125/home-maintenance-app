@@ -966,3 +966,19 @@ html, body {
         white-space: nowrap !important;
     }
 }
+
+/* Nuclear option - Override everything on mobile */
+@media (max-width: 768px) {
+    .enhanced-task-card * {
+        display: revert !important;
+    }
+    
+    .enhanced-task-card.mobile-task-card-simple {
+        display: block !important;
+    }
+    
+    .enhanced-task-card.mobile-task-card-simple > div {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+    }
+}
