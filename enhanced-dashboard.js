@@ -336,77 +336,6 @@ renderEnhancedTaskCard(task) {
 }
 }
 
-// NEW: Edit task from dashboard
-function editTaskFromDashboard(taskId) {
-    const task = window.tasks.find(t => t.id === taskId);
-    if (!task) {
-        console.error('❌ Task not found:', taskId);
-        return;
-    }
-
-    // Create a simple edit dialog
-    const newTitle = prompt('Task Title:', task.title);
-    if (newTitle === null) return; // User cancelled
-    
-    const newDescription = prompt('Task Description:', task.description);
-    if (newDescription === null) return;
-    
-    const newFrequency = parseInt(prompt('Frequency (days):', task.frequency));
-    if (isNaN(newFrequency) || newFrequency <= 0) {
-        alert('Invalid frequency');
-        return;
-    }
-    
-    const newCost = parseFloat(prompt('Cost ($):', task.cost));
-    if (isNaN(newCost)) {
-        alert('Invalid cost');
-        return;
-    }
-    
-    const newPriority = prompt('Priority (high, medium, low):', task.priority);
-    if (!['high', 'medium', 'low'].includes(newPriority)) {
-        alert('Invalid priority');
-        return;
-    }
-    
-    const currentDueDateStr = task.dueDate instanceof Date ? 
-        task.dueDate.toISOString().split('T')[0] : 
-        new Date(task.dueDate).toISOString().split('T')[0];
-    
-    const newDueDateStr = prompt('Due Date (YYYY-MM-DD):', currentDueDateStr);
-    if (newDueDateStr === null) return;
-    
-    const newDueDate = new Date(newDueDateStr + 'T12:00:00');
-    if (isNaN(newDueDate.getTime())) {
-        alert('Invalid date format');
-        return;
-    }
-    
-    // Update task
-    task.title = newTitle;
-    task.description = newDescription;
-    task.frequency = newFrequency;
-    task.cost = newCost;
-    task.priority = newPriority;
-    task.dueDate = newDueDate;
-    
-    // Save data
-    saveData();
-    
-    // Refresh dashboard
-    if (window.enhancedDashboard) {
-        window.enhancedDashboard.render();
-    }
-    
-    // Refresh calendar if it exists
-    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-        window.casaCareCalendar.refresh();
-    }
-    
-    console.log('✅ Task updated:', task);
-    alert(`✅ Task "${newTitle}" updated successfully!`);
-}
-
 // FIXED: Enhanced reschedule function with proper event handling
 function rescheduleTaskFromDashboard(taskId, event) {
     // CRITICAL: Stop any event bubbling immediately
@@ -491,40 +420,6 @@ function addTaskFromDashboard() {
     
     console.log('✅ New task added:', newTask);
     alert(`✅ Task "${title}" added successfully!`);
-}
-
-// Function to export task list
-function exportTaskList() {
-    if (!window.tasks) {
-        alert('❌ No tasks to export');
-        return;
-    }
-    
-    const filteredTasks = window.enhancedDashboard ? 
-        window.enhancedDashboard.getFilteredTasks() : 
-        window.tasks.filter(t => !t.isCompleted && t.dueDate);
-    
-    let csvContent = "Task,Description,Category,Priority,Due Date,Cost,Frequency,Last Completed\n";
-    
-    filteredTasks.forEach(task => {
-        const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'Not set';
-        const lastCompleted = task.lastCompleted ? new Date(task.lastCompleted).toLocaleDateString() : 'Never';
-        
-        csvContent += `"${task.title}","${task.description}","${task.category}","${task.priority}","${dueDate}","$${task.cost}","${task.frequency} days","${lastCompleted}"\n`;
-    });
-    
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `casa_care_tasks_${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-    
-    console.log('📋 Task list exported');
-    alert('📋 Task list exported successfully!');
 }
 
 // Close task edit modal
@@ -829,36 +724,5 @@ function showSuccessNotification(message) {
 // Ensure enhanced dashboard is available globally
 window.EnhancedDashboard = EnhancedDashboard;
 
-// Debug function to check function status
-window.debugDashboardFunctions = function() {
-    console.log('🔍 ENHANCED DASHBOARD FUNCTIONS DEBUG:');
-    const functions = [
-        'addTaskFromDashboard',
-        'editTaskFromDashboard', 
-        'rescheduleTaskFromDashboard',
-        'closeTaskEditModal',
-        'saveTaskFromEdit',
-        'deleteTaskFromEdit',
-        'closeDatePickerModal',
-        'setQuickDate',
-        'confirmReschedule'
-    ];
-    
-    functions.forEach(funcName => {
-        const exists = typeof window[funcName] === 'function';
-        const hasPrompt = exists && window[funcName].toString().includes('prompt');
-        console.log(`  ${funcName}: ${exists ? '✅' : '❌'}${hasPrompt ? ' (⚠️ STILL USES PROMPTS!)' : ''}`);
-    });
-    
-    // Check modal elements
-    const modals = ['task-edit-modal', 'date-picker-modal'];
-    console.log('\n🔍 MODAL ELEMENTS:');
-    modals.forEach(modalId => {
-        const element = document.getElementById(modalId);
-        console.log(`  ${modalId}: ${element ? '✅' : '❌'}`);
-    });
-    
-    console.log('\n🔍 CURRENT EDITING TASK:', window.currentEditingTask ? '✅' : '❌');
-};
 
 console.log('📋 Enhanced Dashboard script loaded with simplified date system');
