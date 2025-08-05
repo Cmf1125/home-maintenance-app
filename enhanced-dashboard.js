@@ -259,28 +259,16 @@ renderEnhancedTaskCard(task) {
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
     return `
-    <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200 cursor-pointer hover:bg-gray-50" onclick="editTaskFromDashboard(${task.id})">
-        <!-- Row 1: Dot + Task Name + Category + Cost (all on one line) -->
-        <div class="flex items-center gap-2 mb-2">
-            <span class="text-sm flex-shrink-0">${urgencyDot}</span>
-            <span class="font-semibold text-gray-900 text-sm flex-1 min-w-0 truncate">${task.title}</span>
-            <span class="text-xs text-gray-500 flex-shrink-0">${categoryInfo.icon} ${task.category}</span>
-            ${task.cost > 0 ? `<span class="text-green-600 font-medium text-xs flex-shrink-0">$${task.cost}</span>` : ''}
+    <div class="p-3 border-b ${statusClass} enhanced-task-card transition-all duration-200 cursor-pointer hover:bg-gray-50 mobile-2-row-task" onclick="editTaskFromDashboard(${task.id})">
+        <div class="mobile-row-1">
+            ${urgencyDot} ${task.title} ${categoryInfo.icon} ${task.category} ${task.cost > 0 ? `$${task.cost}` : ''}
         </div>
-        
-        <!-- Row 2: Due Date + Buttons -->
-        <div class="flex items-center justify-between gap-2">
-            <span class="text-xs ${dueDateColor} flex-shrink-0">${dueDateDisplay}</span>
-            <div class="flex gap-2 flex-shrink-0">
-                <button onclick="event.stopPropagation(); completeTask(${task.id})" 
-                        class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-xs font-medium transition-colors">
-                    Complete
-                </button>
-                <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
-                        class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-xs font-medium transition-colors">
-                    Reschedule
-                </button>
-            </div>
+        <div class="mobile-row-2">
+            <span>${dueDateDisplay}</span>
+            <span>
+                <button onclick="event.stopPropagation(); completeTask(${task.id})" class="btn-complete">Complete</button>
+                <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)" class="btn-reschedule">Reschedule</button>
+            </span>
         </div>
     </div>
 `;
