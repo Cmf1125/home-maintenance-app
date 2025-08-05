@@ -326,41 +326,40 @@
         <!-- Main App (Dashboard & Calendar) -->
         <div id="main-app" class="hidden">
             <div class="main-content">
-            <!-- Enhanced Dashboard View -->
-            <div id="dashboard-view" class="p-4">
-                 <!-- Interactive Stats Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                    <div id="overdue-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
-                    <div class="flex items-center gap-3">
-                    <div class="p-2 bg-red-100 rounded-lg text-lg">⚠️</div>
+        <!-- Enhanced Dashboard View -->
+        <div id="dashboard-view" class="p-4">
+        <!-- Interactive Stats Grid - Now Sticky and Mobile Optimized -->
+        <div class="sticky top-16 z-30 bg-gray-50 pb-4 mb-6">
+            <div class="grid grid-cols-3 gap-2 sm:gap-4">
+                <div id="overdue-card" class="stat-card bg-white rounded-xl p-3 sm:p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+                    <div class="flex flex-col items-center text-center">
+                    <div class="p-1 sm:p-2 bg-red-100 rounded-lg text-base sm:text-lg mb-1 sm:mb-0">⚠️</div>
                     <div>
+                        <p id="overdue-count" class="text-lg sm:text-xl font-bold text-red-600">0</p>
                         <p class="text-xs text-gray-600">Overdue</p>
-                        <p id="overdue-count" class="text-xl font-bold text-gray-900">0</p>
-                    </div>
                 </div>
-            <div class="text-xs text-gray-500 mt-2">Click to view overdue</div>
-        </div>
-    
-    <div id="week-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
-        <div class="flex items-center gap-3">
-            <div class="p-2 bg-orange-100 rounded-lg text-lg">📅</div>
-            <div>
-                <p class="text-xs text-gray-600">This Week</p>
-                <p id="week-count" class="text-xl font-bold text-gray-900">0</p>
             </div>
         </div>
-        <div class="text-xs text-gray-500 mt-2">Click to view week's tasks</div>
-    </div>
     
-    <div id="total-card" class="stat-card bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
-        <div class="flex items-center gap-3">
-            <div class="p-2 bg-blue-100 rounded-lg text-lg">📋</div>
-            <div>
-                <p class="text-xs text-gray-600">All Tasks</p>
-                <p id="total-count" class="text-xl font-bold text-gray-900">0</p>
+        <div id="week-card" class="stat-card bg-white rounded-xl p-3 sm:p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+            <div class="flex flex-col items-center text-center">
+                <div class="p-1 sm:p-2 bg-orange-100 rounded-lg text-base sm:text-lg mb-1 sm:mb-0">📅</div>
+                <div>
+                    <p id="week-count" class="text-lg sm:text-xl font-bold text-orange-600">0</p>
+                    <p class="text-xs text-gray-600">This Week</p>
+                </div>
             </div>
         </div>
-        <div class="text-xs text-gray-500 mt-2">Click to view all tasks</div>
+        
+        <div id="total-card" class="stat-card bg-white rounded-xl p-3 sm:p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+            <div class="flex flex-col items-center text-center">
+                <div class="p-1 sm:p-2 bg-blue-100 rounded-lg text-base sm:text-lg mb-1 sm:mb-0">📋</div>
+                <div>
+                    <p id="total-count" class="text-lg sm:text-xl font-bold text-blue-600">0</p>
+                    <p class="text-xs text-gray-600">All Tasks</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
                     
