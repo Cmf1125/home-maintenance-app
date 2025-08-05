@@ -533,15 +533,15 @@ handleAddFormSubmit(event) {
     this.saveAppliances();
 
     // In your handleAddFormSubmit method, add this after saving the appliance:
-    const askForTasks = confirm(
-        `✅ Appliance "${newAppliance.name}" added successfully!\n\n` +
-        `Would you like to generate automatic maintenance tasks for this appliance?`
-    );
+const askForTasks = confirm(
+    `✅ Appliance "${newAppliance.name}" added successfully!\n\n` +
+    `Would you like to generate automatic maintenance tasks for this appliance?`
+);
 
-    if (askForTasks) {
-        const result = this.addApplianceWithTasks(newAppliance);
-        alert(`🔧 Generated ${result.tasksCreated} maintenance tasks!`);
-    }
+if (askForTasks) {
+    const result = this.addApplianceWithTasks(newAppliance);
+    alert(`🔧 Generated ${result.tasksCreated} maintenance tasks!`);
+
     
     // Clear temporary photos
     window.tempAppliancePhotos = [];
@@ -554,6 +554,7 @@ handleAddFormSubmit(event) {
     
     console.log('✅ New appliance added:', newAppliance);
 }
+    
 // Calculate warranty expiration date
 calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
     if (!purchaseDate || !warrantyMonths) return null;
@@ -662,9 +663,6 @@ renderApplianceCard(appliance) {
         </div>
     `;
 }
-    // Add this to your renderApplianceCard method after the existing content:
-    ${this.renderApplianceTasksSection(appliance)}
-
     // Add these methods to your ApplianceManager class:
 
 // Edit appliance method
