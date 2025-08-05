@@ -234,9 +234,15 @@ renderAddForm() {
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Model Number</label>
-                                <input type="text" id="appliance-model"
-                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                <div class="relative">
+                                    <input type="text" id="appliance-model"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 pr-12"
                                        placeholder="e.g., WRF535SWHZ">
+                                    <button type="button" onclick="window.applianceManager.capturePhoto()"
+                                        class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-100 text-blue-700 px-2 py-1 rounded text-sm hover:bg-blue-200">
+                                     📱 Scan
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         
@@ -1362,8 +1368,187 @@ deleteAppliance(applianceId) {
     }
 }
 
-// appliances.js - Updated initialization section (replace the bottom part of your file)
+// Show enhanced camera interface with scanning
+showEnhancedCameraInterface(stream) {
+    // Create camera modal
+    const cameraModal = document.createElement('div');
+    cameraModal.id = 'camera-scan-modal';
+    cameraModal.className = 'fixed inset-0 bg-black z-50 flex flex-col';
+    
+    cameraModal.innerHTML = `
+        <div class="flex-1 relative">
+            <video id="camera-video" class="w-full h-full object-cover" autoplay playsinline></video>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="border-2 border-white w-64 h-64 rounded-lg"></div>
+            </div>
+        </div>
+        <div class="bg-white p-4 space-y-3">
+            <div class="text-center">
+                <h3 class="font-bold text-lg">📱 Scan Appliance Info</h3>
+                <p class="text-sm text-gray-600">Position QR code or model number sticker in the frame</p>
+            </div>
+            <div class="flex gap-3">
+                <button id="capture-btn" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium">
+                    📸 Capture Photo
+                </button>
+                <button id="close-camera-btn" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-medium">
+                    Cancel
+                </button>
+            </div>
+            <div id="scan-status" class="text-center text-sm text-gray-600">
+                Ready to scan...
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(cameraModal);
+    
+    const video = document.getElementById('camera-video');
+    const captureBtn = document.getElementById('capture-btn');
+    const closeBtn = document.getElementById('close-camera-btn');
+    const statusDiv = document.getElementById('scan-status');
+    
+    video.srcObject = stream;
+    
+    // Capture button click
+    captureBtn.addEventListener('click', () => {
+        this.captureAndScan(video, statusDiv, stream, cameraModal);
+    });
+    
+    // Close button click
+    closeBtn.addEventListener('click', () => {
+        stream.getTracks().forEach(track => track.stop());
+        document.body.removeChild(cameraModal);
+    });
+}
+// Capture photo and scan for QR codes or text
+async captureAndScan(video, statusDiv, stream, modal) {
+    statusDiv.textContent = 'Scanning...';
+    
+    // Create canvas to capture frame
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Draw current video frame to canvas
+    ctx.drawImage(video, 0, 0);
+    
+    // Get image data
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    
+    try {
+        // First try QR code scanning
+        const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+        
+        if (qrCode) {
+            statusDiv.textContent = '✅ QR Code found!';
+            this.processQRResult(qrCode.data);
+            this.closeCameraModal(stream, modal);
+            return;
+        }
+        
+        // If no QR code, try OCR for model numbers
+        statusDiv.textContent = 'Looking for model numbers...';
+        const canvas64 = canvas.toDataURL();
+        
+        const { data: { text } } = await Tesseract.recognize(canvas64, 'eng', {
+            logger: m => {
+                if (m.status === 'recognizing text') {
+                    statusDiv.textContent = `Reading text... ${Math.round(m.progress * 100)}%`;
+                }
+            }
+        });
+        
+        // Look for model numbers in the text
+        const modelNumbers = this.extractModelNumbers(text);
+        
+        if (modelNumbers.length > 0) {
+            statusDiv.textContent = `✅ Found model: ${modelNumbers[0]}`;
+            this.processModelNumber(modelNumbers[0]);
+            this.closeCameraModal(stream, modal);
+        } else {
+            statusDiv.textContent = '❌ No model number found. Try again or enter manually.';
+            setTimeout(() => {
+                statusDiv.textContent = 'Ready to scan...';
+            }, 3000);
+        }
+        
+    } catch (error) {
+        console.error('Scanning error:', error);
+        statusDiv.textContent = '❌ Scan failed. Try again.';
+        setTimeout(() => {
+            statusDiv.textContent = 'Ready to scan...';
+        }, 3000);
+    }
+}
+// Extract model numbers from scanned text
+extractModelNumbers(text) {
+    // Common appliance model patterns
+    const patterns = [
+        /[A-Z]{2,4}-[A-Z0-9]{4,10}/g,  // MSZ-FS09NA style
+        /[A-Z]{3,5}\d{3,6}[A-Z]*/g,     // WRX735SDHZ style
+        /\b[A-Z]{2,3}\d{2,4}[A-Z]{0,3}\b/g // GE123A style
+    ];
+    
+    const matches = [];
+    patterns.forEach(pattern => {
+        const found = text.match(pattern) || [];
+        matches.push(...found);
+    });
+    
+    // Remove duplicates and return
+    return [...new Set(matches)];
+}
 
+// Process QR code result
+processQRResult(qrData) {
+    console.log('QR Code data:', qrData);
+    
+    // Try to extract model info from QR code
+    if (qrData.includes('model') || qrData.includes('MODEL')) {
+        const modelMatch = qrData.match(/model[:\s]*([A-Z0-9-]+)/i);
+        if (modelMatch) {
+            this.fillModelField(modelMatch[1]);
+            return;
+        }
+    }
+    
+    // If QR contains a URL, show it to user
+    if (qrData.startsWith('http')) {
+        alert(`QR Code contains URL: ${qrData}\n\nManual entry required for model number.`);
+    } else {
+        alert(`QR Code data: ${qrData}\n\nManual entry required for model number.`);
+    }
+}
+
+// Process found model number
+processModelNumber(modelNumber) {
+    this.fillModelField(modelNumber);
+    alert(`✅ Model number detected: ${modelNumber}\n\nCheck the model field and adjust if needed.`);
+}
+
+// Fill the model field in the form
+fillModelField(modelNumber) {
+    const modelField = document.getElementById('appliance-model');
+    if (modelField) {
+        modelField.value = modelNumber;
+        modelField.style.backgroundColor = '#dcfce7'; // Light green
+        setTimeout(() => {
+            modelField.style.backgroundColor = '';
+        }, 2000);
+    }
+}
+
+// Close camera modal
+closeCameraModal(stream, modal) {
+    stream.getTracks().forEach(track => track.stop());
+    if (modal && modal.parentNode) {
+        document.body.removeChild(modal);
+    }
+}
+
+// appliances.js - Updated initialization section (replace the bottom part of your file)
 // Make ApplianceManager available globally
 window.ApplianceManager = ApplianceManager;
 
