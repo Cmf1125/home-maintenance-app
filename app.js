@@ -1556,11 +1556,11 @@ function renderAllTasksTaskItem(task) {
                 <span>${dueDateDisplay}</span>
                 <span>Every ${task.frequency} days</span>
             </div>
-            <button onclick="editTaskFromAllTasks(${task.id})" 
-                class="bg-blue-600 text-white hover:bg-blue-700 text-xs px-3 py-0.5 rounded transition-colors font-medium" 
-                title="Edit task">
-            Edit
-        </button>
+         <button onclick="editTaskFromAllTasks(${task.id})" 
+            class="bg-blue-600 text-white hover:bg-blue-700 text-xs px-3 rounded transition-colors font-medium" 
+            title="Edit task">
+        Edit
+    </button>
         </div>
     </div>
 `;
