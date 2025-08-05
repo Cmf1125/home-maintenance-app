@@ -259,7 +259,7 @@ renderEnhancedTaskCard(task) {
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
     return `
-    <div class="p-3 border-b ${statusClass} enhanced-task-card transition-all duration-200 cursor-pointer hover:bg-gray-50 mobile-2-row-task" onclick="editTaskFromDashboard(${task.id})">
+<div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200">
         <div class="mobile-row-1">
             ${urgencyDot} ${task.title} ${categoryInfo.icon} ${task.category} ${task.cost > 0 ? `$${task.cost}` : ''}
         </div>
