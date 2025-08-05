@@ -1084,40 +1084,114 @@ deleteAppliance(applianceId) {
         );
     }
     
-    getApplianceStatus(appliance) {
-        // Simple status logic for now - can be enhanced later
-        const today = new Date();
+    // Enhanced getApplianceStatus method for appliances.js
+// Replace your existing getApplianceStatus method with this enhanced version
+
+getApplianceStatus(appliance) {
+    const today = new Date();
+    const purchaseDate = appliance.purchaseDate ? new Date(appliance.purchaseDate) : null;
+    const ageInYears = purchaseDate ? (today - purchaseDate) / (365.25 * 24 * 60 * 60 * 1000) : 0;
+    
+    // 1. Check warranty status first (highest priority)
+    if (appliance.warrantyExpiration) {
+        const warrantyDate = new Date(appliance.warrantyExpiration);
+        const daysUntilExpiry = Math.ceil((warrantyDate - today) / (1000 * 60 * 60 * 1000));
         
-        // Check warranty
-        if (appliance.warrantyExpiration) {
-            const warrantyDate = new Date(appliance.warrantyExpiration);
-            const daysUntilExpiry = Math.ceil((warrantyDate - today) / (1000 * 60 * 60 * 24));
-            
-            if (daysUntilExpiry < 0) {
-                return {
-                    icon: '❌',
-                    text: 'Out of warranty',
-                    colorClass: 'text-red-600',
-                    needsAttention: false
-                };
-            } else if (daysUntilExpiry < 30) {
-                return {
-                    icon: '⚠️',
-                    text: 'Warranty expiring soon',
-                    colorClass: 'text-yellow-600',
-                    needsAttention: true
-                };
-            }
+        if (daysUntilExpiry < 0) {
+            return {
+                icon: '⚠️',
+                text: `Out of warranty (${Math.abs(daysUntilExpiry)} days ago)`,
+                colorClass: 'text-orange-600',
+                needsAttention: true,  // Changed: Out of warranty needs attention!
+                reason: 'warranty_expired'
+            };
+        } else if (daysUntilExpiry <= 30) {
+            return {
+                icon: '🔔',
+                text: `Warranty expires in ${daysUntilExpiry} days`,
+                colorClass: 'text-yellow-600',
+                needsAttention: true,
+                reason: 'warranty_expiring'
+            };
         }
-        
-        // Default good status
+    }
+    
+    // 2. Check appliance age (varies by category)
+    const ageThresholds = {
+        'kitchen': 10,      // Refrigerators, dishwashers, etc.
+        'hvac': 15,         // HVAC systems
+        'laundry': 12,      // Washers, dryers
+        'bathroom': 8,      // Water heaters
+        'utility': 20,      // More durable utility items
+        'outdoor': 7,       // Outdoor equipment
+        'other': 10         // Default
+    };
+    
+    const threshold = ageThresholds[appliance.category] || 10;
+    
+    if (ageInYears > threshold) {
         return {
-            icon: '✅',
-            text: 'Good condition',
-            colorClass: 'text-green-600',
-            needsAttention: false
+            icon: '🔧',
+            text: `${Math.round(ageInYears)} years old - consider replacement`,
+            colorClass: 'text-orange-600',
+            needsAttention: true,
+            reason: 'age_replacement'
+        };
+    } else if (ageInYears > threshold * 0.8) {  // 80% of lifespan
+        return {
+            icon: '📅',
+            text: `${Math.round(ageInYears)} years old - monitor closely`,
+            colorClass: 'text-yellow-600',
+            needsAttention: true,
+            reason: 'age_monitor'
         };
     }
+    
+    // 3. Check for missing critical information
+    const missingInfo = [];
+    if (!appliance.serialNumber) missingInfo.push('serial number');
+    if (!appliance.purchaseDate) missingInfo.push('purchase date');
+    if (!appliance.manufacturer) missingInfo.push('manufacturer');
+    
+    if (missingInfo.length > 1) {
+        return {
+            icon: '📝',
+            text: `Missing ${missingInfo.join(', ')}`,
+            colorClass: 'text-blue-600',
+            needsAttention: true,
+            reason: 'missing_info'
+        };
+    }
+    
+    // 4. Check if appliance has overdue tasks (if integrated with task system)
+    if (window.tasks && appliance.id) {
+        const overdueTasks = window.tasks.filter(task => {
+            return task.applianceId === appliance.id && 
+                   !task.isCompleted && 
+                   task.dueDate && 
+                   new Date(task.dueDate) < today;
+        });
+        
+        if (overdueTasks.length > 0) {
+            return {
+                icon: '⏰',
+                text: `${overdueTasks.length} overdue maintenance task${overdueTasks.length > 1 ? 's' : ''}`,
+                colorClass: 'text-red-600',
+                needsAttention: true,
+                reason: 'overdue_tasks'
+            };
+        }
+    }
+    
+    // 5. All good!
+    return {
+        icon: '✅',
+        text: 'Good condition',
+        colorClass: 'text-green-600',
+        needsAttention: false,
+        reason: 'good'
+    };
+}
     
     getWarrantyStatus(appliance) {
         if (!appliance.warrantyExpiration) return null;
