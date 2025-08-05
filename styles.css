@@ -838,10 +838,13 @@ body.main-app-active .main-content {
         color: #2563eb; /* Blue for all tasks */
     }
 }
-/* Hide task descriptions on mobile for even more compactness */
+/* Show task descriptions on mobile in modals */
 @media (max-width: 768px) {
     .task-description {
-        display: none;
+        display: block;
+        font-size: 0.875rem;
+        line-height: 1.4;
+        margin-top: 0.5rem;
     }
 }
 
