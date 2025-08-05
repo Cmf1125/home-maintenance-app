@@ -174,6 +174,283 @@ class ApplianceManager {
             </div>
         `;
     }
+
+    // Add these methods to your ApplianceManager class for task integration
+
+// Method to generate maintenance tasks for an appliance
+generateMaintenanceTasks(appliance) {
+    if (!window.tasks) {
+        console.warn('Task system not available');
+        return;
+    }
+    
+    const tasks = [];
+    const baseId = Date.now();
+    
+    // Task templates based on appliance category
+    const taskTemplates = {
+        'kitchen': [
+            {
+                title: `${appliance.name} - Clean Filters`,
+                description: 'Clean or replace filters for optimal performance',
+                frequency: 90,
+                cost: 25,
+                category: 'HVAC'
+            },
+            {
+                title: `${appliance.name} - Deep Clean`,
+                description: 'Thorough cleaning of interior and exterior',
+                frequency: 180,
+                cost: 0,
+                category: 'General'
+            }
+        ],
+        'hvac': [
+            {
+                title: `${appliance.name} - Filter Replacement`,
+                description: 'Replace HVAC filters',
+                frequency: 90,
+                cost: 30,
+                category: 'HVAC'
+            },
+            {
+                title: `${appliance.name} - Professional Service`,
+                description: 'Annual professional HVAC maintenance',
+                frequency: 365,
+                cost: 150,
+                category: 'HVAC'
+            },
+            {
+                title: `${appliance.name} - Duct Inspection`,
+                description: 'Inspect ductwork for leaks or damage',
+                frequency: 730,
+                cost: 100,
+                category: 'HVAC'
+            }
+        ],
+        'laundry': [
+            {
+                title: `${appliance.name} - Lint Trap Clean`,
+                description: 'Clean lint trap and exhaust vent',
+                frequency: 30,
+                cost: 0,
+                category: 'Safety'
+            },
+            {
+                title: `${appliance.name} - Drum Clean Cycle`,
+                description: 'Run cleaning cycle to prevent odors and buildup',
+                frequency: 60,
+                cost: 5,
+                category: 'General'
+            }
+        ],
+        'bathroom': [
+            {
+                title: `${appliance.name} - Temperature Check`,
+                description: 'Check water temperature and pressure relief valve',
+                frequency: 180,
+                cost: 0,
+                category: 'Safety'
+            },
+            {
+                title: `${appliance.name} - Flush System`,
+                description: 'Flush water heater to remove sediment',
+                frequency: 365,
+                cost: 50,
+                category: 'Water Systems'
+            }
+        ],
+        'utility': [
+            {
+                title: `${appliance.name} - Safety Inspection`,
+                description: 'Check safety features and operation',
+                frequency: 180,
+                cost: 0,
+                category: 'Safety'
+            }
+        ],
+        'outdoor': [
+            {
+                title: `${appliance.name} - Seasonal Prep`,
+                description: 'Prepare for seasonal use/storage',
+                frequency: 180,
+                cost: 25,
+                category: 'Exterior'
+            }
+        ]
+    };
+    
+    const templates = taskTemplates[appliance.category] || taskTemplates['utility'];
+    
+    templates.forEach((template, index) => {
+        const task = {
+            id: baseId + index,
+            title: template.title,
+            description: template.description,
+            category: template.category,
+            frequency: template.frequency,
+            cost: template.cost,
+            priority: this.getTaskPriority(template.category, template.title),
+            dueDate: this.calculateInitialDueDate(template.frequency),
+            lastCompleted: null,
+            isCompleted: false,
+            applianceId: appliance.id,  // Link to appliance!
+            applianceName: appliance.name
+        };
+        
+        // Set nextDue for calendar compatibility
+        task.nextDue = task.dueDate;
+        
+        tasks.push(task);
+    });
+    
+    return tasks;
+}
+
+// Helper method to get task priority
+getTaskPriority(category, title) {
+    if (category === 'Safety' || title.toLowerCase().includes('safety')) {
+        return 'high';
+    }
+    return 'medium';
+}
+
+// Helper method to calculate initial due date
+calculateInitialDueDate(frequency) {
+    const today = new Date();
+    
+    // For new appliances, space out initial tasks
+    if (frequency <= 30) {
+        // Daily/weekly tasks - start in 1 week
+        return new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    } else if (frequency <= 90) {
+        // Monthly/quarterly tasks - start in 2 weeks
+        return new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
+    } else {
+        // Annual tasks - start in 1 month
+        return new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+    }
+}
+
+// Method to add maintenance tasks when appliance is created
+addApplianceWithTasks(applianceData) {
+    // First, add the appliance
+    const appliance = {
+        ...applianceData,
+        id: Date.now(),
+        createdDate: new Date().toISOString()
+    };
+    
+    this.appliances.push(appliance);
+    this.saveAppliances();
+    
+    // Then generate and add maintenance tasks
+    const maintenanceTasks = this.generateMaintenanceTasks(appliance);
+    
+    if (maintenanceTasks.length > 0) {
+        // Add tasks to global task array
+        window.tasks.push(...maintenanceTasks);
+        
+        // Save tasks
+        if (typeof window.saveData === 'function') {
+            window.saveData();
+        }
+        
+        console.log(`✅ Added ${maintenanceTasks.length} maintenance tasks for ${appliance.name}`);
+    }
+    
+    return {
+        appliance,
+        tasksCreated: maintenanceTasks.length
+    };
+}
+
+// Method to get appliance-related tasks
+getApplianceTasks(applianceId) {
+    if (!window.tasks) return [];
+    
+    return window.tasks.filter(task => task.applianceId === applianceId);
+}
+
+// Method to get overdue tasks for an appliance  
+getOverdueApplianceTasks(applianceId) {
+    const today = new Date();
+    return this.getApplianceTasks(applianceId).filter(task => {
+        return !task.isCompleted && 
+               task.dueDate && 
+               new Date(task.dueDate) < today;
+    });
+}
+
+// Method to show appliance tasks in UI
+renderApplianceTasksSection(appliance) {
+    const tasks = this.getApplianceTasks(appliance.id);
+    const overdueTasks = this.getOverdueApplianceTasks(appliance.id);
+    
+    if (tasks.length === 0) {
+        return `
+            <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+                <h4 class="font-semibold text-blue-900 mb-2">🔧 Maintenance Tasks</h4>
+                <p class="text-sm text-blue-700">No maintenance tasks yet.</p>
+                <button onclick="window.applianceManager.generateTasksForAppliance(${appliance.id})"
+                        class="mt-2 bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+                    Generate Maintenance Tasks
+                </button>
+            </div>
+        `;
+    }
+    
+    return `
+        <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+            <h4 class="font-semibold text-gray-900 mb-2">🔧 Maintenance Tasks</h4>
+            <div class="grid grid-cols-3 gap-4 text-sm mb-3">
+                <div class="text-center">
+                    <div class="font-bold text-lg ${overdueTasks.length > 0 ? 'text-red-600' : 'text-gray-900'}">${overdueTasks.length}</div>
+                    <div class="text-xs text-gray-600">Overdue</div>
+                </div>
+                <div class="text-center">
+                    <div class="font-bold text-lg text-blue-600">${tasks.filter(t => !t.isCompleted).length}</div>
+                    <div class="text-xs text-gray-600">Pending</div>
+                </div>
+                <div class="text-center">
+                    <div class="font-bold text-lg text-green-600">${tasks.filter(t => t.isCompleted).length}</div>
+                    <div class="text-xs text-gray-600">Completed</div>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="window.applianceManager.showApplianceTasksModal(${appliance.id})"
+                        class="flex-1 bg-blue-100 text-blue-700 px-3 py-1 rounded text-sm hover:bg-blue-200">
+                    View All Tasks
+                </button>
+                <button onclick="window.applianceManager.addCustomApplianceTask(${appliance.id})"
+                        class="bg-green-100 text-green-700 px-3 py-1 rounded text-sm hover:bg-green-200">
+                    Add Task
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// Method to generate tasks for existing appliance
+generateTasksForAppliance(applianceId) {
+    const appliance = this.appliances.find(a => a.id === applianceId);
+    if (!appliance) return;
+    
+    const tasks = this.generateMaintenanceTasks(appliance);
+    
+    if (tasks.length > 0) {
+        window.tasks.push(...tasks);
+        
+        if (typeof window.saveData === 'function') {
+            window.saveData();
+        }
+        
+        // Refresh current view
+        this.render();
+        
+        alert(`✅ Generated ${tasks.length} maintenance tasks for ${appliance.name}!`);
+    }
+}
     // Add these methods to your ApplianceManager class (after the renderOverview method)
 
 // Replace your existing renderAddForm method with this version:
@@ -1083,72 +1360,113 @@ deleteAppliance(applianceId) {
         );
     }
     
-    getApplianceStatus(appliance) {
-        // Simple status logic for now - can be enhanced later
-        const today = new Date();
-        
-        // Check warranty
-        if (appliance.warrantyExpiration) {
-            const warrantyDate = new Date(appliance.warrantyExpiration);
-            const daysUntilExpiry = Math.ceil((warrantyDate - today) / (1000 * 60 * 60 * 24));
-            
-            if (daysUntilExpiry < 0) {
-                return {
-                    icon: '❌',
-                    text: 'Out of warranty',
-                    colorClass: 'text-red-600',
-                    needsAttention: false
-                };
-            } else if (daysUntilExpiry < 30) {
-                return {
-                    icon: '⚠️',
-                    text: 'Warranty expiring soon',
-                    colorClass: 'text-yellow-600',
-                    needsAttention: true
-                };
-            }
-        }
-        
-        // Default good status
-        return {
-            icon: '✅',
-            text: 'Good condition',
-            colorClass: 'text-green-600',
-            needsAttention: false
-        };
-    }
+    // Enhanced getApplianceStatus method for appliances.js
+// Replace your existing getApplianceStatus method with this enhanced version
+
+getApplianceStatus(appliance) {
+    const today = new Date();
+    const purchaseDate = appliance.purchaseDate ? new Date(appliance.purchaseDate) : null;
+    const ageInYears = purchaseDate ? (today - purchaseDate) / (365.25 * 24 * 60 * 60 * 1000) : 0;
     
-    getWarrantyStatus(appliance) {
-        if (!appliance.warrantyExpiration) return null;
-        
-        const today = new Date();
+    // 1. Check warranty status first (highest priority)
+    if (appliance.warrantyExpiration) {
         const warrantyDate = new Date(appliance.warrantyExpiration);
-        const daysUntilExpiry = Math.ceil((warrantyDate - today) / (1000 * 60 * 60 * 24));
+        const daysUntilExpiry = Math.ceil((warrantyDate - today) / (1000 * 60 * 60 * 1000));
         
         if (daysUntilExpiry < 0) {
             return {
-                text: 'Warranty expired',
-                colorClass: 'text-red-600'
+                icon: '⚠️',
+                text: `Out of warranty (${Math.abs(daysUntilExpiry)} days ago)`,
+                colorClass: 'text-orange-600',
+                needsAttention: true,  // Changed: Out of warranty needs attention!
+                reason: 'warranty_expired'
             };
-        } else if (daysUntilExpiry < 30) {
+        } else if (daysUntilExpiry <= 30) {
             return {
+                icon: '🔔',
                 text: `Warranty expires in ${daysUntilExpiry} days`,
-                colorClass: 'text-yellow-600'
-            };
-        } else if (daysUntilExpiry < 365) {
-            const months = Math.ceil(daysUntilExpiry / 30);
-            return {
-                text: `${months} month${months !== 1 ? 's' : ''} warranty left`,
-                colorClass: 'text-green-600'
-            };
-        } else {
-            const years = Math.floor(daysUntilExpiry / 365);
-            return {
-                text: `${years} year${years !== 1 ? 's' : ''} warranty left`,
-                colorClass: 'text-green-600'
+                colorClass: 'text-yellow-600',
+                needsAttention: true,
+                reason: 'warranty_expiring'
             };
         }
     }
+    
+    // 2. Check appliance age (varies by category)
+    const ageThresholds = {
+        'kitchen': 10,      // Refrigerators, dishwashers, etc.
+        'hvac': 15,         // HVAC systems
+        'laundry': 12,      // Washers, dryers
+        'bathroom': 8,      // Water heaters
+        'utility': 20,      // More durable utility items
+        'outdoor': 7,       // Outdoor equipment
+        'other': 10         // Default
+    };
+    
+    const threshold = ageThresholds[appliance.category] || 10;
+    
+    if (ageInYears > threshold) {
+        return {
+            icon: '🔧',
+            text: `${Math.round(ageInYears)} years old - consider replacement`,
+            colorClass: 'text-orange-600',
+            needsAttention: true,
+            reason: 'age_replacement'
+        };
+    } else if (ageInYears > threshold * 0.8) {  // 80% of lifespan
+        return {
+            icon: '📅',
+            text: `${Math.round(ageInYears)} years old - monitor closely`,
+            colorClass: 'text-yellow-600',
+            needsAttention: true,
+            reason: 'age_monitor'
+        };
+    }
+    
+    // 3. Check for missing critical information
+    const missingInfo = [];
+    if (!appliance.serialNumber) missingInfo.push('serial number');
+    if (!appliance.purchaseDate) missingInfo.push('purchase date');
+    if (!appliance.manufacturer) missingInfo.push('manufacturer');
+    
+    if (missingInfo.length > 1) {
+        return {
+            icon: '📝',
+            text: `Missing ${missingInfo.join(', ')}`,
+            colorClass: 'text-blue-600',
+            needsAttention: true,
+            reason: 'missing_info'
+        };
+    }
+    
+    // 4. Check if appliance has overdue tasks (if integrated with task system)
+    if (window.tasks && appliance.id) {
+        const overdueTasks = window.tasks.filter(task => {
+            return task.applianceId === appliance.id && 
+                   !task.isCompleted && 
+                   task.dueDate && 
+                   new Date(task.dueDate) < today;
+        });
+        
+        if (overdueTasks.length > 0) {
+            return {
+                icon: '⏰',
+                text: `${overdueTasks.length} overdue maintenance task${overdueTasks.length > 1 ? 's' : ''}`,
+                colorClass: 'text-red-600',
+                needsAttention: true,
+                reason: 'overdue_tasks'
+            };
+        }
+    }
+    
+    // 5. All good!
+    return {
+        icon: '✅',
+        text: 'Good condition',
+        colorClass: 'text-green-600',
+        needsAttention: false,
+        reason: 'good'
+    };
 }
 
 // appliances.js - Updated initialization section (replace the bottom part of your file)
