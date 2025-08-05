@@ -313,6 +313,14 @@ renderEnhancedTaskCard(task) {
 }
     
     render() {
+        // Don't render enhanced dashboard during setup
+        const setupVisible = !document.getElementById('task-setup').classList.contains('hidden');
+        const setupFormVisible = document.getElementById('setup-form').style.display !== 'none';
+    
+        if (setupVisible || setupFormVisible) {
+            console.log('⏭️ Skipping enhanced dashboard render during setup');
+            return;
+        }
         this.updateStats();
         this.renderFilteredTasks();
         this.updateFilterUI();
