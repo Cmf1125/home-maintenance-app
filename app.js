@@ -1417,7 +1417,7 @@ window.tasks.forEach(task => {
         </div>
         <div class="text-center">
             <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
-            <div class="text-xs text-gray-600">Annual</div>
+            <div class="text-xs text-gray-600">Annual Cost</div>
         </div>
         <button onclick="event.stopPropagation(); window.closeDatePickerModal(); addTaskFromDashboard()" 
                 class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
