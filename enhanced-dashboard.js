@@ -264,10 +264,10 @@ renderEnhancedTaskCard(task) {
     // Get category info
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
-    // ENHANCED: Show appliance info if it's an appliance task
-    const isApplianceTask = task.isApplianceTask || task.applianceId;
-    const applianceInfo = isApplianceTask ? 
-        `${task.applianceName || 'Unknown Appliance'}${task.applianceModel ? ` (${task.applianceModel})` : ''}` : 
+   // ENHANCED: Show appliance info if it's an appliance task
+    const isApplianceTask = Boolean(task.isApplianceTask || task.applianceId);
+    const applianceInfo = isApplianceTask && task.applianceName ? 
+        `${task.applianceName}${task.applianceModel ? ` (${task.applianceModel})` : ''}` : 
         null;
 
     return `
