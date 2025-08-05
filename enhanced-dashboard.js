@@ -2,6 +2,7 @@
 class EnhancedDashboard {
     constructor() {
     this.currentFilter = 'all';
+    this.currentApplianceFilter = 'all'; // NEW: Add appliance filter
     
     // Use global category configuration (defined in app.js)
     this.categoryConfig = window.categoryConfig || {
@@ -13,7 +14,7 @@ class EnhancedDashboard {
         'General': { icon: '🔧', color: 'gray' }
     };
     
-    console.log('🎯 Enhanced Dashboard initializing with shared categoryConfig');
+    console.log('🎯 Enhanced Dashboard initializing with appliance filtering');
     this.init();
 }
 
@@ -65,7 +66,17 @@ class EnhancedDashboard {
     // 🎯 NEW: Smooth scroll to task list with visual feedback
     this.scrollToTaskList();
 }
-
+    
+    // 2. ADD new method to set appliance filter
+    setApplianceFilter(applianceId) {
+        this.currentApplianceFilter = applianceId;
+        this.updateFilterUI();
+        this.renderFilteredTasks();
+        this.scrollToTaskList();
+    
+    console.log(`🔧 Appliance filter set to: ${applianceId}`);
+}
+    
     // Add this method to your EnhancedDashboard class:
     scrollToTaskList() {
         const tasksList = document.getElementById('tasks-list');
@@ -103,109 +114,190 @@ class EnhancedDashboard {
         }
     }
 
-    // UPDATE: updateFilterUI() - Remove cost filter title
-    updateFilterUI() {
-        // Remove active class from all cards
-        document.querySelectorAll('.stat-card').forEach(card => {
-            card.classList.remove('active-filter');
-        });
+   // 4. UPDATE updateFilterUI method to handle appliance filtering
+updateFilterUI() {
+    // Remove active class from all cards
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.classList.remove('active-filter');
+    });
 
-        // Add active class to selected card (overdue, week only)
-        const activeCard = document.getElementById(`${this.currentFilter}-card`);
-        if (activeCard && ['overdue', 'week'].includes(this.currentFilter)) {
-            activeCard.classList.add('active-filter');
-            
-            // Add a subtle pulse effect to show it was clicked
-            activeCard.style.transition = 'transform 0.2s ease';
-            activeCard.style.transform = 'scale(1.05)';
-            setTimeout(() => {
-                activeCard.style.transform = '';
-            }, 200);
+    // Add active class to selected card (overdue, week only)
+    const activeCard = document.getElementById(`${this.currentFilter}-card`);
+    if (activeCard && ['overdue', 'week'].includes(this.currentFilter)) {
+        activeCard.classList.add('active-filter');
+        
+        // Add a subtle pulse effect to show it was clicked
+        activeCard.style.transition = 'transform 0.2s ease';
+        activeCard.style.transform = 'scale(1.05)';
+        setTimeout(() => {
+            activeCard.style.transform = '';
+        }, 200);
+    }
+
+    // Update filter title
+    const filterTitles = {
+        'all': '📋 Upcoming Tasks',
+        'overdue': '⚠️ Overdue Tasks',
+        'week': '📅 This Week\'s Tasks'
+    };
+
+    const titleElement = document.getElementById('tasks-list-title');
+    if (titleElement) {
+        let newTitle = filterTitles[this.currentFilter] || 'Upcoming Tasks';
+        
+        // Add appliance name if filtering by appliance
+        if (this.currentApplianceFilter !== 'all') {
+            const applianceName = this.getApplianceName(this.currentApplianceFilter);
+            newTitle += ` - ${applianceName}`;
         }
+        
+        titleElement.textContent = newTitle;
+        
+        // Add a subtle animation to the title change
+        titleElement.style.opacity = '0.7';
+        setTimeout(() => {
+            titleElement.style.opacity = '1';
+        }, 150);
+    }
+    
+    // Update appliance filter dropdown
+    this.updateApplianceFilterDropdown();
+}
 
-        // Update filter title - simplified
-        const filterTitles = {
-            'all': '📋 Upcoming Tasks',
-            'overdue': '⚠️ Overdue Tasks',
-            'week': '📅 This Week\'s Tasks'
-            // REMOVED: 'cost' title
+// 5. ADD method to get appliance name
+getApplianceName(applianceId) {
+    if (!window.applianceManager || !window.applianceManager.appliances) {
+        return 'Unknown Appliance';
+    }
+    
+    const appliance = window.applianceManager.appliances.find(a => 
+        a.id.toString() === applianceId.toString()
+    );
+    
+    return appliance ? appliance.name : 'Unknown Appliance';
+}
+
+    // 6. ADD method to update appliance filter dropdown
+updateApplianceFilterDropdown() {
+    const dropdown = document.getElementById('appliance-filter-dropdown');
+    if (!dropdown) return;
+    
+    // Update selected value
+    dropdown.value = this.currentApplianceFilter;
+    
+    // Add visual feedback
+    if (this.currentApplianceFilter !== 'all') {
+        dropdown.style.backgroundColor = '#dbeafe';
+        dropdown.style.borderColor = '#2563eb';
+    } else {
+        dropdown.style.backgroundColor = '';
+        dropdown.style.borderColor = '';
+    }
+}
+
+// 7. ADD method to get appliances with tasks
+getAppliancesWithTasks() {
+    if (!window.applianceManager || !window.tasks) return [];
+    
+    const appliancesWithTasks = [];
+    
+    window.applianceManager.appliances.forEach(appliance => {
+        const taskCount = window.tasks.filter(task => 
+            task.applianceId === appliance.id && !task.isCompleted && task.dueDate
+        ).length;
+        
+        if (taskCount > 0) {
+            appliancesWithTasks.push({
+                ...appliance,
+                taskCount: taskCount
+            });
+        }
+    });
+    
+    return appliancesWithTasks.sort((a, b) => b.taskCount - a.taskCount);
+}
+    
+    // 3. UPDATE getFilteredTasks method to include appliance filtering
+getFilteredTasks() {
+    if (!window.tasks) {
+        console.warn('⚠️ No tasks data available');
+        return [];
+    }
+
+    const now = new Date();
+    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    // First filter by time-based criteria
+    let filteredTasks = [];
+    
+    switch (this.currentFilter) {
+        case 'overdue':
+            filteredTasks = window.tasks.filter(task => 
+                !task.isCompleted && 
+                task.dueDate && 
+                new Date(task.dueDate) < now
+            ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            break;
+
+        case 'week':
+            filteredTasks = window.tasks.filter(task => 
+                !task.isCompleted && 
+                task.dueDate && 
+                new Date(task.dueDate) <= oneWeek &&
+                new Date(task.dueDate) >= now
+            ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            break;
+
+        default: // 'all' case - show next 20 upcoming tasks (increased for appliance filtering)
+            filteredTasks = window.tasks.filter(task => 
+                !task.isCompleted && 
+                task.dueDate
+            ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+            .slice(0, 20);
+    }
+    
+    // Then filter by appliance if an appliance filter is active
+    if (this.currentApplianceFilter !== 'all') {
+        filteredTasks = filteredTasks.filter(task => 
+            task.applianceId && 
+            task.applianceId.toString() === this.currentApplianceFilter.toString()
+        );
+    }
+    
+    return filteredTasks;
+}
+
+    // 8. UPDATE renderFilteredTasks to show appliance info
+renderFilteredTasks() {
+    const tasksList = document.getElementById('tasks-list');
+    if (!tasksList) {
+        console.error('❌ Tasks list container not found');
+        return;
+    }
+
+    const filteredTasks = this.getFilteredTasks();
+
+    if (filteredTasks.length === 0) {
+        const emptyMessages = {
+            'overdue': this.currentApplianceFilter !== 'all' ? 
+                `🎉 No overdue tasks for ${this.getApplianceName(this.currentApplianceFilter)}!` : 
+                '🎉 No overdue tasks!',
+            'week': this.currentApplianceFilter !== 'all' ? 
+                `📅 No tasks due this week for ${this.getApplianceName(this.currentApplianceFilter)}!` : 
+                '📅 No tasks due this week!',
+            'all': this.currentApplianceFilter !== 'all' ? 
+                `✅ No tasks for ${this.getApplianceName(this.currentApplianceFilter)}!` : 
+                '🎉 All tasks complete!'
         };
-
-        const titleElement = document.getElementById('tasks-list-title');
-        if (titleElement) {
-            const newTitle = filterTitles[this.currentFilter] || 'Upcoming Tasks';
-            titleElement.textContent = newTitle;
-            
-            // Add a subtle animation to the title change
-            titleElement.style.opacity = '0.7';
-            setTimeout(() => {
-                titleElement.style.opacity = '1';
-            }, 150);
-        }
+        
+        tasksList.innerHTML = `<div class="p-6 text-center text-gray-500">${emptyMessages[this.currentFilter]}</div>`;
+        return;
     }
 
-    // UPDATE: getFilteredTasks() - Remove cost case
-    getFilteredTasks() {
-        if (!window.tasks) {
-            console.warn('⚠️ No tasks data available');
-            return [];
-        }
+    tasksList.innerHTML = filteredTasks.map(task => this.renderEnhancedTaskCard(task)).join('');
+}
 
-        const now = new Date();
-        const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-
-        switch (this.currentFilter) {
-            case 'overdue':
-                return window.tasks.filter(task => 
-                    !task.isCompleted && 
-                    task.dueDate && 
-                    new Date(task.dueDate) < now
-                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-
-            case 'week':
-                return window.tasks.filter(task => 
-                    !task.isCompleted && 
-                    task.dueDate && 
-                    new Date(task.dueDate) <= oneWeek &&
-                    new Date(task.dueDate) >= now
-                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-
-            // REMOVED: 'cost' case - moved to All Tasks
-
-            default: // 'all' case - show next 8 upcoming tasks
-                return window.tasks.filter(task => 
-                    !task.isCompleted && 
-                    task.dueDate
-                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-                .slice(0, 8);
-        }
-    }
-
-    renderFilteredTasks() {
-        const tasksList = document.getElementById('tasks-list');
-        if (!tasksList) {
-            console.error('❌ Tasks list container not found');
-            return;
-        }
-
-        const filteredTasks = this.getFilteredTasks();
-
-        if (filteredTasks.length === 0) {
-            const emptyMessages = {
-                'overdue': '🎉 No overdue tasks!',
-                'week': '📅 No tasks due this week!',
-                'total': '✅ All tasks complete!',
-                'cost': '💰 No tasks found!',
-                'all': '🎉 All tasks complete!'
-            };
-            
-            tasksList.innerHTML = `<div class="p-6 text-center text-gray-500">${emptyMessages[this.currentFilter]}</div>`;
-            return;
-        }
-
-        tasksList.innerHTML = filteredTasks.map(task => this.renderEnhancedTaskCard(task)).join('');
-    }
-
+// 9. UPDATE renderEnhancedTaskCard to show appliance info
 renderEnhancedTaskCard(task) {
     const now = new Date();
     const taskDate = new Date(task.dueDate);
@@ -239,46 +331,56 @@ renderEnhancedTaskCard(task) {
     let dueDateColor = 'text-gray-600';
 
     if (isOverdue) {
-    dueDateDisplay = 'Overdue';
-    dueDateColor = 'text-red-600 font-semibold';
+        dueDateDisplay = 'Overdue';
+        dueDateColor = 'text-red-600 font-semibold';
     } else if (daysUntilDue === 0) {
-    dueDateDisplay = 'Due today';
-    dueDateColor = 'text-orange-600 font-semibold';
+        dueDateDisplay = 'Due today';
+        dueDateColor = 'text-orange-600 font-semibold';
     } else if (daysUntilDue === 1) {
-    dueDateDisplay = 'Due tomorrow';
-    dueDateColor = 'text-orange-600';
+        dueDateDisplay = 'Due tomorrow';
+        dueDateColor = 'text-orange-600';
     } else {
-    dueDateDisplay = `Due ${taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
-    dueDateColor = daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600';
-}
+        dueDateDisplay = `Due ${taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+        dueDateColor = daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600';
+    }
 
     // Get category info
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
+    
+    // Get appliance info if task is linked to appliance
+    let applianceInfo = '';
+    if (task.applianceId && this.currentApplianceFilter === 'all') {
+        const applianceName = this.getApplianceName(task.applianceId);
+        applianceInfo = `<span class="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded">🔧 ${applianceName}</span>`;
+    }
 
     return `
-   <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200 cursor-pointer hover:bg-gray-50" onclick="window.TaskManager.openModal(window.tasks.find(t => t.id === ${task.id}), false)">
-        <!-- Row 1: Dot + Task Name + Category -->
-        <div class="flex items-center gap-2 mb-2">
-            <span class="font-semibold text-gray-900 text-sm flex-1 min-w-0 truncate">${urgencyDot} ${task.title}</span>
-            <span class="text-xs text-gray-500 flex-shrink-0">${categoryInfo.icon} ${task.category}</span>
-        </div>
-        
-        <!-- Row 2: Due Date + Buttons (left aligned) -->
-        <div class="flex items-center justify-start gap-4">
-            <span class="text-xs ${dueDateColor} flex-shrink-0">${dueDateDisplay}</span>
-            <div class="flex gap-2 ml-auto">
-                <button onclick="event.stopPropagation(); completeTask(${task.id})" 
-                        class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-base font-medium transition-colors">
-                    Complete
-                </button>
-                <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
-                        class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-base font-medium transition-colors">
-                    Reschedule
-                </button>
+        <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200 cursor-pointer hover:bg-gray-50" onclick="window.TaskManager.openModal(window.tasks.find(t => t.id === ${task.id}), false)">
+            <!-- Row 1: Dot + Task Name + Category -->
+            <div class="flex items-center gap-2 mb-2">
+                <span class="font-semibold text-gray-900 text-sm flex-1 min-w-0 truncate">${urgencyDot} ${task.title}</span>
+                <div class="flex gap-1 flex-shrink-0">
+                    <span class="text-xs text-gray-500">${categoryInfo.icon} ${task.category}</span>
+                    ${applianceInfo}
+                </div>
+            </div>
+            
+            <!-- Row 2: Due Date + Buttons (left aligned) -->
+            <div class="flex items-center justify-start gap-4">
+                <span class="text-xs ${dueDateColor} flex-shrink-0">${dueDateDisplay}</span>
+                <div class="flex gap-2 ml-auto">
+                    <button onclick="event.stopPropagation(); completeTask(${task.id})" 
+                            class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-base font-medium transition-colors">
+                        Complete
+                    </button>
+                    <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
+                            class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-base font-medium transition-colors">
+                        Reschedule
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-`;
+    `;
 }
     
     render() {
