@@ -78,6 +78,146 @@ class EnhancedDashboard {
 }
     
     // Add this method to your EnhancedDashboard class:
+// Add these methods to your EnhancedDashboard class
+
+// Method to populate appliance filter dropdown
+populateApplianceFilter() {
+    const dropdown = document.getElementById('appliance-filter-dropdown');
+    if (!dropdown) return;
+    
+    // Get appliances with tasks
+    const appliancesWithTasks = this.getAppliancesWithTasks();
+    
+    // Clear existing options (except "All Appliances")
+    dropdown.innerHTML = '<option value="all">All Appliances</option>';
+    
+    if (appliancesWithTasks.length === 0) {
+        dropdown.innerHTML += '<option disabled>No appliances with tasks</option>';
+        dropdown.disabled = true;
+        return;
+    }
+    
+    dropdown.disabled = false;
+    
+    // Add appliance options
+    appliancesWithTasks.forEach(appliance => {
+        const option = document.createElement('option');
+        option.value = appliance.id;
+        option.textContent = `${appliance.name} (${appliance.taskCount} tasks)`;
+        dropdown.appendChild(option);
+    });
+    
+    console.log(`📋 Populated appliance filter with ${appliancesWithTasks.length} appliances`);
+}
+
+// Method to refresh appliance filter (called by refresh button)
+refreshApplianceFilter() {
+    console.log('🔄 Refreshing appliance filter...');
+    
+    // Re-populate dropdown
+    this.populateApplianceFilter();
+    
+    // If current filter is for a specific appliance, verify it still exists
+    if (this.currentApplianceFilter !== 'all') {
+        const dropdown = document.getElementById('appliance-filter-dropdown');
+        const optionExists = Array.from(dropdown.options).some(option => 
+            option.value === this.currentApplianceFilter
+        );
+        
+        if (!optionExists) {
+            console.log('⚠️ Current appliance filter no longer exists, resetting to all');
+            this.currentApplianceFilter = 'all';
+        }
+    }
+    
+    // Update UI and refresh tasks
+    this.updateFilterUI();
+    this.renderFilteredTasks();
+    
+    // Show brief success feedback
+    const refreshBtn = document.querySelector('button[onclick*="refreshApplianceFilter"]');
+    if (refreshBtn) {
+        const originalText = refreshBtn.innerHTML;
+        refreshBtn.innerHTML = '✅';
+        refreshBtn.style.backgroundColor = '#dcfce7';
+        refreshBtn.style.color = '#166534';
+        
+        setTimeout(() => {
+            refreshBtn.innerHTML = originalText;
+            refreshBtn.style.backgroundColor = '';
+            refreshBtn.style.color = '';
+        }, 1000);
+    }
+}
+
+// Method to reset appliance filter
+resetApplianceFilter() {
+    this.currentApplianceFilter = 'all';
+    this.updateFilterUI();
+    this.renderFilteredTasks();
+}
+
+// UPDATE your existing render method to include appliance filter population
+render() {
+    this.updateStats();
+    this.populateApplianceFilter(); // ADD this line
+    this.renderFilteredTasks();
+    this.updateFilterUI();
+}
+
+// Method to get appliance task summary for stats
+getApplianceTaskStats() {
+    if (!window.applianceManager || !window.tasks) {
+        return { totalAppliances: 0, appliancesWithTasks: 0, applianceTasksOverdue: 0 };
+    }
+    
+    const applianceIds = new Set();
+    const now = new Date();
+    let applianceTasksOverdue = 0;
+    
+    window.tasks.forEach(task => {
+        if (task.applianceId) {
+            applianceIds.add(task.applianceId);
+            
+            if (!task.isCompleted && task.dueDate && new Date(task.dueDate) < now) {
+                applianceTasksOverdue++;
+            }
+        }
+    });
+    
+    return {
+        totalAppliances: window.applianceManager.appliances.length,
+        appliancesWithTasks: applianceIds.size,
+        applianceTasksOverdue: applianceTasksOverdue
+    };
+}
+
+// Optional: Add appliance stats to your dashboard
+renderApplianceStats() {
+    const stats = this.getApplianceTaskStats();
+    
+    if (stats.totalAppliances === 0) return '';
+    
+    return `
+        <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 mb-4">
+            <h4 class="font-semibold text-purple-900 mb-2">🔧 Appliance Maintenance</h4>
+            <div class="grid grid-cols-3 gap-4 text-sm">
+                <div class="text-center">
+                    <div class="font-bold text-lg text-purple-600">${stats.totalAppliances}</div>
+                    <div class="text-xs text-purple-700">Total Appliances</div>
+                </div>
+                <div class="text-center">
+                    <div class="font-bold text-lg text-blue-600">${stats.appliancesWithTasks}</div>
+                    <div class="text-xs text-blue-700">With Tasks</div>
+                </div>
+                <div class="text-center">
+                    <div class="font-bold text-lg ${stats.applianceTasksOverdue > 0 ? 'text-red-600' : 'text-green-600'}">${stats.applianceTasksOverdue}</div>
+                    <div class="text-xs ${stats.applianceTasksOverdue > 0 ? 'text-red-700' : 'text-green-700'}">Overdue</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
     scrollToTaskList() {
         const tasksList = document.getElementById('tasks-list');
         const tasksSection = tasksList?.closest('.bg-white.rounded-2xl.shadow-lg');
