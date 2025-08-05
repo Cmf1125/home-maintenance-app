@@ -69,18 +69,17 @@ class CasaCareCalendar {
                 </div>
 
                 <!-- Selected Day Modal -->
-                <div id="selected-day-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-end sm:items-center justify-center z-50 p-4 pb-32">
-                    <div class="bg-white rounded-t-xl sm:rounded-xl w-full max-w-md max-h-[70vh] overflow-hidden shadow-2xl">
-                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                <div id="selected-day-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+                    <div class="bg-white rounded-t-xl sm:rounded-xl w-full max-w-md h-[85vh] sm:max-h-[70vh] overflow-hidden shadow-2xl flex flex-col">
+                        <div class="p-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
                             <h3 id="selected-day-title" class="text-lg font-bold text-gray-900">Selected Day</h3>
                             <button id="close-day-modal" class="text-gray-500 hover:text-gray-700 text-xl w-8 h-8 flex items-center justify-center rounded">×</button>
                         </div>
-                        <div id="selected-day-tasks" class="p-4 max-h-[50vh] overflow-y-auto">
+                        <div id="selected-day-tasks" class="p-4 flex-1 overflow-y-auto" style="padding-bottom: 6rem;">
                             <!-- Tasks for selected day will appear here -->
                         </div>
                     </div>
-                </div>  
-            </div>
+               </div>
         `;
     }
 
