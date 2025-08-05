@@ -302,34 +302,35 @@ class CasaCareCalendar {
         this.showDayPanel(date, dayTasks);
     }
 
-    showDayPanel(date, dayTasks) {
-        const panel = document.getElementById('selected-day-panel');
-        const title = document.getElementById('selected-day-title');
-        const tasksContainer = document.getElementById('selected-day-tasks');
+showDayPanel(date, dayTasks) {
+    const modal = document.getElementById('selected-day-modal');
+    const title = document.getElementById('selected-day-title');
+    const tasksContainer = document.getElementById('selected-day-tasks');
 
-        if (!panel || !title || !tasksContainer) return;
+    if (!modal || !title || !tasksContainer) return;
 
-        // Format date
-        const formatOptions = { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        };
-        const formattedDate = date.toLocaleDateString('en-US', formatOptions);
+    // Format date
+    const formatOptions = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    };
+    const formattedDate = date.toLocaleDateString('en-US', formatOptions);
 
-        title.textContent = formattedDate;
+    title.textContent = formattedDate;
 
-        // Render tasks
-        if (dayTasks.length === 0) {
-            tasksContainer.innerHTML = '<div class="no-tasks">No tasks scheduled for this day</div>';
-        } else {
-            tasksContainer.innerHTML = dayTasks.map(task => this.renderDayPanelTask(task)).join('');
-        }
-
-        panel.classList.remove('hidden');
+    // Render tasks
+    if (dayTasks.length === 0) {
+        tasksContainer.innerHTML = '<div class="text-center text-gray-500 py-8">No tasks scheduled for this day</div>';
+    } else {
+        tasksContainer.innerHTML = dayTasks.map(task => this.renderDayPanelTask(task)).join('');
     }
 
+    // Show modal
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+}
     renderDayPanelTask(task) {
     const taskDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
     const currentDate = new Date();
