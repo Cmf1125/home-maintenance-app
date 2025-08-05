@@ -334,10 +334,14 @@ showDayPanel(date, dayTasks) {
         tasksContainer.innerHTML = dayTasks.map(task => this.renderDayPanelTask(task)).join('');
     }
 
+    // Prevent background scrolling
+    document.body.style.overflow = 'hidden';
+
     // Show modal
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
 }
+    
     renderDayPanelTask(task) {
     const taskDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
     const currentDate = new Date();
@@ -395,6 +399,9 @@ closeDayPanel() {
         modal.classList.add('hidden');
         modal.style.display = 'none';
     }
+    
+    // Restore background scrolling
+    document.body.style.overflow = '';
     
     // Clear selection
     this.selectedDate = null;
