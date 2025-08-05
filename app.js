@@ -1471,20 +1471,19 @@ function renderAllTaskCategories() {
         return `
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
                 <div class="p-4 border-b border-gray-100">
-                    <div class="flex items-center justify-between flex-wrap gap-2">
-                        <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 flex-1 min-w-0">
-                            <span class="text-xl">${categoryInfo.icon}</span>
-                            <span class="truncate">${categoryId}</span>
-                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">
-                                ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
-                            </span>
-                        </h3>
-                        <div class="text-right flex-shrink-0">
-                            <div class="text-lg font-bold text-green-600">$${Math.round(categoryCost)}</div>
-                            <div class="text-xs text-gray-500">annual cost</div>
-                        </div>
-                    </div>
-                </div>
+    <div class="flex items-center justify-between gap-4">
+        <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 flex-1 min-w-0">
+            <span class="text-xl">${categoryInfo.icon}</span>
+            <span class="truncate">${categoryId}</span>
+            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">
+                ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
+            </span>
+        </h3>
+        <div class="text-lg font-bold text-green-600 flex-shrink-0">
+            $${Math.round(categoryCost)}
+        </div>
+    </div>
+</div>
                 <div class="p-4">
                     <div class="space-y-2">
                         ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
