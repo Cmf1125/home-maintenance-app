@@ -256,7 +256,7 @@ renderEnhancedTaskCard(task) {
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
     return `
-    <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200">
+   <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200 cursor-pointer hover:bg-gray-50" onclick="window.TaskManager.openModal(window.tasks.find(t => t.id === ${task.id}), false)">
         <!-- Row 1: Dot + Task Name + Category + Cost -->
         <div class="flex items-center gap-2 mb-2">
             <span class="font-semibold text-gray-900 text-sm flex-1 min-w-0 truncate">${urgencyDot} ${task.title}</span>
