@@ -219,7 +219,7 @@ renderEnhancedTaskCard(task) {
                         task.title.toLowerCase().includes('fire') ||
                         task.title.toLowerCase().includes('carbon');
     
-    // Enhanced status styling
+    // Status styling
     let statusClass = 'bg-white';
     let urgencyDot = '⚪';
     
@@ -234,51 +234,73 @@ renderEnhancedTaskCard(task) {
         urgencyDot = '🟡';
     }
     
-    // Clean due date display
+    // Due date display
     let dueDateDisplay;
     let dueDateColor = 'text-gray-600';
 
     if (isOverdue) {
-    dueDateDisplay = 'Overdue';
-    dueDateColor = 'text-red-600 font-semibold';
+        dueDateDisplay = 'Overdue';
+        dueDateColor = 'text-red-600 font-semibold';
     } else if (daysUntilDue === 0) {
-    dueDateDisplay = 'Due today';
-    dueDateColor = 'text-orange-600 font-semibold';
+        dueDateDisplay = 'Due today';
+        dueDateColor = 'text-orange-600 font-semibold';
     } else if (daysUntilDue === 1) {
-    dueDateDisplay = 'Due tomorrow';
-    dueDateColor = 'text-orange-600';
+        dueDateDisplay = 'Due tomorrow';
+        dueDateColor = 'text-orange-600';
     } else {
-    dueDateDisplay = `Due ${taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
-    dueDateColor = daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600';
-}
+        dueDateDisplay = `Due ${taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+        dueDateColor = daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600';
+    }
 
     // Get category info
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
+    // ENHANCED: Show appliance info if it's an appliance task
+    const isApplianceTask = task.isApplianceTask || task.applianceId;
+    const applianceInfo = isApplianceTask ? 
+        `${task.applianceName || 'Unknown Appliance'}${task.applianceModel ? ` (${task.applianceModel})` : ''}` : 
+        null;
+
     return `
-   <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200 cursor-pointer hover:bg-gray-50" onclick="window.TaskManager.openModal(window.tasks.find(t => t.id === ${task.id}), false)">
-        <!-- Row 1: Dot + Task Name + Category -->
-        <div class="flex items-center gap-2 mb-2">
-            <span class="font-semibold text-gray-900 text-sm flex-1 min-w-0 truncate">${urgencyDot} ${task.title}</span>
-            <span class="text-xs text-gray-500 flex-shrink-0">${categoryInfo.icon} ${task.category}</span>
-        </div>
-        
-        <!-- Row 2: Due Date + Buttons (left aligned) -->
-        <div class="flex items-center justify-start gap-4">
-            <span class="text-xs ${dueDateColor} flex-shrink-0">${dueDateDisplay}</span>
-            <div class="flex gap-2 ml-auto">
-                <button onclick="event.stopPropagation(); completeTask(${task.id})" 
-                        class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-base font-medium transition-colors">
-                    Complete
-                </button>
-                <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
-                        class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-base font-medium transition-colors">
-                    Reschedule
-                </button>
+        <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200 cursor-pointer hover:bg-gray-50" 
+             onclick="window.TaskManager.openModal(window.tasks.find(t => t.id === ${task.id}), false)">
+            
+            <!-- Row 1: Dot + Task Name + Category -->
+            <div class="flex items-center gap-2 mb-2">
+                <span class="font-semibold text-gray-900 text-sm flex-1 min-w-0 truncate">
+                    ${urgencyDot} ${task.title}
+                </span>
+                <span class="text-xs text-gray-500 flex-shrink-0">
+                    ${categoryInfo.icon} ${task.category}
+                </span>
+            </div>
+            
+            <!-- Row 2: Appliance Info (if applicable) + Due Date + Buttons -->
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex flex-col gap-1 flex-1">
+                    <span class="text-xs ${dueDateColor} flex-shrink-0">${dueDateDisplay}</span>
+                    ${applianceInfo ? `<span class="text-xs text-blue-600">🔧 ${applianceInfo}</span>` : ''}
+                </div>
+                <div class="flex gap-2 ml-auto">
+                    <button onclick="event.stopPropagation(); completeTask(${task.id})" 
+                            class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-xs font-medium transition-colors">
+                        Complete
+                    </button>
+                    <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
+                            class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-xs font-medium transition-colors">
+                        Reschedule
+                    </button>
+                    ${isApplianceTask ? `
+                        <button onclick="event.stopPropagation(); viewAppliance(${task.applianceId})" 
+                                class="bg-purple-100 text-purple-700 hover:bg-purple-200 px-2 py-1 rounded text-xs font-medium transition-colors" 
+                                title="View appliance details">
+                            ⚙️
+                        </button>
+                    ` : ''}
+                </div>
             </div>
         </div>
-    </div>
-`;
+    `;
 }
     
     render() {
