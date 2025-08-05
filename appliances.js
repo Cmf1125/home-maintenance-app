@@ -230,7 +230,7 @@ renderAddForm() {
                                        placeholder="e.g., WRF535SWHZ">
                                     <button type="button" onclick="window.applianceManager.capturePhoto()"
                                         class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-100 text-blue-700 px-2 py-1 rounded text-sm hover:bg-blue-200">
-                                         📱 Scan QR Code
+                                         📱 Scan QR
                                     </button>
                                 </div>
                             </div>
