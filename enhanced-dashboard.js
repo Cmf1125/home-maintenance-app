@@ -259,31 +259,35 @@ renderEnhancedTaskCard(task) {
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
     return `
-        <div class="p-3 border-b ${statusClass} enhanced-task-card transition-all duration-200 simple-horizontal-task cursor-pointer hover:bg-gray-50" onclick="editTaskFromDashboard(${task.id})">
-            <div class="flex items-center justify-between gap-2">
-                <!-- Left: Dot + Title + Category + Cost -->
-                <div class="flex items-center gap-2 flex-1 min-w-0">
-                    <span class="text-sm flex-shrink-0">${urgencyDot}</span>
-                    <span class="font-semibold text-gray-900 text-sm truncate">${task.title}</span>
-                    <span class="text-xs text-gray-500">${categoryInfo.icon} ${task.category}</span>
-                    ${task.cost > 0 ? `<span class="text-green-600 font-medium text-xs">$${task.cost}</span>` : ''}
-                </div>
-                
-                <!-- Right: Due Date + Actions -->
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    <span class="text-xs ${dueDateColor} whitespace-nowrap">${dueDateDisplay}</span>
-                    <button onclick="event.stopPropagation(); completeTask(${task.id})" 
-                            class="bg-green-100 text-green-700 hover:bg-green-200 px-2 py-1 rounded text-xs font-medium transition-colors">
-                        Complete
-                    </button>
-                    <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
-                            class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 rounded text-xs font-medium transition-colors">
-                        Reschedule
-                    </button>
-                </div>
+    <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card transition-all duration-200 cursor-pointer hover:bg-gray-50" onclick="editTaskFromDashboard(${task.id})">
+        <div class="task-left">
+            <div class="task-row-1">
+                <span class="text-sm flex-shrink-0">${urgencyDot}</span>
+                <span class="font-semibold text-gray-900 text-sm truncate">${task.title}</span>
+            </div>
+            <div class="task-row-2">
+                <span class="text-xs text-gray-500">${categoryInfo.icon} ${task.category}</span>
+                ${task.cost > 0 ? `<span class="text-green-600 font-medium text-xs">$${task.cost}</span>` : ''}
             </div>
         </div>
-    `;
+        
+        <div class="task-right">
+            <div class="task-row-1">
+                <span class="text-xs ${dueDateColor} whitespace-nowrap">${dueDateDisplay}</span>
+                <button onclick="event.stopPropagation(); completeTask(${task.id})" 
+                        class="bg-green-100 text-green-700 hover:bg-green-200 px-2 py-1 rounded text-xs font-medium transition-colors ml-2">
+                    Complete
+                </button>
+            </div>
+            <div class="task-row-2">
+                <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
+                        class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 rounded text-xs font-medium transition-colors">
+                    Reschedule
+                </button>
+            </div>
+        </div>
+    </div>
+`;
 }
     
     render() {
