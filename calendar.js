@@ -69,7 +69,7 @@ class CasaCareCalendar {
                 </div>
 
                 <!-- Selected Day Modal -->
-                <div id="selected-day-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-end sm:items-center justify-center z-50 p-4 pb-24">
+                <div id="selected-day-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-end sm:items-center justify-center z-50 p-4 pb-32">
                     <div class="bg-white rounded-t-xl sm:rounded-xl w-full max-w-md max-h-[70vh] overflow-hidden shadow-2xl">
                         <div class="p-4 border-b border-gray-100 flex items-center justify-between">
                             <h3 id="selected-day-title" class="text-lg font-bold text-gray-900">Selected Day</h3>
