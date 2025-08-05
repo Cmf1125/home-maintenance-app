@@ -237,22 +237,19 @@ renderEnhancedTaskCard(task) {
     // Clean due date display
     let dueDateDisplay;
     let dueDateColor = 'text-gray-600';
-    
+
     if (isOverdue) {
-    const overdueDays = Math.abs(daysUntilDue);
-    dueDateDisplay = overdueDays === 1 ? '1 day overdue' : `${overdueDays} days overdue`;
+    dueDateDisplay = 'Overdue';
     dueDateColor = 'text-red-600 font-semibold';
-} else if (daysUntilDue === 0) {
+    } else if (daysUntilDue === 0) {
     dueDateDisplay = 'Due today';
     dueDateColor = 'text-orange-600 font-semibold';
-} else if (daysUntilDue === 1) {
+    } else if (daysUntilDue === 1) {
     dueDateDisplay = 'Due tomorrow';
     dueDateColor = 'text-orange-600';
-} else if (daysUntilDue <= 14) {
-    dueDateDisplay = `Due in ${daysUntilDue} days`;
-    dueDateColor = daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600';
-} else {
+    } else {
     dueDateDisplay = `Due ${taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    dueDateColor = daysUntilDue <= 7 ? 'text-orange-600' : 'text-gray-600';
 }
 
     // Get category info
