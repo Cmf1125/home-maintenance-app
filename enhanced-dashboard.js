@@ -262,8 +262,7 @@ renderEnhancedTaskCard(task) {
     <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200">
         <!-- Row 1: Dot + Task Name + Category + Cost -->
         <div class="flex items-center gap-2 mb-2">
-            <span class="text-sm flex-shrink-0">${urgencyDot}</span>
-            <span class="font-semibold text-gray-900 text-sm flex-1 min-w-0 truncate">${task.title}</span>
+            <span class="font-semibold text-gray-900 text-sm flex-1 min-w-0 truncate">${urgencyDot} ${task.title}</span>
             <span class="text-xs text-gray-500 flex-shrink-0">${categoryInfo.icon} ${task.category}</span>
             ${task.cost > 0 ? `<span class="text-green-600 font-medium text-xs flex-shrink-0">$${task.cost}</span>` : ''}
         </div>
