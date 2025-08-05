@@ -230,7 +230,7 @@ renderAddForm() {
                                        placeholder="e.g., WRF535SWHZ">
                                     <button type="button" onclick="window.applianceManager.capturePhoto()"
                                         class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-100 text-blue-700 px-2 py-1 rounded text-sm hover:bg-blue-200">
-                                     📱 Scan
+                                         📱 Scan QR Code
                                     </button>
                                 </div>
                             </div>
@@ -436,10 +436,11 @@ showEnhancedCameraInterface(stream) {
     });
 }
 
-// MOBILE-FRIENDLY VERSION - Replace your captureAndScan function with this:
+// SIMPLIFIED QR CODE ONLY VERSION
 
+// Replace your captureAndScan function with this clean version:
 async captureAndScan(video, statusDiv, stream, modal) {
-    statusDiv.innerHTML = 'Capturing image...';
+    statusDiv.textContent = 'Looking for QR codes...';
     
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -447,156 +448,82 @@ async captureAndScan(video, statusDiv, stream, modal) {
     canvas.height = video.videoHeight;
     
     ctx.drawImage(video, 0, 0);
-    
-    // IMAGE ENHANCEMENT for better OCR
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    this.enhanceImageForOCR(imageData);
-    ctx.putImageData(imageData, 0, 0);
     
     try {
-        // First try QR code scanning
-        statusDiv.innerHTML = 'Scanning for QR codes...';
         const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
         
         if (qrCode) {
-            statusDiv.innerHTML = '✅ QR Code found!<br><small>' + qrCode.data.substring(0, 50) + '</small>';
+            statusDiv.textContent = '✅ QR Code found!';
             this.processQRResult(qrCode.data);
             this.closeCameraModal(stream, modal);
-            return;
-        }
-        
-        // If no QR code, do text scanning
-        statusDiv.innerHTML = '📖 No QR code found.<br>Reading text instead...';
-        const canvas64 = canvas.toDataURL();
-        
-        const { data: { text, confidence } } = await Tesseract.recognize(canvas64, 'eng', {
-            logger: m => {
-                if (m.status === 'recognizing text') {
-                    statusDiv.innerHTML = `Reading text... ${Math.round(m.progress * 100)}%`;
-                }
-            },
-            tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK,
-            tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-. :',
-        });
-        
-        // MOBILE DEBUG - Show what was detected
-        statusDiv.innerHTML = `
-            <div style="font-size: 12px; text-align: left; background: #f0f0f0; padding: 8px; border-radius: 4px; margin: 4px 0;">
-                <strong>OCR Results:</strong><br>
-                Confidence: ${confidence}%<br>
-                Text found: "${text.substring(0, 100)}${text.length > 100 ? '...' : ''}"
-            </div>
-        `;
-        
-        if (confidence < 30) {
-            statusDiv.innerHTML += '<div style="color: orange; margin-top: 8px;">⚠️ Low quality. Try better lighting!</div>';
-            setTimeout(() => statusDiv.innerHTML = 'Ready to scan...', 5000);
-            return;
-        }
-        
-        const modelNumbers = this.extractModelNumbers(text);
-        
-        if (modelNumbers.length > 0) {
-            statusDiv.innerHTML = `
-                <div style="color: green;">✅ Found model: ${modelNumbers[0]}</div>
-                <div style="font-size: 11px; margin-top: 4px;">All matches: ${modelNumbers.join(', ')}</div>
-            `;
-            this.processModelNumber(modelNumbers[0]);
-            setTimeout(() => this.closeCameraModal(stream, modal), 2000);
         } else {
-            statusDiv.innerHTML = `
-                <div style="color: red;">❌ No model number found</div>
-                <div style="font-size: 11px; background: #fff3cd; padding: 4px; margin: 4px 0; border-radius: 4px;">
-                    Text detected: "${text.replace(/\s+/g, ' ').trim().substring(0, 80)}..."
-                </div>
-                <div style="font-size: 11px; color: #666;">Try focusing on just the model number area</div>
-            `;
-            
-            setTimeout(() => statusDiv.innerHTML = 'Ready to scan...', 6000);
+            statusDiv.textContent = '❌ No QR code detected. Try different angle.';
+            setTimeout(() => {
+                statusDiv.textContent = 'Position QR code in the frame and try again';
+            }, 2000);
         }
         
     } catch (error) {
-        statusDiv.innerHTML = `
-            <div style="color: red;">❌ Scan failed</div>
-            <div style="font-size: 11px; color: #666;">Error: ${error.message}</div>
-        `;
-        setTimeout(() => statusDiv.innerHTML = 'Ready to scan...', 4000);
+        console.error('QR scanning error:', error);
+        statusDiv.textContent = '❌ Scan failed. Try again.';
+        setTimeout(() => {
+            statusDiv.textContent = 'Ready to scan QR codes...';
+        }, 3000);
     }
 }
+
+// Update your camera interface text:
+showEnhancedCameraInterface(stream) {
+    const cameraModal = document.createElement('div');
+    cameraModal.id = 'camera-scan-modal';
+    cameraModal.className = 'fixed inset-0 bg-black z-50 flex flex-col';
     
-// IMAGE ENHANCEMENT HELPER - ADD THIS NEW FUNCTION
-enhanceImageForOCR(imageData) {
-    const data = imageData.data;
+    cameraModal.innerHTML = `
+        <div class="flex-1 relative">
+            <video id="camera-video" class="w-full h-full object-cover" autoplay playsinline></video>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="border-2 border-white w-64 h-64 rounded-lg"></div>
+            </div>
+        </div>
+        <div class="bg-white p-4 space-y-3">
+            <div class="text-center">
+                <h3 class="font-bold text-lg">📱 Scan QR Code</h3>
+                <p class="text-sm text-gray-600">Position any QR code in the frame above</p>
+            </div>
+            <div class="flex gap-3">
+                <button id="capture-btn" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium">
+                    📷 Scan QR Code
+                </button>
+                <button id="close-camera-btn" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-medium">
+                    Cancel
+                </button>
+            </div>
+            <div id="scan-status" class="text-center text-sm text-gray-600">
+                Ready to scan QR codes...
+            </div>
+        </div>
+    `;
     
-    for (let i = 0; i < data.length; i += 4) {
-        // Convert to grayscale for better OCR
-        const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-        
-        // Increase contrast (make text darker, background lighter)
-        const contrast = 1.5;
-        const enhanced = ((gray - 128) * contrast) + 128;
-        
-        // Threshold for better text recognition
-        const final = enhanced > 128 ? 255 : 0;
-        
-        data[i] = final;     // R
-        data[i + 1] = final; // G  
-        data[i + 2] = final; // B
-        // Alpha stays the same
-    }
-}
+    document.body.appendChild(cameraModal);
     
-// Extract model numbers from scanned text
-extractModelNumbers(text) {
-    console.log('🔍 Raw OCR text:', text);
+    const video = document.getElementById('camera-video');
+    const captureBtn = document.getElementById('capture-btn');
+    const closeBtn = document.getElementById('close-camera-btn');
+    const statusDiv = document.getElementById('scan-status');
     
-    // More comprehensive patterns for appliance model numbers
-    const patterns = [
-        // Standard formats with hyphens/dashes
-        /(?:Model[\s:]*)?([A-Z]{2,6}[-\s]?[A-Z0-9]{4,12})/gi,
-        
-        // Continuous alphanumeric (most common)
-        /(?:Model[\s:]*)?([A-Z]{2,4}\d{4,8}[A-Z]{0,4})/gi,
-        
-        // With spaces or dots
-        /(?:Model[\s:]*)?([A-Z]{2,4}[\s\.]\d{3,6}[\s\.]?[A-Z]{0,3})/gi,
-        
-        // Pure numbers (some brands use this)
-        /(?:Model[\s:]*)?(\d{8,12})/gi,
-        
-        // Brand-specific patterns
-        /(?:GE|Whirlpool|Samsung|LG)[\s:]([A-Z0-9]{6,15})/gi,
-        
-        // Serial numbers (fallback)
-        /(?:Serial[\s:]*)?([A-Z]{2}\d{8,12})/gi,
-        
-        // Generic word boundaries for standalone codes
-        /\b([A-Z]{3,6}\d{4,8}[A-Z]{0,3})\b/g
-    ];
+    video.srcObject = stream;
     
-    const matches = [];
-    patterns.forEach((pattern, index) => {
-        const found = text.match(pattern) || [];
-        console.log(`Pattern ${index + 1} found:`, found);
-        
-        // Clean up matches (remove "Model:" prefix, etc.)
-        const cleaned = found.map(match => {
-            return match.replace(/^(?:Model|Serial)[\s:]+/i, '').trim();
-        });
-        
-        matches.push(...cleaned);
+    captureBtn.addEventListener('click', () => {
+        this.captureAndScan(video, statusDiv, stream, cameraModal);
     });
     
-    // Remove duplicates and filter out obviously wrong matches
-    const unique = [...new Set(matches)].filter(match => {
-        // Filter out common false positives
-        const falsePositives = /^(MODEL|SERIAL|MADE|USA|CHINA|\d{1,3}V|\d{1,3}HZ)$/i;
-        return match.length >= 5 && !falsePositives.test(match);
+    closeBtn.addEventListener('click', () => {
+        stream.getTracks().forEach(track => track.stop());
+        document.body.removeChild(cameraModal);
     });
-    
-    console.log('🎯 Final matches:', unique);
-    return unique;
 }
+    
 // Process QR code result
 processQRResult(qrData) {
     console.log('QR Code data:', qrData);
@@ -614,21 +541,6 @@ processQRResult(qrData) {
     } else {
         alert(`QR Code data: ${qrData}\n\nManual entry required for model number.`);
     }
-}
-
-// Process found model number
-processModelNumber(modelNumber) {
-    console.log('📝 Processing model number:', modelNumber);
-    
-    // Validate the model number makes sense
-    if (modelNumber.length < 4 || modelNumber.length > 20) {
-        console.warn('⚠️ Suspicious model number length:', modelNumber);
-    }
-    
-    this.fillModelField(modelNumber);
-    
-    // More helpful success message
-    alert(`✅ Model number detected: ${modelNumber}\n\n💡 This was automatically scanned from your appliance label. Please verify it's correct and adjust if needed.`);
 }
 
 // Fill the model field in the form
