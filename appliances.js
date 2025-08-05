@@ -1499,6 +1499,7 @@ generateTasksForAppliance(applianceId) {
         
         alert(`✅ Generated ${tasks.length} maintenance tasks for ${appliance.name}!`);
     }
+   } 
 }
 
 // appliances.js - Updated initialization section (replace the bottom part of your file)
