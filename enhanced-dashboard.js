@@ -169,7 +169,12 @@ class EnhancedDashboard {
                     new Date(task.dueDate) >= now
                 ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
-            // REMOVED: 'cost' case - moved to All Tasks
+             case 'appliances':
+                return window.tasks.filter(task => 
+                    !task.isCompleted && 
+                    task.dueDate && 
+                     (task.isApplianceTask || task.applianceId)
+                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));   
 
             default: // 'all' case - show next 8 upcoming tasks
                 return window.tasks.filter(task => 
