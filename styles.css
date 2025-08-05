@@ -626,7 +626,32 @@
         flex-direction: column;
         gap: 0.75rem;
     }
+
+    /* Mobile Optimizations for Simplified Task Cards */
+    @media (max-width: 768px) {
+    .enhanced-task-card {
+        padding: 1rem 0.75rem;
+    }
     
+    .enhanced-task-card .flex:first-child {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    /* Fix mobile task card alignment */
+    .mobile-task-card-simple .flex.items-center.justify-between {
+        justify-content: flex-start !important;
+        gap: 1rem;
+    }
+    
+    .mobile-task-card-simple .flex.items-center.gap-2.flex-shrink-0 {
+        margin-left: auto;
+    }
+    
+    .task-actions {
+        flex-direction: row !important;
+        gap: 0.5rem;
+        
     .task-actions {
         flex-direction: row !important;
         gap: 0.5rem;
