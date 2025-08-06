@@ -51,47 +51,6 @@ function getClimateRegion(state) {
     return 'GENERAL';
 }
 
-// PWA Input Fix for Standalone Mode
-function fixPWAInputs() {
-    // Detect if we're in PWA standalone mode
-    const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
-                  window.navigator.standalone === true;
-    
-    if (isPWA) {
-        console.log('📱 PWA mode detected - applying input fixes');
-        
-        // Force enable touch events on all inputs
-        document.querySelectorAll('input, select, textarea').forEach(input => {
-            input.style.touchAction = 'manipulation';
-            input.style.userSelect = 'text';
-            input.style.webkitUserSelect = 'text';
-            
-            // Add click handler to ensure focus
-            input.addEventListener('click', function(e) {
-                e.stopPropagation();
-                this.focus();
-            }, true);
-            
-            // Add touchstart for iOS
-            input.addEventListener('touchstart', function(e) {
-                e.stopPropagation();
-                this.focus();
-            }, true);
-        });
-    }
-}
-
-// Call the fix when DOM loads
-document.addEventListener('DOMContentLoaded', fixPWAInputs);
-
-// Also call when new content is added
-const originalCreateMaintenancePlan = createMaintenancePlan;
-function createMaintenancePlan() {
-    originalCreateMaintenancePlan();
-    setTimeout(fixPWAInputs, 100); // Fix inputs after content loads
-}
-
-
 // 👇 ADD THE FUNCTION RIGHT HERE 👇
 function getAutoPriority(title, category) {
     // Safety tasks are always high priority
