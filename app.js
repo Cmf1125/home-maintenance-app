@@ -2981,3 +2981,26 @@ if (document.readyState !== 'loading') {
 
 console.log('📱 Smart installation banner system loaded');
 
+// Open category modal
+function openCategoryModal(categoryId, tasks) {
+    const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
+
+    document.getElementById('modal-category-icon').textContent = categoryInfo.icon;
+    document.getElementById('modal-category-title').textContent = categoryId;
+
+    const taskListEl = document.getElementById('modal-task-list');
+    taskListEl.innerHTML = tasks.map(task => renderAllTasksTaskItem(task)).join('');
+
+    document.getElementById('category-task-modal').classList.add('show');
+    document.getElementById('category-task-modal').classList.remove('hidden');
+}
+
+// Close modal
+function closeCategoryModal() {
+    document.getElementById('category-task-modal').classList.remove('show');
+    document.getElementById('category-task-modal').classList.add('hidden');
+}
+
+// Make functions globally available
+window.openCategoryModal = openCategoryModal;
+window.closeCategoryModal = closeCategoryModal;
