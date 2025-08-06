@@ -1487,10 +1487,11 @@ function renderAllTaskCategories() {
                 <!-- Left: icon + category name + task count -->
                 <div class="flex items-center gap-3">
                     <div class="text-xl">${categoryInfo.icon}</div>
-                    <div class="flex flex-col">
-                        <div class="text-lg font-semibold">${categoryId}</div>
-                        <div class="text-sm text-gray-600">${tasks.length} task${tasks.length !== 1 ? 's' : ''}</div>
+                    <div class="flex flex-col items-start">
+                      <div class="text-lg font-semibold leading-snug">${categoryId}</div>
+                      <div class="text-sm text-gray-600">${tasks.length} task${tasks.length !== 1 ? 's' : ''}</div>
                     </div>
+
                 </div>
 
                 <!-- Right: cost and chevron -->
