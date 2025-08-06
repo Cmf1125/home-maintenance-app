@@ -2994,8 +2994,9 @@ function openCategoryModal(categoryId) {
 
     const modal = document.getElementById('category-task-modal');
     modal.classList.remove('hidden');
-    setTimeout(() => modal.classList.remove('translate-y-full'), 10); // triggers animation
+    setTimeout(() => modal.classList.remove('translate-y-full'), 10);
 }
+
 
 // Close modal
 function closeCategoryModal() {
