@@ -532,15 +532,24 @@ handleAddFormSubmit(event) {
     // Save to storage
     this.saveAppliances();
 
-    // ⬇️ Ask if they want to generate automatic tasks
+   // Ask if they want to generate automatic tasks
 const askForTasks = confirm(
     `✅ Appliance "${newAppliance.name}" added successfully!\n\n` +
     `Would you like to generate automatic maintenance tasks for this appliance?`
 );
 
 if (askForTasks) {
-    const result = this.addApplianceWithTasks(newAppliance);
-    alert(`🔧 Generated ${result.tasksCreated} maintenance tasks!`);
+    // Just generate tasks, don't add appliance again
+    const maintenanceTasks = this.generateMaintenanceTasks(newAppliance);
+    
+    if (maintenanceTasks.length > 0) {
+        window.tasks.push(...maintenanceTasks);
+        if (typeof window.saveData === 'function') {
+            window.saveData();
+        }
+    }
+    
+    alert(`🔧 Generated ${maintenanceTasks.length} maintenance tasks!`);
 }
 
     
