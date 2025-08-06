@@ -1483,7 +1483,7 @@ function renderAllTaskCategories() {
             </span>
         </h3>
         <div class="text-lg font-bold text-green-600 flex-shrink-0">
-            $${Math.round(categoryCost)}
+            Annual Cost $${Math.round(categoryCost)}
         </div>
     </div>
 </div>
