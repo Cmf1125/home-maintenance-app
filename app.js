@@ -1483,7 +1483,6 @@ function renderAllTaskCategories() {
 
        return `
         <div class="rounded-2xl shadow-md mb-4 px-4 py-4 cursor-pointer transition-transform duration-150 hover:scale-[1.01] ${colorClass}"
-            onclick='openCategoryModal("${categoryId}")'
             <div class="flex items-center justify-between gap-4">
                 <!-- Left: icon + category name + task count -->
                 <div class="flex items-center gap-3">
@@ -2981,34 +2980,3 @@ if (document.readyState !== 'loading') {
 }
 
 console.log('📱 Smart installation banner system loaded');
-
-// Open category modal
-function openCategoryModal(categoryId) {
-    const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
-    document.getElementById('modal-category-icon').textContent = categoryInfo.icon;
-    document.getElementById('modal-category-title').textContent = categoryId;
-
-    const categoryTasks = window.tasks.filter(task => task.category === categoryId);
-    const taskListEl = document.getElementById('modal-task-list');
-    taskListEl.innerHTML = categoryTasks.map(task => renderAllTasksTaskItem(task)).join('');
-
-    const modal = document.getElementById('category-task-modal');
-    modal.classList.remove('hidden');
-    setTimeout(() => modal.classList.remove('translate-y-full'), 10);
-}
-
-
-// Close modal
-function closeCategoryModal() {
-    const modal = document.getElementById('category-task-modal');
-    modal.classList.add('translate-y-full');
-
-    // Wait for animation to finish before hiding
-    setTimeout(() => {
-        modal.classList.add('hidden');
-    }, 300);
-}
-
-// Make functions globally available
-window.openCategoryModal = openCategoryModal;
-window.closeCategoryModal = closeCategoryModal;
