@@ -407,9 +407,3 @@ body.install-banner-visible {
 .enhanced-task-card.simple-horizontal-task button {
   transition: transform 0.1s ease, opacity 0.1s ease;
 }
-
-/* Ensure task titles and descriptions wrap onto multiple lines */
-.task-title, .task-description {
-    white-space: normal;
-    word-break: break-word;
-}
