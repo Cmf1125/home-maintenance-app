@@ -1481,29 +1481,30 @@ function renderAllTaskCategories() {
 
         const colorClass = colorClasses[categoryId] || 'bg-white text-gray-900';
 
-       return `
-        <div class="rounded-2xl shadow-md mb-4 px-4 py-4 cursor-pointer transition-transform duration-150 hover:scale-[1.01] ${colorClass}"
-            <div class="flex items-center justify-between gap-4">
-                <!-- Left: icon + category name + task count -->
-                <div class="flex items-center gap-3">
-                    <div class="text-xl">${categoryInfo.icon}</div>
-                    <div class="flex flex-col items-start text-left">
-                      <div class="text-lg font-semibold leading-snug break-words">${categoryId}</div>
-                      <div class="text-sm text-gray-600">${tasks.length} task${tasks.length !== 1 ? 's' : ''}</div>
-                    </div>
+      return `
+  <div class="rounded-2xl shadow-md mb-4 px-4 py-4 transition-transform duration-150 hover:scale-[1.01] ${colorClass}">
+    <div class="flex items-center justify-between gap-4">
+      
+      <!-- Left: icon + category name + task count -->
+      <div class="flex items-center gap-3">
+        <div class="text-xl">${categoryInfo.icon}</div>
+        <div class="flex flex-col items-start text-left">
+          <div class="text-lg font-semibold leading-snug break-words">${categoryId}</div>
+          <div class="text-sm text-gray-600">${tasks.length} task${tasks.length !== 1 ? 's' : ''}</div>
+        </div>
+      </div>
 
+      <!-- Right: cost and chevron -->
+      <div class="flex items-center gap-3">
+        <span class="bg-white shadow px-3 py-1 rounded-full text-sm font-semibold text-green-600">
+          $${Math.round(categoryCost)}/yr
+        </span>
+        <span class="text-gray-400 text-xl">&#8250;</span>
+      </div>
 
-                </div>
-
-                <!-- Right: cost and chevron -->
-                <div class="flex items-center gap-3">
-                    <span class="bg-white shadow px-3 py-1 rounded-full text-sm font-semibold text-green-600">$${Math.round(categoryCost)}/yr</span>
-                    <span class="text-gray-400 text-xl">&#8250;</span>
-                </div>
-            </div>
-        </div>`;
-    }).join('');
-}
+    </div>
+  </div>
+`;
 
 
 function toggleCategoryTasks(button) {
