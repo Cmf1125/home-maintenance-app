@@ -1535,9 +1535,9 @@ function renderAllTasksTaskItem(task) {
     } else if (daysUntilDue === 0) {
         dueDateDisplay = `<span class="text-orange-600 font-semibold">Due today</span>`;
     } else if (daysUntilDue <= 7) {
-        dueDateDisplay = `<span class="text-orange-600">Due in ${daysUntilDue}d</span>`;
+       dueDateDisplay = `<span class="text-orange-600">Due ${taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>`;
     } else {
-        dueDateDisplay = `<span class="text-gray-700">Due ${taskDate.toLocaleDateString()}</span>`;
+        dueDateDisplay = `<span class="text-gray-700">Due ${taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>`;
     }
     
     return `
