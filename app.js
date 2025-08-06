@@ -1339,9 +1339,9 @@ function showTab(tabName) {
 function showAllTasks() {
     console.log('📋 Switching to All Tasks view...');
     
-    // 🎯 NEW: Show header for All Tasks view
-    document.body.classList.remove('hide-header');
-    document.body.classList.add('show-header');
+    // SIMPLIFIED: Just ensure main-app-active class (header will be sticky automatically)
+    document.body.classList.add('main-app-active');
+    document.body.classList.remove('hide-header', 'show-header');
     
     // Hide all other views (including dashboard)
     const dashboardView = document.getElementById('dashboard-view');
@@ -1362,14 +1362,12 @@ function showAllTasks() {
         // Show back arrow
         setTimeout(() => {
             const backButton = document.getElementById('back-to-dashboard');
-            console.log('🔍 Looking for back button...', !!backButton);
-            
             if (backButton) {
                 backButton.classList.remove('hidden');
                 backButton.style.display = 'flex';
                 backButton.style.visibility = 'visible';
                 backButton.style.opacity = '1';
-                console.log('✅ Back arrow should now be visible!');
+                console.log('✅ Back arrow visible with automatically sticky header!');
             }
         }, 50);
         
@@ -1387,7 +1385,7 @@ function showAllTasks() {
     // Render the content
     renderAllTasksView();
     
-    console.log('✅ All Tasks view displayed with header and back arrow');
+    console.log('✅ All Tasks view displayed with unified sticky header system');
 }
 
 function renderAllTasksView() {
