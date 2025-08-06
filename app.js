@@ -1472,16 +1472,8 @@ function renderAllTaskCategories() {
         }, 0);
         
         return `
-
-
-  <!-- Collapsible Task List -->
-  <div class="category-task-list">
-    ${window.tasks.filter(t => !t.isCompleted && t.dueDate).map(task => renderAllTasksTaskItem(task)).join('')}
-  </div>
-</div>
-        
-<div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
- <div class="p-4 border-b border-gray-100">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+<div class="p-4 border-b border-gray-100">
   <div class="flex items-center justify-between flex-wrap gap-2 w-full">
     <div class="flex items-center gap-2 flex-1 min-w-0">
       <span class="text-xl">${categoryInfo.icon}</span>
