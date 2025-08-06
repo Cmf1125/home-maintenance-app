@@ -407,3 +407,19 @@ body.install-banner-visible {
 .enhanced-task-card.simple-horizontal-task button {
   transition: transform 0.1s ease, opacity 0.1s ease;
 }
+
+/* FORCE sticky header positioning */
+.bg-white.shadow-sm.border-b.sticky {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 60 !important;
+    background: white !important;
+}
+
+/* Ensure it works on all main app pages */
+body.main-app-active .bg-white.shadow-sm.border-b.sticky {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 60 !important;
+    background: white !important;
+}
