@@ -1447,6 +1447,10 @@ window.tasks.forEach(task => {
 function renderAllTaskCategories() {
   const tasksByCategory = groupTasksByCategory();
 
+  if (!tasksByCategory || Object.keys(tasksByCategory).length === 0) {
+    return '<div class="text-center text-gray-500 py-8">No categories found.</div>';
+  }
+
   return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
     const categoryInfo = window.categoryConfig?.[categoryId] || {
       icon: '📁',
@@ -1460,17 +1464,12 @@ function renderAllTaskCategories() {
       return sum;
     }, 0);
 
-    // Build dynamic class for border color (e.g. border-l-yellow-500)
     const borderColorClass = `border-l-4 border-${categoryInfo.color}-500`;
 
     return `
       <div class="bg-white rounded-xl shadow overflow-hidden border border-gray-200 mb-4 ${borderColorClass}">
-        
-        <!-- Header -->
         <div class="p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
           <div class="flex items-center justify-between gap-2 w-full">
-            
-            <!-- Left: Icon + Name + Task Count -->
             <div class="flex items-center gap-2 flex-1 min-w-0">
               <span class="text-lg">${categoryInfo.icon}</span>
               <span class="font-medium text-gray-900 truncate">${categoryId}</span>
@@ -1478,8 +1477,6 @@ function renderAllTaskCategories() {
                 ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
               </span>
             </div>
-            
-            <!-- Right: Cost + Toggle -->
             <div class="flex items-center gap-2">
               <span class="bg-green-50 text-green-600 px-2 py-0.5 rounded-full text-xs font-medium">
                 $${Math.round(categoryCost)}/yr
@@ -1491,8 +1488,6 @@ function renderAllTaskCategories() {
             </div>
           </div>
         </div>
-
-        <!-- Task List -->
         <div class="category-task-list">
           ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
         </div>
@@ -1501,15 +1496,65 @@ function renderAllTaskCategories() {
   }).join('');
 }
 
+    // Group active tasks by category (copying your existing logic)
+    const activeTasks = window.tasks.filter(task => !task.isCompleted && task.dueDate);
+    const tasksByCategory = {};
+    
+    activeTasks.forEach(task => {
+        const category = task.category || 'General';
+        if (!tasksByCategory[category]) tasksByCategory[category] = [];
+        tasksByCategory[category].push(task);
+    });
+
+    if (Object.keys(tasksByCategory).length === 0) {
+        return '<div class="text-center text-gray-500 py-8">🎉 All tasks completed!</div>';
+    }
+
+    return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
+        const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
+        
+        // Calculate annual cost for this category
+        const categoryCost = tasks.reduce((total, task) => {
+            return total + (task.cost * (365 / task.frequency));
+        }, 0);
+        
+        return `
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+                <div class="p-4 border-b border-gray-100">
+    <div class="flex flex-wrap items-center justify-between gap-2 w-full">
+        <div class="flex items-center gap-2 flex-1 min-w-0">
+            <span class="text-xl">${categoryInfo.icon}</span>
+            <span class="whitespace-normal break-words font-bold">${categoryId}</span>
+            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">
+            ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
+            </span>
+    </div>
+    <div class="flex items-center gap-2">
+        <div class="text-xs text-green-600 font-semibold">
+            $${Math.round(categoryCost)}/yr
+        </div>
+        <button class="toggle-category-btn text-gray-500 hover:text-gray-700 sm:hidden"
+            onclick="toggleCategoryTasks(this)">
+            ▼
+        </button>
+    </div>
+</div>
+
+    <!-- Collapsible task list -->
+   <div class="category-task-list">
+    ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
+</div>
+</div>
+        `;
+    }).join('');
+}
+
 function toggleCategoryTasks(button) {
-  const card = button.closest('.bg-white');
-  const list = card.querySelector('.category-task-list');
-  const icon = button.querySelector('span');
+    const taskList = button.closest('.bg-white').querySelector('.category-task-list');
+    if (!taskList) return;
 
-  if (!list) return;
-
-  const isExpanded = list.classList.toggle('expanded');
-  icon.style.transform = isExpanded ? 'rotate(90deg)' : 'rotate(0deg)';
+    const isExpanded = taskList.classList.toggle('expanded');
+    button.textContent = isExpanded ? '▼' : '▶';
 }
 
 function renderAllTasksTaskItem(task) {
