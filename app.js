@@ -1487,7 +1487,7 @@ function renderAllTaskCategories() {
 
     <!-- Right: cost + chevron -->
     <div class="flex items-center gap-2">
-      <span class="bg-green-50 text-green-600 px-1.0 py-0.5 rounded-full text-xs font-medium">
+      <span class="bg-green-50 text-green-600 px-1.5 py-0.5 rounded-full text-xs font-medium">
         $${Math.round(categoryCost)}/yr
       </span>
       <button class="toggle-category-btn w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors sm:hidden"
