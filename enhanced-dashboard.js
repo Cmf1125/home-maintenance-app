@@ -312,7 +312,6 @@ renderEnhancedTaskCard(task) {
     `;
 }
     
-  DOes this look right? It still doesn't work.
 render() {
     // CRITICAL: Don't run in PWA mode during setup
     const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
