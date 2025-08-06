@@ -1477,7 +1477,7 @@ function renderAllTaskCategories() {
   <div class="flex items-center justify-between gap-2 w-full">
     <!-- Left: icon, title, count -->
     <div class="flex items-center gap-2 flex-1 min-w-0">
-      <span class="text-lg">${categoryInfo.icon}</span>
+      <span class="text-base">${categoryInfo.icon}</span>
       <span class="font-medium text-gray-900 truncate">${categoryId}</span>
       <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs whitespace-nowrap">
         ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
@@ -1486,7 +1486,7 @@ function renderAllTaskCategories() {
 
     <!-- Right: cost + chevron -->
     <div class="flex items-center gap-2">
-      <span class="bg-green-50 text-green-600 px-2 py-0.5 rounded-full text-xs font-medium">
+      <span class="bg-green-50 text-green-600 px-1.5 py-0.5 rounded-full text-xs font-medium">
         $${Math.round(categoryCost)}/yr
       </span>
       <button class="toggle-category-btn w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors sm:hidden"
