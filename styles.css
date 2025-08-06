@@ -918,3 +918,7 @@ html, body {
     padding-bottom: 1rem;
   }
 }
+
+#all-tasks-category-filter { max-width: 60vw; }
+#all-tasks-list { text-align: left; }
+
