@@ -325,12 +325,16 @@ renderEnhancedTaskCard(task) {
     const totalElement = document.getElementById('total-count');
     if (totalElement) totalElement.textContent = totalTasks;
     
-    // REMOVED: annual-cost update since it's no longer on dashboard
-    // const annualCostElement = document.getElementById('annual-cost');
-    // if (annualCostElement) annualCostElement.textContent = '$' + Math.round(totalCost);
+   const totalElement = document.getElementById('total-count');
+    if (totalElement) totalElement.textContent = totalTasks;
 
     // Update home address
     const homeAddressElement = document.getElementById('home-address');
+    if (homeAddressElement && window.homeData?.fullAddress) {
+        homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
+    }
+
+    console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
     if (homeAddressElement && window.homeData?.fullAddress) {
         homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
     }
