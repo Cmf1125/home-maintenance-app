@@ -1483,7 +1483,7 @@ function renderAllTaskCategories() {
 
        return `
         <div class="rounded-2xl shadow-md mb-4 px-4 py-4 cursor-pointer transition-transform duration-150 hover:scale-[1.01] ${colorClass}"
-         onclick='openCategoryModal(${JSON.stringify(categoryId)}, ${JSON.stringify(tasks)})'>
+            onclick='openCategoryModal("${categoryId}")'
             <div class="flex items-center justify-between gap-4">
                 <!-- Left: icon + category name + task count -->
                 <div class="flex items-center gap-3">
@@ -2983,15 +2983,21 @@ if (document.readyState !== 'loading') {
 console.log('📱 Smart installation banner system loaded');
 
 // Open category modal
-function openCategoryModal(categoryId, tasks) {
+function openCategoryModal(categoryId) {
     const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
 
+    // Set modal header
     document.getElementById('modal-category-icon').textContent = categoryInfo.icon;
     document.getElementById('modal-category-title').textContent = categoryId;
 
-    const taskListEl = document.getElementById('modal-task-list');
-    taskListEl.innerHTML = tasks.map(task => renderAllTasksTaskItem(task)).join('');
+    // Find tasks for this category
+    const categoryTasks = window.tasks.filter(task => task.category === categoryId);
 
+    // Render task list
+    const taskListEl = document.getElementById('modal-task-list');
+    taskListEl.innerHTML = categoryTasks.map(task => renderAllTasksTaskItem(task)).join('');
+
+    // Show modal
     document.getElementById('category-task-modal').classList.add('show');
     document.getElementById('category-task-modal').classList.remove('hidden');
 }
