@@ -1373,20 +1373,10 @@ calculateInitialDueDate(frequency) {
     }
 }
 
-// Method to add maintenance tasks when appliance is created
 addApplianceWithTasks(applianceData) {
-    // First, add the appliance
-    const appliance = {
-        ...applianceData,
-        id: Date.now(),
-        createdDate: new Date().toISOString()
-    };
-    
-    this.appliances.push(appliance);
-    this.saveAppliances();
-    
-    // Then generate and add maintenance tasks
-    const maintenanceTasks = this.generateMaintenanceTasks(appliance);
+    // applianceData is already added to this.appliances in handleAddFormSubmit
+    // Just generate maintenance tasks for the existing appliance
+    const maintenanceTasks = this.generateMaintenanceTasks(applianceData);
     
     if (maintenanceTasks.length > 0) {
         // Add tasks to global task array
@@ -1397,15 +1387,15 @@ addApplianceWithTasks(applianceData) {
             window.saveData();
         }
         
-        console.log(`✅ Added ${maintenanceTasks.length} maintenance tasks for ${appliance.name}`);
+        console.log(`✅ Added ${maintenanceTasks.length} maintenance tasks for ${applianceData.name}`);
     }
     
     return {
-        appliance,
+        appliance: applianceData,
         tasksCreated: maintenanceTasks.length
     };
 }
-
+    
 // Method to get appliance-related tasks
 getApplianceTasks(applianceId) {
     if (!window.tasks) return [];
