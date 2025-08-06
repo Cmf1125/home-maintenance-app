@@ -74,7 +74,6 @@ const categoryConfig = {
     'Pest Control': { icon: '🐛', color: 'orange' },
     'Safety': { icon: '⚠️', color: 'red' },
     'General': { icon: '🔧', color: 'gray' }
-    'Appliance': { icon: '⚙️', color: 'purple' } 
 };
 
 // Make it globally available
@@ -1556,7 +1555,6 @@ function renderAllTasksTaskItem(task) {
             <div class="flex items-center gap-4 text-xs text-gray-500">
                 <span>${dueDateDisplay}</span>
                 <span>Every ${task.frequency} days</span>
-                 ${task.isApplianceTask ? `<span class="text-xs text-purple-600">🔧 ${task.applianceName}</span>` : ''}
             </div>
          <button onclick="editTaskFromAllTasks(${task.id})" 
             class="bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs px-3 py-1 rounded transition-colors font-medium" 
