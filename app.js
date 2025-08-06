@@ -1481,8 +1481,9 @@ function renderAllTaskCategories() {
 
         const colorClass = colorClasses[categoryId] || 'bg-white text-gray-900';
 
-        return `
-        <div class="rounded-2xl shadow-md mb-4 px-4 py-4 cursor-pointer transition-transform duration-150 hover:scale-[1.01] ${colorClass}">
+       return `
+        <div class="rounded-2xl shadow-md mb-4 px-4 py-4 cursor-pointer transition-transform duration-150 hover:scale-[1.01] ${colorClass}"
+         onclick='openCategoryModal(${JSON.stringify(categoryId)}, ${JSON.stringify(tasks)})'>
             <div class="flex items-center justify-between gap-4">
                 <!-- Left: icon + category name + task count -->
                 <div class="flex items-center gap-3">
