@@ -1,4 +1,4 @@
-// The Home Keeper App - Clean Simple Version with All Fixes 
+// The Home Keeper App - Clean Simple Version with All Fixes
 // App data
 let homeData = {};
 let tasks = [];
@@ -73,8 +73,8 @@ const categoryConfig = {
     'Exterior': { icon: '🏠', color: 'green' },
     'Pest Control': { icon: '🐛', color: 'orange' },
     'Safety': { icon: '⚠️', color: 'red' },
-    'General': { icon: '🔧', color: 'gray' },
-    'Appliance': { icon: '⚙️', color: 'purple' }
+    'General': { icon: '🔧', color: 'gray' }
+    'Appliance': { icon: '⚙️', color: 'purple' } 
 };
 
 // Make it globally available
