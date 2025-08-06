@@ -932,4 +932,7 @@ html, body {
 #category-task-modal.show {
   display: flex;
 }
+#category-task-modal {
+  backdrop-filter: blur(4px);
+}
 
