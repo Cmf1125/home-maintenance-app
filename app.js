@@ -74,6 +74,7 @@ const categoryConfig = {
     'Pest Control': { icon: '🐛', color: 'orange' },
     'Safety': { icon: '⚠️', color: 'red' },
     'General': { icon: '🔧', color: 'gray' }
+    'Appliance': { icon: '⚙️', color: 'purple' }
 };
 
 // Make it globally available
