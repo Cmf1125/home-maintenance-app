@@ -1493,8 +1493,8 @@ function renderAllTaskCategories() {
     </div>
     </div>
     <!-- Collapsible task list -->
-    <div class="p-4 category-task-list">
-        ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
+   <div class="category-task-list">
+    ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
 </div>
 </div>
         `;
@@ -1505,8 +1505,8 @@ function toggleCategoryTasks(button) {
     const taskList = button.closest('.bg-white').querySelector('.category-task-list');
     if (!taskList) return;
 
-    const isHidden = taskList.classList.toggle('hidden');
-    button.textContent = isHidden ? '▶' : '▼';
+    const isExpanded = taskList.classList.toggle('expanded');
+    button.textContent = isExpanded ? '▼' : '▶';
 }
 
 function renderAllTasksTaskItem(task) {
