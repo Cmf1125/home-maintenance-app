@@ -269,33 +269,20 @@ renderEnhancedTaskCard(task) {
                 <span class="text-xs text-gray-500 flex-shrink-0">${categoryInfo.icon} ${task.category}</span>
             </div>
             
-            <!-- Row 2: Due Date + Appliance Info + Buttons -->
+            <!-- Row 2: Due Date + Buttons (simplified) -->
             <div class="flex items-center justify-between gap-2">
-                <div class="flex flex-col gap-1 flex-1">
-                    <span class="text-xs ${dueDateColor} flex-shrink-0">${dueDateDisplay}</span>
-                    ${applianceInfo ? `<span class="text-xs text-blue-600">🔧 ${applianceInfo}</span>` : ''}
-                </div>
+                <span class="text-xs ${dueDateColor} flex-shrink-0">${dueDateDisplay}</span>
                 <div class="flex gap-2 ml-auto">
                     <button onclick="event.stopPropagation(); completeTask(${task.id})" 
-                            class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-xs font-medium transition-colors">
-                        Complete
-                    </button>
-                    <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
-                            class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-xs font-medium transition-colors">
-                        Reschedule
-                    </button>
-                    ${isApplianceTask ? `
-                        <button onclick="event.stopPropagation(); viewAppliance(${task.applianceId})" 
-                                class="bg-purple-100 text-purple-700 hover:bg-purple-200 px-2 py-1 rounded text-xs font-medium transition-colors" 
-                                title="View appliance details">
-                            ⚙️
-                        </button>
-                    ` : ''}
-                </div>
-            </div>
+                      class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-xs font-medium transition-colors">
+                    Complete
+                </button>
+                <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
+                    class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-xs font-medium transition-colors">
+                Reschedule
+            </button>
         </div>
-    `;
-}
+    </div>
     
     render() {
         this.updateStats();
