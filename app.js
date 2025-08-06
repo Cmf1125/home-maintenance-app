@@ -1454,9 +1454,7 @@ function renderAllTasksView() {
                                         class="border border-gray-300 rounded-md px-3 py-2 text-sm bg-white"
                                         onchange="handleAllTasksCategoryChange(this)">
                                     <option value="all" ${selectedCategory === 'all' ? 'selected' : ''}>All Tasks</option>
-                                    ${categories.map(c => `
-                                        <option value="${c}" ${selectedCategory === c ? 'selected' : ''}>${c}</option>
-                                    ').join('')}
+                                    ${categories.map(c => `<option value="${c}" ${selectedCategory === c ? 'selected' : ''}>${c}</option>`).join('')}
                                 </select>
                             </div>
                             <div class="text-xs text-gray-600 flex items-center gap-1">
@@ -1480,10 +1478,55 @@ function renderAllTasksView() {
     console.log('✅ All Tasks view rendered with category filter');
 }
 
- function handleAllTasksCategoryChange(selectEl) {
-    window.allTasksCategoryFilter = selectEl.value;
-    renderAllTasksView();
-}                                                    
+    
+   // Calculate stats for All Tasks overview
+let totalCost = 0;
+
+window.tasks.forEach(task => {
+    totalCost += task.cost * (365 / task.frequency);
+});
+    
+    const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
+    
+    // Enhanced All Tasks interface with annual cost
+    allTasksView.innerHTML = `
+        <div class="p-4">
+            <div class="bg-white rounded-xl p-6 shadow-lg max-w-4xl mx-auto">
+<div class="text-center mb-4">
+    <h2 class="text-lg font-bold text-gray-900 mb-3">📋 Manage All Tasks</h2>
+
+<!-- Compact Overview with Add Button -->
+<div class="bg-gray-50 p-3 rounded-lg mb-4">
+    <div class="flex justify-center items-center gap-6 text-sm">
+        <div class="text-center">
+            <div class="text-lg font-bold text-blue-600">${totalTasks}</div>
+            <div class="text-xs text-gray-600">Tasks</div>
+        </div>
+        <div class="text-center">
+            <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
+            <div class="text-xs text-gray-600">Annual Cost</div>
+        </div>
+        <button onclick="event.stopPropagation(); window.closeDatePickerModal(); addTaskFromDashboard()" 
+                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
+        Add Task
+        </button>
+    </div>
+</div>
+                
+               
+                
+                <!-- Task Categories -->
+                <div id="all-tasks-categories" class="space-y-6">
+                    ${renderAllTaskCategories()}
+                </div>
+
+               <!-- Tasks managed through Settings dropdown -->
+            </div>
+        </div>
+    `;
+    
+    console.log('✅ All Tasks view rendered successfully');
+}
 
 function renderAllTaskCategories() {
     if (!window.tasks || window.tasks.length === 0) {
@@ -1515,40 +1558,27 @@ function renderAllTaskCategories() {
         return `
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
                 <div class="p-4 border-b border-gray-100">
-    <div class="flex flex-wrap items-center justify-between gap-2 w-full">
-        <div class="flex items-center gap-2 flex-1 min-w-0">
+    <div class="flex items-center justify-between gap-4">
+        <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 flex-1 min-w-0">
             <span class="text-xl">${categoryInfo.icon}</span>
-            <span class="whitespace-normal break-words font-bold">${categoryId}</span>
+            <span class="truncate">${categoryId}</span>
             <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">
-            ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
+                ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
             </span>
-    </div>
-    <div class="flex items-center gap-2">
-        <div class="text-xs text-green-600 font-semibold">
-            $${Math.round(categoryCost)}/yr
+        </h3>
+        <div class="text-lg font-bold text-green-600 flex-shrink-0">
+            $${Math.round(categoryCost)}
         </div>
-        <button class="toggle-category-btn text-gray-500 hover:text-gray-700 sm:hidden"
-            onclick="toggleCategoryTasks(this)">
-            ▼
-        </button>
     </div>
 </div>
-
-    <!-- Collapsible task list -->
-   <div class="category-task-list">
-    ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
-</div>
-</div>
+                <div class="p-4">
+                    <div class="space-y-2">
+                        ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
+                    </div>
+                </div>
+            </div>
         `;
     }).join('');
-}
-
-function toggleCategoryTasks(button) {
-    const taskList = button.closest('.bg-white').querySelector('.category-task-list');
-    if (!taskList) return;
-
-    const isExpanded = taskList.classList.toggle('expanded');
-    button.textContent = isExpanded ? '▼' : '▶';
 }
 
 function renderAllTasksTaskItem(task) {
@@ -1602,7 +1632,7 @@ if (isOverdue) {
         <div class="flex items-center justify-between gap-2 mb-2">
             <div class="flex items-center gap-2 flex-1 min-w-0">
                 <span class="text-sm">${urgencyDot}</span>
-                <span class="font-medium text-gray-900 text-sm truncate">${task.title}</span>
+                <span class="font-medium text-gray-900 text-sm whitespace-normal break-words">${task.title}</span>
             </div>
             ${task.cost > 0 ? `<span class="text-green-600 font-medium text-sm">$${task.cost}</span>` : ''}
         </div>
@@ -3015,3 +3045,9 @@ if (document.readyState !== 'loading') {
 
 console.log('📱 Smart installation banner system loaded');
 
+
+
+function handleAllTasksCategoryChange(selectEl) {
+    window.allTasksCategoryFilter = selectEl.value;
+    renderAllTasksView();
+}
