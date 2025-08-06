@@ -1254,7 +1254,6 @@ generateMaintenanceTasks(appliance) {
         'other': 'Appliance'          // Other → Appliance tasks
     };
     
-    // Get the appropriate task category for this appliance
     const taskCategory = categoryMapping[appliance.category] || 'Appliance';
     
     const taskTemplates = {
