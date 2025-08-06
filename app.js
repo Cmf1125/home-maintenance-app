@@ -73,8 +73,7 @@ const categoryConfig = {
     'Exterior': { icon: '🏠', color: 'green' },
     'Pest Control': { icon: '🐛', color: 'orange' },
     'Safety': { icon: '⚠️', color: 'red' },
-    'General': { icon: '🔧', color: 'gray' },
-    'Appliance': { icon: '⚙️', color: 'purple' }
+    'General': { icon: '🔧', color: 'gray' }
 };
 
 // Make it globally available
@@ -2959,13 +2958,3 @@ if (document.readyState !== 'loading') {
 
 console.log('📱 Smart installation banner system loaded');
 
-// Add appliance view function
-function viewAppliance(applianceId) {
-    console.log('🔧 Viewing appliance:', applianceId);
-    showTab('appliances');
-    
-    if (window.applianceManager && typeof window.applianceManager.showApplianceDetail === 'function') {
-        window.applianceManager.showApplianceDetail(applianceId);
-    }
-}
-window.viewAppliance = viewAppliance;
