@@ -68,41 +68,47 @@ class EnhancedDashboard {
 
     // Add this method to your EnhancedDashboard class:
     scrollToTaskList() {
-        const tasksList = document.getElementById('tasks-list');
-        const tasksSection = tasksList?.closest('.bg-white.rounded-2xl.shadow-lg');
+    const tasksList = document.getElementById('tasks-list');
+    const tasksSection = tasksList?.closest('.bg-white.rounded-2xl.shadow-lg');
+    
+    if (tasksSection) {
+        // Add a subtle flash effect to show something happened
+        tasksSection.style.transition = 'all 0.3s ease';
+        tasksSection.style.boxShadow = '0 0 20px rgba(14, 165, 233, 0.4)';
+        tasksSection.style.transform = 'scale(1.01)';
         
-        if (tasksSection) {
-            // Add a subtle flash effect to show something happened
-            tasksSection.style.transition = 'all 0.3s ease';
-            tasksSection.style.boxShadow = '0 0 20px rgba(14, 165, 233, 0.4)';
-            tasksSection.style.transform = 'scale(1.01)';
-            
-            // Smooth scroll to the tasks section with some offset
-            const rect = tasksSection.getBoundingClientRect();
-            const offset = window.pageYOffset + rect.top - 20; // 20px offset from top
-            
+        // FIXED: Calculate proper offset accounting for sticky header and stats
+        const rect = tasksSection.getBoundingClientRect();
+        const headerHeight = 64; // Height of sticky header (top-16 = 64px)
+        const statsHeight = 120; // Approximate height of sticky stats grid
+        const buffer = 10; // Small buffer for clean spacing
+        
+        const offset = window.pageYOffset + rect.top - (headerHeight + statsHeight + buffer);
+        
+        // Only scroll if the tasks section is not already visible
+        if (rect.top < (headerHeight + statsHeight + buffer)) {
             window.scrollTo({
-                top: offset,
+                top: Math.max(0, offset), // Prevent negative scroll
                 behavior: 'smooth'
             });
-            
-            // Remove the flash effect after animation
+        }
+        
+        // Remove the flash effect after animation
+        setTimeout(() => {
+            tasksSection.style.boxShadow = '';
+            tasksSection.style.transform = '';
+        }, 800);
+        
+        // Add a brief highlight to the tasks list content
+        if (tasksList) {
+            tasksList.style.transition = 'background-color 0.3s ease';
+            tasksList.style.backgroundColor = '#f0f9ff';
             setTimeout(() => {
-                tasksSection.style.boxShadow = '';
-                tasksSection.style.transform = '';
-            }, 800);
-            
-            // Add a brief highlight to the tasks list content
-            if (tasksList) {
-                tasksList.style.transition = 'background-color 0.3s ease';
-                tasksList.style.backgroundColor = '#f0f9ff';
-                setTimeout(() => {
-                    tasksList.style.backgroundColor = '';
-                }, 600);
-            }
+                tasksList.style.backgroundColor = '';
+            }, 600);
         }
     }
-
+}
     // UPDATE: updateFilterUI() - Remove cost filter title
     updateFilterUI() {
         // Remove active class from all cards
