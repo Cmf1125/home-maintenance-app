@@ -1478,8 +1478,9 @@ function renderAllTaskCategories() {
     <!-- Left: icon, title, count -->
     <div class="flex items-center gap-2 flex-1 min-w-0">
       <span class="text-base">${categoryInfo.icon}</span>
-      <div class="font-bold text-sm sm:text-base text-gray-900 whitespace-normal break-words leading-snug">
-  ${categoryId}</div>
+      <div class="font-semibold text-sm sm:text-base text-gray-900 whitespace-normal break-words leading-normal min-w-0 max-w-full">
+  ${categoryId}
+</div>
       <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs whitespace-nowrap">
         ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
       </span>
