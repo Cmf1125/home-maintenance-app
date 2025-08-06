@@ -1449,10 +1449,9 @@ function renderAllTaskCategories() {
         return '<div class="text-center text-gray-500 py-8">No tasks found.</div>';
     }
 
-    // Group active tasks by category (copying your existing logic)
     const activeTasks = window.tasks.filter(task => !task.isCompleted && task.dueDate);
     const tasksByCategory = {};
-    
+
     activeTasks.forEach(task => {
         const category = task.category || 'General';
         if (!tasksByCategory[category]) tasksByCategory[category] = [];
@@ -1463,44 +1462,47 @@ function renderAllTaskCategories() {
         return '<div class="text-center text-gray-500 py-8">🎉 All tasks completed!</div>';
     }
 
-return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
-    const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
-    
-    const categoryCost = tasks.reduce((total, task) => {
-        return total + (task.cost * (365 / task.frequency));
-    }, 0);
+    const colorClasses = {
+        'Safety': 'bg-red-50 text-red-600',
+        'Exterior': 'bg-green-50 text-green-700',
+        'General': 'bg-gray-50 text-gray-700',
+        'HVAC': 'bg-blue-50 text-blue-700',
+        'Water Systems': 'bg-cyan-50 text-cyan-700',
+        'Pest Control': 'bg-lime-50 text-lime-700',
+        'Seasonal': 'bg-amber-50 text-amber-700',
+        'Appliance': 'bg-purple-50 text-purple-700',
+    };
 
-    // Map category color to Tailwind background tint
-    const colorClass = {
-        blue: 'bg-blue-50 text-blue-800',
-        green: 'bg-green-50 text-green-800',
-        red: 'bg-red-50 text-red-800',
-        yellow: 'bg-yellow-50 text-yellow-800',
-        cyan: 'bg-cyan-50 text-cyan-800',
-        gray: 'bg-gray-50 text-gray-800'
-    }[categoryInfo.color] || 'bg-gray-50 text-gray-800';
+    return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
+        const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
+        const categoryCost = tasks.reduce((total, task) => {
+            return total + (task.cost * (365 / task.frequency));
+        }, 0);
 
-    return `
-    <div class="rounded-2xl ${colorClass} px-4 py-4 mb-4 shadow hover:shadow-md active:scale-95 transition-all cursor-pointer"
-         onclick="navigateToCategory('${categoryId}')">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <span class="text-2xl">${categoryInfo.icon}</span>
-                <div class="flex flex-col">
-                    <span class="font-semibold text-base sm:text-lg">${categoryId}</span>
-                    <span class="text-xs text-gray-500">${tasks.length} task${tasks.length !== 1 ? 's' : ''}</span>
+        const colorClass = colorClasses[categoryId] || 'bg-white text-gray-900';
+
+        return `
+        <div class="rounded-2xl shadow-md mb-4 px-4 py-4 cursor-pointer transition-transform duration-150 hover:scale-[1.01] ${colorClass}">
+            <div class="flex items-center justify-between gap-4">
+                <!-- Left: icon + category name + task count -->
+                <div class="flex items-center gap-3">
+                    <div class="text-xl">${categoryInfo.icon}</div>
+                    <div class="flex flex-col">
+                        <div class="text-lg font-semibold">${categoryId}</div>
+                        <div class="text-sm text-gray-600">${tasks.length} task${tasks.length !== 1 ? 's' : ''}</div>
+                    </div>
+                </div>
+
+                <!-- Right: cost and chevron -->
+                <div class="flex items-center gap-3">
+                    <span class="bg-white shadow px-3 py-1 rounded-full text-sm font-semibold text-green-600">$${Math.round(categoryCost)}/yr</span>
+                    <span class="text-gray-400 text-xl">&#8250;</span>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="text-sm font-medium bg-white bg-opacity-70 px-2 py-0.5 rounded-full text-green-600">
-                    $${Math.round(categoryCost)}/yr
-                </span>
-                <span class="text-xl text-gray-400">&#9654;</span>
-            </div>
-        </div>
-    </div>`;
-}).join('');
-    }
+        </div>`;
+    }).join('');
+}
+
 
 function toggleCategoryTasks(button) {
   const card = button.closest('.bg-white');
