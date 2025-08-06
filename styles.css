@@ -892,3 +892,29 @@ html, body {
   text-align: left !important;
 }
 
+/* 📱 Mobile: start category lists collapsed with animation */
+@media (max-width: 640px) {
+  .category-task-list {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .category-task-list.expanded {
+    max-height: 1000px; /* Large enough to fit most lists */
+    padding-top: 1rem;  /* Restore padding when open */
+    padding-bottom: 1rem;
+  }
+}
+
+/* 🖥 Desktop: always show category lists */
+@media (min-width: 641px) {
+  .category-task-list {
+    max-height: none !important;
+    overflow: visible !important;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
