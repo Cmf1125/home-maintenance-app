@@ -1445,56 +1445,9 @@ window.tasks.forEach(task => {
 }
 
 function renderAllTaskCategories() {
-  const tasksByCategory = groupTasksByCategory();
-
-  if (!tasksByCategory || Object.keys(tasksByCategory).length === 0) {
-    return '<div class="text-center text-gray-500 py-8">No categories found.</div>';
-  }
-
-  return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
-    const categoryInfo = window.categoryConfig?.[categoryId] || {
-      icon: '📁',
-      color: 'gray'
-    };
-
-    const categoryCost = tasks.reduce((sum, task) => {
-      if (task.cost && task.frequency) {
-        return sum + (task.cost * (365 / task.frequency));
-      }
-      return sum;
-    }, 0);
-
-    const borderColorClass = `border-l-4 border-${categoryInfo.color}-500`;
-
-    return `
-      <div class="bg-white rounded-xl shadow overflow-hidden border border-gray-200 mb-4 ${borderColorClass}">
-        <div class="p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
-          <div class="flex items-center justify-between gap-2 w-full">
-            <div class="flex items-center gap-2 flex-1 min-w-0">
-              <span class="text-lg">${categoryInfo.icon}</span>
-              <span class="font-medium text-gray-900 truncate">${categoryId}</span>
-              <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs whitespace-nowrap">
-                ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
-              </span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="bg-green-50 text-green-600 px-2 py-0.5 rounded-full text-xs font-medium">
-                $${Math.round(categoryCost)}/yr
-              </span>
-              <button class="toggle-category-btn w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors sm:hidden"
-                      onclick="toggleCategoryTasks(this)" aria-label="Toggle category">
-                <span class="inline-block transform transition-transform duration-200">&#9654;</span>
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="category-task-list">
-          ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
-        </div>
-      </div>
-    `;
-  }).join('');
-}
+    if (!window.tasks || window.tasks.length === 0) {
+        return '<div class="text-center text-gray-500 py-8">No tasks found.</div>';
+    }
 
     // Group active tasks by category (copying your existing logic)
     const activeTasks = window.tasks.filter(task => !task.isCompleted && task.dueDate);
@@ -1520,24 +1473,21 @@ function renderAllTaskCategories() {
         
         return `
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-                <div class="p-4 border-b border-gray-100">
-    <div class="flex flex-wrap items-center justify-between gap-2 w-full">
-        <div class="flex items-center gap-2 flex-1 min-w-0">
-            <span class="text-xl">${categoryInfo.icon}</span>
-            <span class="whitespace-normal break-words font-bold">${categoryId}</span>
-            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">
-            ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
-            </span>
+<div class="p-4 border-b border-gray-100">
+  <div class="flex items-center justify-between flex-wrap gap-2 w-full">
+    <div class="flex items-center gap-2 flex-1 min-w-0">
+      <span class="text-xl">${categoryInfo.icon}</span>
+      <span class="font-bold whitespace-normal break-words">${categoryId}</span>
+      <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">
+        ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
+      </span>
+      <span class="text-xs text-green-600 font-medium ml-1">$${Math.round(categoryCost)}/yr</span>
     </div>
-    <div class="flex items-center gap-2">
-        <div class="text-xs text-green-600 font-semibold">
-            $${Math.round(categoryCost)}/yr
-        </div>
-        <button class="toggle-category-btn text-gray-500 hover:text-gray-700 sm:hidden"
-            onclick="toggleCategoryTasks(this)">
-            ▼
-        </button>
-    </div>
+    <button class="toggle-category-btn transition-transform duration-200 text-gray-500 hover:text-gray-700 sm:hidden"
+            onclick="toggleCategoryTasks(this)" aria-label="Toggle category section">
+      <span class="inline-block transform transition-transform duration-200">&#9654;</span>
+    </button>
+  </div>
 </div>
 
     <!-- Collapsible task list -->
@@ -1550,11 +1500,14 @@ function renderAllTaskCategories() {
 }
 
 function toggleCategoryTasks(button) {
-    const taskList = button.closest('.bg-white').querySelector('.category-task-list');
-    if (!taskList) return;
+  const card = button.closest('.bg-white');
+  const list = card.querySelector('.category-task-list');
+  const icon = button.querySelector('span');
 
-    const isExpanded = taskList.classList.toggle('expanded');
-    button.textContent = isExpanded ? '▼' : '▶';
+  if (!list) return;
+
+  const isExpanded = list.classList.toggle('expanded');
+  icon.style.transform = isExpanded ? 'rotate(90deg)' : 'rotate(0deg)';
 }
 
 function renderAllTasksTaskItem(task) {
