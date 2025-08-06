@@ -1472,31 +1472,7 @@ function renderAllTaskCategories() {
         }, 0);
         
         return `
-<!-- All Tasks Collapsible Card -->
-<div class="bg-white rounded-xl shadow overflow-hidden border border-gray-200 mb-4">
-  <div class="p-4 border-b border-gray-100">
-    <div class="flex items-center justify-between flex-wrap gap-2 w-full">
-      <!-- Left: Icon + Title + Task Count -->
-      <div class="flex items-center gap-2 flex-1 min-w-0">
-        <span class="text-xl">📋</span>
-        <span class="font-bold whitespace-normal break-words">All Tasks</span>
-        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">
-          ${window.tasks.filter(t => !t.isCompleted && t.dueDate).length} tasks
-        </span>
-      </div>
 
-      <!-- Right: Cost + Toggle -->
-      <div class="flex items-center gap-3">
-        <span class="text-xs text-green-600 font-medium">
-          $${Math.round(window.tasks.reduce((sum, t) => sum + (t.cost * (365 / t.frequency)), 0))}/yr
-        </span>
-        <button class="toggle-category-btn transition-transform duration-200 text-gray-500 hover:text-gray-700 sm:hidden"
-                onclick="toggleCategoryTasks(this)" aria-label="Toggle All Tasks">
-          <span class="inline-block transform transition-transform duration-200">&#9654;</span>
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- Collapsible Task List -->
   <div class="category-task-list">
