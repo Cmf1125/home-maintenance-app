@@ -925,14 +925,3 @@ html, body {
     padding-bottom: 0.5rem;
   }
 }
-#category-task-modal {
-  display: none;
-}
-
-#category-task-modal.show {
-  display: flex;
-}
-#category-task-modal {
-  backdrop-filter: blur(4px);
-}
-
