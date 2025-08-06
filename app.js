@@ -1463,36 +1463,43 @@ function renderAllTaskCategories() {
         return '<div class="text-center text-gray-500 py-8">🎉 All tasks completed!</div>';
     }
 
-   return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
+return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
     const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
-
-    // Calculate annual cost for this category
+    
     const categoryCost = tasks.reduce((total, task) => {
         return total + (task.cost * (365 / task.frequency));
     }, 0);
 
+    // Map category color to Tailwind background tint
+    const colorClass = {
+        blue: 'bg-blue-50 text-blue-800',
+        green: 'bg-green-50 text-green-800',
+        red: 'bg-red-50 text-red-800',
+        yellow: 'bg-yellow-50 text-yellow-800',
+        cyan: 'bg-cyan-50 text-cyan-800',
+        gray: 'bg-gray-50 text-gray-800'
+    }[categoryInfo.color] || 'bg-gray-50 text-gray-800';
+
     return `
-      <button 
-        class="flex items-center justify-between w-full bg-white rounded-2xl p-4 mb-4 shadow hover:shadow-md border border-gray-200 transition-all text-left"
-        onclick="openCategoryModal('${categoryId}')"
-      >
-        <div class="flex items-center gap-3">
-          <div class="text-xl">${categoryInfo.icon}</div>
-          <div class="flex flex-col">
-            <div class="text-base font-semibold leading-tight text-gray-800">${categoryId}</div>
-            <div class="text-xs text-gray-500">${tasks.length} task${tasks.length !== 1 ? 's' : ''}</div>
-          </div>
+    <div class="rounded-2xl ${colorClass} px-4 py-4 mb-4 shadow hover:shadow-md active:scale-95 transition-all cursor-pointer"
+         onclick="navigateToCategory('${categoryId}')">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">${categoryInfo.icon}</span>
+                <div class="flex flex-col">
+                    <span class="font-semibold text-base sm:text-lg">${categoryId}</span>
+                    <span class="text-xs text-gray-500">${tasks.length} task${tasks.length !== 1 ? 's' : ''}</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm font-medium bg-white bg-opacity-70 px-2 py-0.5 rounded-full text-green-600">
+                    $${Math.round(categoryCost)}/yr
+                </span>
+                <span class="text-xl text-gray-400">&#9654;</span>
+            </div>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="bg-green-50 text-green-600 px-2 py-0.5 rounded-full text-xs font-medium">
-            $${Math.round(categoryCost)}/yr
-          </span>
-          <span class="text-gray-400 text-sm">&#9654;</span>
-        </div>
-      </button>
-    `;
+    </div>`;
 }).join('');
-}
 
 function toggleCategoryTasks(button) {
   const card = button.closest('.bg-white');
