@@ -120,7 +120,7 @@ class ApplianceManager {
                     </div>
                     <button onclick="window.applianceManager.showAddForm()" 
                             class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors touch-btn">
-                      Add Appliance
+                        ⚙️ Add Appliance
                     </button>
                 </div>
                 
@@ -155,6 +155,17 @@ class ApplianceManager {
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="bg-white rounded-xl p-4 shadow-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-purple-100 rounded-lg text-lg">📸</div>
+                            <div>
+                                <p class="text-xs text-gray-600">With Photos</p>
+                                <p class="text-xl font-bold text-gray-900">${this.getAppliancesWithPhotos().length}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                 <!-- Appliances by Category -->
                 ${this.renderApplianceCategories(appliancesByCategory)}
