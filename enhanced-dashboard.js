@@ -169,13 +169,6 @@ class EnhancedDashboard {
                     new Date(task.dueDate) >= now
                 ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
-             case 'appliances':
-                return window.tasks.filter(task => 
-                    !task.isCompleted && 
-                    task.dueDate && 
-                     (task.isApplianceTask || task.applianceId)
-                ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));   
-
             default: // 'all' case - show next 8 upcoming tasks
                 return window.tasks.filter(task => 
                     !task.isCompleted && 
@@ -264,11 +257,9 @@ renderEnhancedTaskCard(task) {
     // Get category info
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
-   // ENHANCED: Show appliance info if it's an appliance task
-    const isApplianceTask = Boolean(task.isApplianceTask || task.applianceId);
-    const applianceInfo = isApplianceTask && task.applianceName ? 
-        `${task.applianceName}${task.applianceModel ? ` (${task.applianceModel})` : ''}` : 
-        null;
+   // ENHANCED: Show appliance info if it's an appliance task - TEMPORARILY DISABLED
+const isApplianceTask = false;
+const applianceInfo = null;
 
     return `
         <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200 cursor-pointer hover:bg-gray-50" 
@@ -299,13 +290,14 @@ renderEnhancedTaskCard(task) {
                             class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-xs font-medium transition-colors">
                         Reschedule
                     </button>
-                    ${isApplianceTask ? `
+                   ${/* TEMPORARILY DISABLED:
+                    isApplianceTask ? `
                         <button onclick="event.stopPropagation(); viewAppliance(${task.applianceId})" 
-                                class="bg-purple-100 text-purple-700 hover:bg-purple-200 px-2 py-1 rounded text-xs font-medium transition-colors" 
-                                title="View appliance details">
-                            ⚙️
+                             class="bg-purple-100 text-purple-700 hover:bg-purple-200 px-2 py-1 rounded text-xs font-medium transition-colors" 
+                             title="View appliance details">
+                          ⚙️
                         </button>
-                    ` : ''}
+                    ` : '' */}
                 </div>
             </div>
         </div>
