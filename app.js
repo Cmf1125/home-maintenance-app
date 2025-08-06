@@ -1463,50 +1463,35 @@ function renderAllTaskCategories() {
         return '<div class="text-center text-gray-500 py-8">🎉 All tasks completed!</div>';
     }
 
-    return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
-        const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
-        
-        // Calculate annual cost for this category
-        const categoryCost = tasks.reduce((total, task) => {
-            return total + (task.cost * (365 / task.frequency));
-        }, 0);
-        
-        return `
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-<div class="p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
-  <div class="flex items-center justify-between gap-2 w-full">
-    <!-- Left: icon, title, count -->
-    <div class="flex items-center gap-2 flex-1 min-w-0">
-      <span class="text-base">${categoryInfo.icon}</span>
-      <div class="font-semibold text-sm sm:text-base text-gray-900 whitespace-normal break-words leading-normal min-w-0 max-w-full">
-  ${categoryId}
-</div>
-      <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs whitespace-nowrap">
-        ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
-      </span>
-    </div>
+   return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
+    const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
 
-    <!-- Right: cost + chevron -->
-    <div class="flex items-center gap-2">
-      <span class="bg-green-50 text-green-600 px-1.5 py-0.5 rounded-full text-xs font-medium">
-        $${Math.round(categoryCost)}/yr
-      </span>
-      <button class="toggle-category-btn w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors sm:hidden"
-              onclick="toggleCategoryTasks(this)" aria-label="Toggle category section">
-        <span class="inline-block transform transition-transform duration-200">&#9654;</span>
+    // Calculate annual cost for this category
+    const categoryCost = tasks.reduce((total, task) => {
+        return total + (task.cost * (365 / task.frequency));
+    }, 0);
+
+    return `
+      <button 
+        class="flex items-center justify-between w-full bg-white rounded-2xl p-4 mb-4 shadow hover:shadow-md border border-gray-200 transition-all text-left"
+        onclick="openCategoryModal('${categoryId}')"
+      >
+        <div class="flex items-center gap-3">
+          <div class="text-xl">${categoryInfo.icon}</div>
+          <div class="flex flex-col">
+            <div class="text-base font-semibold leading-tight text-gray-800">${categoryId}</div>
+            <div class="text-xs text-gray-500">${tasks.length} task${tasks.length !== 1 ? 's' : ''}</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="bg-green-50 text-green-600 px-2 py-0.5 rounded-full text-xs font-medium">
+            $${Math.round(categoryCost)}/yr
+          </span>
+          <span class="text-gray-400 text-sm">&#9654;</span>
+        </div>
       </button>
-    </div>
-  </div>
-</div>
-
-
-    <!-- Collapsible task list -->
-   <div class="category-task-list">
-    ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
-</div>
-</div>
-        `;
-    }).join('');
+    `;
+}).join('');
 }
 
 function toggleCategoryTasks(button) {
