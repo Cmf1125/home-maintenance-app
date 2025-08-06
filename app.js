@@ -1500,6 +1500,7 @@ return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
         </div>
     </div>`;
 }).join('');
+    }
 
 function toggleCategoryTasks(button) {
   const card = button.closest('.bg-white');
