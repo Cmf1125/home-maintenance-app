@@ -290,54 +290,7 @@ renderEnhancedTaskCard(task) {
         this.updateFilterUI();
     }
 
-    updateStats() {
-    if (!window.tasks) return;
-
-    const now = new Date();
-    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    
-    let overdueCount = 0;
-    let weekCount = 0;
-    let totalCost = 0;
-
-    window.tasks.forEach(task => {
-        if (!task.isCompleted && task.dueDate) {
-            const taskDate = new Date(task.dueDate);
-            if (taskDate < now) {
-                overdueCount++;
-            }
-            if (taskDate <= oneWeek && taskDate >= now) {
-                weekCount++;
-            }
-        }
-        totalCost += task.cost * (365 / task.frequency);
-    });
-
-    const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
-
-    // Update stat displays - ONLY update elements that exist
-    const overdueElement = document.getElementById('overdue-count');
-    if (overdueElement) overdueElement.textContent = overdueCount;
-    
-    const weekElement = document.getElementById('week-count');
-    if (weekElement) weekElement.textContent = weekCount;
-    
-    const totalElement = document.getElementById('total-count');
-    if (totalElement) totalElement.textContent = totalTasks;
-    
-   const totalElement = document.getElementById('total-count');
-    if (totalElement) totalElement.textContent = totalTasks;
-// TEMPORARY FIX - Comment out entire section
-/*
-// Update home address
-const homeAddressElement = document.getElementById('home-address');
-if (homeAddressElement && window.homeData?.fullAddress) {
-    homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
-}
-*/
-
-console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
-}
+    updateStats()
 
 // FIXED: Enhanced reschedule function with proper event handling
 function rescheduleTaskFromDashboard(taskId, event) {
