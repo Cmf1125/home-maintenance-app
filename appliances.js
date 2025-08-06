@@ -120,7 +120,7 @@ class ApplianceManager {
                     </div>
                     <button onclick="window.applianceManager.showAddForm()" 
                             class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors touch-btn">
-                        Add Appliance
+                        ⚙️ Add Appliance
                     </button>
                 </div>
                 
@@ -314,7 +314,7 @@ renderAddForm() {
                             </button>
                             <button type="submit"
                                     class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
-                                💾 Save 
+                                💾 Save Appliance
                             </button>
                         </div>
                     </form>
@@ -1241,10 +1241,15 @@ getApplianceStatus(appliance) {
 
 // Method to generate maintenance tasks for an appliance
 generateMaintenanceTasks(appliance) {
+    if (!window.tasks) {
+        console.warn('Task system not available');
+        return;
+    }
+    
     const tasks = [];
     const baseId = Date.now();
     
-    // Task templates - but now categorized as 'Appliance'
+    // Task templates based on appliance category
     const taskTemplates = {
         'kitchen': [
             {
@@ -1252,16 +1257,14 @@ generateMaintenanceTasks(appliance) {
                 description: 'Clean or replace filters for optimal performance',
                 frequency: 90,
                 cost: 25,
-                category: 'Appliance',  // CHANGED from 'HVAC'
-                subcategory: 'Maintenance' // ADD subcategory for filtering
+                category: 'HVAC'
             },
             {
                 title: `${appliance.name} - Deep Clean`,
                 description: 'Thorough cleaning of interior and exterior',
                 frequency: 180,
                 cost: 0,
-                category: 'Appliance',  // CHANGED from 'General'
-                subcategory: 'Cleaning'
+                category: 'General'
             }
         ],
         'hvac': [
@@ -1270,19 +1273,73 @@ generateMaintenanceTasks(appliance) {
                 description: 'Replace HVAC filters',
                 frequency: 90,
                 cost: 30,
-                category: 'Appliance',  // CHANGED from 'HVAC'
-                subcategory: 'Maintenance'
+                category: 'HVAC'
             },
             {
                 title: `${appliance.name} - Professional Service`,
                 description: 'Annual professional HVAC maintenance',
                 frequency: 365,
                 cost: 150,
-                category: 'Appliance',  // CHANGED from 'HVAC'
-                subcategory: 'Professional'
+                category: 'HVAC'
+            },
+            {
+                title: `${appliance.name} - Duct Inspection`,
+                description: 'Inspect ductwork for leaks or damage',
+                frequency: 730,
+                cost: 100,
+                category: 'HVAC'
             }
         ],
-        // ... other categories
+        'laundry': [
+            {
+                title: `${appliance.name} - Lint Trap Clean`,
+                description: 'Clean lint trap and exhaust vent',
+                frequency: 30,
+                cost: 0,
+                category: 'Safety'
+            },
+            {
+                title: `${appliance.name} - Drum Clean Cycle`,
+                description: 'Run cleaning cycle to prevent odors and buildup',
+                frequency: 60,
+                cost: 5,
+                category: 'General'
+            }
+        ],
+        'bathroom': [
+            {
+                title: `${appliance.name} - Temperature Check`,
+                description: 'Check water temperature and pressure relief valve',
+                frequency: 180,
+                cost: 0,
+                category: 'Safety'
+            },
+            {
+                title: `${appliance.name} - Flush System`,
+                description: 'Flush water heater to remove sediment',
+                frequency: 365,
+                cost: 50,
+                category: 'Water Systems'
+            }
+        ],
+        'utility': [
+            {
+                title: `${appliance.name} - Safety Inspection`,
+                description: 'Check safety features and operation',
+                frequency: 180,
+                cost: 0,
+                category: 'Safety'
+            }
+        ],
+        'outdoor': [
+            {
+                title: `${appliance.name} - Seasonal Prep`,
+                description: 'Prepare for seasonal use/storage',
+                frequency: 180,
+                cost: 25,
+                category: 'Exterior'
+            }
+        ]
     };
     
     const templates = taskTemplates[appliance.category] || taskTemplates['utility'];
@@ -1292,25 +1349,20 @@ generateMaintenanceTasks(appliance) {
             id: baseId + index,
             title: template.title,
             description: template.description,
-            category: 'Appliance',  // All appliance tasks use 'Appliance' category
-            subcategory: template.subcategory, // Add subcategory for more detail
+            category: template.category,
             frequency: template.frequency,
             cost: template.cost,
-            priority: this.getTaskPriority(template.subcategory, template.title),
+            priority: this.getTaskPriority(template.category, template.title),
             dueDate: this.calculateInitialDueDate(template.frequency),
             lastCompleted: null,
             isCompleted: false,
-            
-            // ENHANCED: More appliance context
-            applianceId: appliance.id,
-            applianceName: appliance.name,
-            applianceCategory: appliance.category, // kitchen, hvac, etc.
-            applianceManufacturer: appliance.manufacturer,
-            applianceModel: appliance.model,
-            isApplianceTask: true // Flag for easy filtering
+            applianceId: appliance.id,  // Link to appliance!
+            applianceName: appliance.name
         };
         
-        task.nextDue = task.dueDate; // Calendar compatibility
+        // Set nextDue for calendar compatibility
+        task.nextDue = task.dueDate;
+        
         tasks.push(task);
     });
     
