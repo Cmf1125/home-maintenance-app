@@ -1252,19 +1252,20 @@ generateMaintenanceTasks(appliance) {
     const tasks = [];
     const baseId = Date.now();
     
-    // 🎯 MAP appliance categories to task categories
+    // 🆕 NEW: Map appliance categories to task categories
     const categoryMapping = {
-        'hvac': 'HVAC',              // HVAC systems → HVAC tasks
-        'kitchen': 'Appliance',       // Kitchen appliances → Appliance tasks  
-        'laundry': 'Appliance',       // Laundry appliances → Appliance tasks
-        'bathroom': 'Appliance',      // Bathroom appliances → Appliance tasks
-        'utility': 'Appliance',       // Utility appliances → Appliance tasks
-        'outdoor': 'Exterior',        // Outdoor equipment → Exterior tasks
-        'other': 'Appliance'          // Other → Appliance tasks
+        'hvac': 'HVAC',
+        'kitchen': 'Appliance', 
+        'laundry': 'Appliance',
+        'bathroom': 'General',
+        'utility': 'General',
+        'outdoor': 'Exterior',
+        'other': 'Appliance'
     };
     
     const taskCategory = categoryMapping[appliance.category] || 'Appliance';
     
+    // Task templates - using mapped categories
     const taskTemplates = {
         'kitchen': [
             {
@@ -1272,7 +1273,7 @@ generateMaintenanceTasks(appliance) {
                 description: 'Clean or replace filters for optimal performance',
                 frequency: 90,
                 cost: 25,
-                category: taskCategory,  // 🎯 Uses mapped category (Appliance)
+                category: taskCategory,  // 🆕 CHANGED: Use mapped category
                 subcategory: 'Maintenance'
             },
             {
