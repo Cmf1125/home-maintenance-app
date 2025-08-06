@@ -1472,23 +1472,31 @@ function renderAllTaskCategories() {
         }, 0);
         
         return `
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-<div class="p-4 border-b border-gray-100">
-  <div class="flex items-center justify-between flex-wrap gap-2 w-full">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+<div class="p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150">
+  <div class="flex items-center justify-between gap-2 w-full">
+    <!-- Left: icon, title, count -->
     <div class="flex items-center gap-2 flex-1 min-w-0">
-      <span class="text-xl">${categoryInfo.icon}</span>
-      <span class="font-bold whitespace-normal break-words">${categoryId}</span>
-      <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">
+      <span class="text-lg">${categoryInfo.icon}</span>
+      <span class="font-medium text-gray-900 truncate">${categoryId}</span>
+      <span class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full text-xs whitespace-nowrap">
         ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
       </span>
-      <span class="text-xs text-green-600 font-medium ml-1">$${Math.round(categoryCost)}/yr</span>
     </div>
-    <button class="toggle-category-btn transition-transform duration-200 text-gray-500 hover:text-gray-700 sm:hidden"
-            onclick="toggleCategoryTasks(this)" aria-label="Toggle category section">
-      <span class="inline-block transform transition-transform duration-200">&#9654;</span>
-    </button>
+
+    <!-- Right: cost + chevron -->
+    <div class="flex items-center gap-2">
+      <span class="bg-green-50 text-green-600 px-2 py-0.5 rounded-full text-xs font-medium">
+        $${Math.round(categoryCost)}/yr
+      </span>
+      <button class="toggle-category-btn w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors sm:hidden"
+              onclick="toggleCategoryTasks(this)" aria-label="Toggle category section">
+        <span class="inline-block transform transition-transform duration-200">&#9654;</span>
+      </button>
+    </div>
   </div>
 </div>
+
 
     <!-- Collapsible task list -->
    <div class="category-task-list">
