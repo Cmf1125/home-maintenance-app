@@ -327,11 +327,14 @@ renderEnhancedTaskCard(task) {
     
    const totalElement = document.getElementById('total-count');
     if (totalElement) totalElement.textContent = totalTasks;
+// TEMPORARY FIX - Comment out entire section
+/*
 // Update home address
 const homeAddressElement = document.getElementById('home-address');
 if (homeAddressElement && window.homeData?.fullAddress) {
     homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
 }
+*/
 
 console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
 }
