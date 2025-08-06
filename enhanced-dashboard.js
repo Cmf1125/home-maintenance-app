@@ -217,7 +217,7 @@ renderEnhancedTaskCard(task) {
                         task.title.toLowerCase().includes('smoke') || 
                         task.title.toLowerCase().includes('detector') ||
                         task.title.toLowerCase().includes('fire') ||
-                        task.title.toLowerCase().includes('carbon');    
+                        task.title.toLowerCase().includes('carbon');
     
     // Enhanced status styling
     let statusClass = 'bg-white';
@@ -254,35 +254,32 @@ renderEnhancedTaskCard(task) {
 
     // Get category info
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
-    
-    // 🆕 ADD THESE LINES - Enhanced appliance task detection
-    const isApplianceTask = task.isApplianceTask || task.applianceId;
-    const applianceInfo = isApplianceTask ? 
-        `${task.applianceName || 'Unknown Appliance'}${task.applianceModel ? ` (${task.applianceModel})` : ''}` : 
-        null;
 
-      return `
-        <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200 cursor-pointer hover:bg-gray-50" onclick="window.TaskManager.openModal(window.tasks.find(t => t.id === ${task.id}), false)">
-            <!-- Row 1: Dot + Task Name + Category -->
-            <div class="flex items-center gap-2 mb-2">
-                <span class="font-semibold text-gray-900 text-sm flex-1 min-w-0 truncate">${urgencyDot} ${task.title}</span>
-                <span class="text-xs text-gray-500 flex-shrink-0">${categoryInfo.icon} ${task.category}</span>
-            </div>
-            
-            <!-- Row 2: Due Date + Buttons (simplified) -->
-            <div class="flex items-center justify-between gap-2">
-                <span class="text-xs ${dueDateColor} flex-shrink-0">${dueDateDisplay}</span>
-                <div class="flex gap-2 ml-auto">
-                    <button onclick="event.stopPropagation(); completeTask(${task.id})" 
-                      class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-xs font-medium transition-colors">
+    return `
+   <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200 cursor-pointer hover:bg-gray-50" onclick="window.TaskManager.openModal(window.tasks.find(t => t.id === ${task.id}), false)">
+        <!-- Row 1: Dot + Task Name + Category -->
+        <div class="flex items-center gap-2 mb-2">
+            <span class="font-semibold text-gray-900 text-sm flex-1 min-w-0 truncate">${urgencyDot} ${task.title}</span>
+            <span class="text-xs text-gray-500 flex-shrink-0">${categoryInfo.icon} ${task.category}</span>
+        </div>
+        
+        <!-- Row 2: Due Date + Buttons (left aligned) -->
+        <div class="flex items-center justify-start gap-4">
+            <span class="text-xs ${dueDateColor} flex-shrink-0">${dueDateDisplay}</span>
+            <div class="flex gap-2 ml-auto">
+                <button onclick="event.stopPropagation(); completeTask(${task.id})" 
+                        class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-base font-medium transition-colors">
                     Complete
                 </button>
                 <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
-                    class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-xs font-medium transition-colors">
-                Reschedule
-            </button>
+                        class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-base font-medium transition-colors">
+                    Reschedule
+                </button>
+            </div>
         </div>
     </div>
+`;
+}
     
     render() {
         this.updateStats();
@@ -290,7 +287,54 @@ renderEnhancedTaskCard(task) {
         this.updateFilterUI();
     }
 
-    updateStats()
+    updateStats() {
+    if (!window.tasks) return;
+
+    const now = new Date();
+    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    let overdueCount = 0;
+    let weekCount = 0;
+    let totalCost = 0;
+
+    window.tasks.forEach(task => {
+        if (!task.isCompleted && task.dueDate) {
+            const taskDate = new Date(task.dueDate);
+            if (taskDate < now) {
+                overdueCount++;
+            }
+            if (taskDate <= oneWeek && taskDate >= now) {
+                weekCount++;
+            }
+        }
+        totalCost += task.cost * (365 / task.frequency);
+    });
+
+    const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
+
+    // Update stat displays - ONLY update elements that exist
+    const overdueElement = document.getElementById('overdue-count');
+    if (overdueElement) overdueElement.textContent = overdueCount;
+    
+    const weekElement = document.getElementById('week-count');
+    if (weekElement) weekElement.textContent = weekCount;
+    
+    const totalElement = document.getElementById('total-count');
+    if (totalElement) totalElement.textContent = totalTasks;
+    
+    // REMOVED: annual-cost update since it's no longer on dashboard
+    // const annualCostElement = document.getElementById('annual-cost');
+    // if (annualCostElement) annualCostElement.textContent = '$' + Math.round(totalCost);
+
+    // Update home address
+    const homeAddressElement = document.getElementById('home-address');
+    if (homeAddressElement && window.homeData?.fullAddress) {
+        homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
+    }
+    
+    console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
+}
+}
 
 // FIXED: Enhanced reschedule function with proper event handling
 function rescheduleTaskFromDashboard(taskId, event) {
