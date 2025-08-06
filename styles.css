@@ -882,3 +882,10 @@ html, body {
     border: 1px solid #fbbf24;
     box-shadow: 0 4px 6px rgba(251, 191, 36, 0.2);
 }
+
+/* Allow task titles and descriptions to wrap */
+.task-title, .task-description {
+    white-space: normal;
+    word-break: break-word;
+}
+
