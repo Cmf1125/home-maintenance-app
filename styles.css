@@ -883,9 +883,11 @@ html, body {
     box-shadow: 0 4px 6px rgba(251, 191, 36, 0.2);
 }
 
-/* Allow task titles and descriptions to wrap */
-.task-title, .task-description {
-    white-space: normal;
-    word-break: break-word;
+/* Allow wrapping in All Tasks view even if elements use Tailwind `truncate` */
+#all-tasks-view .truncate {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: break-word;
 }
 
