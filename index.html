@@ -1236,5 +1236,20 @@
         window.toggleSettingsDropdown = toggleSettingsDropdown;
         window.closeSettingsDropdown = closeSettingsDropdown;
     </script>
+            
+    <!-- Category Task Modal -->
+    <div id="category-task-modal" class="fixed inset-0 bg-white z-50 hidden flex flex-col">
+        <div class="p-4 border-b flex justify-between items-center shadow-md">
+            <div class="flex items-center gap-2">
+                <span id="modal-category-icon" class="text-xl"></span>
+                <h2 id="modal-category-title" class="text-lg font-bold text-gray-800"></h2>
+            </div>
+            <button onclick="closeCategoryModal()" class="text-gray-600 text-xl">&times;</button>
+        </div>
+
+        <div id="modal-task-list" class="flex-1 overflow-y-auto p-4 space-y-4">
+            <!-- Tasks will be inserted here dynamically -->
+        </div>
+    </div>
 </body>
 </html>
