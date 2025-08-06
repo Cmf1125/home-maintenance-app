@@ -1482,7 +1482,7 @@ function renderAllTaskCategories() {
                 ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
             </span>
         </h3>
-        <div class="text-sm text-green-600 flex-shrink-0">$${Math.round(categoryCost)}/yr </div>
+        <div class="text-sm font-bold text-green-600 flex-shrink-0">$${Math.round(categoryCost)}/yr </div>
     </div>
 </div>
                 <div class="p-4">
