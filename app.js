@@ -1472,35 +1472,42 @@ function renderAllTaskCategories() {
         }, 0);
         
         return `
-
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
                 <div class="p-4 border-b border-gray-100">
-  <div class="flex flex-wrap items-center justify-between gap-2 w-full">
-    <div class="flex items-center gap-2 flex-1 min-w-0">
-      <span class="text-xl">${categoryInfo.icon}</span>
-      <span class="whitespace-normal break-words font-bold">${categoryId}</span>
-      <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">
-        ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
-      </span>
+    <div class="flex flex-wrap items-center justify-between gap-2 w-full">
+        <div class="flex items-center gap-2 flex-1 min-w-0">
+            <span class="text-xl">${categoryInfo.icon}</span>
+            <span class="whitespace-normal break-words font-bold">${categoryId}</span>
+            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">
+            ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
+            </span>
     </div>
     <div class="flex items-center gap-2">
-      <div class="text-xs text-green-600 font-semibold">$${Math.round(categoryCost)}/yr</div>
-      <button class="toggle-category-btn text-gray-500 hover:text-gray-700 sm:hidden"
-              onclick="toggleCategoryTasks(this)" aria-label="Toggle category tasks">
-        ▼
-      </button>
+        <div class="text-xs text-green-600 font-semibold">
+            $${Math.round(categoryCost)}/yr
+        </div>
+        <button class="toggle-category-btn text-gray-500 hover:text-gray-700 sm:hidden"
+            onclick="toggleCategoryTasks(this)">
+            ▼
+        </button>
     </div>
-  </div>
 </div>
-<div class="category-task-list">
 
-                    <div class="space-y-2">
-                        ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
-                    </div>
-            </div>
-        
-`;
-}).join('');
+    <!-- Collapsible task list -->
+   <div class="category-task-list">
+    ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
+</div>
+</div>
+        `;
+    }).join('');
+}
+
+function toggleCategoryTasks(button) {
+    const taskList = button.closest('.bg-white').querySelector('.category-task-list');
+    if (!taskList) return;
+
+    const isExpanded = taskList.classList.toggle('expanded');
+    button.textContent = isExpanded ? '▼' : '▶';
 }
 
 function renderAllTasksTaskItem(task) {
@@ -1554,7 +1561,7 @@ if (isOverdue) {
         <div class="flex items-center justify-between gap-2 mb-2">
             <div class="flex items-center gap-2 flex-1 min-w-0">
                 <span class="text-sm">${urgencyDot}</span>
-                <span class="font-medium text-gray-900 text-sm whitespace-normal break-words">${task.title}</span>
+                <span class="font-medium text-gray-900 text-sm truncate">${task.title}</span>
             </div>
             ${task.cost > 0 ? `<span class="text-green-600 font-medium text-sm">$${task.cost}</span>` : ''}
         </div>
@@ -2967,13 +2974,3 @@ if (document.readyState !== 'loading') {
 
 console.log('📱 Smart installation banner system loaded');
 
-
-
-function toggleCategoryTasks(button) {
-    const card = button.closest('.bg-white');
-    if (!card) return;
-    const list = card.querySelector('.category-task-list');
-    if (!list) return;
-    const isExpanded = list.classList.toggle('expanded');
-    button.textContent = isExpanded ? '▼' : '▶';
-}
