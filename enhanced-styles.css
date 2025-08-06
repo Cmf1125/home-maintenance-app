@@ -407,18 +407,3 @@ body.install-banner-visible {
 .enhanced-task-card.simple-horizontal-task button {
   transition: transform 0.1s ease, opacity 0.1s ease;
 }
-
-/* Alternative: Fixed positioning for header */
-.bg-white.shadow-sm.border-b.sticky {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 60 !important;
-    background: white !important;
-}
-
-/* Add top padding to prevent content from hiding behind fixed header */
-body.main-app-active .main-content {
-    padding-top: 80px; /* Adjust based on your header height */
-}
