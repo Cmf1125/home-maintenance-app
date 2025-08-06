@@ -1474,24 +1474,25 @@ function renderAllTaskCategories() {
         return `
             <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
                 <div class="p-4 border-b border-gray-100">
-    <div class="flex items-center justify-between gap-4">
-        <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 flex-1 min-w-0">
+    <div class="flex flex-wrap items-center justify-between gap-2 w-full">
+        <div class="flex items-center gap-2 flex-1 min-w-0">
             <span class="text-xl">${categoryInfo.icon}</span>
-            <span class="truncate">${categoryId}</span>
+            <span class="whitespace-normal break-words font-bold">${categoryId}</span>
             <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">
-                ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
+            ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
             </span>
-    </h3>
-    <div class="text-sm font-bold text-green-600 flex-shrink-0">
-        $${Math.round(categoryCost)}/yr
     </div>
-    <!-- Mobile toggle button -->
-    <button class="toggle-category-btn text-gray-500 hover:text-gray-700 sm:hidden"
-        onclick="toggleCategoryTasks(this)">
-        ▼
-    </button>
+    <div class="flex items-center gap-2">
+        <div class="text-xs text-green-600 font-semibold">
+            $${Math.round(categoryCost)}/yr
+        </div>
+        <button class="toggle-category-btn text-gray-500 hover:text-gray-700 sm:hidden"
+            onclick="toggleCategoryTasks(this)">
+            ▼
+        </button>
     </div>
-    </div>
+</div>
+
     <!-- Collapsible task list -->
    <div class="category-task-list">
     ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
