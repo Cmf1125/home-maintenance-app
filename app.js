@@ -1482,8 +1482,8 @@ function renderAllTaskCategories() {
                 ${tasks.length} task${tasks.length !== 1 ? 's' : ''}
             </span>
     </h3>
-    <div class="text-lg font-bold text-green-600 flex-shrink-0">
-        Annual Cost $${Math.round(categoryCost)}
+    <div class="text-sm font-bold text-green-600 flex-shrink-0">
+        $${Math.round(categoryCost)}/yr
     </div>
     <!-- Mobile toggle button -->
     <button class="toggle-category-btn text-gray-500 hover:text-gray-700 sm:hidden"
