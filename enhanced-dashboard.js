@@ -313,27 +313,10 @@ renderEnhancedTaskCard(task) {
 }
     
    render() {
-    // CRITICAL: Don't run in PWA mode during setup
-    const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
-                  window.navigator.standalone === true;
-    const setupVisible = !document.getElementById('task-setup').classList.contains('hidden');
-    const setupFormVisible = document.getElementById('setup-form').style.display !== 'none';
-    
-    if (isPWA && (setupVisible || setupFormVisible)) {
-        console.log('⏭️ Skipping enhanced dashboard in PWA setup mode');
-        return;
-    }
-    
-    // Also skip if no tasks yet
-    if (!window.tasks || window.tasks.length === 0) {
-        console.log('⏭️ No tasks available, skipping render');
-        return;
-    }
-    
     this.updateStats();
     this.renderFilteredTasks();
     this.updateFilterUI();
-}        
+}
         // Don't render enhanced dashboard during setup
         const setupVisible = !document.getElementById('task-setup').classList.contains('hidden');
         const setupFormVisible = document.getElementById('setup-form').style.display !== 'none';
