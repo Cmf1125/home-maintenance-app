@@ -947,132 +947,256 @@
        console.log('✅ Task system override loaded (cleaned up version)');
     </script>
 
-<!-- Reschedule Modal System -->
+<!-- WORKING MODAL SOLUTION -->
 <script>
+    console.log('🔧 Creating NEW working reschedule modal...');
+    
+    // Create a completely new, simple modal that definitely works
     function createWorkingRescheduleModal() {
-        const existing = document.getElementById('date-picker-modal-working');
+        // Remove any existing working modal
+        const existing = document.getElementById('working-reschedule-modal');
         if (existing) existing.remove();
         
+        // Create new modal HTML
         const modalHTML = `
-            <div id="date-picker-modal-working" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-                <div class="bg-white rounded-xl w-full max-w-sm p-6 shadow-2xl">
-                    <div class="text-center mb-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">📅 Reschedule Task</h3>
-                        <p id="reschedule-task-name" class="text-gray-600 text-sm"></p>
+            <div id="working-reschedule-modal" style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 99999;
+                font-family: Inter, sans-serif;
+            ">
+                <div style="
+                    background: white;
+                    border-radius: 12px;
+                    padding: 24px;
+                    max-width: 400px;
+                    width: 90%;
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                ">
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <h3 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 600;">📅 Reschedule Task</h3>
+                        <p id="working-task-name" style="margin: 0; color: #666; font-size: 14px;"></p>
                     </div>
-                    <div class="space-y-4">
-                        <div class="bg-gray-50 rounded-lg p-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Current Due Date</label>
-                            <p id="current-due-date" class="text-gray-900 font-semibold"></p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">New Due Date</label>
-                            <input type="date" id="new-due-date" 
-                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Quick Options</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button type="button" onclick="setQuickDate(1)" 
-                                        class="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-200 text-sm">
-                                    Tomorrow
-                                </button>
-                                <button type="button" onclick="setQuickDate(7)" 
-                                        class="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 text-sm">
-                                    Next Week
-                                </button>
-                                <button type="button" onclick="setQuickDate(30)" 
-                                        class="bg-yellow-100 text-yellow-700 px-3 py-2 rounded-lg hover:bg-yellow-200 text-sm">
-                                    Next Month
-                                </button>
-                                <button type="button" onclick="setQuickDate(90)" 
-                                        class="bg-purple-100 text-purple-700 px-3 py-2 rounded-lg hover:bg-purple-200 text-sm">
-                                    3 Months
-                                </button>
-                            </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 14px;">Current Due Date</label>
+                        <div id="working-current-date" style="padding: 12px; background: #f3f4f6; border-radius: 8px; font-weight: 600;"></div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 14px;">New Due Date</label>
+                        <input type="date" id="working-new-date" style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 2px solid #e5e7eb;
+                            border-radius: 8px;
+                            font-size: 16px;
+                            box-sizing: border-box;
+                        ">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 14px;">Quick Options</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <button onclick="setWorkingQuickDate(1)" style="
+                                padding: 8px 12px;
+                                background: #dbeafe;
+                                color: #1e40af;
+                                border: none;
+                                border-radius: 6px;
+                                font-size: 13px;
+                                cursor: pointer;
+                            ">Tomorrow</button>
+                            <button onclick="setWorkingQuickDate(7)" style="
+                                padding: 8px 12px;
+                                background: #dcfce7;
+                                color: #166534;
+                                border: none;
+                                border-radius: 6px;
+                                font-size: 13px;
+                                cursor: pointer;
+                            ">Next Week</button>
+                            <button onclick="setWorkingQuickDate(30)" style="
+                                padding: 8px 12px;
+                                background: #fef3c7;
+                                color: #92400e;
+                                border: none;
+                                border-radius: 6px;
+                                font-size: 13px;
+                                cursor: pointer;
+                            ">Next Month</button>
+                            <button onclick="setWorkingQuickDate(90)" style="
+                                padding: 8px 12px;
+                                background: #f3e8ff;
+                                color: #7c3aed;
+                                border: none;
+                                border-radius: 6px;
+                                font-size: 13px;
+                                cursor: pointer;
+                            ">3 Months</button>
                         </div>
                     </div>
-                    <div class="flex gap-3 mt-6">
-                        <button onclick="closeDatePickerModal()" 
-                                class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300">
-                            Cancel
-                        </button>
-                        <button onclick="confirmReschedule()" 
-                                class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
-                            📅 Reschedule
-                        </button>
+                    
+                    <div style="display: flex; gap: 12px;">
+                        <button onclick="closeWorkingModal()" style="
+                            flex: 1;
+                            padding: 12px;
+                            background: #f3f4f6;
+                            color: #374151;
+                            border: none;
+                            border-radius: 8px;
+                            font-weight: 500;
+                            cursor: pointer;
+                        ">Cancel</button>
+                        <button onclick="confirmWorkingReschedule()" style="
+                            flex: 1;
+                            padding: 12px;
+                            background: #2563eb;
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            font-weight: 500;
+                            cursor: pointer;
+                        ">📅 Reschedule</button>
                     </div>
                 </div>
             </div>
         `;
         
+        // Add to page
         document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
     
+    // Main reschedule function using new modal
     window.rescheduleTaskFromDashboard = function(taskId, event) {
+        // CRITICAL: Stop any event bubbling immediately
         if (event) {
             event.stopPropagation();
             event.preventDefault();
         }
         
-        const task = window.tasks.find(t => t.id === taskId);
-        if (!task) return;
+        console.log('📅 Opening WORKING reschedule modal for task:', taskId);
         
+        const task = window.tasks.find(t => t.id === taskId);
+        if (!task) {
+            console.error('❌ Task not found:', taskId);
+            return;
+        }
+        
+        // Store current task
         window.currentRescheduleTask = task;
+        
+        // Ensure modal exists
         createWorkingRescheduleModal();
         
-        const modal = document.getElementById('date-picker-modal-working');
-        document.getElementById('reschedule-task-name').textContent = `"${task.title}"`;
+        // Get modal and elements
+        const modal = document.getElementById('working-reschedule-modal');
+        const taskNameEl = document.getElementById('working-task-name');
+        const currentDateEl = document.getElementById('working-current-date');
+        const newDateEl = document.getElementById('working-new-date');
         
-        const currentDate = new Date(task.dueDate);
-        document.getElementById('current-due-date').textContent = currentDate.toLocaleDateString('en-US', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        // Set content
+        taskNameEl.textContent = `"${task.title}"`;
+        
+        const currentDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+        currentDateEl.textContent = currentDate.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
         });
-        document.getElementById('new-due-date').value = currentDate.toISOString().split('T')[0];
         
-        modal.classList.remove('hidden');
+        newDateEl.value = currentDate.toISOString().split('T')[0];
+        
+        // SHOW the modal
+        modal.style.display = 'flex';
+        
+        // Focus on date input
+        setTimeout(() => {
+            newDateEl.focus();
+            console.log('✅ Working modal should now be visible!');
+        }, 100);
     };
     
-    window.setQuickDate = function(daysFromNow) {
-        const newDateEl = document.getElementById('new-due-date');
+    // Quick date setter for new modal
+    window.setWorkingQuickDate = function(daysFromNow) {
+        const newDateEl = document.getElementById('working-new-date');
         if (!newDateEl) return;
         
         const newDate = new Date();
         newDate.setDate(newDate.getDate() + daysFromNow);
         newDateEl.value = newDate.toISOString().split('T')[0];
         
+        // Visual feedback
         newDateEl.style.background = '#dbeafe';
         setTimeout(() => newDateEl.style.background = '', 300);
     };
     
-    window.closeDatePickerModal = function() {
-        const modal = document.getElementById('date-picker-modal-working');
-        if (modal) modal.classList.add('hidden');
+    // Close working modal
+    window.closeWorkingModal = function() {
+        const modal = document.getElementById('working-reschedule-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
         window.currentRescheduleTask = null;
     };
     
-    window.confirmReschedule = function() {
-        if (!window.currentRescheduleTask) return;
+    // Confirm reschedule with new modal
+    window.confirmWorkingReschedule = function() {
+        if (!window.currentRescheduleTask) {
+            alert('❌ No task selected');
+            return;
+        }
         
-        const newDateEl = document.getElementById('new-due-date');
+        const newDateEl = document.getElementById('working-new-date');
         if (!newDateEl?.value) {
             alert('❌ Please select a new due date');
             return;
         }
         
         const newDate = new Date(newDateEl.value + 'T12:00:00');
+        if (isNaN(newDate.getTime())) {
+            alert('❌ Invalid date');
+            return;
+        }
+        
         const taskTitle = window.currentRescheduleTask.title;
         
+        // Update task
         window.currentRescheduleTask.dueDate = newDate;
-        window.currentRescheduleTask.nextDue = newDate;
+        window.currentRescheduleTask.nextDue = newDate; // Calendar sync
         
-        if (typeof saveData === 'function') saveData();
-        if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
-        if (window.casaCareCalendar?.refresh) window.casaCareCalendar.refresh();
+        console.log('✅ Task updated:', taskTitle, 'to', newDate.toLocaleDateString());
         
-        window.closeDatePickerModal();
+        // Save and refresh
+        if (typeof saveData === 'function') {
+            saveData();
+            console.log('💾 Data saved');
+        }
+        
+        if (window.enhancedDashboard?.render) {
+            window.enhancedDashboard.render();
+            console.log('🔄 Dashboard refreshed');
+        }
+        
+        if (window.casaCareCalendar?.refresh) {
+            window.casaCareCalendar.refresh();
+            console.log('📅 Calendar refreshed');
+        }
+        
+        // Close modal and show success
+        window.closeWorkingModal();
         alert(`✅ "${taskTitle}" rescheduled to ${newDate.toLocaleDateString()}`);
     };
+    
+    console.log('✅ NEW working reschedule modal created and ready!');
 </script>
             
     <!-- Settings Dropdown Functions -->
