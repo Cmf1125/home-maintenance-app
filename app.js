@@ -1155,10 +1155,14 @@ function finishTaskSetup() {
 function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
 
-    // Show header on all main tabs (dashboard, calendar, etc.)
+    // UNIFIED: Always ensure header is visible on all main tabs
     if (['dashboard', 'calendar', 'appliances', 'documents'].includes(tabName)) {
-        document.body.classList.remove('hide-header');
-        document.body.classList.add('show-header');
+        // Ensure main-app-active class is set (makes header sticky)
+        document.body.classList.add('main-app-active');
+        // Remove any conflicting header classes
+        document.body.classList.remove('hide-header', 'show-header');
+        
+        console.log('✅ Header made sticky for tab:', tabName);
     }
     
     // 🎯 CRITICAL FIX: Only hide back arrow if we're actually switching away from All Tasks
