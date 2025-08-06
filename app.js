@@ -1394,90 +1394,6 @@ function renderAllTasksView() {
         console.error('❌ All tasks view element not found');
         return;
     }
-
-    // ---- Global totals (unchanged) ----
-    let totalCost = 0;
-    window.tasks.forEach(task => {
-        totalCost += task.cost * (365 / task.frequency);
-    });
-    const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
-
-    // ---- Category filter state & data ----
-    const selectedCategory = window.allTasksCategoryFilter || 'all';
-    const activeTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate);
-
-    // Build category list from active tasks (fallback to 'General')
-    const categories = Array.from(
-        new Set(activeTasks.map(t => t.category || 'General'))
-    ).sort();
-
-    // Apply filter
-    const filteredTasks = (selectedCategory === 'all')
-        ? activeTasks
-        : activeTasks.filter(t => (t.category || 'General') === selectedCategory);
-
-    // Filtered annual cost
-    const filteredCost = filteredTasks.reduce(
-        (sum, t) => sum + (t.cost * (365 / t.frequency)),
-        0
-    );
-
-    // ---- UI ----
-    allTasksView.innerHTML = `
-        <div class="p-4">
-            <div class="bg-white rounded-xl p-6 shadow-lg max-w-4xl mx-auto">
-                <div class="text-center mb-4">
-                    <h2 class="text-lg font-bold text-gray-900 mb-3">📋 Manage All Tasks</h2>
-
-                    <!-- Compact Overview with Add Button -->
-                    <div class="bg-gray-50 p-3 rounded-lg mb-4">
-                        <div class="flex justify-center items-center gap-6 text-sm">
-                            <div class="text-center">
-                                <div class="text-lg font-bold text-blue-600">${totalTasks}</div>
-                                <div class="text-xs text-gray-600">Tasks</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
-                                <div class="text-xs text-gray-600">Annual Cost</div>
-                            </div>
-                            <button onclick="event.stopPropagation(); window.closeDatePickerModal && window.closeDatePickerModal(); addTaskFromDashboard && addTaskFromDashboard()" 
-                                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-                                Add Task
-                            </button>
-                        </div>
-
-                        <!-- Category Filter -->
-                        <div class="flex items-center justify-between gap-3 mt-3">
-                            <div class="flex items-center gap-2">
-                                <label for="all-tasks-category-filter" class="text-sm text-gray-600">Category</label>
-                                <select id="all-tasks-category-filter"
-                                        class="border border-gray-300 rounded-md px-3 py-2 text-sm bg-white"
-                                        onchange="handleAllTasksCategoryChange(this)">
-                                    <option value="all" ${selectedCategory === 'all' ? 'selected' : ''}>All Tasks</option>
-                                    ${categories.map(c => `<option value="${c}" ${selectedCategory === c ? 'selected' : ''}>${c}</option>`).join('')}
-                                </select>
-                            </div>
-                            <div class="text-xs text-gray-600 flex items-center gap-1">
-                                <span>${filteredTasks.length} task${filteredTasks.length !== 1 ? 's' : ''}</span>
-                                <span class="text-[0.7rem] text-green-600 font-semibold">• $${Math.round(filteredCost)}/yr</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Filtered Task List -->
-                <div id="all-tasks-list" class="space-y-2 mt-4 text-left">
-                    ${filteredTasks.map(task => renderAllTasksTaskItem(task)).join('')}
-                </div>
-
-                <!-- Tasks managed through Settings dropdown -->
-            </div>
-        </div>
-    `;
-
-    console.log('✅ All Tasks view rendered with category filter');
-}
-
     
    // Calculate stats for All Tasks overview
 let totalCost = 0;
@@ -1632,7 +1548,7 @@ if (isOverdue) {
         <div class="flex items-center justify-between gap-2 mb-2">
             <div class="flex items-center gap-2 flex-1 min-w-0">
                 <span class="text-sm">${urgencyDot}</span>
-                <span class="font-medium text-gray-900 text-sm whitespace-normal break-words">${task.title}</span>
+                <span class="font-medium text-gray-900 text-sm truncate">${task.title}</span>
             </div>
             ${task.cost > 0 ? `<span class="text-green-600 font-medium text-sm">$${task.cost}</span>` : ''}
         </div>
@@ -3045,9 +2961,3 @@ if (document.readyState !== 'loading') {
 
 console.log('📱 Smart installation banner system loaded');
 
-
-
-function handleAllTasksCategoryChange(selectEl) {
-    window.allTasksCategoryFilter = selectEl.value;
-    renderAllTasksView();
-}
