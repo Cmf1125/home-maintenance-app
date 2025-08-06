@@ -1529,16 +1529,16 @@ function renderAllTasksTaskItem(task) {
     }
     
     // Clean due date display
-    let dueDateDisplay;
-    if (isOverdue) {
-        dueDateDisplay = `<span class="text-red-600 font-semibold">${Math.abs(daysUntilDue)}d overdue</span>`;
-    } else if (daysUntilDue === 0) {
-        dueDateDisplay = `<span class="text-orange-600 font-semibold">Due today</span>`;
-    } else if (daysUntilDue <= 7) {
-       dueDateDisplay = `<span class="text-orange-600">Due ${taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>`;
-    } else {
-        dueDateDisplay = `<span class="text-gray-700">Due ${taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>`;
-    }
+let dueDateDisplay;
+if (isOverdue) {
+    dueDateDisplay = `<span class="text-red-600 font-semibold">Overdue</span>`;
+} else if (daysUntilDue === 0) {
+    dueDateDisplay = `<span class="text-orange-600 font-semibold">Due today</span>`;
+} else if (daysUntilDue === 1) {
+    dueDateDisplay = `<span class="text-orange-600 font-semibold">Due tomorrow</span>`;
+} else {
+    dueDateDisplay = `<span class="text-gray-700">Due ${taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>`;
+}
     
     return `
     <div class="flex flex-col py-3 px-4 ${statusClass} rounded-lg hover:bg-gray-100 transition-colors">
