@@ -2985,27 +2985,27 @@ console.log('📱 Smart installation banner system loaded');
 // Open category modal
 function openCategoryModal(categoryId) {
     const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
-
-    // Set modal header
     document.getElementById('modal-category-icon').textContent = categoryInfo.icon;
     document.getElementById('modal-category-title').textContent = categoryId;
 
-    // Find tasks for this category
     const categoryTasks = window.tasks.filter(task => task.category === categoryId);
-
-    // Render task list
     const taskListEl = document.getElementById('modal-task-list');
     taskListEl.innerHTML = categoryTasks.map(task => renderAllTasksTaskItem(task)).join('');
 
-    // Show modal
-    document.getElementById('category-task-modal').classList.add('show');
-    document.getElementById('category-task-modal').classList.remove('hidden');
+    const modal = document.getElementById('category-task-modal');
+    modal.classList.remove('hidden');
+    setTimeout(() => modal.classList.remove('translate-y-full'), 10); // triggers animation
 }
 
 // Close modal
 function closeCategoryModal() {
-    document.getElementById('category-task-modal').classList.remove('show');
-    document.getElementById('category-task-modal').classList.add('hidden');
+    const modal = document.getElementById('category-task-modal');
+    modal.classList.add('translate-y-full');
+
+    // Wait for animation to finish before hiding
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
 }
 
 // Make functions globally available
