@@ -2986,37 +2986,28 @@ if (document.readyState !== 'loading') {
 console.log('📱 Smart installation banner system loaded');
 
 function openCategoryModal(categoryId) {
-    const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
-    document.getElementById('modal-category-icon').textContent = categoryInfo.icon;
-    document.getElementById('modal-category-title').textContent = categoryId;
+  const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
 
-    const categoryTasks = window.tasks.filter(task => task.category === categoryId);
-    const taskListEl = document.getElementById('modal-task-list');
-    taskListEl.innerHTML = categoryTasks.map(task => renderAllTasksTaskItem(task)).join('');
+  // Update modal icon and title
+  document.getElementById('modal-category-icon').textContent = categoryInfo.icon;
+  document.getElementById('modal-category-title').textContent = categoryId;
 
-    const modal = document.getElementById('category-task-modal');
+  // Get and render tasks for this category
+  const categoryTasks = window.tasks.filter(task => task.category === categoryId);
+  const taskListEl = document.getElementById('modal-task-list');
+  taskListEl.innerHTML = categoryTasks.map(task => renderAllTasksTaskItem(task)).join('');
 
-    // Make modal visible in DOM
-    modal.classList.remove('hidden');      // Show it
-    modal.style.display = 'flex';          // Make sure flex layout applies
-
-    // Animate in (slide up)
-    setTimeout(() => {
-        modal.classList.remove('translate-y-full');
-    }, 10);
+  // Show the modal
+  const modal = document.getElementById('category-task-modal');
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+  modal.scrollIntoView({ behavior: 'smooth' });
 }
 
 function closeCategoryModal() {
-    const modal = document.getElementById('category-task-modal');
-
-    // Animate out (slide down)
-    modal.classList.add('translate-y-full');
-
-    // Fully hide after animation
-    setTimeout(() => {
-        modal.classList.add('hidden');
-        modal.style.display = 'none';
-    }, 300); // Match Tailwind's transition duration
+  const modal = document.getElementById('category-task-modal');
+  modal.classList.add('hidden');
+  modal.style.display = 'none';
 }
 
 // ✅ Export to global scope
