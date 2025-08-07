@@ -695,7 +695,7 @@ renderApplianceCard(appliance) {
                 </button>
                 <button onclick="event.stopPropagation(); window.applianceManager.showApplianceTasks('${appliance.id}')" 
                         class="flex-1 bg-green-100 text-green-700 hover:bg-green-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
-                    Tasks
+                    See Tasks
                 </button>
             </div>
         </div>
