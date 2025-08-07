@@ -1225,5 +1225,160 @@
     <script src="enhanced-dashboard.js"></script>
     <script src="documents.js"></script> 
     <script src="appliances.js"></script>
+            <!-- SIMPLE MODAL FIX - Add this before </body> -->
+<script>
+console.log('🔧 Loading simple modal fix...');
+
+// Remove all the conflicting TaskManager and modal override code
+// and replace with this clean version:
+
+// 1. TASK EDIT MODAL FUNCTIONS
+window.openTaskEditModal = function(task, isNew = false) {
+    console.log('📝 Opening task modal:', task.title || 'New Task');
+    
+    const modal = document.getElementById('task-edit-modal');
+    if (!modal) return;
+    
+    // Store current task
+    window.currentEditingTask = {...task};
+    
+    // Fill form
+    document.getElementById('edit-task-name').value = task.title || '';
+    document.getElementById('edit-task-description').value = task.description || '';
+    document.getElementById('edit-task-cost').value = task.cost || 0;
+    document.getElementById('edit-task-frequency').value = task.frequency || 365;
+    document.getElementById('edit-task-category').value = task.category || 'General';
+    
+    const dateField = document.getElementById('edit-task-due-date');
+    const date = task.dueDate ? new Date(task.dueDate) : new Date();
+    dateField.value = date.toISOString().split('T')[0];
+    
+    // Show/hide delete button
+    const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
+    if (deleteBtn) deleteBtn.style.display = isNew ? 'none' : 'block';
+    
+    // Show modal
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+};
+
+window.saveTaskFromEdit = function() {
+    const task = window.currentEditingTask;
+    if (!task) return;
+    
+    // Get values
+    const title = document.getElementById('edit-task-name').value.trim();
+    const description = document.getElementById('edit-task-description').value.trim();
+    const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
+    const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
+    const category = document.getElementById('edit-task-category').value;
+    const dueDateStr = document.getElementById('edit-task-due-date').value;
+    
+    if (!title) { alert('❌ Name required'); return; }
+    if (!dueDateStr) { alert('❌ Date required'); return; }
+    
+    const dueDate = new Date(dueDateStr + 'T12:00:00');
+    
+    // Update task
+    task.title = title;
+    task.description = description;
+    task.cost = cost;
+    task.frequency = frequency;
+    task.category = category;
+    task.priority = category === 'Safety' ? 'high' : 'medium';
+    task.dueDate = dueDate;
+    task.nextDue = dueDate;
+    delete task.isTemplate;
+    
+    // Add or update in array
+    const isNew = !window.tasks.find(t => t.id === task.id);
+    if (isNew) {
+        window.tasks.push(task);
+    } else {
+        const index = window.tasks.findIndex(t => t.id === task.id);
+        if (index !== -1) window.tasks[index] = task;
+    }
+    
+    // Save and refresh
+    if (typeof saveData === 'function') saveData();
+    if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
+    if (window.casaCareCalendar?.refresh) window.casaCareCalendar.refresh();
+    if (typeof renderTaskCategories === 'function') renderTaskCategories();
+    
+    window.closeTaskEditModal();
+    alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
+};
+
+window.closeTaskEditModal = function() {
+    const modal = document.getElementById('task-edit-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    }
+    window.currentEditingTask = null;
+};
+
+// 2. ADD TASK FUNCTIONS
+window.addTaskFromDashboard = function() {
+    const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+    const newTask = {
+        id: maxId + 1, title: '', description: '', category: 'General',
+        frequency: 365, cost: 0, dueDate: new Date()
+    };
+    window.openTaskEditModal(newTask, true);
+};
+
+window.addTaskFromSetup = function() {
+    const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+    const newTask = {
+        id: maxId + 1, title: '', description: '', category: 'General',
+        frequency: 365, cost: 0, dueDate: new Date(), isTemplate: true
+    };
+    window.openTaskEditModal(newTask, true);
+};
+
+// 3. EDIT TASK FUNCTIONS
+window.editTaskFromSetup = function(taskId) {
+    const task = window.tasks?.find(t => t.id === taskId);
+    if (task) window.openTaskEditModal(task, false);
+};
+
+window.editTaskFromDashboard = function(taskId) {
+    const task = window.tasks?.find(t => t.id === taskId);
+    if (task) window.openTaskEditModal(task, false);
+};
+
+// 4. SIMPLE RESCHEDULE MODAL
+window.rescheduleTaskFromDashboard = function(taskId, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    
+    const task = window.tasks?.find(t => t.id === taskId);
+    if (!task) return;
+    
+    const newDateStr = prompt(`Reschedule "${task.title}".\n\nCurrent due: ${new Date(task.dueDate).toLocaleDateString()}\n\nEnter new date (YYYY-MM-DD):`, new Date(task.dueDate).toISOString().split('T')[0]);
+    
+    if (!newDateStr) return;
+    
+    const newDate = new Date(newDateStr + 'T12:00:00');
+    if (isNaN(newDate.getTime())) {
+        alert('❌ Invalid date format');
+        return;
+    }
+    
+    task.dueDate = newDate;
+    task.nextDue = newDate;
+    
+    if (typeof saveData === 'function') saveData();
+    if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
+    if (window.casaCareCalendar?.refresh) window.casaCareCalendar.refresh();
+    
+    alert(`✅ "${task.title}" rescheduled to ${newDate.toLocaleDateString()}`);
+};
+
+console.log('✅ Simple modal fix loaded - try your buttons now!');
+</script>
 </body>
 </html>
