@@ -2932,39 +2932,41 @@ window.TaskManager = {
     currentTask: null,
     
     openModal: function(task, isNew) {
-        console.log('📝 Opening modal for:', task.title || 'New Task');
-        
-        this.currentTask = {...task};
-        window.currentEditingTask = this.currentTask;
-        
-        const modal = document.getElementById('task-edit-modal');
-        if (!modal) {
-            alert('❌ Modal not found');
-            return;
-        }
-        
-        // Set title
-        const titleElement = document.getElementById('task-edit-title');
-        if (titleElement) {
-            titleElement.textContent = isNew ? 'Add Task' : 'Edit Task';
-        }
-        
-        // Show/hide delete button
-        const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
-        if (deleteBtn) {
-            deleteBtn.style.display = isNew ? 'none' : 'block';
-        }
-        
-        this.fillForm(task);
-        
-        modal.classList.remove('hidden');
-        modal.style.display = 'flex';
-        
-        setTimeout(() => {
-            const nameField = document.getElementById('edit-task-name');
-            if (nameField) nameField.focus();
-        }, 100);
-    },
+    console.log('📝 Opening modal for:', task.title || 'New Task');
+    
+    this.currentTask = {...task};
+    window.currentEditingTask = this.currentTask;
+    
+    const modal = document.getElementById('task-edit-modal');
+    if (!modal) {
+        alert('❌ Modal not found');
+        return;
+    }
+    
+    // Set title
+    const titleElement = document.getElementById('task-edit-title');
+    if (titleElement) {
+        titleElement.textContent = isNew ? 'Add Task' : 'Edit Task';
+    }
+    
+    // Show/hide delete button
+    const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
+    if (deleteBtn) {
+        deleteBtn.style.display = isNew ? 'none' : 'block';
+    }
+    
+    this.fillForm(task);
+    
+    // FIXED: Force modal to show
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    modal.style.zIndex = '9999';
+    
+    setTimeout(() => {
+        const nameField = document.getElementById('edit-task-name');
+        if (nameField) nameField.focus();
+    }, 100);
+},
     
     fillForm: function(task) {
         const fields = [
