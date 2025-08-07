@@ -3088,6 +3088,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+function toggleCategory(categoryId) {
+    const tasksDiv = document.getElementById(`tasks-${categoryId}`);
+    const arrow = document.getElementById(`arrow-${categoryId}`);
+    
+    if (tasksDiv.classList.contains('hidden')) {
+        // Show tasks
+        tasksDiv.classList.remove('hidden');
+        arrow.style.transform = 'rotate(90deg)';
+    } else {
+        // Hide tasks
+        tasksDiv.classList.add('hidden');
+        arrow.style.transform = 'rotate(0deg)';
+    }
+}
+
+// Make it globally available
+window.toggleCategory = toggleCategory;
+
 // Make sure functions are globally available
 window.openCategoryModal = openCategoryModal;
 window.closeCategoryModal = closeCategoryModal;
