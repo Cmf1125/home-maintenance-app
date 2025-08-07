@@ -1857,105 +1857,23 @@ function completeTask(taskId) {
 }
 
 // Add Task functionality for dashboard
-function addTaskFromDashboard() {
-    const title = prompt('Task Title:');
-    if (!title) return;
+window.addTaskFromDashboard = function() {
+    console.log('➕ Adding new task from dashboard...');
     
-    const description = prompt('Task Description:');
-    if (!description) return;
-    
-    const frequency = parseInt(prompt('How often (in days):', '365'));
-    if (!frequency || frequency <= 0) return;
-    
-    const cost = parseFloat(prompt('Estimated cost ($):', '0'));
-    if (isNaN(cost)) return;
-    
-    const priority = prompt('Priority (high, medium, low):', 'medium');
-    if (!['high', 'medium', 'low'].includes(priority)) {
-        alert('Invalid priority. Please use: high, medium, or low');
-        return;
-    }
-    
-    const dueDateStr = prompt('Due date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-    if (!dueDateStr) return;
-    
-    const dueDate = new Date(dueDateStr + 'T12:00:00');
-    if (isNaN(dueDate.getTime())) {
-        alert('Invalid date format');
-        return;
-    }
-    
-    // Find next available ID
-    const maxId = Math.max(...tasks.map(t => t.id), 0);
-    
+    const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
     const newTask = {
-        id: maxId + 1,
-        title: title,
-        description: description,
+        id: maxId + 1, 
+        title: '', 
+        description: '', 
         category: 'General',
-        frequency: frequency,
-        cost: cost,
-        priority: priority,
-        dueDate: dueDate,
-        nextDue: dueDate, // Calendar compatibility
-        lastCompleted: null,
-        isCompleted: false
+        frequency: 365, 
+        cost: 0, 
+        priority: 'medium', 
+        dueDate: new Date()
     };
     
-    tasks.push(newTask);
-    window.tasks = tasks;
-    
-    // Save data
-    saveData();
-    
-    // Refresh dashboard
-    if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-        window.enhancedDashboard.render();
-    } else {
-        updateDashboard();
-    }
-    
-    // Refresh calendar if it exists
-    if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-        window.casaCareCalendar.refresh();
-    }
-    
-    // ENHANCED DEBUG: Refresh All Tasks view if it's currently visible
-    console.log('🔍 DEBUG: Checking if All Tasks view needs refresh...');
-    
-    const allTasksView = document.getElementById('all-tasks-view');
-    console.log('🔍 All Tasks view element found:', !!allTasksView);
-    
-    if (allTasksView) {
-        const hasHiddenClass = allTasksView.classList.contains('hidden');
-        const computedDisplay = window.getComputedStyle(allTasksView).display;
-        const isVisible = !hasHiddenClass && computedDisplay !== 'none';
-        
-        console.log('🔍 All Tasks view has hidden class:', hasHiddenClass);
-        console.log('🔍 All Tasks view computed display:', computedDisplay);
-        console.log('🔍 All Tasks view is visible:', isVisible);
-        console.log('🔍 renderAllTasksView function exists:', typeof renderAllTasksView === 'function');
-        
-        if (!hasHiddenClass) {
-            console.log('🔄 Refreshing All Tasks view after adding task...');
-            setTimeout(() => {
-                if (typeof renderAllTasksView === 'function') {
-                    renderAllTasksView();
-                    console.log('✅ All Tasks view refreshed');
-                } else {
-                    console.error('❌ renderAllTasksView function not found!');
-                }
-            }, 100);
-        } else {
-            console.log('⏭️ All Tasks view is hidden, skipping refresh');
-        }
-    } else {
-        console.error('❌ All Tasks view element not found!');
-    }
-    
-    console.log('✅ New task added:', newTask);
-    alert(`✅ Task "${title}" added successfully!`);
-}
+    window.TaskManager.openModal(newTask, true);
+};
 
 // FIXED: Enhanced Edit Task function for setup with better modal handling
 function editTaskFromSetup(taskId) {
