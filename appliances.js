@@ -1369,13 +1369,13 @@ showApplianceTasks(applianceId) {
                 <!-- Action Buttons -->
                 <div style="display: flex; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
                     ${applianceTasks.length > 0 ? `
-                        <button onclick="window.applianceManager.generateTasksForAppliance(${applianceId}); document.getElementById('appliance-tasks-modal').remove(); window.applianceManager.render();"
-                                style="
-                                    background: #f3f4f6; color: #374151; border: none; padding: 12px 24px;
-                                    border-radius: 8px; font-weight: 500; cursor: pointer; flex: 1;
-                                ">
-                            ➕ Add More Tasks
-                        </button>
+                       <button onclick="window.applianceManager.addCustomTaskForAppliance(${applianceId}); document.getElementById('appliance-tasks-modal').remove();"
+                        style="
+                            background: #f3f4f6; color: #374151; border: none; padding: 12px 24px;
+                            border-radius: 8px; font-weight: 500; cursor: pointer; flex: 1;
+                         ">
+                ➕ Add Custom Task
+            </button>
                     ` : ''}
                     <button onclick="document.getElementById('appliance-tasks-modal').remove()"
                             style="
@@ -1390,6 +1390,45 @@ showApplianceTasks(applianceId) {
     `;
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+// Add custom task for specific appliance
+addCustomTaskForAppliance(applianceId) {
+    const appliance = this.appliances.find(a => a.id == applianceId);
+    if (!appliance) {
+        console.error('Appliance not found:', applianceId);
+        return;
+    }
+    
+    // Find next available task ID
+    const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+    
+    // Create new task pre-linked to this appliance
+    const newTask = {
+        id: maxId + 1,
+        title: `${appliance.name} - `, // Pre-fill with appliance name
+        description: '',
+        category: 'Appliance',
+        frequency: 365,
+        cost: 0,
+        priority: 'medium',
+        dueDate: new Date(),
+        
+        // Link to appliance
+        applianceId: applianceId,
+        applianceName: appliance.name,
+        applianceCategory: appliance.category,
+        applianceManufacturer: appliance.manufacturer,
+        applianceModel: appliance.model,
+        isApplianceTask: true
+    };
+    
+    // Open the main task modal
+    if (window.TaskManager && window.TaskManager.openModal) {
+        window.TaskManager.openModal(newTask, true);
+    } else {
+        console.error('TaskManager not available');
+        alert('❌ Task editor not available');
+    }
 }
     
 // Enhanced getApplianceStatus method for appliances.js
