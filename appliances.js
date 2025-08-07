@@ -663,28 +663,24 @@ renderApplianceCard(appliance) {
                             <span class="text-xs text-gray-500">📍 ${appliance.location}</span>
                         </div>
                     ` : ''}
+                    ${appliance.serialNumber ? `
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500">Serial # ${appliance.serialNumber}</span>
+                        </div>
+                    ` : ''}
+
+                    ${appliance.purchaseDate ? `
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-gray-500">Purchased ${new Date(appliance.purchaseDate).getFullYear()}</span>
+                        </div>
+                    ` : ''}
+
                 </div>
                 
 <div class="flex items-center gap-2 mt-3 flex-wrap">
   ${appliance.photos && appliance.photos.length > 0
     ? `<span class="bg-blue-50 text-blue-700 px-2 rounded text-xs inline-flex items-center h-6">
          📸 ${appliance.photos.length}
-       </span>`
-    : ''
-  }
-
-  ${appliance.serialNumber
-    ? `<button
-         class="bg-green-50 text-green-700 px-2 rounded text-xs inline-flex items-center h-6"
-         title="Click to copy"
-         onclick="event.stopPropagation(); navigator.clipboard.writeText('${(appliance.serialNumber || '').replace(/'/g, "\\'")}')"
-       >🔢 ${appliance.serialNumber}</button>`
-    : ''
-  }
-
-  ${appliance.purchaseDate
-    ? `<span class="bg-purple-50 text-purple-700 px-2 rounded text-xs inline-flex items-center h-6">
-         Purchased ${new Date(appliance.purchaseDate).getFullYear()}
        </span>`
     : ''
   }
