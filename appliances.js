@@ -1295,66 +1295,64 @@ showApplianceTasks(applianceId) {
                             Maintenance Schedule (${applianceTasks.length} task${applianceTasks.length !== 1 ? 's' : ''})
                         </h4>
                         <div style="space-y: 12px;">
-                            ${applianceTasks.map(task => {
-                                const now = new Date();
-                                const taskDate = new Date(task.dueDate);
-                                const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
-                                const isOverdue = daysUntilDue < 0;
-                                const isDueSoon = daysUntilDue <= 7 && daysUntilDue >= 0;
-                                
-                                let statusColor = '#6b7280';
-                                let statusText = `Due ${taskDate.toLocaleDateString()}`;
-                                let cardBg = 'white';
-                                
-                                if (task.isCompleted) {
-                                    statusColor = '#059669';
-                                    statusText = '✅ Complete';
-                                    cardBg = '#f0f9ff';
-                                } else if (isOverdue) {
-                                    statusColor = '#dc2626';
-                                    statusText = `⚠️ Overdue (${Math.abs(daysUntilDue)} days)`;
-                                    cardBg = '#fef2f2';
-                                } else if (isDueSoon) {
-                                    statusColor = '#f59e0b';
-                                    statusText = `🔔 Due in ${daysUntilDue} day${daysUntilDue !== 1 ? 's' : ''}`;
-                                    cardBg = '#fffbeb';
-                                }
-                                
-                                return `
-                                    <div style="
-                                        border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;
-                                        background: ${cardBg}; margin-bottom: 8px;
-                                    ">
-                                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                                            <h5 style="margin: 0; font-weight: 600; font-size: 14px; color: #1f2937;">${task.title}</h5>
-                                            ${task.cost > 0 ? `<span style="color: #059669; font-weight: 600; font-size: 12px;">$${task.cost}</span>` : ''}
-                                        </div>
-                                        ${task.description ? `<p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px;">${task.description}</p>` : ''}
-                                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <div style="display: flex; gap: 12px; font-size: 12px; color: #6b7280;">
-                                                <span style="color: ${statusColor}; font-weight: 500;">${statusText}</span>
-                                                <span>🔄 Every ${task.frequency} days</span>
-                                                <span>📂 ${task.category}</span>
-                                            </div>
-<div style="display: flex; justify-content: space-between; align-items: center;">
-    <div style="display: flex; gap: 12px; font-size: 12px; color: #6b7280;">
-        <span style="color: ${statusColor}; font-weight: 500;">${statusText}</span>
-        <span>🔄 Every ${task.frequency} days</span>
-        <span>📂 ${task.category}</span>
-    </div>
-    <button onclick="window.applianceManager.removeApplianceTask(${task.id}, ${applianceId})"
-            style="
-                background: #fee2e2; color: #991b1b; border: none; padding: 4px 8px;
-                border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 500;
-            "
-            title="Remove this task from this appliance">
-        Remove
-    </button>
-</div>
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('')}
+${applianceTasks.map(task => {
+    const now = new Date();
+    const taskDate = new Date(task.dueDate);
+    const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
+    const isOverdue = daysUntilDue < 0;
+    const isDueSoon = daysUntilDue <= 7 && daysUntilDue >= 0;
+    
+    let statusColor = '#6b7280';
+    let statusText = `Due ${taskDate.toLocaleDateString()}`;
+    let cardBg = 'white';
+    
+    if (task.isCompleted) {
+        statusColor = '#059669';
+        statusText = '✅ Complete';
+        cardBg = '#f0f9ff';
+    } else if (isOverdue) {
+        statusColor = '#dc2626';
+        statusText = `⚠️ Overdue`;
+        cardBg = '#fef2f2';
+    } else if (isDueSoon) {
+        statusColor = '#f59e0b';
+        statusText = `🔔 Due soon`;
+        cardBg = '#fffbeb';
+    }
+    
+    // Clean up task title by removing appliance name if it's there
+    let cleanTitle = task.title;
+    if (cleanTitle.startsWith(appliance.name)) {
+        cleanTitle = cleanTitle.replace(appliance.name + ' - ', '').replace(appliance.name, '').trim();
+        if (cleanTitle.startsWith('- ')) cleanTitle = cleanTitle.substring(2);
+    }
+    
+    return `
+        <div style="
+            border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;
+            background: ${cardBg}; margin-bottom: 8px;
+        ">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                <h5 style="margin: 0; font-weight: 600; font-size: 14px; color: #1f2937;">${cleanTitle}</h5>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    ${task.cost > 0 ? `<span style="color: #059669; font-weight: 600; font-size: 12px;">$${task.cost}</span>` : ''}
+                    <button onclick="window.applianceManager.removeApplianceTask(${task.id}, ${applianceId})"
+                            style="
+                                background: #fee2e2; color: #991b1b; border: none; padding: 2px 6px;
+                                border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: 500;
+                            "
+                            title="Remove this task">
+                        ✕
+                    </button>
+                </div>
+            </div>
+            ${task.description ? `<p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px;">${task.description}</p>` : ''}
+            <div style="font-size: 12px; color: ${statusColor}; font-weight: 500;">
+                ${statusText}
+            </div>
+        </div>
+    `;
+}).join('')}
                         </div>
                     </div>
                 ` : `
