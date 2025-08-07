@@ -632,7 +632,8 @@ calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
 renderApplianceCard(appliance) {
     const statusInfo = this.getApplianceStatus(appliance);
     const warrantyStatus = this.getWarrantyStatus(appliance);
-    const applianceTasks = this.getApplianceTasks ? this.getApplianceTasks(appliance.id) : [];
+    const applianceTasks = this.getApplianceTasks(appliance.id);
+    console.log(`Appliance ${appliance.name} (ID: ${appliance.id}) has ${applianceTasks.length} tasks`);
     
     return `
         <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
@@ -1252,7 +1253,9 @@ showApplianceTasks(applianceId) {
         return;
     }
     
-    const applianceTasks = this.getApplianceTasks ? this.getApplianceTasks(applianceId) : [];
+    // Get tasks for this appliance
+    const applianceTasks = this.getApplianceTasks(applianceId);
+    console.log(`Found ${applianceTasks.length} tasks for appliance ${appliance.name}`);
     
     // Create modal
     const existingModal = document.getElementById('appliance-tasks-modal');
@@ -1270,53 +1273,114 @@ showApplianceTasks(applianceId) {
                 box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             ">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3 style="margin: 0; font-size: 18px; font-weight: 600;">🔧 ${appliance.name} Tasks</h3>
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 600;">🔧 ${appliance.name} - Maintenance Tasks</h3>
                     <button onclick="document.getElementById('appliance-tasks-modal').remove()" 
                             style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">×</button>
                 </div>
                 
+                <!-- Appliance Info Summary -->
+                <div style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <div style="font-weight: 600; margin-bottom: 4px;">${appliance.manufacturer} ${appliance.model || ''}</div>
+                    <div style="font-size: 12px; color: #6b7280;">
+                        ${appliance.location ? `📍 ${appliance.location}` : ''}
+                        ${appliance.serialNumber ? ` • 🔢 ${appliance.serialNumber}` : ''}
+                        ${appliance.purchaseDate ? ` • 📅 Purchased ${new Date(appliance.purchaseDate).getFullYear()}` : ''}
+                    </div>
+                </div>
+                
                 ${applianceTasks.length > 0 ? `
-                    <div style="space-y: 12px;">
-                        ${applianceTasks.map(task => `
-                            <div style="
-                                border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;
-                                background: ${task.isCompleted ? '#f0f9ff' : 'white'};
-                            ">
-                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                                    <h4 style="margin: 0; font-weight: 600; font-size: 14px;">${task.title}</h4>
-                                    ${task.cost > 0 ? `<span style="color: #059669; font-weight: 600; font-size: 12px;">$${task.cost}</span>` : ''}
-                                </div>
-                                <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px;">${task.description || ''}</p>
-                                <div style="display: flex; gap: 12px; font-size: 12px; color: #6b7280;">
-                                    <span>📅 ${task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}</span>
-                                    <span>🔄 Every ${task.frequency} days</span>
-                                    <span style="color: ${task.isCompleted ? '#059669' : '#dc2626'};">
-                                        ${task.isCompleted ? '✅ Complete' : '⏳ Pending'}
-                                    </span>
-                                </div>
-                            </div>
-                        `).join('')}
+                    <!-- Task List -->
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: #374151;">
+                            Maintenance Schedule (${applianceTasks.length} task${applianceTasks.length !== 1 ? 's' : ''})
+                        </h4>
+                        <div style="space-y: 12px;">
+                            ${applianceTasks.map(task => {
+                                const now = new Date();
+                                const taskDate = new Date(task.dueDate);
+                                const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
+                                const isOverdue = daysUntilDue < 0;
+                                const isDueSoon = daysUntilDue <= 7 && daysUntilDue >= 0;
+                                
+                                let statusColor = '#6b7280';
+                                let statusText = `Due ${taskDate.toLocaleDateString()}`;
+                                let cardBg = 'white';
+                                
+                                if (task.isCompleted) {
+                                    statusColor = '#059669';
+                                    statusText = '✅ Complete';
+                                    cardBg = '#f0f9ff';
+                                } else if (isOverdue) {
+                                    statusColor = '#dc2626';
+                                    statusText = `⚠️ Overdue (${Math.abs(daysUntilDue)} days)`;
+                                    cardBg = '#fef2f2';
+                                } else if (isDueSoon) {
+                                    statusColor = '#f59e0b';
+                                    statusText = `🔔 Due in ${daysUntilDue} day${daysUntilDue !== 1 ? 's' : ''}`;
+                                    cardBg = '#fffbeb';
+                                }
+                                
+                                return `
+                                    <div style="
+                                        border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;
+                                        background: ${cardBg}; margin-bottom: 8px;
+                                    ">
+                                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                            <h5 style="margin: 0; font-weight: 600; font-size: 14px; color: #1f2937;">${task.title}</h5>
+                                            ${task.cost > 0 ? `<span style="color: #059669; font-weight: 600; font-size: 12px;">$${task.cost}</span>` : ''}
+                                        </div>
+                                        ${task.description ? `<p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px;">${task.description}</p>` : ''}
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div style="display: flex; gap: 12px; font-size: 12px; color: #6b7280;">
+                                                <span style="color: ${statusColor}; font-weight: 500;">${statusText}</span>
+                                                <span>🔄 Every ${task.frequency} days</span>
+                                                <span>📂 ${task.category}</span>
+                                            </div>
+                                            ${!task.isCompleted ? `
+                                                <button onclick="completeTask(${task.id}); document.getElementById('appliance-tasks-modal').remove();"
+                                                        style="
+                                                            background: #dcfce7; color: #166534; border: none; padding: 4px 8px;
+                                                            border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 500;
+                                                        ">
+                                                    Mark Complete
+                                                </button>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
                     </div>
                 ` : `
                     <div style="text-align: center; padding: 40px; color: #6b7280;">
                         <div style="font-size: 48px; margin-bottom: 16px;">🔧</div>
                         <h4 style="margin: 0 0 8px 0; font-weight: 600;">No maintenance tasks yet</h4>
-                        <p style="margin: 0; font-size: 14px;">Generate maintenance tasks for this appliance to track upkeep.</p>
-                        <button onclick="window.applianceManager.generateTasksForAppliance(${applianceId}); document.getElementById('appliance-tasks-modal').remove();"
+                        <p style="margin: 0 0 16px 0; font-size: 14px;">Generate maintenance tasks for this appliance to track upkeep schedules.</p>
+                        <button onclick="window.applianceManager.generateTasksForAppliance(${applianceId}); document.getElementById('appliance-tasks-modal').remove(); window.applianceManager.render();"
                                 style="
                                     background: #2563eb; color: white; border: none; padding: 12px 24px;
-                                    border-radius: 8px; font-weight: 500; cursor: pointer; margin-top: 16px;
+                                    border-radius: 8px; font-weight: 500; cursor: pointer;
                                 ">
-                            Generate Tasks
+                            🔧 Generate Maintenance Tasks
                         </button>
                     </div>
                 `}
                 
-                <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+                    ${applianceTasks.length > 0 ? `
+                        <button onclick="window.applianceManager.generateTasksForAppliance(${applianceId}); document.getElementById('appliance-tasks-modal').remove(); window.applianceManager.render();"
+                                style="
+                                    background: #f3f4f6; color: #374151; border: none; padding: 12px 24px;
+                                    border-radius: 8px; font-weight: 500; cursor: pointer; flex: 1;
+                                ">
+                            ➕ Add More Tasks
+                        </button>
+                    ` : ''}
                     <button onclick="document.getElementById('appliance-tasks-modal').remove()"
                             style="
                                 background: #f3f4f6; color: #374151; border: none; padding: 12px 24px;
-                                border-radius: 8px; font-weight: 500; cursor: pointer; width: 100%;
+                                border-radius: 8px; font-weight: 500; cursor: pointer; flex: 1;
                             ">
                         Close
                     </button>
@@ -1632,7 +1696,7 @@ addApplianceWithTasks(applianceData) {
 getApplianceTasks(applianceId) {
     if (!window.tasks) return [];
     
-    return window.tasks.filter(task => task.applianceId === applianceId);
+    return window.tasks.filter(task => task.applianceId == applianceId);
 }
 
 // Method to get overdue tasks for an appliance  
