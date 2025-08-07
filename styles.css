@@ -925,3 +925,16 @@ html, body {
     padding-bottom: 0.5rem;
   }
 }
+/* Modal appears from bottom with a smooth slide-up effect */
+#category-task-modal {
+  height: 100vh;
+  max-height: 100vh;
+  background-color: white;
+  z-index: 50;
+}
+
+/* Animate slide-up */
+#category-task-modal.translate-y-full {
+  transform: translateY(100%);
+}
+
