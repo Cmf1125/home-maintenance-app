@@ -626,8 +626,6 @@ calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
             </div>
         `;
     }
-    
-    // Replace your existing renderApplianceCard method with this version:
 
 renderApplianceCard(appliance) {
     const statusInfo = this.getApplianceStatus(appliance);
@@ -677,9 +675,7 @@ renderApplianceCard(appliance) {
                     ${appliance.purchaseDate ? 
                         `<span class="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs">📅 ${new Date(appliance.purchaseDate).getFullYear()}</span>` : ''
                     }
-                    ${applianceTasks.length > 0 ? 
-                        `<span class="bg-orange-50 text-orange-700 px-2 py-1 rounded text-xs">🔧 ${applianceTasks.length} task${applianceTasks.length !== 1 ? 's' : ''}</span>` : ''
-                    }
+                
                 </div>
             </div>
             
@@ -691,7 +687,7 @@ renderApplianceCard(appliance) {
                 </button>
                 <button onclick="event.stopPropagation(); window.applianceManager.showApplianceTasks('${appliance.id}')" 
                         class="flex-1 bg-green-100 text-green-700 hover:bg-green-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
-                    Tasks (${applianceTasks.length})
+                    Tasks
                 </button>
             </div>
         </div>
