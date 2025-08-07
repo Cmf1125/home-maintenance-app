@@ -677,10 +677,9 @@ renderApplianceCard(appliance) {
                     >🔢 ${appliance.serialNumber}</button>` : ''
                     }
 
-                  ${appliance.purchaseYear ? 
-                    `<span class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs">Purchased ${appliance.purchaseYear}</span>` : ''
+                 ${appliance.purchaseDate ? 
+                    `<span class="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs">Purchased ${new Date(appliance.purchaseDate).getFullYear()}</span>` : ''
                     }
-
                 
                 </div>
             </div>
@@ -1286,7 +1285,7 @@ showApplianceTasks(applianceId) {
                     <div style="font-size: 12px; color: #6b7280;">
                         ${appliance.location ? `📍 ${appliance.location}` : ''}
                         ${appliance.serialNumber ? ` • 🔢 ${appliance.serialNumber}` : ''}
-                        ${appliance.purchaseDate ? ` • 📅 Purchased ${new Date(appliance.purchaseDate).getFullYear()}` : ''}
+                        ${appliance.purchaseDate ? ` • Purchased ${new Date(appliance.purchaseDate).getFullYear()}` : ''}
                     </div>
                 </div>
                 
