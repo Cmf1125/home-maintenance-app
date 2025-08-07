@@ -2986,28 +2986,29 @@ if (document.readyState !== 'loading') {
 console.log('📱 Smart installation banner system loaded');
 
 function openCategoryModal(categoryId) {
-  const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
+    console.log('🔍 Opening category modal for:', categoryId);
+    
+    const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
+    
+    // Update modal content
+    document.getElementById('modal-category-icon').textContent = categoryInfo.icon;
+    document.getElementById('modal-category-title').textContent = categoryId;
 
-  // Update modal icon and title
-  document.getElementById('modal-category-icon').textContent = categoryInfo.icon;
-  document.getElementById('modal-category-title').textContent = categoryId;
+    // Get and render tasks for this category
+    const categoryTasks = window.tasks.filter(task => task.category === categoryId);
+    const taskListEl = document.getElementById('modal-task-list');
+    taskListEl.innerHTML = categoryTasks.map(task => renderAllTasksTaskItem(task)).join('');
 
-  // Get and render tasks for this category
-  const categoryTasks = window.tasks.filter(task => task.category === categoryId);
-  const taskListEl = document.getElementById('modal-task-list');
-  taskListEl.innerHTML = categoryTasks.map(task => renderAllTasksTaskItem(task)).join('');
-
-  // Show the modal
-  const modal = document.getElementById('category-task-modal');
-  modal.classList.remove('hidden');
-  modal.style.display = 'flex';
-  modal.scrollIntoView({ behavior: 'smooth' });
+    // Show the modal
+    const modal = document.getElementById('category-task-modal');
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
 }
 
 function closeCategoryModal() {
-  const modal = document.getElementById('category-task-modal');
-  modal.classList.add('hidden');
-  modal.style.display = 'none';
+    const modal = document.getElementById('category-task-modal');
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
 }
 
 // ✅ Export to global scope
