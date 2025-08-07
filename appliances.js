@@ -125,48 +125,47 @@ class ApplianceManager {
                 </div>
                 
                 <!-- Quick Stats -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="bg-white rounded-xl p-4 shadow-lg">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-blue-100 rounded-lg text-lg">⚙️</div>
-                            <div>
-                                <p class="text-xs text-gray-600">Total Appliances</p>
-                                <p class="text-xl font-bold text-gray-900">${totalAppliances}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white rounded-xl p-4 shadow-lg">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-yellow-100 rounded-lg text-lg">⚠️</div>
-                            <div>
-                                <p class="text-xs text-gray-600">Need Attention</p>
-                                <p class="text-xl font-bold text-gray-900">${appliancesNeedingAttention.length}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white rounded-xl p-4 shadow-lg">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-green-100 rounded-lg text-lg">🛡️</div>
-                            <div>
-                                <p class="text-xs text-gray-600">Under Warranty</p>
-                                <p class="text-xl font-bold text-gray-900">${this.getAppliancesUnderWarranty().length}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white rounded-xl p-4 shadow-lg">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-purple-100 rounded-lg text-lg">📸</div>
-                            <div>
-                                <p class="text-xs text-gray-600">With Photos</p>
-                                <p class="text-xl font-bold text-gray-900">${this.getAppliancesWithPhotos().length}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl p-4 shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-red-100 rounded-lg text-lg">⚠️</div>
+            <div>
+                <p class="text-xs text-gray-600">Need Attention</p>
+                <p class="text-xl font-bold text-gray-900">${appliancesNeedingAttention.length}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl p-4 shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-orange-100 rounded-lg text-lg">⏰</div>
+            <div>
+                <p class="text-xs text-gray-600">Expiring Soon</p>
+                <p class="text-xl font-bold text-gray-900">${this.getWarrantiesExpiringSoon().length}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl p-4 shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-yellow-100 rounded-lg text-lg">🔄</div>
+            <div>
+                <p class="text-xs text-gray-600">Aging Out</p>
+                <p class="text-xl font-bold text-gray-900">${this.getAppliancesAgingOut().length}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-xl p-4 shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-blue-100 rounded-lg text-lg">📋</div>
+            <div>
+                <p class="text-xs text-gray-600">Missing Info</p>
+                <p class="text-xl font-bold text-gray-900">${this.getAppliancesMissingInfo().length}</p>
+            </div>
+        </div>
+    </div>
+</div>                
                 <!-- Appliances by Category -->
                 ${this.renderApplianceCategories(appliancesByCategory)}
                 
@@ -1105,6 +1104,32 @@ deleteAppliance(applianceId) {
             appliance.photos && appliance.photos.length > 0
         );
     }
+
+    getWarrantiesExpiringSoon() {
+    const threeMonthsFromNow = new Date();
+    threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
+    
+    return this.appliances.filter(appliance => {
+        if (!appliance.warrantyExpiration) return false;
+        const warrantyDate = new Date(appliance.warrantyExpiration);
+        const now = new Date();
+        return warrantyDate > now && warrantyDate <= threeMonthsFromNow;
+    });
+}
+
+getAppliancesAgingOut() {
+    return this.appliances.filter(appliance => {
+        const status = this.getApplianceStatus(appliance);
+        return status.reason === 'age_monitor' || status.reason === 'age_replacement';
+    });
+}
+
+getAppliancesMissingInfo() {
+    return this.appliances.filter(appliance => {
+        const status = this.getApplianceStatus(appliance);
+        return status.reason === 'missing_info';
+    });
+}
     
     // Enhanced getApplianceStatus method for appliances.js
 // Replace your existing getApplianceStatus method with this enhanced version
