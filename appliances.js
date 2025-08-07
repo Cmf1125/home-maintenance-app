@@ -1334,21 +1334,22 @@ ${applianceTasks.map(task => {
         ">
             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
                 <h5 style="margin: 0; font-weight: 600; font-size: 14px; color: #1f2937;">${cleanTitle}</h5>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    ${task.cost > 0 ? `<span style="color: #059669; font-weight: 600; font-size: 12px;">$${task.cost}</span>` : ''}
-                    <button onclick="window.applianceManager.removeApplianceTask(${task.id}, ${applianceId})"
-                            style="
-                                background: #fee2e2; color: #991b1b; border: none; padding: 2px 6px;
-                                border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: 500;
-                            "
-                            title="Remove this task">
-                        ✕
-                    </button>
-                </div>
+                ${task.cost > 0 ? `<span style="color: #059669; font-weight: 600; font-size: 12px;">$${task.cost}</span>` : ''}
             </div>
             ${task.description ? `<p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px;">${task.description}</p>` : ''}
-            <div style="font-size: 12px; color: ${statusColor}; font-weight: 500;">
-                ${statusText}
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 12px; font-size: 12px; color: #6b7280;">
+                    <span style="color: ${statusColor}; font-weight: 500;">${statusText}</span>
+                    <span>🔄 Every ${task.frequency} days</span>
+                </div>
+                <button onclick="window.applianceManager.removeApplianceTask(${task.id}, ${applianceId})"
+                        style="
+                            background: #fee2e2; color: #991b1b; border: none; padding: 4px 8px;
+                            border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 500;
+                        "
+                        title="Remove this task from this appliance">
+                    Remove Task
+                </button>
             </div>
         </div>
     `;
