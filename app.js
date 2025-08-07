@@ -2985,7 +2985,7 @@ if (document.readyState !== 'loading') {
 
 console.log('📱 Smart installation banner system loaded');
 
-// Open category modal
+// In app.js
 function openCategoryModal(categoryId) {
     const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
     document.getElementById('modal-category-icon').textContent = categoryInfo.icon;
@@ -3000,14 +3000,12 @@ function openCategoryModal(categoryId) {
     setTimeout(() => modal.classList.remove('translate-y-full'), 10);
 }
 
-// Close modal
 function closeCategoryModal() {
     const modal = document.getElementById('category-task-modal');
     modal.classList.add('translate-y-full');
     setTimeout(() => modal.classList.add('hidden'), 300);
 }
 
-// Make globally available
+// ✅ Export to global scope
 window.openCategoryModal = openCategoryModal;
 window.closeCategoryModal = closeCategoryModal;
-
