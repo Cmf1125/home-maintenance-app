@@ -2982,3 +2982,30 @@ if (document.readyState !== 'loading') {
 }
 
 console.log('📱 Smart installation banner system loaded');
+
+// Open category modal
+function openCategoryModal(categoryId) {
+    const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
+    document.getElementById('modal-category-icon').textContent = categoryInfo.icon;
+    document.getElementById('modal-category-title').textContent = categoryId;
+
+    const categoryTasks = window.tasks.filter(task => task.category === categoryId);
+    const taskListEl = document.getElementById('modal-task-list');
+    taskListEl.innerHTML = categoryTasks.map(task => renderAllTasksTaskItem(task)).join('');
+
+    const modal = document.getElementById('category-task-modal');
+    modal.classList.remove('hidden');
+    setTimeout(() => modal.classList.remove('translate-y-full'), 10);
+}
+
+// Close modal
+function closeCategoryModal() {
+    const modal = document.getElementById('category-task-modal');
+    modal.classList.add('translate-y-full');
+    setTimeout(() => modal.classList.add('hidden'), 300);
+}
+
+// Make globally available
+window.openCategoryModal = openCategoryModal;
+window.closeCategoryModal = closeCategoryModal;
+
