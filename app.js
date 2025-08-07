@@ -2995,21 +2995,28 @@ function openCategoryModal(categoryId) {
     taskListEl.innerHTML = categoryTasks.map(task => renderAllTasksTaskItem(task)).join('');
 
     const modal = document.getElementById('category-task-modal');
-    
-    // ✅ Show the modal
-    modal.classList.remove('hidden');
-    modal.classList.remove('translate-y-full');  // Slide up animation
-    modal.style.display = 'flex'; // <-- Ensure it's in layout
+
+    // Make modal visible in DOM
+    modal.classList.remove('hidden');      // Show it
+    modal.style.display = 'flex';          // Make sure flex layout applies
+
+    // Animate in (slide up)
+    setTimeout(() => {
+        modal.classList.remove('translate-y-full');
+    }, 10);
 }
 
 function closeCategoryModal() {
     const modal = document.getElementById('category-task-modal');
+
+    // Animate out (slide down)
     modal.classList.add('translate-y-full');
-    
+
+    // Fully hide after animation
     setTimeout(() => {
         modal.classList.add('hidden');
-        modal.style.display = 'none';  // 💡 Fully hide from layout again
-    }, 300); // match the duration-300 transition
+        modal.style.display = 'none';
+    }, 300); // Match Tailwind's transition duration
 }
 
 // ✅ Export to global scope
