@@ -3072,8 +3072,113 @@ window.TaskManager = {
     },
     
     save: function() {
-        // ... (rest of save function - this is a big one, should I give you the full thing?)
-    },
+    if (!this.currentTask) {
+        alert('❌ No task to save');
+        return;
+    }
+    
+    // Get form values
+    const nameEl = document.getElementById('edit-task-name');
+    const descEl = document.getElementById('edit-task-description');
+    const costEl = document.getElementById('edit-task-cost');
+    const freqEl = document.getElementById('edit-task-frequency');
+    const catEl = document.getElementById('edit-task-category');
+    const dateEl = document.getElementById('edit-task-due-date');
+    
+    if (!nameEl || !descEl || !costEl || !freqEl || !catEl || !dateEl) {
+        alert('❌ Form elements missing');
+        return;
+    }
+    
+    const title = nameEl.value.trim();
+    const description = descEl.value.trim();
+    const cost = parseFloat(costEl.value) || 0;
+    const frequency = parseInt(freqEl.value) || 365;
+    const category = catEl.value || 'General';
+    const dueDateStr = dateEl.value;
+    
+    if (!title) {
+        alert('❌ Task name required');
+        return;
+    }
+    
+    if (frequency <= 0) {
+        alert('❌ Frequency must be > 0');
+        return;
+    }
+    
+    // Auto-calculate priority
+    let priority = 'medium';
+    if (typeof getAutoPriority === 'function') {
+        priority = getAutoPriority(title, category);
+    } else {
+        if (category === 'Safety' || title.toLowerCase().includes('smoke') || title.toLowerCase().includes('detector')) {
+            priority = 'high';
+        }
+    }
+    
+    const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
+    
+    // Update task
+    this.currentTask.title = title;
+    this.currentTask.description = description;
+    this.currentTask.cost = cost;
+    this.currentTask.frequency = frequency;
+    this.currentTask.category = category;
+    this.currentTask.priority = priority;
+    this.currentTask.dueDate = dueDate;
+    this.currentTask.nextDue = dueDate;
+    
+    delete this.currentTask.isTemplate;
+    
+    // Add or update
+    const isNew = !window.tasks.find(t => t.id === this.currentTask.id);
+    
+    if (isNew) {
+        window.tasks.push(this.currentTask);
+    } else {
+        const index = window.tasks.findIndex(t => t.id === this.currentTask.id);
+        if (index > -1) {
+            window.tasks[index] = this.currentTask;
+        }
+    }
+    
+    this.saveAndRefresh();
+    this.close();
+    
+    alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
+},
+
+saveAndRefresh: function() {
+    const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
+    const mainAppVisible = !document.getElementById('main-app').classList.contains('hidden');
+    
+    if (taskSetupVisible) {
+        if (typeof renderTaskCategories === 'function') {
+            renderTaskCategories();
+        }
+    } else if (mainAppVisible) {
+        if (typeof saveData === 'function') {
+            saveData();
+        }
+        
+        if (window.enhancedDashboard && window.enhancedDashboard.render) {
+            window.enhancedDashboard.render();
+        }
+        
+        if (window.casaCareCalendar && window.casaCareCalendar.refresh) {
+            window.casaCareCalendar.refresh();
+        }
+        
+        // Refresh All Tasks view if visible
+        const allTasksView = document.getElementById('all-tasks-view');
+        if (allTasksView && !allTasksView.classList.contains('hidden')) {
+            if (typeof renderAllTasksView === 'function') {
+                renderAllTasksView();
+            }
+        }
+    }
+},
     
     close: function() {
         const modal = document.getElementById('task-edit-modal');
@@ -3084,4 +3189,17 @@ window.TaskManager = {
         this.currentTask = null;
         window.currentEditingTask = null;
     }
+};
+
+// Override functions to use TaskManager
+window.openTaskEditModal = function(task, isNew) {
+    window.TaskManager.openModal(task, isNew);
+};
+
+window.saveTaskFromEdit = function() {
+    window.TaskManager.save();
+};
+
+window.closeTaskEditModal = function() {
+    window.TaskManager.close();
 };
