@@ -1482,34 +1482,40 @@ function renderAllTaskCategories() {
         const colorClass = colorClasses[categoryId] || 'bg-white text-gray-900';
 
         return `
-              <div class="rounded-2xl shadow-md mb-4 px-4 py-4 transition-transform duration-150 hover:scale-[1.01] ${colorClass}"
-               onclick='openCategoryModal("${categoryId}")'>
+            <div class="rounded-2xl shadow-md mb-4 overflow-hidden ${colorClass}">
+                <!-- Category Header (Clickable) -->
+                <div class="px-4 py-4 cursor-pointer hover:opacity-80 transition-opacity" 
+                     onclick="toggleCategory('${categoryId}')">
+                    <div class="flex items-center justify-between gap-4">
+                        <!-- Left: icon + category name + task count -->
+                        <div class="flex items-center gap-3">
+                            <div class="text-xl">${categoryInfo.icon}</div>
+                            <div class="flex flex-col items-start text-left">
+                                <div class="text-lg font-semibold leading-snug break-words">${categoryId}</div>
+                                <div class="text-sm text-gray-600">${tasks.length} task${tasks.length !== 1 ? 's' : ''}</div>
+                            </div>
+                        </div>
 
-                <div class="flex items-center justify-between gap-4">
-                
-                    <!-- Left: icon + category name + task count -->
-                    <div class="flex items-center gap-3">
-                        <div class="text-xl">${categoryInfo.icon}</div>
-                        <div class="flex flex-col items-start text-left">
-                            <div class="text-lg font-semibold leading-snug break-words">${categoryId}</div>
-                            <div class="text-sm text-gray-600">${tasks.length} task${tasks.length !== 1 ? 's' : ''}</div>
+                        <!-- Right: cost and arrow -->
+                        <div class="flex items-center gap-3">
+                            <span class="bg-white shadow px-3 py-1 rounded-full text-sm font-semibold text-green-600">
+                                $${Math.round(categoryCost)}/yr
+                            </span>
+                            <span id="arrow-${categoryId}" class="text-gray-400 text-xl transition-transform duration-300">&#8250;</span>
                         </div>
                     </div>
-
-                    <!-- Right: cost and chevron -->
-                    <div class="flex items-center gap-3">
-                        <span class="bg-white shadow px-3 py-1 rounded-full text-sm font-semibold text-green-600">
-                            $${Math.round(categoryCost)}/yr
-                        </span>
-                        <span class="text-gray-400 text-xl">&#8250;</span>
+                </div>
+                
+                <!-- Tasks List (Hidden by default) -->
+                <div id="tasks-${categoryId}" class="hidden border-t border-gray-200 bg-white">
+                    <div class="p-4 space-y-3">
+                        ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
                     </div>
                 </div>
             </div>
         `;
     }).join('');
 }
-
-
 function toggleCategoryTasks(button) {
   const card = button.closest('.bg-white');
   const list = card.querySelector('.category-task-list');
