@@ -2993,21 +2993,6 @@ function openCategoryModal(categoryId) {
     document.getElementById('category-modal').style.display = 'flex';
 }
 
-// REPLACE your existing closeCategoryModal function:
-function closeCategoryModal() {
-    console.log('🔒 Closing category modal');
-    
-    const modal = document.getElementById('category-task-modal');
-    if (!modal) {
-        console.error('❌ Category modal not found');
-        return;
-    }
-    
-    modal.classList.remove('show');
-    document.body.style.overflow = '';
-    
-    console.log('✅ Category modal closed successfully');
-}
 // ADD this new function (this was missing!):
 function renderModalTaskItem(task) {
     const now = new Date();
