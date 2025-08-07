@@ -304,7 +304,7 @@ class CasaCareDocuments {
                                 </button>
                                 <button type="submit"
                                         class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
-                                    💾 Save Document
+                                    💾 Save 
                                 </button>
                             </div>
                         </form>
