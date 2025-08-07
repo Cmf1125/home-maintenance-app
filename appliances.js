@@ -181,10 +181,8 @@ class ApplianceManager {
             Show All
         </button>
     </div>
-    <div class="appliances-list-container">
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        ${this.getFilteredAppliances().map(appliance => this.renderApplianceCard(appliance)).join('')}
-    </div>
+   <div class="appliances-list-container">
+    ${this.renderApplianceCategories(appliancesByCategory)}
 </div>
 
 </div>
@@ -1236,14 +1234,19 @@ renderFilteredAppliances() {
         return;
     }
 
-   const appliancesList = document.querySelector('.appliances-list-container');
+   // Group filtered appliances by category and render
+const appliancesByCategory = filteredAppliances.reduce((groups, appliance) => {
+    const category = appliance.category || 'other';
+    if (!groups[category]) groups[category] = [];
+    groups[category].push(appliance);
+    return groups;
+}, {});
+
+const appliancesList = document.querySelector('.appliances-list-container');
 if (appliancesList) {
-    appliancesList.innerHTML = `
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            ${filteredAppliances.map(appliance => this.renderApplianceCard(appliance)).join('')}
-        </div>
-    `;
+    appliancesList.innerHTML = this.renderApplianceCategories(appliancesByCategory);
 }
+
 }
 // Show appliance tasks in modal
 showApplianceTasks(applianceId) {
