@@ -2985,32 +2985,157 @@ if (document.readyState !== 'loading') {
 
 console.log('📱 Smart installation banner system loaded');
 
+// REPLACE your existing openCategoryModal function:
 function openCategoryModal(categoryId) {
     console.log('🔍 Opening category modal for:', categoryId);
     
     const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
-    
+
     // Update modal content
-    document.getElementById('modal-category-icon').textContent = categoryInfo.icon;
-    document.getElementById('modal-category-title').textContent = categoryId;
+    const iconEl = document.getElementById('modal-category-icon');
+    const titleEl = document.getElementById('modal-category-title');
+    
+    if (!iconEl || !titleEl) {
+        console.error('❌ Modal elements not found');
+        return;
+    }
+    
+    iconEl.textContent = categoryInfo.icon;
+    titleEl.textContent = categoryId;
 
     // Get and render tasks for this category
-    const categoryTasks = window.tasks.filter(task => task.category === categoryId);
+    const categoryTasks = window.tasks ? window.tasks.filter(task => task.category === categoryId) : [];
     const taskListEl = document.getElementById('modal-task-list');
-    taskListEl.innerHTML = categoryTasks.map(task => renderAllTasksTaskItem(task)).join('');
+    
+    if (!taskListEl) {
+        console.error('❌ Task list element not found');
+        return;
+    }
 
-    // Show the modal
+    if (categoryTasks.length === 0) {
+        taskListEl.innerHTML = '<div class="text-center text-gray-500 py-8">No tasks in this category</div>';
+    } else {
+        taskListEl.innerHTML = categoryTasks.map(task => renderModalTaskItem(task)).join('');
+    }
+
+    // Show the modal with animation
     const modal = document.getElementById('category-task-modal');
+    if (!modal) {
+        console.error('❌ Category modal not found');
+        return;
+    }
+    
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
+    
+    console.log('✅ Category modal opened successfully');
 }
 
+// REPLACE your existing closeCategoryModal function:
 function closeCategoryModal() {
+    console.log('🔒 Closing category modal');
+    
     const modal = document.getElementById('category-task-modal');
+    if (!modal) {
+        console.error('❌ Category modal not found');
+        return;
+    }
+    
     modal.classList.remove('show');
     document.body.style.overflow = '';
+    
+    console.log('✅ Category modal closed successfully');
+}
+// ADD this new function (this was missing!):
+function renderModalTaskItem(task) {
+    const now = new Date();
+    const taskDate = new Date(task.dueDate || task.nextDue);
+    const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
+    const isOverdue = daysUntilDue < 0;
+    const isSafety = task.category === 'Safety';
+    const isDueSoon = daysUntilDue <= 7 && daysUntilDue >= 0;
+
+    let statusClass = '';
+    let urgencyDot = '⚪';
+    
+    if (isOverdue) {
+        statusClass = 'overdue';
+        urgencyDot = '🔴';
+    } else if (isSafety) {
+        statusClass = 'safety';
+        urgencyDot = '🟠';
+    } else if (isDueSoon) {
+        statusClass = 'due-soon';
+        urgencyDot = '🟡';
+    }
+
+    let dueDateDisplay;
+    if (isOverdue) {
+        dueDateDisplay = '<span class="text-red-600 font-semibold">Overdue</span>';
+    } else if (daysUntilDue === 0) {
+        dueDateDisplay = '<span class="text-orange-600 font-semibold">Due today</span>';
+    } else if (daysUntilDue === 1) {
+        dueDateDisplay = '<span class="text-orange-600 font-semibold">Due tomorrow</span>';
+    } else {
+        dueDateDisplay = `<span class="text-gray-700">Due ${taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>`;
+    }
+
+    return `
+        <div class="modal-task-item ${statusClass}">
+            <!-- Row 1: Dot + Task Name + Cost -->
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <span class="text-lg">${urgencyDot}</span>
+                    <span class="font-semibold text-gray-900 truncate">${task.title}</span>
+                </div>
+                ${task.cost > 0 ? `<span class="text-green-600 font-semibold">$${task.cost}</span>` : ''}
+            </div>
+            
+            <!-- Row 2: Description -->
+            <p class="text-gray-700 text-sm mb-3 leading-relaxed">${task.description || 'No description available'}</p>
+            
+            <!-- Row 3: Due Date + Actions -->
+            <div class="flex items-center justify-between">
+                <div class="text-sm">${dueDateDisplay}</div>
+                <div class="flex gap-2">
+                    <button onclick="completeTask(${task.id}); closeCategoryModal();" 
+                            class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-sm font-medium transition-colors">
+                        ✅ Complete
+                    </button>
+                    <button onclick="editTaskFromAllTasks ? editTaskFromAllTasks(${task.id}) : alert('Edit function not available')" 
+                            class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-sm font-medium transition-colors">
+                        ✏️ Edit
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
-// ✅ Export to global scope
+// Add these event listeners 
+document.addEventListener('DOMContentLoaded', function() {
+    // Close modal when clicking outside
+    const modal = document.getElementById('category-task-modal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCategoryModal();
+            }
+        });
+    }
+
+    // Escape key to close modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('category-task-modal');
+            if (modal && modal.classList.contains('show')) {
+                closeCategoryModal();
+            }
+        }
+    });
+});
+
+// Make sure functions are globally available
 window.openCategoryModal = openCategoryModal;
 window.closeCategoryModal = closeCategoryModal;
+window.renderModalTaskItem = renderModalTaskItem;
