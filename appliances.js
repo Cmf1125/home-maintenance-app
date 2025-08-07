@@ -669,11 +669,16 @@ renderApplianceCard(appliance) {
                     ${appliance.photos && appliance.photos.length > 0 ? 
                         `<span class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs">📸 ${appliance.photos.length}</span>` : ''
                     }
-                    ${appliance.serialNumber ? 
-                        `<span class="bg-green-50 text-green-700 px-2 py-1 rounded text-xs">🔢 Serial</span>` : ''
+                   ${appliance.serialNumber ? 
+                    `<button
+                    class="bg-green-50 text-green-700 px-2 py-1 rounded text-xs"
+                    title="Click to copy"
+                    onclick="event.stopPropagation(); navigator.clipboard.writeText('${appliance.serialNumber.replace(/'/g, "\\'")}')"
+                    >🔢 ${appliance.serialNumber}</button>` : ''
                     }
-                    ${appliance.purchaseDate ? 
-                        `<span class="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs">📅 ${new Date(appliance.purchaseDate).getFullYear()}</span>` : ''
+
+                   ${appliance.purchaseYear ? 
+                    `<span class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs">Purchased ${appliance.purchaseYear}</span>` : ''
                     }
                 
                 </div>
