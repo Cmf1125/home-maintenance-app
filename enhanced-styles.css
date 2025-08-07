@@ -407,3 +407,11 @@ body.install-banner-visible {
 .enhanced-task-card.simple-horizontal-task button {
   transition: transform 0.1s ease, opacity 0.1s ease;
 }
+
+/* Appliance filter active state */
+.active-filter {
+    border: 2px solid #0891b2 !important;
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe) !important;
+    box-shadow: 0 8px 25px -5px rgb(8 145 178 / 0.2) !important;
+    transform: translateY(-2px) !important;
+}
