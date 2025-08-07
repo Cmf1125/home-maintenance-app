@@ -669,12 +669,36 @@ renderApplianceCard(appliance) {
                         </div>
                     ` : ''}
 
-                    ${appliance.purchaseDate ? `
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-gray-500">Purchased ${new Date(appliance.purchaseDate).getFullYear()}</span>
-                        </div>
-                    ` : ''}
+                   ${appliance.purchaseDate ? (() => {
+  const msPerYear = 1000 * 60 * 60 * 24 * 365;
+  const purchase = new Date(appliance.purchaseDate);
+  if (isNaN(purchase)) return '';
 
+  const years = Math.floor((Date.now() - purchase.getTime()) / msPerYear);
+  const ageText = years < 1 ? '&lt; 1 year' : `${years} year${years > 1 ? 's' : ''}`;
+
+  // Pull expected lifespan from appliance override OR categoryConfig
+  const lifespanYears =
+    (typeof appliance.expectedLifespanYears === 'number' ? appliance.expectedLifespanYears : null) ??
+    (window.categoryConfig &&
+     appliance.category &&
+     window.categoryConfig[appliance.category] &&
+     window.categoryConfig[appliance.category].lifespanYears) ??
+    null;
+
+  const lifespanText = lifespanYears
+    ? ` (of expected ${lifespanYears} year${lifespanYears > 1 ? 's' : ''})`
+    : '';
+
+  return `
+    <div class="flex items-center gap-2">
+      <span class="text-xs text-gray-500">Purchased ${purchase.getFullYear()}</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-xs text-gray-500">Age: ${ageText}${lifespanText}</span>
+    </div>
+  `;
+})() : ''}
                 </div>
                 
 <div class="flex items-center gap-2 mt-3 flex-wrap">
