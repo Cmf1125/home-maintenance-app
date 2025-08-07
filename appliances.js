@@ -669,7 +669,7 @@ renderApplianceCard(appliance) {
                         </div>
                     ` : ''}
 
-                   ${appliance.purchaseDate ? (() => {
+${appliance.purchaseDate ? (() => {
   const msPerYear = 1000 * 60 * 60 * 24 * 365;
   const purchase = new Date(appliance.purchaseDate);
   if (isNaN(purchase)) return '';
@@ -677,14 +677,19 @@ renderApplianceCard(appliance) {
   const years = Math.floor((Date.now() - purchase.getTime()) / msPerYear);
   const ageText = years < 1 ? '&lt; 1 year' : `${years} year${years > 1 ? 's' : ''}`;
 
-  // Pull expected lifespan from appliance override OR categoryConfig
-  const lifespanYears =
+  // Try multiple sources/keys for lifespan
+  const cfg = (typeof window !== 'undefined' ? (window.categoryConfig || window.CategoryConfig || null) : null);
+  const catKey = (appliance.category || appliance.type || appliance.categoryName || '').trim();
+  const cfgEntry = (cfg && catKey && (cfg[catKey] || cfg[catKey.toLowerCase()] || cfg[catKey.replace(/\s+/g,' ')])) || null;
+
+  let lifespanYears =
     (typeof appliance.expectedLifespanYears === 'number' ? appliance.expectedLifespanYears : null) ??
-    (window.categoryConfig &&
-     appliance.category &&
-     window.categoryConfig[appliance.category] &&
-     window.categoryConfig[appliance.category].lifespanYears) ??
-    null;
+    (typeof appliance.lifespanYears === 'number' ? appliance.lifespanYears : null) ??
+    (cfgEntry && (Number(cfgEntry.lifespanYears) || Number(cfgEntry.lifespan))) || null;
+
+  if (!lifespanYears && cfg && catKey) {
+    console.warn('[Appliance lifespan not found]', { catKey, availableKeys: Object.keys(cfg) });
+  }
 
   const lifespanText = lifespanYears
     ? ` (of expected ${lifespanYears} year${lifespanYears > 1 ? 's' : ''})`
@@ -699,16 +704,7 @@ renderApplianceCard(appliance) {
     </div>
   `;
 })() : ''}
-                </div>
-                
-<div class="flex items-center gap-2 mt-3 flex-wrap">
-  ${appliance.photos && appliance.photos.length > 0
-    ? `<span class="bg-blue-50 text-blue-700 px-2 rounded text-xs inline-flex items-center h-6">
-         📸 ${appliance.photos.length}
-       </span>`
-    : ''
-  }
-</div>
+
             </div>
             
             <!-- Action Buttons -->
