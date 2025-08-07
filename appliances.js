@@ -632,21 +632,13 @@ calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
 renderApplianceCard(appliance) {
     const statusInfo = this.getApplianceStatus(appliance);
     const warrantyStatus = this.getWarrantyStatus(appliance);
+    const applianceTasks = this.getApplianceTasks ? this.getApplianceTasks(appliance.id) : [];
     
     return `
-        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow relative group">
-            <!-- Edit Button (appears on hover) -->
-            <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onclick="window.applianceManager.editAppliance('${appliance.id}')" 
-                        class="bg-blue-100 text-blue-700 hover:bg-blue-200 p-2 rounded-lg text-sm transition-colors"
-                        title="Edit appliance">
-                    ✏️
-                </button>
-            </div>
-            
+        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
             <!-- Clickable area for details -->
-            <div class="cursor-pointer" onclick="window.applianceManager.showApplianceDetail('${appliance.id}')">
-                <div class="flex items-start justify-between mb-3 pr-8">
+            <div class="cursor-pointer mb-4" onclick="window.applianceManager.showApplianceDetail('${appliance.id}')">
+                <div class="flex items-start justify-between mb-3">
                     <div class="flex-1">
                         <h4 class="font-semibold text-gray-900 text-sm">${appliance.name}</h4>
                         <p class="text-xs text-gray-600">${appliance.manufacturer} ${appliance.model || ''}</p>
@@ -684,7 +676,22 @@ renderApplianceCard(appliance) {
                     ${appliance.purchaseDate ? 
                         `<span class="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs">📅 ${new Date(appliance.purchaseDate).getFullYear()}</span>` : ''
                     }
+                    ${applianceTasks.length > 0 ? 
+                        `<span class="bg-orange-50 text-orange-700 px-2 py-1 rounded text-xs">🔧 ${applianceTasks.length} task${applianceTasks.length !== 1 ? 's' : ''}</span>` : ''
+                    }
                 </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex gap-2 pt-3 border-t border-gray-100">
+                <button onclick="event.stopPropagation(); window.applianceManager.editAppliance('${appliance.id}')" 
+                        class="flex-1 bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                    Edit
+                </button>
+                <button onclick="event.stopPropagation(); window.applianceManager.showApplianceTasks('${appliance.id}')" 
+                        class="flex-1 bg-green-100 text-green-700 hover:bg-green-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                    Tasks (${applianceTasks.length})
+                </button>
             </div>
         </div>
     `;
@@ -1155,6 +1162,8 @@ getAppliancesMissingInfo() {
     });
 }
 
+    
+    
 // ADD ALL THE FILTER METHODS HERE:
 // Filter management
 setFilter(filterType) {
@@ -1235,6 +1244,90 @@ renderFilteredAppliances() {
     }
 }
 
+// Show appliance tasks in modal
+showApplianceTasks(applianceId) {
+    const appliance = this.appliances.find(a => a.id == applianceId);
+    if (!appliance) {
+        alert('❌ Appliance not found');
+        return;
+    }
+    
+    const applianceTasks = this.getApplianceTasks ? this.getApplianceTasks(applianceId) : [];
+    
+    // Create modal
+    const existingModal = document.getElementById('appliance-tasks-modal');
+    if (existingModal) existingModal.remove();
+    
+    const modalHTML = `
+        <div id="appliance-tasks-modal" style="
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
+            z-index: 99999; font-family: Inter, sans-serif; padding: 1rem;
+        ">
+            <div style="
+                background: white; border-radius: 12px; padding: 24px; 
+                max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 600;">🔧 ${appliance.name} Tasks</h3>
+                    <button onclick="document.getElementById('appliance-tasks-modal').remove()" 
+                            style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">×</button>
+                </div>
+                
+                ${applianceTasks.length > 0 ? `
+                    <div style="space-y: 12px;">
+                        ${applianceTasks.map(task => `
+                            <div style="
+                                border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;
+                                background: ${task.isCompleted ? '#f0f9ff' : 'white'};
+                            ">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                    <h4 style="margin: 0; font-weight: 600; font-size: 14px;">${task.title}</h4>
+                                    ${task.cost > 0 ? `<span style="color: #059669; font-weight: 600; font-size: 12px;">$${task.cost}</span>` : ''}
+                                </div>
+                                <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px;">${task.description || ''}</p>
+                                <div style="display: flex; gap: 12px; font-size: 12px; color: #6b7280;">
+                                    <span>📅 ${task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}</span>
+                                    <span>🔄 Every ${task.frequency} days</span>
+                                    <span style="color: ${task.isCompleted ? '#059669' : '#dc2626'};">
+                                        ${task.isCompleted ? '✅ Complete' : '⏳ Pending'}
+                                    </span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : `
+                    <div style="text-align: center; padding: 40px; color: #6b7280;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🔧</div>
+                        <h4 style="margin: 0 0 8px 0; font-weight: 600;">No maintenance tasks yet</h4>
+                        <p style="margin: 0; font-size: 14px;">Generate maintenance tasks for this appliance to track upkeep.</p>
+                        <button onclick="window.applianceManager.generateTasksForAppliance(${applianceId}); document.getElementById('appliance-tasks-modal').remove();"
+                                style="
+                                    background: #2563eb; color: white; border: none; padding: 12px 24px;
+                                    border-radius: 8px; font-weight: 500; cursor: pointer; margin-top: 16px;
+                                ">
+                            Generate Tasks
+                        </button>
+                    </div>
+                `}
+                
+                <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+                    <button onclick="document.getElementById('appliance-tasks-modal').remove()"
+                            style="
+                                background: #f3f4f6; color: #374151; border: none; padding: 12px 24px;
+                                border-radius: 8px; font-weight: 500; cursor: pointer; width: 100%;
+                            ">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+    
 // Enhanced getApplianceStatus method for appliances.js
 // Replace your existing getApplianceStatus method with this enhanced version
 
