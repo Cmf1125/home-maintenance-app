@@ -2927,46 +2927,44 @@ function toggleCategory(categoryId) {
 // Make it globally available
 window.toggleCategory = toggleCategory;
 
-// TaskManager object (restore this!)
+// Complete Working TaskManager System
 window.TaskManager = {
     currentTask: null,
     
     openModal: function(task, isNew) {
-    console.log('📝 Opening modal for:', task.title || 'New Task');
-    
-    this.currentTask = {...task};
-    window.currentEditingTask = this.currentTask;
-    
-    const modal = document.getElementById('task-edit-modal');
-    if (!modal) {
-        alert('❌ Modal not found');
-        return;
-    }
-    
-    // Set title
-    const titleElement = document.getElementById('task-edit-title');
-    if (titleElement) {
-        titleElement.textContent = isNew ? 'Add Task' : 'Edit Task';
-    }
-    
-    // Show/hide delete button
-    const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
-    if (deleteBtn) {
-        deleteBtn.style.display = isNew ? 'none' : 'block';
-    }
-    
-    this.fillForm(task);
-    
-    // FIXED: Force modal to show
-    modal.classList.remove('hidden');
-    modal.style.display = 'flex';
-    modal.style.zIndex = '9999';
-    
-    setTimeout(() => {
-        const nameField = document.getElementById('edit-task-name');
-        if (nameField) nameField.focus();
-    }, 100);
-},
+        console.log('📝 Opening modal for:', task.title || 'New Task');
+        
+        this.currentTask = {...task};
+        window.currentEditingTask = this.currentTask;
+        
+        const modal = document.getElementById('task-edit-modal');
+        if (!modal) {
+            alert('❌ Modal not found');
+            return;
+        }
+        
+        // Set title
+        const titleElement = document.getElementById('task-edit-title');
+        if (titleElement) {
+            titleElement.textContent = isNew ? 'Add Task' : 'Edit Task';
+        }
+        
+        // Show/hide delete button
+        const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
+        if (deleteBtn) {
+            deleteBtn.style.display = isNew ? 'none' : 'block';
+        }
+        
+        this.fillForm(task);
+        
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+        
+        setTimeout(() => {
+            const nameField = document.getElementById('edit-task-name');
+            if (nameField) nameField.focus();
+        }, 100);
+    },
     
     fillForm: function(task) {
         const fields = [
@@ -2992,92 +2990,84 @@ window.TaskManager = {
     },
     
     save: function() {
-    if (!this.currentTask) {
-        alert('❌ No task to save');
-        return;
-    }
-    
-    // Get form values
-    const nameEl = document.getElementById('edit-task-name');
-    const descEl = document.getElementById('edit-task-description');
-    const costEl = document.getElementById('edit-task-cost');
-    const freqEl = document.getElementById('edit-task-frequency');
-    const catEl = document.getElementById('edit-task-category');
-    const dateEl = document.getElementById('edit-task-due-date');
-    
-    if (!nameEl || !descEl || !costEl || !freqEl || !catEl || !dateEl) {
-        alert('❌ Form elements missing');
-        return;
-    }
-    
-    const title = nameEl.value.trim();
-    const description = descEl.value.trim();
-    const cost = parseFloat(costEl.value) || 0;
-    const frequency = parseInt(freqEl.value) || 365;
-    const category = catEl.value || 'General';
-    const dueDateStr = dateEl.value;
-    
-    if (!title) {
-        alert('❌ Task name required');
-        return;
-    }
-    
-    if (frequency <= 0) {
-        alert('❌ Frequency must be > 0');
-        return;
-    }
-    
-    // Auto-calculate priority
-    let priority = 'medium';
-    if (typeof getAutoPriority === 'function') {
-        priority = getAutoPriority(title, category);
-    } else {
-        if (category === 'Safety' || title.toLowerCase().includes('smoke') || title.toLowerCase().includes('detector')) {
-            priority = 'high';
+        if (!this.currentTask) {
+            alert('❌ No task to save');
+            return;
         }
-    }
-    
-    const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
-    
-    // Update task
-    this.currentTask.title = title;
-    this.currentTask.description = description;
-    this.currentTask.cost = cost;
-    this.currentTask.frequency = frequency;
-    this.currentTask.category = category;
-    this.currentTask.priority = priority;
-    this.currentTask.dueDate = dueDate;
-    this.currentTask.nextDue = dueDate;
-    
-    delete this.currentTask.isTemplate;
-    
-    // Add or update
-    const isNew = !window.tasks.find(t => t.id === this.currentTask.id);
-    
-    if (isNew) {
-        window.tasks.push(this.currentTask);
-    } else {
-        const index = window.tasks.findIndex(t => t.id === this.currentTask.id);
-        if (index > -1) {
-            window.tasks[index] = this.currentTask;
+        
+        // Get form values
+        const nameEl = document.getElementById('edit-task-name');
+        const descEl = document.getElementById('edit-task-description');
+        const costEl = document.getElementById('edit-task-cost');
+        const freqEl = document.getElementById('edit-task-frequency');
+        const catEl = document.getElementById('edit-task-category');
+        const dateEl = document.getElementById('edit-task-due-date');
+        
+        if (!nameEl || !descEl || !costEl || !freqEl || !catEl || !dateEl) {
+            alert('❌ Form elements missing');
+            return;
         }
-    }
-    
-    this.saveAndRefresh();
-    this.close();
-    
-    alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
-},
-
-saveAndRefresh: function() {
-    const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
-    const mainAppVisible = !document.getElementById('main-app').classList.contains('hidden');
-    
-    if (taskSetupVisible) {
-        if (typeof renderTaskCategories === 'function') {
-            renderTaskCategories();
+        
+        const title = nameEl.value.trim();
+        const description = descEl.value.trim();
+        const cost = parseFloat(costEl.value) || 0;
+        const frequency = parseInt(freqEl.value) || 365;
+        const category = catEl.value || 'General';
+        const dueDateStr = dateEl.value;
+        
+        if (!title) {
+            alert('❌ Task name required');
+            return;
         }
-    } else if (mainAppVisible) {
+        
+        if (frequency <= 0) {
+            alert('❌ Frequency must be > 0');
+            return;
+        }
+        
+        // Auto-calculate priority
+        let priority = 'medium';
+        if (typeof getAutoPriority === 'function') {
+            priority = getAutoPriority(title, category);
+        } else {
+            if (category === 'Safety' || title.toLowerCase().includes('smoke') || title.toLowerCase().includes('detector')) {
+                priority = 'high';
+            }
+        }
+        
+        const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
+        
+        // Update task
+        this.currentTask.title = title;
+        this.currentTask.description = description;
+        this.currentTask.cost = cost;
+        this.currentTask.frequency = frequency;
+        this.currentTask.category = category;
+        this.currentTask.priority = priority;
+        this.currentTask.dueDate = dueDate;
+        this.currentTask.nextDue = dueDate;
+        
+        delete this.currentTask.isTemplate;
+        
+        // Add or update
+        const isNew = !window.tasks.find(t => t.id === this.currentTask.id);
+        
+        if (isNew) {
+            window.tasks.push(this.currentTask);
+        } else {
+            const index = window.tasks.findIndex(t => t.id === this.currentTask.id);
+            if (index > -1) {
+                window.tasks[index] = this.currentTask;
+            }
+        }
+        
+        this.saveAndRefresh();
+        this.close();
+        
+        alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
+    },
+    
+    saveAndRefresh: function() {
         if (typeof saveData === 'function') {
             saveData();
         }
@@ -3097,8 +3087,7 @@ saveAndRefresh: function() {
                 renderAllTasksView();
             }
         }
-    }
-},
+    },
     
     close: function() {
         const modal = document.getElementById('task-edit-modal');
