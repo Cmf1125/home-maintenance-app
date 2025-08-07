@@ -2987,48 +2987,10 @@ console.log('📱 Smart installation banner system loaded');
 
 // REPLACE your existing openCategoryModal function:
 function openCategoryModal(categoryId) {
-    console.log('🔍 Opening category modal for:', categoryId);
-    
-    const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
-
-    // Update modal content
-    const iconEl = document.getElementById('modal-category-icon');
-    const titleEl = document.getElementById('modal-category-title');
-    
-    if (!iconEl || !titleEl) {
-        console.error('❌ Modal elements not found');
-        return;
-    }
-    
-    iconEl.textContent = categoryInfo.icon;
-    titleEl.textContent = categoryId;
-
-    // Get and render tasks for this category
-    const categoryTasks = window.tasks ? window.tasks.filter(task => task.category === categoryId) : [];
-    const taskListEl = document.getElementById('modal-task-list');
-    
-    if (!taskListEl) {
-        console.error('❌ Task list element not found');
-        return;
-    }
-
-    if (categoryTasks.length === 0) {
-        taskListEl.innerHTML = '<div class="text-center text-gray-500 py-8">No tasks in this category</div>';
-    } else {
-        taskListEl.innerHTML = categoryTasks.map(task => renderModalTaskItem(task)).join('');
-    }
-
-    // Show the modal with animation
-    const modal = document.getElementById('category-task-modal');
-    if (!modal) {
-        console.error('❌ Category modal not found');
-        return;
-    }
-    
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-    
-    console.log('✅ Category modal opened successfully');
+    const tasks = window.tasks.filter(t => t.category === categoryId);
+    document.getElementById('modal-title').textContent = categoryId;
+    document.getElementById('modal-tasks').innerHTML = tasks.map(t => `<div style="padding: 0.5rem; border: 1px solid #ccc; margin-bottom: 0.5rem; border-radius: 8px;"><strong>${t.title}</strong><br><small>${t.description}</small></div>`).join('');
+    document.getElementById('category-modal').style.display = 'flex';
 }
 
 // REPLACE your existing closeCategoryModal function:
