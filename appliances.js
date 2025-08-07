@@ -667,13 +667,15 @@ renderApplianceCard(appliance) {
                 
 <div class="flex items-center gap-2 mt-3 flex-wrap">
   ${appliance.photos && appliance.photos.length > 0
-    ? `<span class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs">📸 ${appliance.photos.length}</span>`
+    ? `<span class="bg-blue-50 text-blue-700 px-2 rounded text-xs inline-flex items-center h-6">
+         📸 ${appliance.photos.length}
+       </span>`
     : ''
   }
 
   ${appliance.serialNumber
     ? `<button
-         class="bg-green-50 text-green-700 px-2 py-1 rounded text-xs inline-flex items-center h-6"
+         class="bg-green-50 text-green-700 px-2 rounded text-xs inline-flex items-center h-6"
          title="Click to copy"
          onclick="event.stopPropagation(); navigator.clipboard.writeText('${(appliance.serialNumber || '').replace(/'/g, "\\'")}')"
        >🔢 ${appliance.serialNumber}</button>`
@@ -681,11 +683,13 @@ renderApplianceCard(appliance) {
   }
 
   ${appliance.purchaseDate
-    ? `<span class="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs inline-flex items-center h-6">
+    ? `<span class="bg-purple-50 text-purple-700 px-2 rounded text-xs inline-flex items-center h-6">
          Purchased ${new Date(appliance.purchaseDate).getFullYear()}
        </span>`
     : ''
   }
+</div>
+
 </div>
             </div>
             
