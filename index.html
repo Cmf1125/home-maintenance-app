@@ -590,21 +590,22 @@
   </div>
 </div>
 
-<!-- Category Task Modal (Simple Rebuild) -->
-<div id="category-task-modal" class="fixed inset-0 z-50 bg-white hidden flex-col p-4 shadow-2xl overflow-y-auto" style="display: none;">
-  <!-- Modal Header -->
-  <div class="border-b flex justify-between items-center mb-4">
-    <div class="flex items-center gap-2">
-      <span id="modal-category-icon" class="text-xl">📋</span>
-      <h2 id="modal-category-title" class="text-lg font-bold text-gray-800">Category</h2>
+<!-- Fixed Category Task Modal -->
+<div id="category-task-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="flex items-center gap-2">
+                <span id="modal-category-icon" class="text-xl">📋</span>
+                <h2 id="modal-category-title" class="text-lg font-bold text-gray-800">Category</h2>
+            </div>
+            <button onclick="closeCategoryModal()" class="text-gray-600 text-xl">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="modal-task-list" class="space-y-4">
+                <!-- Task items will be injected here -->
+            </div>
+        </div>
     </div>
-    <button onclick="closeCategoryModal()" class="text-gray-600 text-xl">&times;</button>
-  </div>
-
-  <!-- Task List -->
-  <div id="modal-task-list" class="space-y-4">
-    <!-- Task items will be injected here -->
-  </div>
 </div>
 
             <!-- Editable Home Info Modal -->
