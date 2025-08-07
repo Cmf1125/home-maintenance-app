@@ -1244,7 +1244,7 @@ if (appliancesList) {
         </div>
     `;
 }
-
+}
 // Show appliance tasks in modal
 showApplianceTasks(applianceId) {
     const appliance = this.appliances.find(a => a.id == applianceId);
