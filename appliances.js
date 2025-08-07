@@ -677,19 +677,14 @@ ${appliance.purchaseDate ? (() => {
   const years = Math.floor((Date.now() - purchase.getTime()) / msPerYear);
   const ageText = years < 1 ? '&lt; 1 year' : `${years} year${years > 1 ? 's' : ''}`;
 
-  // Try multiple sources/keys for lifespan
-  const cfg = (typeof window !== 'undefined' ? (window.categoryConfig || window.CategoryConfig || null) : null);
-  const catKey = (appliance.category || appliance.type || appliance.categoryName || '').trim();
-  const cfgEntry = (cfg && catKey && (cfg[catKey] || cfg[catKey.toLowerCase()] || cfg[catKey.replace(/\s+/g,' ')])) || null;
-
-  let lifespanYears =
+  // Pull expected lifespan from appliance override OR categoryConfig
+  const lifespanYears =
     (typeof appliance.expectedLifespanYears === 'number' ? appliance.expectedLifespanYears : null) ??
-    (typeof appliance.lifespanYears === 'number' ? appliance.lifespanYears : null) ??
-    (cfgEntry && (Number(cfgEntry.lifespanYears) || Number(cfgEntry.lifespan))) || null;
-
-  if (!lifespanYears && cfg && catKey) {
-    console.warn('[Appliance lifespan not found]', { catKey, availableKeys: Object.keys(cfg) });
-  }
+    (window.categoryConfig &&
+     appliance.category &&
+     window.categoryConfig[appliance.category] &&
+     window.categoryConfig[appliance.category].lifespanYears) ??
+    null;
 
   const lifespanText = lifespanYears
     ? ` (of expected ${lifespanYears} year${lifespanYears > 1 ? 's' : ''})`
@@ -704,6 +699,7 @@ ${appliance.purchaseDate ? (() => {
     </div>
   `;
 })() : ''}
+
 
             </div>
             
