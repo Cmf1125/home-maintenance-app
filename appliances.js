@@ -6,6 +6,7 @@ class ApplianceManager {
         this.appliances = [];
         this.currentView = 'overview'; // 'overview', 'add', 'edit', 'detail'
         this.currentAppliance = null;
+        this.currentFilter = 'all'; // Add this line
         this.categories = [
             { id: 'kitchen', name: 'Kitchen', icon: '🍽️' },
             { id: 'hvac', name: 'HVAC', icon: '🌡️' },
@@ -126,7 +127,8 @@ class ApplianceManager {
                 
                 <!-- Quick Stats -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <div class="bg-white rounded-xl p-4 shadow-lg">
+    <div class="bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105" 
+         onclick="window.applianceManager.setFilter('attention')" id="attention-card">
         <div class="flex items-center gap-3">
             <div class="p-2 bg-red-100 rounded-lg text-lg">⚠️</div>
             <div>
@@ -136,7 +138,8 @@ class ApplianceManager {
         </div>
     </div>
     
-    <div class="bg-white rounded-xl p-4 shadow-lg">
+    <div class="bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105" 
+         onclick="window.applianceManager.setFilter('expiring')" id="expiring-card">
         <div class="flex items-center gap-3">
             <div class="p-2 bg-orange-100 rounded-lg text-lg">⏰</div>
             <div>
@@ -146,7 +149,8 @@ class ApplianceManager {
         </div>
     </div>
     
-    <div class="bg-white rounded-xl p-4 shadow-lg">
+    <div class="bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105" 
+         onclick="window.applianceManager.setFilter('aging')" id="aging-card">
         <div class="flex items-center gap-3">
             <div class="p-2 bg-yellow-100 rounded-lg text-lg">🔄</div>
             <div>
@@ -156,7 +160,8 @@ class ApplianceManager {
         </div>
     </div>
     
-    <div class="bg-white rounded-xl p-4 shadow-lg">
+    <div class="bg-white rounded-xl p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105" 
+         onclick="window.applianceManager.setFilter('missing')" id="missing-card">
         <div class="flex items-center gap-3">
             <div class="p-2 bg-blue-100 rounded-lg text-lg">📋</div>
             <div>
@@ -165,9 +170,21 @@ class ApplianceManager {
             </div>
         </div>
     </div>
-</div>                
-                <!-- Appliances by Category -->
-                ${this.renderApplianceCategories(appliancesByCategory)}
+</div>
+
+<!-- Appliances List with Filter Support -->
+<div class="appliances-section">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="appliances-list-title text-lg font-bold text-gray-900">All Appliances</h3>
+        <button onclick="window.applianceManager.setFilter('all')" 
+                class="text-sm text-blue-600 hover:text-blue-800">
+            Show All
+        </button>
+    </div>
+    <div class="appliances-list-container">
+        ${this.renderApplianceCategories(appliancesByCategory)}
+    </div>
+</div>
                 
                 ${totalAppliances === 0 ? this.renderEmptyState() : ''}
             </div>
@@ -1130,8 +1147,95 @@ getAppliancesMissingInfo() {
         return status.reason === 'missing_info';
     });
 }
+
+    getAppliancesMissingInfo() {
+    return this.appliances.filter(appliance => {
+        const status = this.getApplianceStatus(appliance);
+        return status.reason === 'missing_info';
+    });
+}
+
+// ADD ALL THE FILTER METHODS HERE:
+// Filter management
+setFilter(filterType) {
+    this.currentFilter = filterType;
+    this.updateFilterUI();
+    this.renderFilteredAppliances();
+}
+
+updateFilterUI() {
+    // Remove active class from all cards
+    document.querySelectorAll('#attention-card, #expiring-card, #aging-card, #missing-card').forEach(card => {
+        if (card) card.classList.remove('active-filter');
+    });
+
+    // Add active class to selected card
+    const activeCard = document.getElementById(`${this.currentFilter}-card`);
+    if (activeCard && this.currentFilter !== 'all') {
+        activeCard.classList.add('active-filter');
+    }
+
+    // Update section title
+    const titleElement = document.querySelector('.appliances-list-title');
+    if (titleElement) {
+        const filterTitles = {
+            'all': 'All Appliances',
+            'attention': '⚠️ Appliances Needing Attention',
+            'expiring': '⏰ Warranties Expiring Soon', 
+            'aging': '🔄 Appliances Aging Out',
+            'missing': '📋 Missing Information'
+        };
+        titleElement.textContent = filterTitles[this.currentFilter] || 'All Appliances';
+    }
+}
+
+getFilteredAppliances() {
+    switch (this.currentFilter) {
+        case 'attention':
+            return this.getAppliancesNeedingAttention();
+        case 'expiring':
+            return this.getWarrantiesExpiringSoon();
+        case 'aging':
+            return this.getAppliancesAgingOut();
+        case 'missing':
+            return this.getAppliancesMissingInfo();
+        default:
+            return this.appliances;
+    }
+}
+
+renderFilteredAppliances() {
+    const filteredAppliances = this.getFilteredAppliances();
     
-    // Enhanced getApplianceStatus method for appliances.js
+    if (filteredAppliances.length === 0) {
+        const appliancesList = document.querySelector('.appliances-list-container');
+        if (appliancesList) {
+            const emptyMessages = {
+                'attention': '🎉 No appliances need attention!',
+                'expiring': '✅ No warranties expiring soon!',
+                'aging': '👍 No appliances aging out!',
+                'missing': '✅ All appliance info complete!'
+            };
+            appliancesList.innerHTML = `<div class="text-center text-gray-500 py-8">${emptyMessages[this.currentFilter] || 'No appliances found.'}</div>`;
+        }
+        return;
+    }
+
+    // Group filtered appliances by category and render
+    const appliancesByCategory = filteredAppliances.reduce((groups, appliance) => {
+        const category = appliance.category || 'other';
+        if (!groups[category]) groups[category] = [];
+        groups[category].push(appliance);
+        return groups;
+    }, {});
+
+    const appliancesList = document.querySelector('.appliances-list-container');
+    if (appliancesList) {
+        appliancesList.innerHTML = this.renderApplianceCategories(appliancesByCategory);
+    }
+}
+
+// Enhanced getApplianceStatus method for appliances.js
 // Replace your existing getApplianceStatus method with this enhanced version
 
 getApplianceStatus(appliance) {
