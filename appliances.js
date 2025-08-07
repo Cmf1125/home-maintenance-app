@@ -1336,15 +1336,21 @@ showApplianceTasks(applianceId) {
                                                 <span>🔄 Every ${task.frequency} days</span>
                                                 <span>📂 ${task.category}</span>
                                             </div>
-                                            ${!task.isCompleted ? `
-                                                <button onclick="completeTask(${task.id}); document.getElementById('appliance-tasks-modal').remove();"
-                                                        style="
-                                                            background: #dcfce7; color: #166534; border: none; padding: 4px 8px;
-                                                            border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 500;
-                                                        ">
-                                                    Mark Complete
-                                                </button>
-                                            ` : ''}
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; gap: 12px; font-size: 12px; color: #6b7280;">
+        <span style="color: ${statusColor}; font-weight: 500;">${statusText}</span>
+        <span>🔄 Every ${task.frequency} days</span>
+        <span>📂 ${task.category}</span>
+    </div>
+    <button onclick="window.applianceManager.removeApplianceTask(${task.id}, ${applianceId})"
+            style="
+                background: #fee2e2; color: #991b1b; border: none; padding: 4px 8px;
+                border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 500;
+            "
+            title="Remove this task from this appliance">
+        Remove
+    </button>
+</div>
                                         </div>
                                     </div>
                                 `;
@@ -1430,6 +1436,44 @@ addCustomTaskForAppliance(applianceId) {
         alert('❌ Task editor not available');
     }
 }
+
+// Remove task from appliance (with confirmation)
+removeApplianceTask(taskId, applianceId) {
+    const task = window.tasks?.find(t => t.id === taskId);
+    const appliance = this.appliances.find(a => a.id == applianceId);
+    
+    if (!task || !appliance) {
+        alert('❌ Task or appliance not found');
+        return;
+    }
+    
+    if (confirm(`Remove "${task.title}" from ${appliance.name}?\n\nThis will delete the task entirely.`)) {
+        // Remove task from global tasks array
+        const taskIndex = window.tasks.findIndex(t => t.id === taskId);
+        if (taskIndex > -1) {
+            window.tasks.splice(taskIndex, 1);
+            
+            // Save data
+            if (typeof window.saveData === 'function') {
+                window.saveData();
+            }
+            
+            // Refresh views
+            if (window.enhancedDashboard?.render) {
+                window.enhancedDashboard.render();
+            }
+            if (window.casaCareCalendar?.refresh) {
+                window.casaCareCalendar.refresh();
+            }
+            
+            // Close modal and show success
+            document.getElementById('appliance-tasks-modal').remove();
+            alert(`✅ Task removed from ${appliance.name}`);
+            
+            console.log('🗑️ Task removed:', task.title);
+        }
+    }
+}    
     
 // Enhanced getApplianceStatus method for appliances.js
 // Replace your existing getApplianceStatus method with this enhanced version
