@@ -3008,3 +3008,80 @@ function toggleCategory(categoryId) {
 
 // Make it globally available
 window.toggleCategory = toggleCategory;
+
+// TaskManager object (restore this!)
+window.TaskManager = {
+    currentTask: null,
+    
+    openModal: function(task, isNew) {
+        console.log('📝 Opening modal for:', task.title || 'New Task');
+        
+        this.currentTask = {...task};
+        window.currentEditingTask = this.currentTask;
+        
+        const modal = document.getElementById('task-edit-modal');
+        if (!modal) {
+            alert('❌ Modal not found');
+            return;
+        }
+        
+        // Set title
+        const titleElement = document.getElementById('task-edit-title');
+        if (titleElement) {
+            titleElement.textContent = isNew ? 'Add Task' : 'Edit Task';
+        }
+        
+        // Show/hide delete button
+        const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
+        if (deleteBtn) {
+            deleteBtn.style.display = isNew ? 'none' : 'block';
+        }
+        
+        this.fillForm(task);
+        
+        modal.classList.remove('hidden');
+        modal.style.display = 'flex';
+        
+        setTimeout(() => {
+            const nameField = document.getElementById('edit-task-name');
+            if (nameField) nameField.focus();
+        }, 100);
+    },
+    
+    fillForm: function(task) {
+        const fields = [
+            ['edit-task-name', task.title || ''],
+            ['edit-task-description', task.description || ''],
+            ['edit-task-cost', task.cost || 0],
+            ['edit-task-frequency', task.frequency || 365],
+            ['edit-task-category', task.category || 'General']
+        ];
+        
+        fields.forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.value = value;
+            }
+        });
+        
+        const dateField = document.getElementById('edit-task-due-date');
+        if (dateField) {
+            const date = task.dueDate ? new Date(task.dueDate) : new Date();
+            dateField.value = date.toISOString().split('T')[0];
+        }
+    },
+    
+    save: function() {
+        // ... (rest of save function - this is a big one, should I give you the full thing?)
+    },
+    
+    close: function() {
+        const modal = document.getElementById('task-edit-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+        }
+        this.currentTask = null;
+        window.currentEditingTask = null;
+    }
+};
