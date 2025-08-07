@@ -670,47 +670,16 @@ renderApplianceCard(appliance) {
                     ` : ''}
 
 ${appliance.purchaseDate ? (() => {
-  const msPerYear = 1000 * 60 * 60 * 24 * 365;
-  const purchase = new Date(appliance.purchaseDate);
-  if (isNaN(purchase)) return '';
-
-  const years = Math.floor((Date.now() - purchase.getTime()) / msPerYear);
-  const ageText = years < 1 ? '&lt; 1 year' : `${years} year${years > 1 ? 's' : ''}`;
-
-  // DEBUG: See what category we have and what config keys exist
-  console.log('[Lifespan debug]', {
-    category: appliance.category,
-    type: appliance.type,
-    categoryName: appliance.categoryName,
-    configKeys: Object.keys(window.categoryConfig || {})
-  });
-
-  // Try multiple sources/keys for lifespan
-  const cfg = (typeof window !== 'undefined' ? (window.categoryConfig || window.CategoryConfig || null) : null);
-  const catKey = (appliance.category || appliance.type || appliance.categoryName || '').trim();
-  const cfgEntry = (cfg && catKey && (cfg[catKey] || cfg[catKey.toLowerCase()] || cfg[catKey.replace(/\s+/g, ' ')])) || null;
-
-  let lifespanYears =
-    (typeof appliance.expectedLifespanYears === 'number' ? appliance.expectedLifespanYears : null) ??
-    (typeof appliance.lifespanYears === 'number' ? appliance.lifespanYears : null) ??
-    (cfgEntry && (Number(cfgEntry.lifespanYears) || Number(cfgEntry.lifespan))) || null;
-
-  if (!lifespanYears && cfg && catKey) {
-    console.warn('[Appliance lifespan not found]', { catKey, availableKeys: Object.keys(cfg) });
-  }
-
-  const lifespanText = lifespanYears
-    ? ` (of expected ${lifespanYears} year${lifespanYears > 1 ? 's' : ''})`
-    : '';
-
-  return `
-    <div class="flex items-center gap-2">
-      <span class="text-xs text-gray-500">Purchased ${purchase.getFullYear()}</span>
-    </div>
-    <div class="flex items-center gap-2">
-      <span class="text-xs text-gray-500">Age: ${ageText}${lifespanText}</span>
-    </div>
-  `;
+    const years = Math.floor((Date.now() - new Date(appliance.purchaseDate)) / (1000*60*60*24*365));
+    const ageText = years < 1 ? '< 1 year' : `${years} year${years > 1 ? 's' : ''}`;
+    return `
+        <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-500">Purchased ${new Date(appliance.purchaseDate).getFullYear()}</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-500">Age: ${ageText}</span>
+        </div>
+    `;
 })() : ''}
 
 
