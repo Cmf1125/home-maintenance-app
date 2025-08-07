@@ -686,275 +686,248 @@
     </div>
 </div>
     
-    <!-- Task System Override (Working Fix) -->
-    <script>
-        console.log('🚨 Loading task system override...');
+  <!-- Task System Override (Working Fix) -->
+<script>
+    console.log('🚨 Loading task system override...');
 
-        // Complete override system (keep this exactly as is - it's working!)
-        window.openTaskEditModal = function(task, isNew) {
-            window.TaskManager.openModal(task, isNew);
-        };
+    // Complete override system
+    window.openTaskEditModal = function(task, isNew) {
+        window.TaskManager.openModal(task, isNew);
+    };
 
-        window.saveTaskFromEdit = function() {
-            window.TaskManager.save();
-        };
+    window.saveTaskFromEdit = function() {
+        window.TaskManager.save();
+    };
 
-        window.closeTaskEditModal = function() {
-            window.TaskManager.close();
-        };
+    window.closeTaskEditModal = function() {
+        window.TaskManager.close();
+    };
 
-        // TaskManager object (keep exactly as is)
-        window.TaskManager = {
-            currentTask: null,
+    // TaskManager object
+    window.TaskManager = {
+        currentTask: null,
+        
+        openModal: function(task, isNew) {
+            console.log('📝 Opening modal for:', task.title || 'New Task');
             
-            openModal: function(task, isNew) {
-                console.log('📝 Opening modal for:', task.title || 'New Task');
-                
-                this.currentTask = {...task};
-                window.currentEditingTask = this.currentTask;
-                
-                const modal = document.getElementById('task-edit-modal');
-                if (!modal) {
-                    alert('❌ Modal not found');
-                    return;
-                }
-                
-                // Set title
-                const titleElement = document.getElementById('task-edit-title');
-                if (titleElement) {
-                    titleElement.textContent = isNew ? 'Add Task' : 'Edit Task';
-                }
-                
-                // Show/hide delete button
-                const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
-                if (deleteBtn) {
-                    deleteBtn.style.display = isNew ? 'none' : 'block';
-                }
-                
-                this.fillForm(task);
-                
-                modal.classList.remove('hidden');
-                modal.style.display = 'flex';
-                
-                setTimeout(() => {
-                    const nameField = document.getElementById('edit-task-name');
-                    if (nameField) nameField.focus();
-                }, 100);
-            },
+            this.currentTask = {...task};
+            window.currentEditingTask = this.currentTask;
             
-            fillForm: function(task) {
-                const fields = [
-    ['edit-task-name', task.title || ''],
-    ['edit-task-description', task.description || ''],
-    ['edit-task-cost', task.cost || 0],
-    ['edit-task-frequency', task.frequency || 365],
-    ['edit-task-category', task.category || 'General']
-    // Priority removed - auto-calculated in save()
-                ];
-                
-                fields.forEach(([id, value]) => {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        element.value = value;
-                    }
-                });
-                
-                const dateField = document.getElementById('edit-task-due-date');
-                if (dateField) {
-                    const date = task.dueDate ? new Date(task.dueDate) : new Date();
-                    dateField.value = date.toISOString().split('T')[0];
-                }
-            },
+            const modal = document.getElementById('task-edit-modal');
+            if (!modal) {
+                alert('❌ Modal not found');
+                return;
+            }
             
-            save: function() {
-                if (!this.currentTask) {
-                    alert('❌ No task to save');
-                    return;
+            // Set title
+            const titleElement = document.getElementById('task-edit-title');
+            if (titleElement) {
+                titleElement.textContent = isNew ? 'Add Task' : 'Edit Task';
+            }
+            
+            // Show/hide delete button
+            const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
+            if (deleteBtn) {
+                deleteBtn.style.display = isNew ? 'none' : 'block';
+            }
+            
+            this.fillForm(task);
+            
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            
+            setTimeout(() => {
+                const nameField = document.getElementById('edit-task-name');
+                if (nameField) nameField.focus();
+            }, 100);
+        },
+        
+        fillForm: function(task) {
+            const fields = [
+                ['edit-task-name', task.title || ''],
+                ['edit-task-description', task.description || ''],
+                ['edit-task-cost', task.cost || 0],
+                ['edit-task-frequency', task.frequency || 365],
+                ['edit-task-category', task.category || 'General']
+            ];
+            
+            fields.forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.value = value;
+                }
+            });
+            
+            const dateField = document.getElementById('edit-task-due-date');
+            if (dateField) {
+                const date = task.dueDate ? new Date(task.dueDate) : new Date();
+                dateField.value = date.toISOString().split('T')[0];
+            }
+        },
+        
+        save: function() {
+            if (!this.currentTask) {
+                alert('❌ No task to save');
+                return;
+            }
+            
+            // Get form values
+            const nameEl = document.getElementById('edit-task-name');
+            const descEl = document.getElementById('edit-task-description');
+            const costEl = document.getElementById('edit-task-cost');
+            const freqEl = document.getElementById('edit-task-frequency');
+            const catEl = document.getElementById('edit-task-category');
+            const dateEl = document.getElementById('edit-task-due-date');
+            
+            if (!nameEl || !descEl || !costEl || !freqEl || !catEl || !dateEl) {
+                alert('❌ Form elements missing');
+                return;
+            }
+            
+            const title = nameEl.value.trim();
+            const description = descEl.value.trim();
+            const cost = parseFloat(costEl.value) || 0;
+            const frequency = parseInt(freqEl.value) || 365;
+            const category = catEl.value || 'General';
+            const dueDateStr = dateEl.value;
+            
+            if (!title) {
+                alert('❌ Task name required');
+                return;
+            }
+            
+            if (frequency <= 0) {
+                alert('❌ Frequency must be > 0');
+                return;
+            }
+            
+            // Auto-calculate priority
+            let priority = 'medium';
+            if (typeof getAutoPriority === 'function') {
+                priority = getAutoPriority(title, category);
+            } else {
+                if (category === 'Safety' || title.toLowerCase().includes('smoke') || title.toLowerCase().includes('detector')) {
+                    priority = 'high';
+                }
+            }
+            
+            const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
+            
+            // Update task
+            this.currentTask.title = title;
+            this.currentTask.description = description;
+            this.currentTask.cost = cost;
+            this.currentTask.frequency = frequency;
+            this.currentTask.category = category;
+            this.currentTask.priority = priority;
+            this.currentTask.dueDate = dueDate;
+            this.currentTask.nextDue = dueDate;
+            
+            delete this.currentTask.isTemplate;
+            
+            // Add or update
+            const isNew = !window.tasks.find(t => t.id === this.currentTask.id);
+            
+            if (isNew) {
+                window.tasks.push(this.currentTask);
+            } else {
+                const index = window.tasks.findIndex(t => t.id === this.currentTask.id);
+                if (index > -1) {
+                    window.tasks[index] = this.currentTask;
+                }
+            }
+            
+            this.saveAndRefresh();
+            this.close();
+            
+            alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
+        },
+        
+        saveAndRefresh: function() {
+            const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
+            const mainAppVisible = !document.getElementById('main-app').classList.contains('hidden');
+            
+            if (taskSetupVisible) {
+                if (typeof renderTaskCategories === 'function') {
+                    renderTaskCategories();
+                }
+            } else if (mainAppVisible) {
+                if (typeof saveData === 'function') {
+                    saveData();
                 }
                 
-                // Get form values
-                const nameEl = document.getElementById('edit-task-name');
-                const descEl = document.getElementById('edit-task-description');
-                const costEl = document.getElementById('edit-task-cost');
-                const freqEl = document.getElementById('edit-task-frequency');
-                const catEl = document.getElementById('edit-task-category');
-                const dateEl = document.getElementById('edit-task-due-date');
-                
-                if (!nameEl || !descEl || !costEl || !freqEl || !catEl || !dateEl) {
-                    alert('❌ Form elements missing');
-                    return;
+                if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                    window.enhancedDashboard.render();
                 }
                 
-                const title = nameEl.value.trim();
-                const description = descEl.value.trim();
-                const cost = parseFloat(costEl.value) || 0;
-                const frequency = parseInt(freqEl.value) || 365;
-                const category = catEl.value || 'General';
-                const dueDateStr = dateEl.value;
-                
-                if (!title) {
-                    alert('❌ Task name required');
-                    return;
+                if (window.casaCareCalendar && window.casaCareCalendar.refresh) {
+                    window.casaCareCalendar.refresh();
                 }
                 
-                if (frequency <= 0) {
-                    alert('❌ Frequency must be > 0');
-                    return;
-                }
-                
-               // Auto-calculate priority using the proper function
-                let priority = 'medium';
-                if (typeof getAutoPriority === 'function') {
-                    priority = getAutoPriority(title, category);
-                    console.log(`🎯 Auto-priority for "${title}" (${category}): ${priority}`);
-                } else {
-                    // Fallback logic if function not available
-                    if (category === 'Safety' || title.toLowerCase().includes('smoke') || title.toLowerCase().includes('detector')) {
-                        priority = 'high';
-                    }
-                    console.log(`⚠️ Using fallback priority for "${title}": ${priority}`);
-                }
-                
-                const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
-                
-                // Update task
-                this.currentTask.title = title;
-                this.currentTask.description = description;
-                this.currentTask.cost = cost;
-                this.currentTask.frequency = frequency;
-                this.currentTask.category = category;
-                this.currentTask.priority = priority;
-                this.currentTask.dueDate = dueDate;
-                this.currentTask.nextDue = dueDate;
-                
-                delete this.currentTask.isTemplate;
-                
-                // Add or update
-                const isNew = !window.tasks.find(t => t.id === this.currentTask.id);
-                
-                if (isNew) {
-                    window.tasks.push(this.currentTask);
-                } else {
-                    const index = window.tasks.findIndex(t => t.id === this.currentTask.id);
-                    if (index > -1) {
-                        window.tasks[index] = this.currentTask;
-                    }
-                }
-                
-                this.saveAndRefresh();
-                this.close();
-                
-                // ENHANCED: Refresh All Tasks view for both edits AND new tasks
+                // Refresh All Tasks view if visible
                 const allTasksView = document.getElementById('all-tasks-view');
-                const isAllTasksVisible = allTasksView && !allTasksView.classList.contains('hidden');
-                
-                if (window.editingFromAllTasks || isAllTasksVisible) {
-                    console.log('🔄 Refreshing All Tasks view after task save...');
-                    setTimeout(() => {
-                        if (typeof renderAllTasksView === 'function') {
-                            renderAllTasksView();
-                            console.log('✅ All Tasks view refreshed after TaskManager save');
-                        }
-                        window.editingFromAllTasks = false;
-                    }, 100);
-                }
-
-                alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);            },
-            
-            saveAndRefresh: function() {
-                const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
-                const mainAppVisible = !document.getElementById('main-app').classList.contains('hidden');
-                
-                if (taskSetupVisible) {
-                    if (typeof renderTaskCategories === 'function') {
-                        renderTaskCategories();
-                    }
-                } else if (mainAppVisible) {
-                    if (typeof saveData === 'function') {
-                        saveData();
-                    }
-                    
-                    if (window.enhancedDashboard && window.enhancedDashboard.render) {
-                        window.enhancedDashboard.render();
-                    }
-                    
-                    if (window.casaCareCalendar && window.casaCareCalendar.refresh) {
-                        window.casaCareCalendar.refresh();
-                    }
-                }
-            },
-            
-            close: function() {
-                const modal = document.getElementById('task-edit-modal');
-                if (modal) {
-                    modal.classList.add('hidden');
-                    modal.style.display = 'none';
-                }
-                this.currentTask = null;
-                window.currentEditingTask = null;
-            }
-        };
-
-        // Override functions
-        window.addTaskFromSetup = function() {
-            const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
-            const newTask = {
-                id: maxId + 1, title: '', description: '', category: 'General',
-                frequency: 365, cost: 0, priority: 'medium', dueDate: new Date(), isTemplate: true
-            };
-            window.TaskManager.openModal(newTask, true);
-        };
-
-        window.addTaskFromDashboard = function() {
-            const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
-            const newTask = {
-                id: maxId + 1, title: '', description: '', category: 'General',
-                frequency: 365, cost: 0, priority: 'medium', dueDate: new Date()
-            };
-            window.TaskManager.openModal(newTask, true);
-        };
-
-        window.editTaskFromSetup = function(taskId) {
-            const task = window.tasks?.find(t => t.id === taskId);
-            if (task) {
-                window.TaskManager.openModal(task, false);
-            }
-        };
-
-       window.deleteTaskFromEdit = function() {
-    if (!window.TaskManager.currentTask) return;
-    
-    const taskTitle = window.TaskManager.currentTask.title || 'Untitled';
-    if (confirm(`Delete "${taskTitle}"?`)) {
-        const index = window.tasks.findIndex(t => t.id === window.TaskManager.currentTask.id);
-        if (index > -1) {
-            window.tasks.splice(index, 1);
-            window.TaskManager.saveAndRefresh();
-            window.TaskManager.close();
-            
-            // ENHANCED: Refresh All Tasks view after deletion
-            const allTasksView = document.getElementById('all-tasks-view');
-            const isAllTasksVisible = allTasksView && !allTasksView.classList.contains('hidden');
-            
-            if (window.editingFromAllTasks || isAllTasksVisible) {
-                console.log('🔄 Refreshing All Tasks view after task deletion...');
-                setTimeout(() => {
+                if (allTasksView && !allTasksView.classList.contains('hidden')) {
                     if (typeof renderAllTasksView === 'function') {
                         renderAllTasksView();
-                        console.log('✅ All Tasks view refreshed after deletion');
                     }
-                    window.editingFromAllTasks = false;
-                }, 100);
+                }
             }
-            
-            alert(`✅ "${taskTitle}" deleted!`);
+        },
+        
+        close: function() {
+            const modal = document.getElementById('task-edit-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+            this.currentTask = null;
+            window.currentEditingTask = null;
         }
-    }
-};
+    };
 
-       console.log('✅ Task system override loaded (cleaned up version)');
-    </script>
+    // Override functions
+    window.addTaskFromSetup = function() {
+        const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+        const newTask = {
+            id: maxId + 1, title: '', description: '', category: 'General',
+            frequency: 365, cost: 0, priority: 'medium', dueDate: new Date(), isTemplate: true
+        };
+        window.TaskManager.openModal(newTask, true);
+    };
 
+    window.addTaskFromDashboard = function() {
+        const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+        const newTask = {
+            id: maxId + 1, title: '', description: '', category: 'General',
+            frequency: 365, cost: 0, priority: 'medium', dueDate: new Date()
+        };
+        window.TaskManager.openModal(newTask, true);
+    };
+
+    window.editTaskFromSetup = function(taskId) {
+        const task = window.tasks?.find(t => t.id === taskId);
+        if (task) {
+            window.TaskManager.openModal(task, false);
+        }
+    };
+
+    window.deleteTaskFromEdit = function() {
+        if (!window.TaskManager.currentTask) return;
+        
+        const taskTitle = window.TaskManager.currentTask.title || 'Untitled';
+        if (confirm(`Delete "${taskTitle}"?`)) {
+            const index = window.tasks.findIndex(t => t.id === window.TaskManager.currentTask.id);
+            if (index > -1) {
+                window.tasks.splice(index, 1);
+                window.TaskManager.saveAndRefresh();
+                window.TaskManager.close();
+                alert(`✅ "${taskTitle}" deleted!`);
+            }
+        }
+    };
+
+    console.log('✅ Task system override loaded');
+</script>
 <!-- WORKING MODAL SOLUTION -->
 <script>
     console.log('🔧 Creating NEW working reschedule modal...');
