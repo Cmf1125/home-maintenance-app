@@ -48,6 +48,58 @@
         document.head.appendChild(s2);
       })();
     </script>
+    <!-- 🔧 First-run generator: runs ONCE after onboarding -->
+<script>
+  (function () {
+    // Try calling any of your app’s known generation methods.
+    async function generateInitialPlanIfNeeded() {
+      try {
+        if (localStorage.getItem('hk_needs_initial_generation') !== '1') return;
+
+        // Wait a bit for your app globals to be ready
+        await new Promise(r => setTimeout(r, 200));
+
+        // Try several common hook locations. Safe if they don't exist.
+        const calls = [
+          () => window.TaskEngine?.generateInitialTasks?.(),
+          () => window.generateInitialTasks?.(),
+          () => window.taskManager?.generateInitialTasks?.(),
+          () => window.applianceManager?.generateInitialTasks?.(),
+          () => window.HomeKeeper?.generateInitialTasks?.()
+        ];
+
+        let ran = false;
+        for (const fn of calls) {
+          try {
+            const res = await (fn?.() || null);
+            if (res !== null && res !== undefined) { ran = true; break; }
+          } catch (e) {
+            // keep trying others
+          }
+        }
+
+        // If none of the above exist, we still continue — you can wire your actual function later.
+        // OPTIONAL: save snapshot if our helper exists (from earlier auth wiring)
+        try { await window.saveSnapshotForUser?.(firebase?.auth?.().currentUser?.uid); } catch (e) {}
+
+        // Clear the flag so it only runs once
+        localStorage.removeItem('hk_needs_initial_generation');
+      } catch (e) {
+        // If something goes wrong, don't loop; just clear the flag to avoid repeats.
+        localStorage.removeItem('hk_needs_initial_generation');
+        console.warn('[HK] initial generation failed once:', e);
+      }
+    }
+
+    // Run after DOM is ready; retry briefly if your app globals load a bit later
+    document.addEventListener('DOMContentLoaded', async () => {
+      await generateInitialPlanIfNeeded();
+      setTimeout(generateInitialPlanIfNeeded, 400);
+      setTimeout(generateInitialPlanIfNeeded, 1000);
+    });
+  })();
+</script>
+
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Smart Installation Banner -->
