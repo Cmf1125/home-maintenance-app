@@ -1147,28 +1147,6 @@ function finishTaskSetup() {
     
     console.log('🎉 CLEAN SIMPLE TASK SETUP COMPLETION SUCCESSFUL!');
 }
-// ✅ Mark onboarding as complete after tasks are generated
-try {
-  localStorage.setItem('hk_onboarded', '1');
-  const user = firebase.auth().currentUser;
-  if (user) {
-    const db = firebase.firestore();
-    await db.collection('users').doc(user.uid).set({ onboarded: true }, { merge: true });
-  }
-} catch (e) {
-  console.warn('Could not mark onboarding complete', e);
-}
-// ✅ Mark onboarding as complete after tasks are generated
-try {
-  localStorage.setItem('hk_onboarded', '1');
-  const user = firebase.auth().currentUser;
-  if (user) {
-    const db = firebase.firestore();
-    await db.collection('users').doc(user.uid).set({ onboarded: true }, { merge: true });
-  }
-} catch (e) {
-  console.warn('Could not mark onboarding complete', e);
-}
 
 // Enhanced showTab function with better error handling
 // In your app.js, find the showTab function and make it look like this:
