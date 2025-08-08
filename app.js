@@ -2960,3 +2960,15 @@ document.addEventListener('DOMContentLoaded', function () {
   // Show the first step initially
   showStep(currentStep);
 });
+document.addEventListener('DOMContentLoaded', () => {
+    const backBtn = document.getElementById('back-to-home-info');
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            // Hide task setup
+            document.getElementById('task-setup').classList.add('hidden');
+            // Show setup form again
+            document.getElementById('setup-form').style.display = 'block';
+            document.getElementById('setup-form').classList.remove('hidden');
+        });
+    }
+});
