@@ -1568,6 +1568,24 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('✅ Form section headers added at step starts');
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const fields = document.querySelectorAll(
+    '#setup-form input:not([type="checkbox"]):not([type="radio"]), #setup-form select, #setup-form textarea'
+  );
+
+  fields.forEach(el => {
+    // remove tall sizing
+    el.classList.remove('py-3', 'text-base', 'px-4');
+    // add compact sizing
+    el.classList.add('py-2', 'text-sm', 'px-3');
+  });
+
+  // (Nice touch) auto-uppercase state as user types
+  const st = document.getElementById('state');
+  if (st) st.addEventListener('input', () => st.value = st.value.toUpperCase());
+});
+</script>
             
 </body>
 </html>
