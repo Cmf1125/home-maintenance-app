@@ -1536,31 +1536,31 @@ console.log('✅ FIXED modal script loaded - all buttons should work now!');
 </script>
 
 <script>
-// Simple form sections - no awkward buttons
 document.addEventListener('DOMContentLoaded', function() {
     const setupForm = document.getElementById('setup-form');
     if (!setupForm || setupForm.style.display === 'none') return;
-    
-    // Just add section headings to make it feel organized
+
+    // Insert headings at the top of Step 2 and Step 3
     const sections = [
-        { afterElement: 'sqft', heading: '⚙️ Home Systems', subheading: 'Tell us about your heating, cooling, and water systems' },
-        { afterElement: 'septic', heading: '🏠 Additional Features', subheading: 'Any extra features your home has' }
+        { step: 2, heading: '⚙️ Home Systems', subheading: 'Tell us about your heating, cooling, and water systems' },
+        { step: 3, heading: '🏠 Additional Features', subheading: 'Any extra features your home has' }
     ];
-    
+
     sections.forEach(section => {
-        const element = document.getElementById(section.afterElement);
-        if (element) {
+        const stepContainer = document.querySelector(`.onboarding-step[data-step="${section.step}"]`);
+        if (stepContainer) {
             const sectionHeader = document.createElement('div');
-            sectionHeader.className = 'mt-8 mb-4 pt-6 border-t border-gray-200';
+            sectionHeader.className = 'mb-4';
             sectionHeader.innerHTML = `
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">${section.heading}</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-1">${section.heading}</h3>
                 <p class="text-sm text-gray-600">${section.subheading}</p>
             `;
-            element.parentElement.insertAdjacentElement('afterend', sectionHeader);
+            // Insert at very top of the step container
+            stepContainer.insertAdjacentElement('afterbegin', sectionHeader);
         }
     });
-    
-    console.log('✅ Form sections added');
+
+    console.log('✅ Form section headers added at step starts');
 });
 </script>
             
