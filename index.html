@@ -1434,10 +1434,23 @@ async function checkUserData(userId) {
 
 // Load user data and show dashboard (placeholder for now)
 function loadUserDataAndShowDashboard(userId) {
-    // For now, use existing loadData function
+    console.log('📊 Loading user data and showing dashboard for user:', userId);
+    
+    // Load the data first
     if (typeof loadData === 'function') {
-        loadData();
+        const dataLoaded = loadData();
+        console.log('📊 Data loaded:', dataLoaded);
     }
+    
+    // Make sure global variables are set
+    if (typeof window.tasks === 'undefined') {
+        window.tasks = tasks || [];
+    }
+    if (typeof window.homeData === 'undefined') {
+        window.homeData = homeData || {};
+    }
+    
+    console.log('📊 Final check - Tasks:', window.tasks?.length, 'Home:', window.homeData?.fullAddress);
     
     // Hide ALL other views first
     document.getElementById('login-page').style.display = 'none';
@@ -1445,12 +1458,21 @@ function loadUserDataAndShowDashboard(userId) {
     document.getElementById('task-setup').classList.add('hidden');
     document.getElementById('main-app').classList.remove('hidden');
     
+    // Update header with address
+    if (window.homeData?.fullAddress) {
+        const headerSubtitle = document.getElementById('header-subtitle');
+        if (headerSubtitle) {
+            headerSubtitle.textContent = window.homeData.fullAddress;
+        }
+    }
+    
     // Make sure body shows main app
     document.body.classList.add('main-app-active');
     
     // Initialize dashboard
     if (typeof showTab === 'function') {
         showTab('dashboard');
+        console.log('✅ Dashboard should now be visible');
     }
 }
     
