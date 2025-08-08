@@ -82,7 +82,6 @@ window.categoryConfig = categoryConfig;
 
 // Create maintenance plan
 function createMaintenancePlan() {
-    
     try {
         // Collect home data
         homeData = {
@@ -96,7 +95,7 @@ function createMaintenancePlan() {
         };
         homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
 
-        // Collect features with null checks
+        // Collect features
         homeData.features = {
             centralAC: document.getElementById('central-ac')?.checked || false,
             miniSplits: document.getElementById('mini-splits')?.checked || false,
@@ -121,25 +120,30 @@ function createMaintenancePlan() {
 
         // Generate tasks
         generateTaskTemplates();
-    
 
-        // Update global references immediately
+        // Update global references
         window.homeData = homeData;
         window.tasks = tasks;
 
-        // Show task setup
-        document.getElementById('setup-form').style.display = 'none';
-        document.getElementById('task-setup').classList.remove('hidden');
+        // Switch to task setup screen
+        const setupForm = document.getElementById('setup-form');
+        const taskSetup = document.getElementById('task-setup');
+
+        if (setupForm) setupForm.style.display = 'none';
+        if (taskSetup) {
+            taskSetup.classList.remove('hidden'); // remove Tailwind hidden
+            taskSetup.style.display = 'block';    // ensure visible
+        }
+
+        // Delay showTaskSetup to allow DOM update
         setTimeout(showTaskSetup, 0);
-        
+
         console.log('✅ Successfully moved to task setup screen');
-        
     } catch (error) {
         console.error('❌ Error in createMaintenancePlan:', error);
         alert('❌ Error creating maintenance plan. Check console for details.');
     }
 }
-
 // Generate task templates
 function generateTaskTemplates() {
 
