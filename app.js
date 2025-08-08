@@ -800,13 +800,12 @@ function showTaskSetup() {
 
 // FIXED: Clean simple task categories without big button at bottom
 function renderTaskCategories() {
-    const taskCategoriesContainer = document.getElementById('task-categories');
-    const taskSummaryStats = document.getElementById('task-summary-stats');
-    
-    if (!taskCategoriesContainer || !taskSummaryStats) {
-        console.error('❌ Task containers not found!');
-        return;
-    }
+const taskCategoriesContainer = document.getElementById('task-categories');
+
+if (!taskCategoriesContainer) {
+    console.error('❌ Task containers not found!');
+    return;
+}
     
     if (tasks.length === 0) {
         taskCategoriesContainer.innerHTML = '<div class="text-center text-gray-500 py-8">No tasks generated.</div>';
@@ -835,24 +834,24 @@ function renderTaskCategories() {
    const safetyTasks = tasks.filter(t => t.category === 'Safety').length;
     const seasonalTasksCount = tasks.filter(t => t.category === 'Seasonal').length;
 
-    taskSummaryStats.innerHTML = `
-        <div class="text-center">
-            <div class="text-lg font-bold text-gray-900">${totalTasks}</div>
-            <div class="text-xs text-gray-600">Total Tasks</div>
-        </div>
-        <div class="text-center">
-            <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
-            <div class="text-xs text-gray-600">Annual Cost</div>
-        </div>
-        <div class="text-center">
-           <div class="text-lg font-bold text-red-600">${safetyTasks}</div>
-            <div class="text-xs text-gray-600">Safety Tasks</div>
-        </div>
-        <div class="text-center">
-            <div class="text-lg font-bold text-purple-600">${seasonalTasksCount}</div>
-            <div class="text-xs text-gray-600">Seasonal Tasks</div>
-        </div>
-    `;
+   // taskSummaryStats.innerHTML = `
+    //     <div class="text-center">
+    //         <div class="text-lg font-bold text-gray-900">${totalTasks}</div>
+    //         <div class="text-xs text-gray-600">Total Tasks</div>
+    //     </div>
+    //     <div class="text-center">
+    //         <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
+    //         <div class="text-xs text-gray-600">Annual Cost</div>
+    //     </div>
+    //     <div class="text-center">
+    //        <div class="text-lg font-bold text-red-600">${safetyTasks}</div>
+    //         <div class="text-xs text-gray-600">Safety Tasks</div>
+    //     </div>
+    //     <div class="text-center">
+    //         <div class="text-lg font-bold text-purple-600">${seasonalTasksCount}</div>
+    //         <div class="text-xs text-gray-600">Seasonal Tasks</div>
+    //     </div>
+    // `;
 
     // Category configuration
     const categoryConfig = {
