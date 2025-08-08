@@ -2920,3 +2920,39 @@ window.saveTaskFromEdit = function() {
 window.closeTaskEditModal = function() {
     window.TaskManager.close();
 };
+// Onboarding step navigation
+document.addEventListener('DOMContentLoaded', function () {
+  let currentStep = 1;
+  const totalSteps = 3;
+
+  function showStep(step) {
+    document.querySelectorAll('.onboarding-step').forEach(div => {
+      div.classList.add('hidden');
+      if (parseInt(div.dataset.step) === step) {
+        div.classList.remove('hidden');
+      }
+    });
+
+    // Update progress bar
+    const percent = Math.round((step / totalSteps) * 100);
+    document.getElementById('progress-label').textContent = `Step ${step} of ${totalSteps}`;
+    document.getElementById('progress-percent').textContent = `${percent}%`;
+    document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+  }
+
+  // Button listeners
+  const stepButtons = [
+    { id: 'next-to-step-2', action: () => { currentStep = 2; showStep(currentStep); } },
+    { id: 'next-to-step-3', action: () => { currentStep = 3; showStep(currentStep); } },
+    { id: 'back-to-step-1', action: () => { currentStep = 1; showStep(currentStep); } },
+    { id: 'back-to-step-2', action: () => { currentStep = 2; showStep(currentStep); } }
+  ];
+
+  stepButtons.forEach(btn => {
+    const el = document.getElementById(btn.id);
+    if (el) el.addEventListener('click', btn.action);
+  });
+
+  // Show the first step initially
+  showStep(currentStep);
+});
