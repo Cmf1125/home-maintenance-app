@@ -162,9 +162,15 @@
       // 4) Mark onboarded
       await db.collection('users').doc(user.uid).set({ onboarded: true }, { merge: true });
 
-      // 5) Go to dashboard
-      statusEl.textContent = 'All set! Redirecting…';
-      window.location.href = 'index.html';
+      // 5) Set a one-time flag so the dashboard generates tasks on first load
+try {
+  localStorage.setItem('hk_needs_initial_generation', '1');
+} catch (e) { /* ignore */ }
+
+// 6) Go to dashboard
+statusEl.textContent = 'All set! Redirecting…';
+window.location.href = 'index.html';
+
     });
   </script>
 </body>
