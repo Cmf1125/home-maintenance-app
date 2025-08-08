@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Onboarding • Home Keeper</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-50">
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-lg p-6 w-full max-w-xl">
+      <h1 class="text-2xl font-semibold text-gray-900 mb-2">Let’s set up your home</h1>
+      <p class="text-sm text-gray-600 mb-6">A few details so we can create your first maintenance plan.</p>
+
+      <form id="setupForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="md:col-span-2">
+          <label class="block text-sm text-gray-700 mb-1">Home nickname</label>
+          <input id="homeName" class="w-full border rounded-lg px-3 py-2" placeholder="e.g., Stone Ridge House" />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm text-gray-700 mb-1">Street address</label>
+          <input id="address" class="w-full border rounded-lg px-3 py-2" placeholder="123 Main St" />
+        </div>
+
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">ZIP</label>
+          <input id="zip" class="w-full border rounded-lg px-3 py-2" placeholder="12345" />
+        </div>
+
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">Square footage</label>
+          <input id="sqft" type="number" class="w-full border rounded-lg px-3 py-2" placeholder="e.g., 1800" />
+        </div>
+
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">Bedrooms</label>
+          <input id="beds" type="number" class="w-full border rounded-lg px-3 py-2" placeholder="e.g., 3" />
+        </div>
+
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">Bathrooms</label>
+          <input id="baths" type="number" class="w-full border rounded-lg px-3 py-2" placeholder="e.g., 2" />
+        </div>
+
+        <div class="md:col-span-2 mt-2">
+          <button class="w-full bg-gray-900 text-white rounded-lg py-2" id="finishBtn">Generate my plan</button>
+        </div>
+      </form>
+
+      <p id="status" class="text-xs text-gray-500 mt-3"></p>
+      <p id="error" class="text-xs text-red-600 mt-2 hidden"></p>
+    </div>
+  </div>
+
+  <!-- Your Firebase config (same as login/index) -->
+  <script>
+    window.FIREBASE_CONFIG = {
+      apiKey: "AIzaSyBuBfJvkhiTs0OSFlNE8ZhSTAnOa_sidE0",
+      authDomain: "home-keeper-app.firebaseapp.com",
+      projectId: "home-keeper-app",
+      storageBucket: "home-keeper-app.firebasestorage.app",
+      messagingSenderId: "434638918453",
+      appId: "1:434638918453:web:5fd99aed69ef4a4c2b727c"
+    };
+  </script>
+
+  <!-- Firebase compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+  <script>
+    // --- Init ---
+    firebase.initializeApp(window.FIREBASE_CONFIG);
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
+
+    const $ = (id) => document.getElementById(id);
+    const statusEl = $('status');
+    const errorEl  = $('error');
+
+    // Require login
+    auth.onAuthStateChanged((user) => {
+      if (!user) window.location.replace('login.html');
+    });
+
+    async function saveProfile(uid, profile) {
+      await db.collection('users').doc(uid).set(profile, { merge: true });
+    }
+
+    // Optional: persist a basic snapshot so dashboard has data on first load
+    // Adjust keys to your app's localStorage usage if you want.
+    async function saveSnapshot(uid) {
+      const snapshot = {
+        settings: {
+          homeName: $('homeName').value.trim() || null,
+          address: $('address').value.trim() || null,
+          zip: $('zip').value.trim() || null,
+          sqft: Number($('sqft').value) || null,
+          beds: Number($('beds').value) || null,
+          baths: Number($('baths').value) || null,
+        },
+        // Start empty; your app can fill these later or in the generation step:
+        appliances: JSON.parse(localStorage.getItem('appliances') || '[]'),
+        tasks: JSON.parse(localStorage.getItem('tasks') || '[]'),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      // Local first (so your dashboard sees it immediately)
+      localStorage.setItem('settings', JSON.stringify(snapshot.settings));
+      // Keep existing local appliances/tasks if present
+      // Save to Firestore (optional but recommended to sync across devices)
+      await db.collection('userSnapshots').doc(uid).set(snapshot, { merge: true });
+    }
+
+    async function runGenerationIfAvailable() {
+      // Safely call your app’s existing generation hooks if they exist.
+      // All are wrapped in try/catch and presence checks so nothing crashes.
+      try {
+        if (window.TaskEngine && typeof window.TaskEngine.generateInitialTasks === 'function') {
+          await window.TaskEngine.generateInitialTasks();
+        } else if (window.generateInitialTasks) {
+          await window.generateInitialTasks();
+        }
+      } catch (e) {
+        console.warn('[onboarding] task generation skipped:', e);
+      }
+    }
+
+    $('finishBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      errorEl.classList.add('hidden');
+      statusEl.textContent = 'Saving your setup…';
+
+      const user = auth.currentUser;
+      if (!user) {
+        window.location.replace('login.html');
+        return;
+      }
+
+      // 1) Save basic profile fields
+      await saveProfile(user.uid, {
+        onboarded: false, // stays false until we finish
+        homeName: $('homeName').value.trim() || null,
+        address: $('address').value.trim() || null,
+        zip: $('zip').value.trim() || null,
+        sqft: Number($('sqft').value) || null,
+        beds: Number($('beds').value) || null,
+        baths: Number($('baths').value) || null,
+        lastSetupAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      // 2) Optionally generate tasks using your app’s code (no-op if not present)
+      statusEl.textContent = 'Generating your maintenance plan…';
+      await runGenerationIfAvailable();
+
+      // 3) Save a user snapshot (so dashboard/localStorage are ready)
+      statusEl.textContent = 'Preparing your dashboard…';
+      await saveSnapshot(user.uid);
+
+      // 4) Mark onboarded
+      await db.collection('users').doc(user.uid).set({ onboarded: true }, { merge: true });
+
+      // 5) Go to dashboard
+      statusEl.textContent = 'All set! Redirecting…';
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>
