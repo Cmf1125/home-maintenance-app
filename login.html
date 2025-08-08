@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign in • Home Keeper</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-50">
+  <div class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+      <h1 class="text-2xl font-semibold text-gray-900 mb-1">Welcome</h1>
+      <p class="text-sm text-gray-600 mb-6">Sign in to manage your home</p>
+
+      <button id="googleBtn" class="w-full border rounded-lg py-2 mb-3 hover:bg-gray-50">Continue with Google</button>
+
+      <div class="text-center text-xs text-gray-400 my-3">or</div>
+
+      <form id="emailForm" class="space-y-3">
+        <input id="email" class="w-full border rounded-lg px-3 py-2" placeholder="Email" type="email" required />
+        <input id="password" class="w-full border rounded-lg px-3 py-2" placeholder="Password" type="password" required />
+        <button class="w-full bg-gray-900 text-white rounded-lg py-2">Continue</button>
+      </form>
+
+      <p id="error" class="text-xs text-red-600 mt-3 hidden"></p>
+    </div>
+  </div>
+
+  <!-- Your Firebase config -->
+  <script>
+    window.FIREBASE_CONFIG = {
+      apiKey: "AIzaSyBuBfJvkhiTs0OSFlNE8ZhSTAnOa_sidE0",
+      authDomain: "home-keeper-app.firebaseapp.com",
+      projectId: "home-keeper-app",
+      storageBucket: "home-keeper-app.firebasestorage.app",
+      messagingSenderId: "434638918453",
+      appId: "1:434638918453:web:5fd99aed69ef4a4c2b727c"
+    };
+  </script>
+
+  <!-- Firebase compat SDKs (keeps things simple, no bundler needed) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+  <script>
+    // --- Init ---
+    firebase.initializeApp(window.FIREBASE_CONFIG);
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
+
+    // Simple helpers
+    const go  = (url) => window.location.href = url;
+    const q   = (id) => document.getElementById(id);
+    const err = (e) => {
+      const el = q('error');
+      if (!el) return alert(e?.message || String(e));
+      el.textContent = e?.message || String(e);
+      el.classList.remove('hidden');
+    };
+
+    // Route on auth change
+    auth.onAuthStateChanged(async (user) => {
+      const here = location.pathname.split('/').pop();
+      if (!user) {
+        // stay on login.html
+        return;
+      }
+
+      const userRef = db.collection('users').doc(user.uid);
+      const snap = await userRef.get();
+
+      if (!snap.exists) {
+        // First ever sign-in: create profile with onboarded:false
+        await userRef.set({
+          email: user.email || null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          onboarded: false
+        });
+        return go('onboarding.html');
+      }
+
+      const data = snap.data() || {};
+      if (data.onboarded) return go('index.html');
+      return go('onboarding.html');
+    });
+
+    // Google sign-in
+    q('googleBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        await auth.signInWithPopup(provider);
+        // onAuthStateChanged will handle routing
+      } catch (e) { err(e); }
+    });
+
+    // Email/password sign-in (create if not found)
+    q('emailForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = q('email').value.trim();
+      const password = q('password').value;
+
+      try {
+        try {
+          await auth.signInWithEmailAndPassword(email, password);
+        } catch (e1) {
+          if (e1.code === 'auth/user-not-found') {
+            await auth.createUserWithEmailAndPassword(email, password);
+          } else {
+            throw e1;
+          }
+        }
+        // onAuthStateChanged will handle routing
+      } catch (e2) { err(e2); }
+    });
+  </script>
+</body>
+</html>
