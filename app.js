@@ -727,12 +727,12 @@ function showTaskSetup() {
 }
 
 // Update property summary
-function updatePropertySummary() {
-    const taskSetupSummary = document.getElementById('task-setup-summary');
-    if (!taskSetupSummary) {
-        console.error('❌ Task setup summary element not found');
-        return;
-    }
+    function updatePropertySummary() {
+       // const taskSetupSummary = document.getElementById('task-setup-summary');
+       // if (!taskSetupSummary) {
+          // console.error('❌ Task setup summary element not found');
+         // return;
+      // }
     
     const heatingCooling = [];
     if (homeData.features.centralAC) heatingCooling.push('Central AC/Heat');
@@ -786,16 +786,16 @@ function updatePropertySummary() {
         'mobile-home': 'Mobile Home'
     };
 
-    taskSetupSummary.innerHTML = `
-        <div class="space-y-1 text-sm">
-            <div><strong>🏠 Address:</strong> ${homeData.fullAddress}</div>
-            <div><strong>🏢 Type:</strong> ${propertyTypeDisplay[homeData.propertyType]} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString()} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt}</div>
-            ${heatingCooling.length > 0 ? `<div><strong>🌡️ Heating/Cooling:</strong> ${heatingCooling.join(', ')}</div>` : ''}
-            ${waterSewer.length > 0 ? `<div><strong>💧 Water/Sewer:</strong> ${waterSewer.join(', ')}</div>` : ''}
-            ${otherFeatures.length > 0 ? `<div><strong>⚙️ Other Features:</strong> ${otherFeatures.join(', ')}</div>` : ''}
-            <div><strong>🌍 Climate Region:</strong> ${regionDisplayNames[climateRegion]} (includes regional seasonal tasks)</div>
-        </div>
-    `;
+   // taskSetupSummary.innerHTML = `
+       // <div class="space-y-1 text-sm">
+           // <div><strong>🏠 Address:</strong> ${homeData.fullAddress}</div>
+           // <div><strong>🏢 Type:</strong> ${propertyTypeDisplay[homeData.propertyType]} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString()} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt}</div>
+           // ${heatingCooling.length > 0 ? `<div><strong>🌡️ Heating/Cooling:</strong> ${heatingCooling.join(', ')}</div>` : ''}
+           // ${waterSewer.length > 0 ? `<div><strong>💧 Water/Sewer:</strong> ${waterSewer.join(', ')}</div>` : ''}
+           // ${otherFeatures.length > 0 ? `<div><strong>⚙️ Other Features:</strong> ${otherFeatures.join(', ')}</div>` : ''}
+           // <div><strong>🌍 Climate Region:</strong> ${regionDisplayNames[climateRegion]} (includes regional seasonal tasks)</div>
+       // </div>
+    //`;
 }
 
 // FIXED: Clean simple task categories without big button at bottom
