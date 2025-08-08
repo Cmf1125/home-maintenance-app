@@ -2926,22 +2926,34 @@ window.saveTaskFromEdit = function() {
 window.closeTaskEditModal = function() {
     window.TaskManager.close();
 };
+// Onboarding step navigation
+document.addEventListener('DOMContentLoaded', function () {
+  let currentStep = 1;
+  const totalSteps = 3;
 
-<!-- Onboarding Progress -->
-<div id="onboarding-progress" class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200 px-6 py-2">
-  <div class="flex items-center justify-between text-sm font-medium text-gray-600 mb-2">
-    <span id="progress-label">Step 1 of 3</span>
-    <span id="progress-percent">33%</span>
-  </div>
-  <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-    <div id="progress-bar-fill" class="h-full bg-blue-500" style="width: 33%;"></div>
-  </div>
-  <div class="mt-3 grid grid-cols-3 text-center text-xs text-gray-500">
-    <div class="font-semibold text-gray-900">Basic info</div>
-    <div>Systems & features</div>
-    <div>Preferences</div>
-  </div>
-</div>
+  function showStep(step) {
+    document.querySelectorAll('.onboarding-step').forEach(div => {
+      div.classList.add('hidden');
+      if (parseInt(div.dataset.step) === step) {
+        div.classList.remove('hidden');
+      }
+    });
+
+    // Update progress bar
+    const percent = Math.round((step / totalSteps) * 100);
+    document.getElementById('progress-label').textContent = `Step ${step} of ${totalSteps}`;
+    document.getElementById('progress-percent').textContent = `${percent}%`;
+    document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+    
+   // Scroll so the new step sits just below the fixed progress bar
+    const stepEl = document.querySelector(`.onboarding-step[data-step="${step}"]`);
+    const progress = document.getElementById('onboarding-progress');
+    const headerH = progress ? progress.offsetHeight : 0;
+    if (stepEl) {
+      const y = stepEl.getBoundingClientRect().top + window.pageYOffset - headerH - 8; // small buffer
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+}
+      }
 
   // Button listeners
   const stepButtons = [
