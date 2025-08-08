@@ -1300,6 +1300,111 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 console.log('🔥 Firebase initialized successfully');
 </script>
+
+<!-- Authentication Functions -->
+<script>
+// Authentication functions
+const auth = firebase.auth();
+
+// Toggle between sign-up and sign-in forms
+function toggleAuthForms() {
+    const signupForm = document.getElementById('email-signup-form');
+    const signinForm = document.getElementById('email-signin-form');
+    const showSignin = document.getElementById('show-signin');
+    const showSignup = document.getElementById('show-signup');
+    
+    if (signupForm.classList.contains('hidden')) {
+        // Show signup, hide signin
+        signupForm.classList.remove('hidden');
+        signinForm.classList.add('hidden');
+    } else {
+        // Show signin, hide signup
+        signupForm.classList.add('hidden');
+        signinForm.classList.remove('hidden');
+    }
+}
+
+// Email Sign Up
+async function signUpWithEmail() {
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    
+    if (!email || !password) {
+        alert('❌ Please enter both email and password');
+        return;
+    }
+    
+    if (password.length < 6) {
+        alert('❌ Password must be at least 6 characters');
+        return;
+    }
+    
+    try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        console.log('✅ User signed up:', userCredential.user.email);
+        showSetupForm();
+    } catch (error) {
+        console.error('❌ Sign up error:', error);
+        alert('❌ Sign up failed: ' + error.message);
+    }
+}
+
+// Email Sign In
+async function signInWithEmail() {
+    const email = document.getElementById('signin-email').value;
+    const password = document.getElementById('signin-password').value;
+    
+    if (!email || !password) {
+        alert('❌ Please enter both email and password');
+        return;
+    }
+    
+    try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        console.log('✅ User signed in:', userCredential.user.email);
+        showSetupForm();
+    } catch (error) {
+        console.error('❌ Sign in error:', error);
+        alert('❌ Sign in failed: ' + error.message);
+    }
+}
+
+// Google Sign In
+async function signInWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    
+    try {
+        const result = await auth.signInWithPopup(provider);
+        console.log('✅ Google sign in successful:', result.user.email);
+        showSetupForm();
+    } catch (error) {
+        console.error('❌ Google sign in error:', error);
+        alert('❌ Google sign in failed: ' + error.message);
+    }
+}
+
+// Show setup form after successful login
+function showSetupForm() {
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('setup-form').style.display = 'block';
+}
+
+// Set up event listeners when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle forms
+    document.getElementById('show-signin')?.addEventListener('click', toggleAuthForms);
+    document.getElementById('show-signup')?.addEventListener('click', toggleAuthForms);
+    
+    // Email authentication
+    document.getElementById('email-signup')?.addEventListener('click', signUpWithEmail);
+    document.getElementById('email-signin')?.addEventListener('click', signInWithEmail);
+    
+    // Google authentication
+    document.getElementById('google-signin')?.addEventListener('click', signInWithGoogle);
+    
+    console.log('🔑 Authentication event listeners set up');
+});
+</script>
             
     <!-- ✅ Core Scripts go here -->
     <script src="date-utils.js"></script>
