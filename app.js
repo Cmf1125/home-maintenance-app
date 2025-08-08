@@ -2926,12 +2926,8 @@ window.saveTaskFromEdit = function() {
 window.closeTaskEditModal = function() {
     window.TaskManager.close();
 };
-// Onboarding step navigation
-document.addEventListener('DOMContentLoaded', function () {
-  let currentStep = 1;
-  const totalSteps = 3;
 
-  function showStep(step) {
+function showStep(step) {
     document.querySelectorAll('.onboarding-step').forEach(div => {
       div.classList.add('hidden');
       if (parseInt(div.dataset.step) === step) {
@@ -2942,18 +2938,43 @@ document.addEventListener('DOMContentLoaded', function () {
     // Update progress bar
     const percent = Math.round((step / totalSteps) * 100);
     document.getElementById('progress-label').textContent = `Step ${step} of ${totalSteps}`;
-    document.getElementById('progress-percent').textContent = `${percent}%`;
+    document.getElementById('progress-percent').textContent = `${percent}% Complete`;
     document.getElementById('progress-bar-fill').style.width = `${percent}%`;
     
-   // Scroll so the new step sits just below the fixed progress bar
+    // Update step indicators with smooth animations
+    for (let i = 1; i <= totalSteps; i++) {
+      const indicator = document.getElementById(`step-${i}-indicator`);
+      const circle = indicator.querySelector('div');
+      const text = indicator.querySelector('span');
+      
+      if (i <= step) {
+        // Active or completed step
+        circle.className = 'w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold transition-all duration-300';
+        text.className = 'text-sm font-medium text-gray-900';
+        if (i < step) {
+          // Completed step - show checkmark
+          circle.innerHTML = '✓';
+        } else {
+          // Current step - show number
+          circle.innerHTML = i;
+        }
+      } else {
+        // Future step
+        circle.className = 'w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-sm font-semibold transition-all duration-300';
+        text.className = 'text-sm font-medium text-gray-500';
+        circle.innerHTML = i;
+      }
+    }
+    
+    // Scroll so the new step sits just below the fixed progress bar
     const stepEl = document.querySelector(`.onboarding-step[data-step="${step}"]`);
     const progress = document.getElementById('onboarding-progress');
     const headerH = progress ? progress.offsetHeight : 0;
     if (stepEl) {
-      const y = stepEl.getBoundingClientRect().top + window.pageYOffset - headerH - 8; // small buffer
+      const y = stepEl.getBoundingClientRect().top + window.pageYOffset - headerH - 8;
       window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
-}
-      }
+    }
+  }
 
   // Button listeners
   const stepButtons = [
