@@ -1416,7 +1416,8 @@ auth.onAuthStateChanged(async function(user) {
 async function checkUserData(userId) {
     // For now, check localStorage - we'll upgrade this to Firebase next
     const savedData = localStorage.getItem('casaCareData');
-    return savedData && JSON.parse(savedData).homeData?.fullAddress;
+    const hasAddress = savedData && JSON.parse(savedData).homeData?.fullAddress;
+    return !!hasAddress; // Convert to true/false
 }
 
 // Load user data and show dashboard (placeholder for now)
