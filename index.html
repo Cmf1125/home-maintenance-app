@@ -1497,12 +1497,44 @@ document.addEventListener('DOMContentLoaded', function() {
     const setupForm = document.getElementById('setup-form');
     if (!setupForm || setupForm.style.display === 'none') return;
     
-    console.log('✅ Progressive form script loaded');
+    // Hide all sections after the first few fields initially
+    const allInputs = setupForm.querySelectorAll('input, select, textarea');
+    const firstSectionEnd = 5; // Show first 5 fields (address, city, state, zip, property type)
     
-    // For now, just log that we're ready
-    // We'll add the reveal logic in the next step
+    // Hide everything after the basic info
+    for (let i = firstSectionEnd; i < allInputs.length; i++) {
+        const field = allInputs[i];
+        const fieldContainer = field.closest('div');
+        if (fieldContainer) {
+            fieldContainer.style.display = 'none';
+        }
+    }
+    
+    // Add a continue button after the basic info
+    const propertyTypeField = document.getElementById('property-type');
+    if (propertyTypeField) {
+        const continueBtn = document.createElement('button');
+        continueBtn.type = 'button';
+        continueBtn.className = 'w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium continue-btn';
+        continueBtn.textContent = 'Continue to Home Systems →';
+        continueBtn.onclick = function() {
+            // Show the rest of the form
+            for (let i = firstSectionEnd; i < allInputs.length; i++) {
+                const field = allInputs[i];
+                const fieldContainer = field.closest('div');
+                if (fieldContainer) {
+                    fieldContainer.style.display = 'block';
+                }
+            }
+            continueBtn.style.display = 'none';
+        };
+        
+        propertyTypeField.parentElement.insertAdjacentElement('afterend', continueBtn);
+    }
+    
+    console.log('✅ Progressive form reveal active');
 });
-</script>  
+</script>
             
 </body>
 </html>
