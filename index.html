@@ -1388,7 +1388,55 @@ function showSetupForm() {
     document.getElementById('login-page').style.display = 'none';
     document.getElementById('setup-form').style.display = 'block';
 }
+    
+// Check authentication state and load user data
+auth.onAuthStateChanged(async function(user) {
+    if (user) {
+        console.log('✅ User is signed in:', user.email);
+        
+        // Check if user has existing data in Firebase
+        const hasUserData = await checkUserData(user.uid);
+        
+        if (hasUserData) {
+            console.log('📊 User has existing data, loading dashboard...');
+            loadUserDataAndShowDashboard(user.uid);
+        } else {
+            console.log('🆕 New user, showing setup form...');
+            showSetupForm();
+        }
+    } else {
+        console.log('👤 No user signed in, showing login page');
+        document.getElementById('login-page').style.display = 'block';
+        document.getElementById('setup-form').style.display = 'none';
+        document.getElementById('main-app').classList.add('hidden');
+    }
+});
 
+// Check if user has data in Firebase (placeholder for now)
+async function checkUserData(userId) {
+    // For now, check localStorage - we'll upgrade this to Firebase next
+    const savedData = localStorage.getItem('casaCareData');
+    return savedData && JSON.parse(savedData).homeData?.fullAddress;
+}
+
+// Load user data and show dashboard (placeholder for now)
+function loadUserDataAndShowDashboard(userId) {
+    // For now, use existing loadData function
+    if (typeof loadData === 'function') {
+        loadData();
+    }
+    
+    // Show main app
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('setup-form').style.display = 'none';
+    document.getElementById('main-app').classList.remove('hidden');
+    
+    // Initialize dashboard
+    if (typeof showTab === 'function') {
+        showTab('dashboard');
+    }
+}
+    
 // Set up event listeners when page loads
 document.addEventListener('DOMContentLoaded', function() {
     // Toggle forms
