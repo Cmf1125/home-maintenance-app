@@ -2960,15 +2960,20 @@ document.addEventListener('DOMContentLoaded', function () {
   // Show the first step initially
   showStep(currentStep);
 });
-document.addEventListener('DOMContentLoaded', () => {
-    const backBtn = document.getElementById('back-to-home-info');
-    if (backBtn) {
-        backBtn.addEventListener('click', () => {
-            // Hide task setup
-            document.getElementById('task-setup').classList.add('hidden');
-            // Show setup form again
-            document.getElementById('setup-form').style.display = 'block';
-            document.getElementById('setup-form').classList.remove('hidden');
-        });
+function goBackToHomeSetup() {
+    // Hide the task setup screen
+    const taskSetup = document.getElementById('task-setup');
+    if (taskSetup) taskSetup.classList.add('hidden');
+
+    // Show the setup form again
+    const setupForm = document.getElementById('setup-form');
+    if (setupForm) {
+        setupForm.style.display = 'block';
+        setupForm.classList.remove('hidden');
     }
-});
+
+    // Optional: reset to the last step they were on
+    // If you want them to always start at Step 3, uncomment:
+    // document.querySelectorAll('.onboarding-step').forEach(step => step.classList.add('hidden'));
+    // document.querySelector('.onboarding-step[data-step="3"]').classList.remove('hidden');
+}
