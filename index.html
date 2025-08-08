@@ -300,20 +300,22 @@
     </div>
 </div> <!-- ✅ Tip box closes here -->
 
-<!-- Back button -->
-<div class="flex justify-start mb-4">
-    <button type="button" id="back-to-step-2" class="px-4 py-2 bg-gray-300 rounded-lg">
-        ← Back
-    </button>
-</div>
+<!-- Buttons row (stack on mobile, side-by-side on desktop) -->
+<div class="mt-4 flex flex-col sm:flex-row gap-3">
+  <button
+    type="button"
+    id="back-to-step-2"
+    class="w-full sm:flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg">
+    ← Back
+  </button>
 
-<!-- Create My Plan button -->
-<button 
-    type="button" 
-    onclick="createMaintenancePlan()" 
-    class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg touch-btn">
+  <button
+    type="button"
+    onclick="createMaintenancePlan()"
+    class="w-full sm:flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors touch-btn">
     🚀 Create My Plan
-</button>
+  </button>
+</div>
                   
 </div> <!-- This closes Step 3 -->
 </div> <!-- This closes the space-y-6 block -->
