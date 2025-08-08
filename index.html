@@ -23,6 +23,31 @@
 
 <!-- App Icon -->
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='180' height='180' fill='%232563eb'/%3E%3Ctext x='90' y='110' font-family='Arial' font-size='50' fill='white' text-anchor='middle'%3E🏠%3C/text%3E%3C/svg%3E">
+<!-- 🔐 Firebase Auth Guard -->
+    <script>
+      (function () {
+        const cfg = {
+          apiKey: "AIzaSyBuBfJvkhiTs0OSFlNE8ZhSTAnOa_sidE0",
+          authDomain: "home-keeper-app.firebaseapp.com",
+          projectId: "home-keeper-app",
+          storageBucket: "home-keeper-app.firebasestorage.app",
+          messagingSenderId: "434638918453",
+          appId: "1:434638918453:web:5fd99aed69ef4a4c2b727c"
+        };
+        const s1 = document.createElement('script');
+        s1.src = "https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js";
+        const s2 = document.createElement('script');
+        s2.src = "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js";
+        s2.onload = function () {
+          firebase.initializeApp(cfg);
+          firebase.auth().onAuthStateChanged(function (user) {
+            if (!user) window.location.replace('login.html');
+          });
+        };
+        document.head.appendChild(s1);
+        document.head.appendChild(s2);
+      })();
+    </script>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Smart Installation Banner -->
