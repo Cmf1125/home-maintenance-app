@@ -2395,34 +2395,11 @@ function initializeApp() {
     window.tasks = tasks;
     window.homeData = homeData;
     
-   if (hasExistingData()) {
-    // Hide setup screens AND login page
-    document.getElementById('login-page').style.display = 'none';
-    document.getElementById('setup-form').style.display = 'none';
-    document.getElementById('task-setup').classList.add('hidden');
-    document.getElementById('main-app').classList.remove('hidden');
-        
-        // Update header
-        document.getElementById('header-subtitle').textContent = homeData.fullAddress;
-
-        // Show bottom navigation for returning users
-        document.body.classList.add('main-app-active');
-        
-        // Update global references
-        window.tasks = tasks;
-        window.homeData = homeData;
-        
-        // Show dashboard
-        showTab('dashboard');
-        
-        console.log(`👋 Welcome back! Loaded ${tasks.length} tasks for ${homeData.fullAddress}`);
-   } else {
-    // Don't show anything here - let Firebase auth handle it
-    document.getElementById('setup-form').style.display = 'none';
-    document.getElementById('task-setup').classList.add('hidden');
-    document.getElementById('main-app').classList.add('hidden');
-    // Login page visibility will be controlled by Firebase auth
-}
+   // Let Firebase auth handle all flow control - don't check for existing data here
+document.getElementById('setup-form').style.display = 'none';
+document.getElementById('task-setup').classList.add('hidden');
+document.getElementById('main-app').classList.add('hidden');
+// Login page visibility will be controlled by Firebase auth
     
    // ADD THIS LINE at the end:
     initializeDateManagement();
