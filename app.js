@@ -2416,11 +2416,12 @@ function initializeApp() {
         showTab('dashboard');
         
         console.log(`👋 Welcome back! Loaded ${tasks.length} tasks for ${homeData.fullAddress}`);
-    } else {
-    document.getElementById('login-page').style.display = 'block';
+   } else {
+    // Don't show anything here - let Firebase auth handle it
     document.getElementById('setup-form').style.display = 'none';
     document.getElementById('task-setup').classList.add('hidden');
     document.getElementById('main-app').classList.add('hidden');
+    // Login page visibility will be controlled by Firebase auth
 }
     
    // ADD THIS LINE at the end:
