@@ -89,40 +89,60 @@
     }
 
     // Route on auth change
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) return; // stay on login
-      try {
-        setBusy(true);
-        clearErr();
+   auth.onAuthStateChanged(async (user) => {
+  if (!user) return; // stay on login
+  try {
+    setBusy(true); clearErr();
 
-        const userRef = db.collection('users').doc(user.uid);
-        const snap = await userRef.get();
+    const userRef = db.collection('users').doc(user.uid);
+    let snap = await userRef.get();
 
-        if (!snap.exists) {
-          // First sign-in ever -> create profile with onboarded:false
-          await userRef.set({
-            email: user.email || null,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            onboarded: false
-          });
-          return go('onboarding.html');
-        }
+    // If no profile doc yet, see if a snapshot exists (implies they used the app before)
+    if (!snap.exists) {
+      const snapDoc = await db.collection('userSnapshots').doc(user.uid).get();
+      if (snapDoc.exists) {
+        // Recover as an existing user
+        await userRef.set({
+          email: user.email || null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          onboarded: true
+        }, { merge: true });
 
-        const data = snap.data() || {};
-        if (data.onboarded) {
-          // Existing + onboarded: hydrate first, then dashboard
-          await hydrateLocalForUser(user.uid);
-          return go('index.html');
-        }
-
-        // Not onboarded yet
-        return go('onboarding.html');
-      } catch (e) {
-        showErr(e);
-      } finally {
-        setBusy(false);
+        await hydrateLocalForUser(user.uid);
+        return go('index.html');
       }
-    });
+
+      // Truly new user -> create profile and go to onboarding
+      await userRef.set({
+        email: user.email || null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        onboarded: false
+      });
+      return go('onboarding.html');
+    }
+
+    // Profile exists
+    const data = snap.data() || {};
+    if (data.onboarded) {
+      await hydrateLocalForUser(user.uid);
+      return go('index.html');
+    }
+
+    // Not onboarded -> last chance: if they have a snapshot, treat as onboarded
+    const snapDoc = await db.collection('userSnapshots').doc(user.uid).get();
+    if (snapDoc.exists) {
+      await userRef.set({ onboarded: true }, { merge: true });
+      await hydrateLocalForUser(user.uid);
+      return go('index.html');
+    }
+
+    return go('onboarding.html');
+  } catch (e) {
+    showErr(e);
+  } finally {
+    setBusy(false);
+  }
+});
 
     // Prevent form submit from reloading page
     q('emailForm').addEventListener('submit', (e) => e.preventDefault());
