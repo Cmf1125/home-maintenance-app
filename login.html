@@ -2,17 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login - The Home Keeper</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Firebase SDKs -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
   <script>
-    // Your Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBuBfJvkhiTs0OSFlNE8ZhSTAnOa_sidE0",
       authDomain: "home-keeper-app.firebaseapp.com",
@@ -21,66 +19,77 @@
       messagingSenderId: "434638918453",
       appId: "1:434638918453:web:5fd99aed69ef4a4c2b727c"
     };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   </script>
 </head>
-<body class="bg-gray-50 flex items-center justify-center min-h-screen">
-  <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
-    <h1 class="text-2xl font-bold mb-6 text-center">Welcome to The Home Keeper</h1>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-    <!-- Email Sign Up/Login -->
-    <input id="email" type="email" placeholder="Email" class="border rounded w-full p-2 mb-3" />
-    <input id="password" type="password" placeholder="Password" class="border rounded w-full p-2 mb-4" />
+  <div class="bg-white p-8 rounded shadow-md w-full max-w-sm">
+    <h1 class="text-2xl font-bold mb-4 text-center">The Home Keeper</h1>
+    <p class="mb-6 text-gray-600 text-center">Sign up or log in to continue</p>
 
-    <div class="flex gap-2 mb-4">
-      <button id="signupBtn" class="flex-1 bg-blue-500 text-white p-2 rounded">Create Account</button>
-      <button id="loginBtn" class="flex-1 bg-green-500 text-white p-2 rounded">Login</button>
-    </div>
+    <!-- Email -->
+    <input id="email" type="email" placeholder="Email"
+      class="border rounded w-full px-3 py-2 mb-3"/>
 
-    <div class="text-center mb-4">— or —</div>
+    <!-- Password -->
+    <input id="password" type="password" placeholder="Password"
+      class="border rounded w-full px-3 py-2 mb-3"/>
 
-    <!-- Google Login -->
-    <button id="googleBtn" class="w-full bg-red-500 text-white p-2 rounded">Continue with Google</button>
+    <!-- Buttons -->
+    <button id="signupBtn" class="bg-blue-500 hover:bg-blue-600 text-white w-full py-2 rounded mb-2">
+      Create Account
+    </button>
+    <button id="loginBtn" class="bg-green-500 hover:bg-green-600 text-white w-full py-2 rounded mb-4">
+      Login
+    </button>
+
+    <div class="text-center text-gray-500 my-2">OR</div>
+
+    <!-- Google -->
+    <button id="googleBtn" class="bg-red-500 hover:bg-red-600 text-white w-full py-2 rounded">
+      Continue with Google
+    </button>
+
+    <p id="error" class="text-red-500 text-sm mt-3 text-center"></p>
   </div>
 
   <script>
-    const emailEl = document.getElementById('email');
-    const passwordEl = document.getElementById('password');
+    const auth = firebase.auth();
+    const $ = id => document.getElementById(id);
+    const showError = msg => { $("error").textContent = msg; };
 
-    document.getElementById('signupBtn').addEventListener('click', async () => {
+    // Email sign-up
+    $("signupBtn").addEventListener("click", async () => {
+      showError("");
       try {
-        await auth.createUserWithEmailAndPassword(emailEl.value, passwordEl.value);
-        window.location.href = 'index.html';
+        await auth.createUserWithEmailAndPassword($("email").value, $("password").value);
+        window.location.href = "index.html";
       } catch (err) {
-        alert(err.message);
+        showError(err.message);
       }
     });
 
-    document.getElementById('loginBtn').addEventListener('click', async () => {
+    // Email login
+    $("loginBtn").addEventListener("click", async () => {
+      showError("");
       try {
-        await auth.signInWithEmailAndPassword(emailEl.value, passwordEl.value);
-        window.location.href = 'index.html';
+        await auth.signInWithEmailAndPassword($("email").value, $("password").value);
+        window.location.href = "index.html";
       } catch (err) {
-        alert(err.message);
+        showError(err.message);
       }
     });
 
-    document.getElementById('googleBtn').addEventListener('click', async () => {
+    // Google login
+    $("googleBtn").addEventListener("click", async () => {
+      showError("");
       try {
         const provider = new firebase.auth.GoogleAuthProvider();
         await auth.signInWithPopup(provider);
-        window.location.href = 'index.html';
+        window.location.href = "index.html";
       } catch (err) {
-        alert(err.message);
-      }
-    });
-
-    // Auto-redirect if already logged in
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        window.location.href = 'index.html';
+        showError(err.message);
       }
     });
   </script>
