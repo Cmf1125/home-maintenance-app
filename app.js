@@ -2943,9 +2943,14 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('progress-percent').textContent = `${percent}%`;
     document.getElementById('progress-bar-fill').style.width = `${percent}%`;
     
-    // Scroll to top when step changes
-     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+   // Scroll so the new step sits just below the fixed progress bar
+    const stepEl = document.querySelector(`.onboarding-step[data-step="${step}"]`);
+    const progress = document.getElementById('onboarding-progress');
+    const headerH = progress ? progress.offsetHeight : 0;
+    if (stepEl) {
+      const y = stepEl.getBoundingClientRect().top + window.pageYOffset - headerH - 8; // small buffer
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+}
 
   // Button listeners
   const stepButtons = [
