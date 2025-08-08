@@ -53,9 +53,12 @@
       q('busy').classList.toggle('hidden', !on);
       ['googleBtn','emailLoginBtn','emailSignupBtn'].forEach(id => { const b=q(id); if(b) b.disabled = on; });
     };
-    const showErr = e => { const el=q('error'); el.textContent = e?.message || String(e); el.classList.remove('hidden'); };
-    const clearErr = () => q('error').classList.add('hidden');
-    const go = url => window.location.href = url;
+   const showErr = (e) => {
+  const msg = `${e?.code || 'error'}: ${e?.message || String(e)}`;
+  const el = document.getElementById('error');
+  if (el) { el.textContent = msg; el.classList.remove('hidden'); }
+  console.error('AUTH ERROR', e);
+};
 
     // Routing: existing onboarded -> index, others -> onboarding
     auth.onAuthStateChanged(async (user) => {
@@ -76,12 +79,29 @@
       finally { setBusy(false); }
     });
 
-    // Google
-    q('googleBtn').addEventListener('click', async (e) => {
-      e.preventDefault();
-      try { setBusy(true); clearErr(); await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-      catch (e) { showErr(e); } finally { setBusy(false); }
-    });
+   // Google
+q('googleBtn').addEventListener('click', async (e) => {
+  e.preventDefault();
+  try {
+    setBusy(true); 
+    clearErr();
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try {
+      await auth.signInWithPopup(provider);
+    } catch (err) {
+      if (err && (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user')) {
+        await auth.signInWithRedirect(provider);
+      } else {
+        throw err;
+      }
+    }
+  } catch (e) {
+    showErr(e);
+  } finally {
+    setBusy(false);
+  }
+});
+
 
     // Email Sign In
     q('emailLoginBtn').addEventListener('click', async () => {
