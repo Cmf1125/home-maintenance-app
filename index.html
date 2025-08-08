@@ -1427,10 +1427,14 @@ function loadUserDataAndShowDashboard(userId) {
         loadData();
     }
     
-    // Show main app
+    // Hide ALL other views first
     document.getElementById('login-page').style.display = 'none';
     document.getElementById('setup-form').style.display = 'none';
+    document.getElementById('task-setup').classList.add('hidden');
     document.getElementById('main-app').classList.remove('hidden');
+    
+    // Make sure body shows main app
+    document.body.classList.add('main-app-active');
     
     // Initialize dashboard
     if (typeof showTab === 'function') {
