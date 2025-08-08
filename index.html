@@ -354,6 +354,47 @@
 </div> <!-- This closes the white rounded-xl setup card -->
 </div> <!-- This closes #setup-form -->
 
+        <!-- NEW: Property Confirmation Page -->
+<div id="property-confirmation" class="hidden p-4 main-content pt-20">
+    <div class="bg-white rounded-xl p-6 shadow-lg max-w-2xl mx-auto">
+        <div class="text-center mb-6">
+            <div class="text-4xl mb-4">✅</div>
+            <h2 class="text-xl font-bold text-gray-900 mb-2">Confirm Your Property</h2>
+            <p class="text-gray-600 text-sm">Please review your home details before we generate your maintenance plan</p>
+        </div>
+        
+        <!-- Property Details Card -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 mb-6">
+            <h3 class="font-semibold text-blue-900 mb-4 flex items-center gap-2">
+                <span class="text-xl">🏠</span>
+                Your Property Details
+            </h3>
+            <div id="confirmation-summary" class="text-sm text-blue-800 space-y-2">
+                <!-- Property summary will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex gap-3">
+            <button onclick="goBackToHomeSetup()" 
+                    class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition-colors touch-btn">
+                ← Edit Details
+            </button>
+            <button onclick="proceedToTaskGeneration()" 
+                    class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-colors touch-btn">
+                ✨ Generate My Tasks
+            </button>
+        </div>
+        
+        <!-- Helper Text -->
+        <div class="mt-6 text-center">
+            <p class="text-xs text-gray-500">
+                We'll create a personalized maintenance schedule based on your home's features and location
+            </p>
+        </div>
+    </div>
+</div>
+
         <!-- Task Setup Screen -->
         <div id="task-setup" class="hidden p-4 main-content">
             <div class="bg-white rounded-xl p-6 shadow-lg max-w-4xl mx-auto">
