@@ -2942,6 +2942,9 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('progress-label').textContent = `Step ${step} of ${totalSteps}`;
     document.getElementById('progress-percent').textContent = `${percent}%`;
     document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+    
+    // Scroll to top when step changes
+     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // Button listeners
