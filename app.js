@@ -84,18 +84,18 @@ window.categoryConfig = categoryConfig;
 function createMaintenancePlan() {
     
     try {
-// Collect home data from multi-step form
-homeData = {
-    address: document.getElementById('address')?.value || '123 Main Street',
-    city: document.getElementById('city')?.value || 'Anytown', 
-    state: document.getElementById('state')?.value || 'NY',
-    zipcode: document.getElementById('zipcode')?.value || '12345',
-    propertyType: document.getElementById('property-type')?.value || 'single-family',
-    yearBuilt: parseInt(document.getElementById('year-built')?.value) || 2000,
-    sqft: parseInt(document.getElementById('sqft')?.value) || 2000
-};
-homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
-        
+        // Collect home data
+        homeData = {
+            address: document.getElementById('address')?.value || '123 Main Street',
+            city: document.getElementById('city')?.value || 'Anytown',
+            state: document.getElementById('state')?.value || 'NY',
+            zipcode: document.getElementById('zipcode')?.value || '12345',
+            propertyType: document.getElementById('property-type')?.value || 'single-family',
+            yearBuilt: parseInt(document.getElementById('year-built')?.value) || 2000,
+            sqft: parseInt(document.getElementById('sqft')?.value) || 2000
+        };
+        homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
+
         // Collect features with null checks
         homeData.features = {
             centralAC: document.getElementById('central-ac')?.checked || false,
