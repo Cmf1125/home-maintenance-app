@@ -59,6 +59,22 @@
       el.classList.remove('hidden');
     };
 
+// Load user's saved snapshot (appliances/tasks/settings) into localStorage
+async function hydrateLocalForUser(uid, db) {
+  try {
+    const doc = await db.collection('userSnapshots').doc(uid).get();
+    if (!doc.exists) return; // no snapshot yet -> nothing to hydrate
+
+    const data = doc.data() || {};
+    if (data.appliances !== undefined) localStorage.setItem('appliances', JSON.stringify(data.appliances));
+    if (data.tasks !== undefined)      localStorage.setItem('tasks', JSON.stringify(data.tasks));
+    if (data.settings !== undefined)   localStorage.setItem('settings', JSON.stringify(data.settings));
+  } catch (e) {
+    console.warn('[HK] hydrateLocalForUser failed', e);
+  }
+}
+
+    
     // Route on auth change
     auth.onAuthStateChanged(async (user) => {
       const here = location.pathname.split('/').pop();
