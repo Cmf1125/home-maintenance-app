@@ -1283,7 +1283,24 @@
         window.toggleSettingsDropdown = toggleSettingsDropdown;
         window.closeSettingsDropdown = closeSettingsDropdown;
     </script>
+            
+<!-- Firebase Configuration -->
+<script>
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBuBfJvkhiTs0OSFlNE8ZhSTAnOa_sidE0",
+  authDomain: "home-keeper-app.firebaseapp.com",
+  projectId: "home-keeper-app",
+  storageBucket: "home-keeper-app.firebasestorage.app",
+  messagingSenderId: "434638918453",
+  appId: "1:434638918453:web:5fd99aed69ef4a4c2b727c"
+};
 
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+console.log('🔥 Firebase initialized successfully');
+</script>
+            
     <!-- ✅ Core Scripts go here -->
     <script src="date-utils.js"></script>
     <script src="app.js"></script>
