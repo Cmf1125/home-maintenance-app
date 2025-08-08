@@ -1152,9 +1152,6 @@ function finishTaskSetup() {
     console.log('🎉 CLEAN SIMPLE TASK SETUP COMPLETION SUCCESSFUL!');
 }
 
-// Enhanced showTab function with better error handling
-// In your app.js, find the showTab function and make it look like this:
-
 // FIXED: Enhanced showTab function that respects All Tasks view
 function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
