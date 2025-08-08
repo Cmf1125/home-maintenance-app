@@ -24,15 +24,11 @@
 <!-- App Icon -->
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='180' height='180' fill='%232563eb'/%3E%3Ctext x='90' y='110' font-family='Arial' font-size='50' fill='white' text-anchor='middle'%3E🏠%3C/text%3E%3C/svg%3E">
 
-<!-- Firebase SDKs (load FIRST, in order) -->
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-
-<!-- Init + Auth Guard + Snapshot helpers + Fallback rehydrate -->
 <script>
-  // --- Config (your real keys) ---
-  const HK_FIREBASE_CFG = {
+  const CFG = {
     apiKey: "AIzaSyBuBfJvkhiTs0OSFlNE8ZhSTAnOa_sidE0",
     authDomain: "home-keeper-app.firebaseapp.com",
     projectId: "home-keeper-app",
@@ -40,72 +36,18 @@
     messagingSenderId: "434638918453",
     appId: "1:434638918453:web:5fd99aed69ef4a4c2b727c"
   };
+  if (!firebase.apps.length) firebase.initializeApp(CFG);
 
-  // --- Init (safe if run once) ---
-  if (!firebase.apps.length) {
-    firebase.initializeApp(HK_FIREBASE_CFG);
-  }
-
-  // --- Auth guard (redirects logged-out users to login.html) ---
-  firebase.auth().onAuthStateChanged(function(user) {
-    if (!user) {
-      // redirect immediately before the rest of the app loads
-      window.location.replace('login.html');
-    }
+  // If not logged in -> go to login
+  firebase.auth().onAuthStateChanged((user) => {
+    if (!user) window.location.replace('login.html');
   });
 
-  // --- Save snapshot helper (call this after big changes) ---
-  window.hkSaveSnapshot = async function () {
-    try {
-      const user = firebase.auth().currentUser;
-      if (!user) return;
-
-      const db = firebase.firestore();
-      const appliances = JSON.parse(localStorage.getItem('appliances') || '[]');
-      const tasks      = JSON.parse(localStorage.getItem('tasks') || '[]');
-      const settings   = JSON.parse(localStorage.getItem('settings') || '{}');
-
-      await db.collection('userSnapshots').doc(user.uid).set({
-        appliances, tasks, settings,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-    } catch (e) {
-      console.warn('[HK] hkSaveSnapshot failed', e);
-    }
+  // Optional: expose logout
+  window.hkSignOut = async function () {
+    await firebase.auth().signOut();
+    window.location.replace('login.html');
   };
-
-  // --- Fallback rehydrate (for direct visits/bookmarks on a new device) ---
-  function hkIsLocalEmpty() {
-    try {
-      return !(
-        localStorage.getItem('appliances') ||
-        localStorage.getItem('tasks') ||
-        localStorage.getItem('settings')
-      );
-    } catch { return true; }
-  }
-
-  async function hkRehydrateIfNeeded() {
-    try {
-      // Only run after auth is available & a user is signed in
-      const user = firebase.auth().currentUser;
-      if (!user) return;
-      if (!hkIsLocalEmpty()) return;
-
-      const db = firebase.firestore();
-      const doc = await db.collection('userSnapshots').doc(user.uid).get();
-      if (!doc.exists) return;
-      const data = doc.data() || {};
-      if (data.appliances !== undefined) localStorage.setItem('appliances', JSON.stringify(data.appliances));
-      if (data.tasks !== undefined)      localStorage.setItem('tasks', JSON.stringify(data.tasks));
-      if (data.settings !== undefined)   localStorage.setItem('settings', JSON.stringify(data.settings));
-    } catch (e) {
-      console.warn('[HK] fallback rehydrate failed', e);
-    }
-  }
-
-  // Run after DOM is ready
-  document.addEventListener('DOMContentLoaded', hkRehydrateIfNeeded);
 </script>
 
 </head>
