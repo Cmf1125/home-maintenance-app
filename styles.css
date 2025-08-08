@@ -937,3 +937,12 @@ html, body {
 #category-task-modal.translate-y-full {
   transform: translateY(100%);
 }
+/* Force task setup to have proper dimensions */
+#task-setup {
+    min-height: 100px !important;
+    width: 100% !important;
+}
+
+#task-setup .bg-white {
+    min-height: 200px !important;
+}
