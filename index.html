@@ -115,178 +115,214 @@
     </div>
 </div>
                 
-                <div class="space-y-6">
-                    <!-- Address -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
-                        <input type="text" id="address" placeholder="123 Main Street" 
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
-                    </div>
+               <div class="space-y-6">
+    <!-- Step 1: Basic Home Info -->
+    <div id="setup-step-1" class="setup-step">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">📍 Basic Home Information</h3>
+        
+        <!-- Address -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
+            <input type="text" id="address" placeholder="123 Main Street" 
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
+        </div>
 
-                    <!-- City, State, Zip -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
-                            <input type="text" id="city" placeholder="Anytown" 
-                                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
-                            <input type="text" id="state" placeholder="NY" maxlength="2"
-                                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Zip Code</label>
-                            <input type="text" id="zipcode" placeholder="12345" 
-                                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-                        </div>
-                    </div>
+        <!-- City, State, Zip -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                <input type="text" id="city" placeholder="Anytown" 
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
+                <input type="text" id="state" placeholder="NY" maxlength="2"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Zip Code</label>
+                <input type="text" id="zipcode" placeholder="12345" 
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+            </div>
+        </div>
 
-                    <!-- Property Info -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Property Type</label>
-                            <select id="property-type" class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-                                <option value="single-family">Single Family Home</option>
-                                <option value="townhouse">Townhouse</option>
-                                <option value="condo">Condo</option>
-                                <option value="apartment">Apartment</option>
-                                <option value="mobile-home">Mobile Home</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Year Built</label>
-                            <input type="number" id="year-built" value="1995" min="1900" max="2025"
-                                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-                        </div>
-                    </div>
+        <!-- Property Info -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Property Type</label>
+                <select id="property-type" class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+                    <option value="single-family">Single Family Home</option>
+                    <option value="townhouse">Townhouse</option>
+                    <option value="condo">Condo</option>
+                    <option value="apartment">Apartment</option>
+                    <option value="mobile-home">Mobile Home</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Year Built</label>
+                <input type="number" id="year-built" value="1995" min="1900" max="2025"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+            </div>
+        </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Square Feet</label>
-                        <input type="number" id="sqft" value="2000" min="500" max="10000"
-                               class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-                    </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Square Feet</label>
+            <input type="number" id="sqft" value="2000" min="500" max="10000"
+                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+        </div>
 
-                    <!-- Heating & Cooling Systems -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Heating & Cooling Systems</label>
-                        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="central-ac" class="w-5 h-5">
-                                <span>Central Air/Heat</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="mini-splits" class="w-5 h-5">
-                                <span>Mini-Split Systems</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="wall-ac" class="w-5 h-5">
-                                <span>Wall Air Conditioners</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="electric-baseboard" class="w-5 h-5">
-                                <span>Electric Baseboard Heat</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="boiler" class="w-5 h-5">
-                                <span>Boiler System</span>
-                            </label>
-                        </div>
-                    </div>
+        <!-- Step 1 Navigation -->
+        <div class="flex gap-3 pt-4">
+            <button type="button" onclick="nextStep(2)" class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg touch-btn">
+                Continue to Systems →
+            </button>
+        </div>
+    </div>
 
-                   <!-- Water & Sewer Systems -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Water & Sewer Systems</label>
-                        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="municipal-water" class="w-5 h-5">
-                                <span>Municipal Water</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="well-water" class="w-5 h-5" onchange="toggleWellWaterOptions()">
-                                <span>Well Water</span>
-                            </label>
-                            <!-- Well Water Sub-options -->
-                            <div id="well-water-options" class="ml-8 space-y-2 hidden">
-                                <label class="flex items-center space-x-3 touch-btn">
-                                    <input type="checkbox" id="sediment-filter" class="w-4 h-4">
-                                    <span class="text-sm">Sediment Filtration</span>
-                                </label>
-                                <label class="flex items-center space-x-3 touch-btn">
-                                    <input type="checkbox" id="uv-filter" class="w-4 h-4">
-                                    <span class="text-sm">UV Filtration</span>
-                                </label>
-                                <label class="flex items-center space-x-3 touch-btn">
-                                    <input type="checkbox" id="water-softener" class="w-4 h-4">
-                                    <span class="text-sm">Water Softener</span>
-                                </label>
-                                <label class="flex items-center space-x-3 touch-btn">
-                                    <input type="checkbox" id="whole-house-filter" class="w-4 h-4">
-                                    <span class="text-sm">Whole House Filter</span>
-                                </label>
-                            </div>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="municipal-sewer" class="w-5 h-5">
-                                <span>Municipal Sewer</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="septic" class="w-5 h-5">
-                                <span>Septic System</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <!-- Other Home Features -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Other Home Features</label>
-                        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="fireplace" class="w-5 h-5">
-                                <span>Fireplace</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="pool" class="w-5 h-5">
-                                <span>Pool/Spa</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="deck" class="w-5 h-5">
-                                <span>Deck/Patio</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="garage" class="w-5 h-5">
-                                <span>Garage</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="basement" class="w-5 h-5">
-                                <span>Basement</span>
-                            </label>
-                        </div>
-                    </div>
+    <!-- Step 2: Home Systems -->
+    <div id="setup-step-2" class="setup-step hidden">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">⚙️ Home Systems</h3>
+        
+        <!-- Heating & Cooling Systems -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">Heating & Cooling Systems</label>
+            <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="central-ac" class="w-5 h-5">
+                    <span>Central Air/Heat</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="mini-splits" class="w-5 h-5">
+                    <span>Mini-Split Systems</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="wall-ac" class="w-5 h-5">
+                    <span>Wall Air Conditioners</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="electric-baseboard" class="w-5 h-5">
+                    <span>Electric Baseboard Heat</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="boiler" class="w-5 h-5">
+                    <span>Boiler System</span>
+                </label>
+            </div>
+        </div>
 
-                    <!-- Other Features -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Other Features</label>
-                        <input type="text" id="other-features" placeholder="e.g., Hot tub, Generator, Solar panels..." 
-                               class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-                        <p class="text-xs text-gray-500 mt-1">List any additional features not mentioned above</p>
-                    </div>
+        <!-- Water & Sewer Systems -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">Water & Sewer Systems</label>
+            <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="municipal-water" class="w-5 h-5">
+                    <span>Municipal Water</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="well-water" class="w-5 h-5" onchange="toggleWellWaterOptions()">
+                    <span>Well Water</span>
+                </label>
+                <!-- Well Water Sub-options -->
+                <div id="well-water-options" class="ml-8 space-y-2 hidden">
+                    <label class="flex items-center space-x-3 touch-btn">
+                        <input type="checkbox" id="sediment-filter" class="w-4 h-4">
+                        <span class="text-sm">Sediment Filtration</span>
+                    </label>
+                    <label class="flex items-center space-x-3 touch-btn">
+                        <input type="checkbox" id="uv-filter" class="w-4 h-4">
+                        <span class="text-sm">UV Filtration</span>
+                    </label>
+                    <label class="flex items-center space-x-3 touch-btn">
+                        <input type="checkbox" id="water-softener" class="w-4 h-4">
+                        <span class="text-sm">Water Softener</span>
+                    </label>
+                    <label class="flex items-center space-x-3 touch-btn">
+                        <input type="checkbox" id="whole-house-filter" class="w-4 h-4">
+                        <span class="text-sm">Whole House Filter</span>
+                    </label>
+                </div>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="municipal-sewer" class="w-5 h-5">
+                    <span>Municipal Sewer</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="septic" class="w-5 h-5">
+                    <span>Septic System</span>
+                </label>
+            </div>
+        </div>
 
-                    <!-- Helpful Note -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div class="flex items-start gap-3">
-                            <div class="text-blue-600 text-lg">💡</div>
-                            <div class="text-sm text-blue-800">
-                                <strong>Good to know:</strong> Task frequencies can be adjusted later based on your specific needs (pets, usage patterns, manufacturer recommendations, etc.)
-                            </div>
-                        </div>
-                    </div>
+        <!-- Step 2 Navigation -->
+        <div class="flex gap-3 pt-4">
+            <button type="button" onclick="prevStep(1)" class="flex-1 bg-gray-200 text-gray-700 py-4 px-6 rounded-lg hover:bg-gray-300 transition-colors font-medium text-lg touch-btn">
+                ← Back
+            </button>
+            <button type="button" onclick="nextStep(3)" class="flex-1 bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg touch-btn">
+                Continue to Features →
+            </button>
+        </div>
+    </div>
 
-                    <button onclick="createMaintenancePlan()" class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg touch-btn">
-                        🚀 Create My Plan
-                    </button>
+    <!-- Step 3: Additional Features -->
+    <div id="setup-step-3" class="setup-step hidden">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">🏠 Additional Features</h3>
+        
+        <!-- Other Home Features -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">Select any features your home has</label>
+            <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="fireplace" class="w-5 h-5">
+                    <span>Fireplace</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="pool" class="w-5 h-5">
+                    <span>Pool/Spa</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="deck" class="w-5 h-5">
+                    <span>Deck/Patio</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="garage" class="w-5 h-5">
+                    <span>Garage</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="basement" class="w-5 h-5">
+                    <span>Basement</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Other Features -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Other Features</label>
+            <input type="text" id="other-features" placeholder="e.g., Hot tub, Generator, Solar panels..." 
+                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+            <p class="text-xs text-gray-500 mt-1">List any additional features not mentioned above</p>
+        </div>
+
+        <!-- Helpful Note -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex items-start gap-3">
+                <div class="text-blue-600 text-lg">💡</div>
+                <div class="text-sm text-blue-800">
+                    <strong>Good to know:</strong> Task frequencies can be adjusted later based on your specific needs (pets, usage patterns, manufacturer recommendations, etc.)
                 </div>
             </div>
         </div>
+
+        <!-- Step 3 Navigation -->
+        <div class="flex gap-3 pt-4">
+            <button type="button" onclick="prevStep(2)" class="flex-1 bg-gray-200 text-gray-700 py-4 px-6 rounded-lg hover:bg-gray-300 transition-colors font-medium text-lg touch-btn">
+                ← Back
+            </button>
+            <button onclick="createMaintenancePlan()" class="flex-1 bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg touch-btn">
+                🚀 Create My Plan
+            </button>
+        </div>
+    </div>
+</div>          
 
         <!-- Task Setup Screen -->
         <div id="task-setup" class="hidden p-4 main-content">
