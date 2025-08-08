@@ -2395,11 +2395,12 @@ function initializeApp() {
     window.tasks = tasks;
     window.homeData = homeData;
     
-    if (hasExistingData()) {
-        // Hide setup screens
-        document.getElementById('setup-form').style.display = 'none';
-        document.getElementById('task-setup').classList.add('hidden');
-        document.getElementById('main-app').classList.remove('hidden');
+   if (hasExistingData()) {
+    // Hide setup screens AND login page
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('setup-form').style.display = 'none';
+    document.getElementById('task-setup').classList.add('hidden');
+    document.getElementById('main-app').classList.remove('hidden');
         
         // Update header
         document.getElementById('header-subtitle').textContent = homeData.fullAddress;
