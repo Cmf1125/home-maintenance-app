@@ -2960,20 +2960,34 @@ document.addEventListener('DOMContentLoaded', function () {
   // Show the first step initially
   showStep(currentStep);
 });
-function goBackToHomeSetup() {
-    // Hide the task setup screen
-    const taskSetup = document.getElementById('task-setup');
-    if (taskSetup) taskSetup.classList.add('hidden');
 
-    // Show the setup form again
+function goBackToHomeSetup() {
+    const taskSetup = document.getElementById('task-setup');
+    if (taskSetup) {
+        taskSetup.classList.add('hidden');
+        taskSetup.style.display = 'none';
+    }
+
     const setupForm = document.getElementById('setup-form');
     if (setupForm) {
         setupForm.style.display = 'block';
         setupForm.classList.remove('hidden');
     }
 
-    // Optional: reset to the last step they were on
-    // If you want them to always start at Step 3, uncomment:
-    // document.querySelectorAll('.onboarding-step').forEach(step => step.classList.add('hidden'));
-    // document.querySelector('.onboarding-step[data-step="3"]').classList.remove('hidden');
+    // Show Step 3 only, hide other steps
+    document.querySelectorAll('.onboarding-step').forEach(step => {
+        step.classList.add('hidden');
+    });
+    const step3 = document.querySelector('.onboarding-step[data-step="3"]');
+    if (step3) {
+        step3.classList.remove('hidden');
+    }
+
+    // Update progress bar to Step 3
+    const totalSteps = 3;
+    const step = 3;
+    const percent = Math.round((step / totalSteps) * 100);
+    document.getElementById('progress-label').textContent = `Step ${step} of ${totalSteps}`;
+    document.getElementById('progress-percent').textContent = `${percent}%`;
+    document.getElementById('progress-bar-fill').style.width = `${percent}%`;
 }
