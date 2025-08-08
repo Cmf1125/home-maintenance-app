@@ -1489,5 +1489,20 @@ window.rescheduleTaskFromDashboard = function(taskId, event) {
 
 console.log('✅ FIXED modal script loaded - all buttons should work now!');
 </script>
+
+<script>
+// Progressive form reveal - no HTML structure changes
+document.addEventListener('DOMContentLoaded', function() {
+    // Only run this on the setup form
+    const setupForm = document.getElementById('setup-form');
+    if (!setupForm || setupForm.style.display === 'none') return;
+    
+    console.log('✅ Progressive form script loaded');
+    
+    // For now, just log that we're ready
+    // We'll add the reveal logic in the next step
+});
+</script>  
+            
 </body>
 </html>
