@@ -2951,6 +2951,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const y = stepEl.getBoundingClientRect().top + window.pageYOffset - headerH - 8; // small buffer
       window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
 }
+      }
 
   // Button listeners
   const stepButtons = [
