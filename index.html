@@ -1281,7 +1281,7 @@
     <script src="enhanced-dashboard.js"></script>
     <script src="documents.js"></script> 
     <script src="appliances.js"></script>
-            <!-- SIMPLE MODAL FIX - Add this before </body> -->
+<!-- SIMPLE MODAL FIX - Add this before </body> -->
 <!-- FIXED MODAL SCRIPT - Replace the previous one with this -->
 <script>
 console.log('🔧 Loading FIXED modal script...');
@@ -1544,6 +1544,75 @@ window.rescheduleTaskFromDashboard = function(taskId, event) {
 };
 
 console.log('✅ FIXED modal script loaded - all buttons should work now!');
+</script>
+
+<script>
+// Multi-step setup form navigation
+let currentStep = 1;
+
+function nextStep(step) {
+    // Hide current step
+    document.getElementById(`setup-step-${currentStep}`).classList.add('hidden');
+    
+    // Show next step
+    document.getElementById(`setup-step-${step}`).classList.remove('hidden');
+    
+    // Update current step
+    currentStep = step;
+    
+    // Update progress indicator
+    updateProgressIndicator();
+    
+    console.log(`✅ Moved to step ${step}`);
+}
+
+function prevStep(step) {
+    // Hide current step
+    document.getElementById(`setup-step-${currentStep}`).classList.add('hidden');
+    
+    // Show previous step
+    document.getElementById(`setup-step-${step}`).classList.remove('hidden');
+    
+    // Update current step
+    currentStep = step;
+    
+    // Update progress indicator
+    updateProgressIndicator();
+    
+    console.log(`⬅️ Moved back to step ${step}`);
+}
+
+function updateProgressIndicator() {
+    // Reset all indicators
+    for (let i = 1; i <= 3; i++) {
+        const indicator = document.getElementById(`step-${i}-indicator`);
+        const label = indicator.nextElementSibling;
+        
+        if (i < currentStep) {
+            // Completed steps
+            indicator.className = 'w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-semibold';
+            indicator.innerHTML = '✓';
+            label.className = 'ml-2 text-sm font-medium text-green-600';
+        } else if (i === currentStep) {
+            // Current step
+            indicator.className = 'w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold';
+            indicator.innerHTML = i;
+            label.className = 'ml-2 text-sm font-medium text-blue-600';
+        } else {
+            // Future steps
+            indicator.className = 'w-8 h-8 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center text-sm font-semibold';
+            indicator.innerHTML = i;
+            label.className = 'ml-2 text-sm font-medium text-gray-500';
+        }
+    }
+}
+
+// Make functions globally available
+window.nextStep = nextStep;
+window.prevStep = prevStep;
+window.updateProgressIndicator = updateProgressIndicator;
+
+console.log('✅ Multi-step navigation loaded');
 </script>
 </body>
 </html>
