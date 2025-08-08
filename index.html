@@ -23,7 +23,8 @@
 
 <!-- App Icon -->
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='180' height='180' fill='%232563eb'/%3E%3Ctext x='90' y='110' font-family='Arial' font-size='50' fill='white' text-anchor='middle'%3E🏠%3C/text%3E%3C/svg%3E">
-<!-- 🔐 Firebase Auth Guard -->
+
+ <!-- 🔐 Firebase Auth Guard -->
     <script>
       (function () {
         const cfg = {
@@ -48,7 +49,76 @@
         document.head.appendChild(s2);
       })();
     </script>
-    <!-- 🔧 First-run generator: runs ONCE after onboarding -->
+
+<!-- 🔄 Snapshot saver: call window.hkSaveSnapshot() whenever major data changes -->
+<script>
+  (function () {
+    // Load Firestore compat after app/auth scripts init
+    const s = document.createElement('script');
+    s.src = "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js";
+    s.onload = function () {
+      // Expose a global saver
+      window.hkSaveSnapshot = async function () {
+        try {
+          const user = firebase.auth().currentUser;
+          if (!user) return;
+
+          const db = firebase.firestore();
+          const appliances = JSON.parse(localStorage.getItem('appliances') || '[]');
+          const tasks      = JSON.parse(localStorage.getItem('tasks') || '[]');
+          const settings   = JSON.parse(localStorage.getItem('settings') || '{}');
+
+          await db.collection('userSnapshots').doc(user.uid).set({
+            appliances, tasks, settings,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+        } catch (e) {
+          console.warn('[HK] hkSaveSnapshot failed', e);
+        }
+      };
+    };
+    document.head.appendChild(s);
+  })();
+</script>
+
+<!-- 🧯 Fallback re-hydrate on direct loads (only if localStorage is empty) -->
+<script>
+  (function () {
+    function isEmptyLS() {
+      try {
+        const a = localStorage.getItem('appliances');
+        const t = localStorage.getItem('tasks');
+        const s = localStorage.getItem('settings');
+        return !(a || t || s);
+      } catch { return true; }
+    }
+
+    async function rehydrateIfNeeded() {
+      try {
+        if (!isEmptyLS()) return;
+        const user = firebase.auth().currentUser;
+        if (!user) return;
+
+        const db = firebase.firestore();
+        const doc = await db.collection('userSnapshots').doc(user.uid).get();
+        if (!doc.exists) return;
+
+        const data = doc.data() || {};
+        if (data.appliances !== undefined) localStorage.setItem('appliances', JSON.stringify(data.appliances));
+        if (data.tasks !== undefined)      localStorage.setItem('tasks', JSON.stringify(data.tasks));
+        if (data.settings !== undefined)   localStorage.setItem('settings', JSON.stringify(data.settings));
+      } catch (e) {
+        console.warn('[HK] fallback rehydrate failed', e);
+      }
+    }
+
+    // Run as soon as DOM is ready
+    document.addEventListener('DOMContentLoaded', rehydrateIfNeeded);
+  })();
+</script>
+
+    
+<!-- 🔧 First-run generator: runs ONCE after onboarding -->
 <script>
   (function () {
     // Try calling any of your app’s known generation methods.
