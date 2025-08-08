@@ -1415,9 +1415,21 @@ auth.onAuthStateChanged(async function(user) {
 // Check if user has data in Firebase (placeholder for now)
 async function checkUserData(userId) {
     // For now, check localStorage - we'll upgrade this to Firebase next
-    const savedData = localStorage.getItem('casaCareData');
-    const hasAddress = savedData && JSON.parse(savedData).homeData?.fullAddress;
-    return !!hasAddress; // Convert to true/false
+    try {
+        const savedData = localStorage.getItem('casaCareData');
+        if (!savedData) return false;
+        
+        const data = JSON.parse(savedData);
+        const hasAddress = data.homeData && data.homeData.fullAddress;
+        const hasTasks = data.tasks && data.tasks.length > 0;
+        
+        console.log('🔍 Checking user data:', { hasAddress, hasTasks, address: data.homeData?.fullAddress });
+        
+        return hasAddress && hasTasks;
+    } catch (error) {
+        console.error('❌ Error checking user data:', error);
+        return false;
+    }
 }
 
 // Load user data and show dashboard (placeholder for now)
