@@ -1127,10 +1127,15 @@ function finishTaskSetup() {
     window.tasks = tasks;
     console.log('🌐 Global references updated');
     
-    // Switch to main app
-    document.getElementById('task-setup').classList.add('hidden');
-    document.getElementById('main-app').classList.remove('hidden');
-    document.getElementById('header-subtitle').textContent = homeData.fullAddress;
+  // Switch to main app
+const taskSetupEl = document.getElementById('task-setup');
+if (taskSetupEl) {
+    taskSetupEl.classList.add('hidden');
+    taskSetupEl.style.display = 'none'; // ensures it's fully hidden
+}
+
+document.getElementById('main-app').classList.remove('hidden');
+document.getElementById('header-subtitle').textContent = homeData.fullAddress;
 
     // Show bottom navigation
     document.body.classList.add('main-app-active');
