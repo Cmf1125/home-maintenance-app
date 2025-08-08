@@ -126,12 +126,12 @@
     <input type="text" id="city" placeholder="Anytown"
            class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
   </div>
-  <div class="sm:col-span-3">
+  <div class="sm:col-span-2">
     <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
     <input type="text" id="state" placeholder="NY" maxlength="2"
            class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
   </div>
-  <div class="sm:col-span-3">
+  <div class="sm:col-span-4">
     <label class="block text-sm font-medium text-gray-700 mb-2">Zip Code</label>
     <input type="text" id="zipcode" placeholder="12345"
            class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
@@ -1566,24 +1566,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   console.log('✅ Form section headers added at step starts');
-});
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const fields = document.querySelectorAll(
-    '#setup-form input:not([type="checkbox"]):not([type="radio"]), #setup-form select, #setup-form textarea'
-  );
-
-  fields.forEach(el => {
-    // remove tall sizing
-    el.classList.remove('py-3', 'text-base', 'px-4');
-    // add compact sizing
-    el.classList.add('py-2', 'text-sm', 'px-3');
-  });
-
-  // (Nice touch) auto-uppercase state as user types
-  const st = document.getElementById('state');
-  if (st) st.addEventListener('input', () => st.value = st.value.toUpperCase());
 });
 </script>
             
