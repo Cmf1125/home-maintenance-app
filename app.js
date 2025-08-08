@@ -130,7 +130,7 @@ function createMaintenancePlan() {
         // Show task setup
         document.getElementById('setup-form').style.display = 'none';
         document.getElementById('task-setup').classList.remove('hidden');
-        showTaskSetup();
+        setTimeout(showTaskSetup, 0);
         
         console.log('✅ Successfully moved to task setup screen');
         
