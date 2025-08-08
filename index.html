@@ -1537,30 +1537,32 @@ console.log('✅ FIXED modal script loaded - all buttons should work now!');
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const setupForm = document.getElementById('setup-form');
-    if (!setupForm || setupForm.style.display === 'none') return;
+  const setupForm = document.getElementById('setup-form');
+  if (!setupForm) return;
 
-    // Insert headings at the top of Step 2 and Step 3
-    const sections = [
-        { step: 2, heading: '⚙️ Home Systems', subheading: 'Tell us about your heating, cooling, and water systems' },
-        { step: 3, heading: '🏠 Additional Features', subheading: 'Any extra features your home has' }
-    ];
+  // 1) Remove any previously inserted headers (avoid duplicates)
+  document.querySelectorAll('.onboarding-section-header').forEach(h => h.remove());
 
-    sections.forEach(section => {
-        const stepContainer = document.querySelector(`.onboarding-step[data-step="${section.step}"]`);
-        if (stepContainer) {
-            const sectionHeader = document.createElement('div');
-            sectionHeader.className = 'mb-4';
-            sectionHeader.innerHTML = `
-                <h3 class="text-lg font-semibold text-gray-900 mb-1">${section.heading}</h3>
-                <p class="text-sm text-gray-600">${section.subheading}</p>
-            `;
-            // Insert at very top of the step container
-            stepContainer.insertAdjacentElement('afterbegin', sectionHeader);
-        }
-    });
+  // 2) Insert new headers at the top of Step 2 and Step 3
+  const sections = [
+    { step: 2, heading: '⚙️ Home Systems', subheading: 'Tell us about your heating, cooling, and water systems' },
+    { step: 3, heading: '🏠 Additional Features', subheading: 'Any extra features your home has' }
+  ];
 
-    console.log('✅ Form section headers added at step starts');
+  sections.forEach(({ step, heading, subheading }) => {
+    const stepContainer = document.querySelector(`.onboarding-step[data-step="${step}"]`);
+    if (!stepContainer) return;
+
+    const sectionHeader = document.createElement('div');
+    sectionHeader.className = 'onboarding-section-header mb-4';
+    sectionHeader.innerHTML = `
+      <h3 class="text-lg font-semibold text-gray-900 mb-1">${heading}</h3>
+      <p class="text-sm text-gray-600">${subheading}</p>
+    `;
+    stepContainer.insertAdjacentElement('afterbegin', sectionHeader);
+  });
+
+  console.log('✅ Form section headers added at step starts');
 });
 </script>
             
