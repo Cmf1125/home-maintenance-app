@@ -12,32 +12,31 @@
       <h1 class="text-2xl font-semibold text-gray-900 mb-1">Welcome</h1>
       <p class="text-sm text-gray-600 mb-6">Sign in to manage your home</p>
 
-      <!-- Google -->
-      <button id="googleBtn" class="w-full border rounded-lg py-2 mb-3 hover:bg-gray-50">
-        Continue with Google
-      </button>
+      <button id="googleBtn" class="w-full border rounded-lg py-2 mb-3 hover:bg-gray-50">Continue with Google</button>
 
       <div class="text-center text-xs text-gray-400 my-3">or</div>
 
-      <!-- Email -->
-      <form id="emailForm" class="space-y-3">
-        <input id="email" class="w-full border rounded-lg px-3 py-2" placeholder="Email" type="email" autocomplete="username" required />
-        <input id="password" class="w-full border rounded-lg px-3 py-2" placeholder="Password" type="password" autocomplete="current-password" required />
-
+      <div class="space-y-3">
+        <input id="email" class="w-full border rounded-lg px-3 py-2" placeholder="Email" type="email" autocomplete="username" />
+        <input id="password" class="w-full border rounded-lg px-3 py-2" placeholder="Password" type="password" autocomplete="current-password" />
         <div class="flex gap-2">
-          <button id="emailLoginBtn" type="button" class="flex-1 bg-gray-900 text-white rounded-lg py-2">Sign In</button>
-          <button id="emailSignupBtn" type="button" class="flex-1 bg-gray-700 text-white rounded-lg py-2">Create Account</button>
+          <button id="emailLoginBtn"  class="flex-1 bg-gray-900 text-white rounded-lg py-2">Sign In</button>
+          <button id="emailSignupBtn" class="flex-1 bg-gray-700 text-white rounded-lg py-2">Create Account</button>
         </div>
-      </form>
+      </div>
 
       <div id="busy" class="hidden text-xs text-gray-500 mt-3">Working…</div>
       <p id="error" class="text-xs text-red-600 mt-3 hidden"></p>
     </div>
   </div>
 
-  <!-- Your Firebase config -->
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
   <script>
-    window.FIREBASE_CONFIG = {
+    const CFG = {
       apiKey: "AIzaSyBuBfJvkhiTs0OSFlNE8ZhSTAnOa_sidE0",
       authDomain: "home-keeper-app.firebaseapp.com",
       projectId: "home-keeper-app",
@@ -45,158 +44,61 @@
       messagingSenderId: "434638918453",
       appId: "1:434638918453:web:5fd99aed69ef4a4c2b727c"
     };
-  </script>
-
-  <!-- Firebase compat SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-
-  <script>
-    // --- Init ---
-    firebase.initializeApp(window.FIREBASE_CONFIG);
+    firebase.initializeApp(CFG);
     const auth = firebase.auth();
     const db   = firebase.firestore();
 
-    // Helpers
-    const q = (id) => document.getElementById(id);
-    const setBusy = (on) => {
+    const q = id => document.getElementById(id);
+    const setBusy = on => {
       q('busy').classList.toggle('hidden', !on);
-      q('googleBtn').disabled = on;
-      q('emailLoginBtn').disabled = on;
-      q('emailSignupBtn').disabled = on;
+      ['googleBtn','emailLoginBtn','emailSignupBtn'].forEach(id => { const b=q(id); if(b) b.disabled = on; });
     };
-    const showErr = (e) => {
-      const el = q('error');
-      el.textContent = e?.message || String(e);
-      el.classList.remove('hidden');
-    };
+    const showErr = e => { const el=q('error'); el.textContent = e?.message || String(e); el.classList.remove('hidden'); };
     const clearErr = () => q('error').classList.add('hidden');
-    const go  = (url) => window.location.href = url;
+    const go = url => window.location.href = url;
 
-    // Hydrate localStorage before dashboard for existing users
-    async function hydrateLocalForUser(uid) {
+    // Routing: existing onboarded -> index, others -> onboarding
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) return; // stay here until they log in
+      setBusy(true); clearErr();
       try {
-        const doc = await db.collection('userSnapshots').doc(uid).get();
-        if (!doc.exists) return;
-        const data = doc.data() || {};
-        if (data.appliances !== undefined) localStorage.setItem('appliances', JSON.stringify(data.appliances));
-        if (data.tasks !== undefined)      localStorage.setItem('tasks', JSON.stringify(data.tasks));
-        if (data.settings !== undefined)   localStorage.setItem('settings', JSON.stringify(data.settings));
-      } catch (e) {
-        console.warn('[HK] hydrateLocalForUser failed', e);
-      }
-    }
-
-    // Route on auth change
-   auth.onAuthStateChanged(async (user) => {
-  if (!user) return; // stay on login
-  try {
-    setBusy(true); clearErr();
-
-    const userRef = db.collection('users').doc(user.uid);
-    let snap = await userRef.get();
-
-    // If no profile doc yet, see if a snapshot exists (implies they used the app before)
-    if (!snap.exists) {
-      const snapDoc = await db.collection('userSnapshots').doc(user.uid).get();
-      if (snapDoc.exists) {
-        // Recover as an existing user
-        await userRef.set({
-          email: user.email || null,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          onboarded: true
-        }, { merge: true });
-
-        await hydrateLocalForUser(user.uid);
-        return go('index.html');
-      }
-
-      // Truly new user -> create profile and go to onboarding
-      await userRef.set({
-        email: user.email || null,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        onboarded: false
-      });
-      return go('onboarding.html');
-    }
-
-    // Profile exists
-    const data = snap.data() || {};
-    if (data.onboarded) {
-      await hydrateLocalForUser(user.uid);
-      return go('index.html');
-    }
-
-    // Not onboarded -> last chance: if they have a snapshot, treat as onboarded
-    const snapDoc = await db.collection('userSnapshots').doc(user.uid).get();
-    if (snapDoc.exists) {
-      await userRef.set({ onboarded: true }, { merge: true });
-      await hydrateLocalForUser(user.uid);
-      return go('index.html');
-    }
-
-    return go('onboarding.html');
-  } catch (e) {
-    showErr(e);
-  } finally {
-    setBusy(false);
-  }
-});
-
-    // Prevent form submit from reloading page
-    q('emailForm').addEventListener('submit', (e) => e.preventDefault());
-
-    // Google sign-in
-    q('googleBtn').addEventListener('click', async (e) => {
-      e.preventDefault();
-      try {
-        setBusy(true); clearErr();
-        const provider = new firebase.auth.GoogleAuthProvider();
-        await auth.signInWithPopup(provider);
-        // onAuthStateChanged will route
-      } catch (e) {
-        showErr(e);
-      } finally {
-        setBusy(false);
-      }
+        const ref = db.collection('users').doc(user.uid);
+        const snap = await ref.get();
+        if (!snap.exists) {
+          // New profile -> send to onboarding
+          await ref.set({ email: user.email || null, createdAt: firebase.firestore.FieldValue.serverTimestamp(), onboarded: false });
+          return go('onboarding.html');
+        }
+        const data = snap.data() || {};
+        if (data.onboarded) return go('index.html');
+        return go('onboarding.html');
+      } catch (e) { showErr(e); }
+      finally { setBusy(false); }
     });
 
-    // Email sign-in
+    // Google
+    q('googleBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      try { setBusy(true); clearErr(); await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+      catch (e) { showErr(e); } finally { setBusy(false); }
+    });
+
+    // Email Sign In
     q('emailLoginBtn').addEventListener('click', async () => {
       try {
         setBusy(true); clearErr();
-        const email = q('email').value.trim();
-        const password = q('password').value.trim();
-        await auth.signInWithEmailAndPassword(email, password);
-        // onAuthStateChanged will route
-      } catch (e) {
-        showErr(e);
-      } finally {
-        setBusy(false);
-      }
+        await auth.signInWithEmailAndPassword(q('email').value.trim(), q('password').value.trim());
+      } catch (e) { showErr(e); } finally { setBusy(false); }
     });
 
-    // Email create account
+    // Email Create Account
     q('emailSignupBtn').addEventListener('click', async () => {
       try {
         setBusy(true); clearErr();
-        const email = q('email').value.trim();
-        const password = q('password').value.trim();
-
-        const cred = await auth.createUserWithEmailAndPassword(email, password);
-        await db.collection('users').doc(cred.user.uid).set({
-          email,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          onboarded: false
-        });
-
+        const cred = await auth.createUserWithEmailAndPassword(q('email').value.trim(), q('password').value.trim());
+        await db.collection('users').doc(cred.user.uid).set({ email: cred.user.email || null, createdAt: firebase.firestore.FieldValue.serverTimestamp(), onboarded: false });
         go('onboarding.html');
-      } catch (e) {
-        showErr(e);
-      } finally {
-        setBusy(false);
-      }
+      } catch (e) { showErr(e); } finally { setBusy(false); }
     });
   </script>
 </body>
