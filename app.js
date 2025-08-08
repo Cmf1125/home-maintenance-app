@@ -2453,6 +2453,126 @@ window.exportData = exportData;
 window.showAllTasks = showAllTasks;
 window.exportTaskList = exportTaskList;
 
+// NEW: Property confirmation functions
+function showPropertyConfirmation() {
+    // Collect home data (same as before)
+    homeData = {
+        address: document.getElementById('address')?.value || '123 Main Street',
+        city: document.getElementById('city')?.value || 'Anytown',
+        state: document.getElementById('state')?.value || 'NY',
+        zipcode: document.getElementById('zipcode')?.value || '12345',
+        propertyType: document.getElementById('property-type')?.value || 'single-family',
+        yearBuilt: parseInt(document.getElementById('year-built')?.value) || 2000,
+        sqft: parseInt(document.getElementById('sqft')?.value) || 2000
+    };
+    homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
+
+    // Collect features
+    homeData.features = {
+        centralAC: document.getElementById('central-ac')?.checked || false,
+        miniSplits: document.getElementById('mini-splits')?.checked || false,
+        wallAC: document.getElementById('wall-ac')?.checked || false,
+        electricBaseboard: document.getElementById('electric-baseboard')?.checked || false,
+        boiler: document.getElementById('boiler')?.checked || false,
+        municipalWater: document.getElementById('municipal-water')?.checked || false,
+        wellWater: document.getElementById('well-water')?.checked || false,
+        sedimentFilter: document.getElementById('sediment-filter')?.checked || false,
+        uvFilter: document.getElementById('uv-filter')?.checked || false,
+        waterSoftener: document.getElementById('water-softener')?.checked || false,
+        wholeHouseFilter: document.getElementById('whole-house-filter')?.checked || false,
+        municipalSewer: document.getElementById('municipal-sewer')?.checked || false,
+        septic: document.getElementById('septic')?.checked || false,
+        fireplace: document.getElementById('fireplace')?.checked || false,
+        pool: document.getElementById('pool')?.checked || false,
+        deck: document.getElementById('deck')?.checked || false,
+        garage: document.getElementById('garage')?.checked || false,
+        basement: document.getElementById('basement')?.checked || false,
+        otherFeatures: document.getElementById('other-features')?.value || ''
+    };
+
+    // Update confirmation summary
+    updateConfirmationSummary();
+
+    // Show confirmation page
+    document.getElementById('setup-form').style.display = 'none';
+    document.getElementById('property-confirmation').classList.remove('hidden');
+}
+
+function updateConfirmationSummary() {
+    const confirmationSummary = document.getElementById('confirmation-summary');
+    if (!confirmationSummary) return;
+    
+    // Build summary content (reusing your existing logic)
+    const heatingCooling = [];
+    if (homeData.features.centralAC) heatingCooling.push('Central AC/Heat');
+    if (homeData.features.miniSplits) heatingCooling.push('Mini-Splits');
+    if (homeData.features.wallAC) heatingCooling.push('Wall AC');
+    if (homeData.features.electricBaseboard) heatingCooling.push('Electric Baseboard');
+    if (homeData.features.boiler) heatingCooling.push('Boiler');
+
+    const waterSewer = [];
+    if (homeData.features.municipalWater) waterSewer.push('Municipal Water');
+    if (homeData.features.wellWater) {
+        let wellWaterText = 'Well Water';
+        const wellWaterSubs = [];
+        if (homeData.features.sedimentFilter) wellWaterSubs.push('Sediment Filter');
+        if (homeData.features.uvFilter) wellWaterSubs.push('UV Filter');
+        if (homeData.features.waterSoftener) wellWaterSubs.push('Water Softener');
+        if (homeData.features.wholeHouseFilter) wellWaterSubs.push('Whole House Filter');
+        if (wellWaterSubs.length > 0) {
+            wellWaterText += ` (${wellWaterSubs.join(', ')})`;
+        }
+        waterSewer.push(wellWaterText);
+    }
+    if (homeData.features.municipalSewer) waterSewer.push('Municipal Sewer');
+    if (homeData.features.septic) waterSewer.push('Septic System');
+
+    const otherFeatures = [];
+    if (homeData.features.fireplace) otherFeatures.push('Fireplace');
+    if (homeData.features.pool) otherFeatures.push('Pool/Spa');
+    if (homeData.features.deck) otherFeatures.push('Deck/Patio');
+    if (homeData.features.garage) otherFeatures.push('Garage');
+    if (homeData.features.basement) otherFeatures.push('Basement');
+    if (homeData.features.otherFeatures) otherFeatures.push(homeData.features.otherFeatures);
+
+    const propertyTypeDisplay = {
+        'single-family': 'Single Family Home',
+        'townhouse': 'Townhouse',
+        'condo': 'Condo',
+        'apartment': 'Apartment',
+        'mobile-home': 'Mobile Home'
+    };
+
+    confirmationSummary.innerHTML = `
+        <div><strong>📍 Address:</strong> ${homeData.fullAddress}</div>
+        <div><strong>🏢 Type:</strong> ${propertyTypeDisplay[homeData.propertyType]} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString()} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt}</div>
+        ${heatingCooling.length > 0 ? `<div><strong>🌡️ Heating/Cooling:</strong> ${heatingCooling.join(', ')}</div>` : ''}
+        ${waterSewer.length > 0 ? `<div><strong>💧 Water/Sewer:</strong> ${waterSewer.join(', ')}</div>` : ''}
+        ${otherFeatures.length > 0 ? `<div><strong>⚙️ Other Features:</strong> ${otherFeatures.join(', ')}</div>` : ''}
+    `;
+}
+
+function proceedToTaskGeneration() {
+    console.log('🚀 Proceeding to task generation...');
+    
+    // Generate tasks (using your existing function)
+    generateTaskTemplates();
+    
+    // Update global references
+    window.homeData = homeData;
+    window.tasks = tasks;
+    
+    // Hide confirmation page and show task setup
+    document.getElementById('property-confirmation').classList.add('hidden');
+    document.getElementById('task-setup').classList.remove('hidden');
+    document.getElementById('task-setup').style.display = 'block';
+    
+    // Run your existing task setup display
+    setTimeout(showTaskSetup, 0);
+    
+    console.log('✅ Moved to task setup page');
+}
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', initializeApp);
 if (document.readyState !== 'loading') {
