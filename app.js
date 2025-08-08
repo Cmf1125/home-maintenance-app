@@ -2562,8 +2562,12 @@ function proceedToTaskGeneration() {
     window.homeData = homeData;
     window.tasks = tasks;
     
-    // Hide confirmation page and show task setup
+   // Hide confirmation page, setup form, and progress bar
     document.getElementById('property-confirmation').classList.add('hidden');
+    document.getElementById('setup-form').style.display = 'none';
+    document.getElementById('onboarding-progress').classList.add('hidden');
+    
+    // Show task setup
     document.getElementById('task-setup').classList.remove('hidden');
     document.getElementById('task-setup').style.display = 'block';
     
