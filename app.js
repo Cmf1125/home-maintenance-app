@@ -2416,10 +2416,11 @@ function initializeApp() {
         
         console.log(`👋 Welcome back! Loaded ${tasks.length} tasks for ${homeData.fullAddress}`);
     } else {
-        document.getElementById('setup-form').style.display = 'block';
-        document.getElementById('task-setup').classList.add('hidden');
-        document.getElementById('main-app').classList.add('hidden');
-    }
+    document.getElementById('login-page').style.display = 'block';
+    document.getElementById('setup-form').style.display = 'none';
+    document.getElementById('task-setup').classList.add('hidden');
+    document.getElementById('main-app').classList.add('hidden');
+}
     
    // ADD THIS LINE at the end:
     initializeDateManagement();
