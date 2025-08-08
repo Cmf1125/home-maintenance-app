@@ -2573,6 +2573,31 @@ function proceedToTaskGeneration() {
     console.log('✅ Moved to task setup page');
 }
 
+function goBackFromConfirmation() {
+    // Hide confirmation page
+    document.getElementById('property-confirmation').classList.add('hidden');
+    
+    // Show setup form
+    document.getElementById('setup-form').style.display = 'block';
+    
+    // Show Step 3 (the last step where they left off)
+    document.querySelectorAll('.onboarding-step').forEach(step => {
+        step.classList.add('hidden');
+    });
+    const step3 = document.querySelector('.onboarding-step[data-step="3"]');
+    if (step3) {
+        step3.classList.remove('hidden');
+    }
+
+    // Update progress bar to Step 3
+    const totalSteps = 3;
+    const step = 3;
+    const percent = Math.round((step / totalSteps) * 100);
+    document.getElementById('progress-label').textContent = `Step ${step} of ${totalSteps}`;
+    document.getElementById('progress-percent').textContent = `${percent}% Complete`;
+    document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+}
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', initializeApp);
 if (document.readyState !== 'loading') {
