@@ -925,12 +925,3 @@ html, body {
     padding-bottom: 0.5rem;
   }
 }
-/* Progressive form reveal - no HTML changes needed */
-.form-section-hidden {
-    display: none;
-}
-
-.continue-btn {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-}
