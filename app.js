@@ -724,6 +724,7 @@ function showTaskSetup() {
     
     // Render task categories
     renderTaskCategories();
+    updateCompactTaskSummary();
 }
 
 // Update property summary
@@ -828,6 +829,34 @@ if (!taskCategoriesContainer) {
         }
     });
 
+    // Update the new compact task summary
+function updateCompactTaskSummary() {
+    const annualCostDisplay = document.getElementById('annual-cost-display');
+    const taskSummaryCompact = document.getElementById('task-summary-compact');
+    
+    if (!annualCostDisplay || !taskSummaryCompact) return;
+    
+    // Calculate total cost and category breakdown
+    let totalCost = 0;
+    const categoryStats = {};
+    
+    tasks.forEach(task => {
+        totalCost += task.cost * (365 / task.frequency);
+        
+        const category = task.category || 'General';
+        categoryStats[category] = (categoryStats[category] || 0) + 1;
+    });
+    
+    // Update cost display
+    annualCostDisplay.textContent = `$${Math.round(totalCost)}`;
+    
+    // Create category breakdown text
+    const categoryText = Object.entries(categoryStats)
+        .map(([category, count]) => `${count} ${category}`)
+        .join(' • ');
+    
+    taskSummaryCompact.textContent = categoryText || 'No tasks generated';
+}
     // Generate summary stats
     const totalTasks = tasks.length;
     const totalCost = tasks.reduce((sum, task) => sum + (task.cost * (365 / task.frequency)), 0);
