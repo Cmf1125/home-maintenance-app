@@ -12,13 +12,17 @@
       <h1 class="text-2xl font-semibold text-gray-900 mb-1">Welcome</h1>
       <p class="text-sm text-gray-600 mb-6">Sign in to manage your home</p>
 
-      <button id="googleBtn" class="w-full border rounded-lg py-2 mb-3 hover:bg-gray-50">Continue with Google</button>
+      <!-- Google -->
+      <button id="googleBtn" class="w-full border rounded-lg py-2 mb-3 hover:bg-gray-50">
+        Continue with Google
+      </button>
 
       <div class="text-center text-xs text-gray-400 my-3">or</div>
 
+      <!-- Email -->
       <div class="space-y-3">
         <input id="email" class="w-full border rounded-lg px-3 py-2" placeholder="Email" type="email" autocomplete="username" />
-        <input id="password" class="w-full border rounded-lg px-3 py-2" placeholder="Password" type="password" autocomplete="current-password" />
+        <input id="password" class="w-full border rounded-lg px-3 py-2" placeholder="Password (min 6 chars)" type="password" autocomplete="current-password" />
         <div class="flex gap-2">
           <button id="emailLoginBtn"  class="flex-1 bg-gray-900 text-white rounded-lg py-2">Sign In</button>
           <button id="emailSignupBtn" class="flex-1 bg-gray-700 text-white rounded-lg py-2">Create Account</button>
@@ -36,6 +40,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
   <script>
+    // --- Config & init ---
     const CFG = {
       apiKey: "AIzaSyBuBfJvkhiTs0OSFlNE8ZhSTAnOa_sidE0",
       authDomain: "home-keeper-app.firebaseapp.com",
@@ -44,79 +49,99 @@
       messagingSenderId: "434638918453",
       appId: "1:434638918453:web:5fd99aed69ef4a4c2b727c"
     };
-    firebase.initializeApp(CFG);
+    if (!firebase.apps.length) firebase.initializeApp(CFG);
     const auth = firebase.auth();
     const db   = firebase.firestore();
 
+    // --- Tiny helpers ---
     const q = id => document.getElementById(id);
-    const setBusy = on => {
+    function setBusy(on) {
       q('busy').classList.toggle('hidden', !on);
       ['googleBtn','emailLoginBtn','emailSignupBtn'].forEach(id => { const b=q(id); if(b) b.disabled = on; });
-    };
-   const showErr = (e) => {
-  const msg = `${e?.code || 'error'}: ${e?.message || String(e)}`;
-  const el = document.getElementById('error');
-  if (el) { el.textContent = msg; el.classList.remove('hidden'); }
-  console.error('AUTH ERROR', e);
-};
+    }
+    function showErr(e) {
+      const el = q('error');
+      el.textContent = `${e?.code || 'error'}: ${e?.message || String(e)}`;
+      el.classList.remove('hidden');
+      console.error('AUTH ERROR', e);
+    }
+    function clearErr(){ q('error').classList.add('hidden'); }
+    const go = url => window.location.href = url;
 
-    // Routing: existing onboarded -> index, others -> onboarding
+    // --- Router: decide onboarding vs dashboard after auth ---
     auth.onAuthStateChanged(async (user) => {
-      if (!user) return; // stay here until they log in
-      setBusy(true); clearErr();
+      if (!user) return; // stay on login until they auth
       try {
-        const ref = db.collection('users').doc(user.uid);
-        const snap = await ref.get();
+        setBusy(true); clearErr();
+
+        const userRef = db.collection('users').doc(user.uid);
+        const snap = await userRef.get();
+
         if (!snap.exists) {
-          // New profile -> send to onboarding
-          await ref.set({ email: user.email || null, createdAt: firebase.firestore.FieldValue.serverTimestamp(), onboarded: false });
+          // Brand new profile -> send to onboarding
+          await userRef.set({
+            email: user.email || null,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            onboarded: false
+          }, { merge: true });
           return go('onboarding.html');
         }
+
         const data = snap.data() || {};
         if (data.onboarded) return go('index.html');
         return go('onboarding.html');
-      } catch (e) { showErr(e); }
-      finally { setBusy(false); }
+      } catch (e) {
+        showErr(e);
+      } finally {
+        setBusy(false);
+      }
     });
 
-   // Google
-q('googleBtn').addEventListener('click', async (e) => {
-  e.preventDefault();
-  try {
-    setBusy(true); 
-    clearErr();
-    const provider = new firebase.auth.GoogleAuthProvider();
-    try {
-      await auth.signInWithPopup(provider);
-    } catch (err) {
-      if (err && (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user')) {
-        await auth.signInWithRedirect(provider);
-      } else {
-        throw err;
+    // --- Google sign-in (popup with redirect fallback) ---
+    q('googleBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        setBusy(true); clearErr();
+        const provider = new firebase.auth.GoogleAuthProvider();
+        try {
+          await auth.signInWithPopup(provider);
+        } catch (err) {
+          if (err && (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user')) {
+            await auth.signInWithRedirect(provider);
+          } else {
+            throw err;
+          }
+        }
+      } catch (e) {
+        showErr(e);
+      } finally {
+        setBusy(false);
       }
-    }
-  } catch (e) {
-    showErr(e);
-  } finally {
-    setBusy(false);
-  }
-});
+    });
 
-
-    // Email Sign In
+    // --- Email sign in ---
     q('emailLoginBtn').addEventListener('click', async () => {
       try {
         setBusy(true); clearErr();
-        await auth.signInWithEmailAndPassword(q('email').value.trim(), q('password').value.trim());
+        const email = q('email').value.trim();
+        const pass  = q('password').value.trim();
+        await auth.signInWithEmailAndPassword(email, pass);
+        // onAuthStateChanged will route
       } catch (e) { showErr(e); } finally { setBusy(false); }
     });
 
-    // Email Create Account
+    // --- Email create account ---
     q('emailSignupBtn').addEventListener('click', async () => {
       try {
         setBusy(true); clearErr();
-        const cred = await auth.createUserWithEmailAndPassword(q('email').value.trim(), q('password').value.trim());
-        await db.collection('users').doc(cred.user.uid).set({ email: cred.user.email || null, createdAt: firebase.firestore.FieldValue.serverTimestamp(), onboarded: false });
+        const email = q('email').value.trim();
+        const pass  = q('password').value.trim(); // must be >= 6 chars
+        const cred = await auth.createUserWithEmailAndPassword(email, pass);
+        await db.collection('users').doc(cred.user.uid).set({
+          email: cred.user.email || null,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          onboarded: false
+        }, { merge: true });
         go('onboarding.html');
       } catch (e) { showErr(e); } finally { setBusy(false); }
     });
