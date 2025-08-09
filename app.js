@@ -1011,13 +1011,11 @@ function renderSimpleTaskItem(task) {
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="editTaskFromSetup(${task.id})" class="text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded transition-colors" title="Edit task">
-                    ✏️
-                </button>
-                <button onclick="deleteTaskDirect(${task.id})" class="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded transition-colors" title="Delete task">
-                    🗑️
-                </button>
-            </div>
+                <button onclick="editTaskFromSetup(${task.id})" 
+                    class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-sm font-medium transition-colors">
+                Review Task
+            </button>
+        </div>
         </div>
     `;
 }
