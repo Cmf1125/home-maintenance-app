@@ -993,32 +993,31 @@ function renderSimpleTaskItem(task) {
                        task.priority === 'medium' ? '🟡' : 
                        '⚪';
     
-    // Get category info from global config
-    const categoryInfo = window.categoryConfig?.[task.category] || { icon: '📋', color: 'gray' };
-    
     return `
-        <div class="flex items-center justify-between py-3 px-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" data-task-id="${task.id}">
-            <div class="flex items-center gap-3 flex-1">
+        <div class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" data-task-id="${task.id}">
+            <!-- Row 1: Dot + Task Name -->
+            <div class="flex items-center gap-2 mb-2">
                 <span class="text-sm">${priorityDot}</span>
-                <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="font-medium text-gray-900 text-sm">${task.title}</span>
-                    </div>
-                    <div class="flex items-center gap-3 text-xs text-gray-500">
-                        <span>Every ${task.frequency} days</span>
-                        ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
-                    </div>
-                </div>
+                <span class="font-medium text-gray-900 text-sm flex-1">${task.title}</span>
             </div>
-            <div class="flex items-center gap-2">
+            
+            <!-- Row 2: Frequency + Cost -->
+            <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+                <span>Every ${task.frequency} days</span>
+                ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
+            </div>
+            
+            <!-- Row 3: Review Button -->
+            <div>
                 <button onclick="editTaskFromSetup(${task.id})" 
-                    class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-sm font-medium transition-colors">
-                Review Task
-            </button>
-        </div>
+                        class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-xs font-medium transition-colors">
+                    Review Task
+                </button>
+            </div>
         </div>
     `;
 }
+
 // Navigation functions
 function goBackToHomeSetup() {
     document.getElementById('task-setup').classList.add('hidden');
