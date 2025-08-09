@@ -1003,9 +1003,6 @@ function renderSimpleTaskItem(task) {
                 <div class="flex-1">
                     <div class="flex items-center gap-2 mb-1">
                         <span class="font-medium text-gray-900 text-sm">${task.title}</span>
-                        <span class="px-2 py-1 rounded-full bg-${categoryInfo.color}-50 text-${categoryInfo.color}-700 text-xs font-medium">
-                            ${categoryInfo.icon} ${task.category}
-                        </span>
                     </div>
                     <div class="flex items-center gap-3 text-xs text-gray-500">
                         <span>Every ${task.frequency} days</span>
