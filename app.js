@@ -973,7 +973,7 @@ const categoryItems = Object.entries(categoryStats)
     })
     .join('');
 
-taskSummaryCompact.textContent = categoryText || 'No tasks generated';
+taskSummaryCompact.innerHTML = categoryItems || 'No tasks generated';
     }
 
 // CLEAN SIMPLE VERSION: Render simple task list (just titles with edit/delete)
