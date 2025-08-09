@@ -964,7 +964,8 @@ function updateCompactTaskSummary() {
     // Update cost display
     annualCostDisplay.textContent = `$${Math.round(totalCost)}`;
     
-// Create category breakdown with icons on separate lines
+// Create category breakdown with total count
+const totalTasks = tasks.length;
 const categoryItems = Object.entries(categoryStats)
     .sort(([,a], [,b]) => b - a) // Sort by count, highest first
     .map(([category, count]) => {
@@ -973,7 +974,7 @@ const categoryItems = Object.entries(categoryStats)
     })
     .join('');
 
-taskSummaryCompact.innerHTML = categoryItems || 'No tasks generated';
+taskSummaryCompact.innerHTML = `<div class="font-medium text-gray-700 mb-1">${totalTasks} tasks across ${Object.keys(categoryStats).length} categories:</div>${categoryItems}` || 'No tasks generated';
     }
 
 // CLEAN SIMPLE VERSION: Render simple task list (just titles with edit/delete)
