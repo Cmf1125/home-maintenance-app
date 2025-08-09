@@ -964,16 +964,14 @@ function updateCompactTaskSummary() {
     // Update cost display
     annualCostDisplay.textContent = `$${Math.round(totalCost)}`;
     
-// Create category breakdown with icons
-const categoryText = Object.entries(categoryStats)
+// Create category breakdown with icons on separate lines
+const categoryItems = Object.entries(categoryStats)
     .sort(([,a], [,b]) => b - a) // Sort by count, highest first
     .map(([category, count]) => {
         const categoryInfo = window.categoryConfig?.[category] || { icon: '📋' };
-        return `${count} ${categoryInfo.icon} ${category}`;
+        return `<span class="inline-block mr-4 mb-1">${categoryInfo.icon} ${category} (${count})</span>`;
     })
-    .join(' • ');
-
-taskSummaryCompact.textContent = categoryText || 'No tasks generated';
+    .join('');
 
 taskSummaryCompact.textContent = categoryText || 'No tasks generated';
     }
