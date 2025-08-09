@@ -963,11 +963,17 @@ function updateCompactTaskSummary() {
     
     // Update cost display
     annualCostDisplay.textContent = `$${Math.round(totalCost)}`;
-// Create category breakdown text
+    
+// Create category breakdown with icons
 const categoryText = Object.entries(categoryStats)
     .sort(([,a], [,b]) => b - a) // Sort by count, highest first
-    .map(([category, count]) => `${count} ${category}`)
+    .map(([category, count]) => {
+        const categoryInfo = window.categoryConfig?.[category] || { icon: '📋' };
+        return `${count} ${categoryInfo.icon} ${category}`;
+    })
     .join(' • ');
+
+taskSummaryCompact.textContent = categoryText || 'No tasks generated';
 
 taskSummaryCompact.textContent = categoryText || 'No tasks generated';
     }
