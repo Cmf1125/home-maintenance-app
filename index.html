@@ -1800,16 +1800,27 @@ function createUser() {
 }
 
 function signInWithGoogle() {
+    window.googleSignInInProgress = true; // Flag to prevent auto-login
     const provider = new firebase.auth.GoogleAuthProvider();
     
     auth.signInWithPopup(provider)
         .then((result) => {
             console.log('✅ Google sign in success:', result.user.email);
-            // Let the auth state listener handle what happens next
+            window.googleSignInInProgress = false;
+            
+            // Check if this is a new user based on data, not account creation
+            loadUserData(result.user.uid).then(hasData => {
+                if (hasData) {
+                    handleSuccessfulLogin(result.user);
+                } else {
+                    handleNewUserSignup(result.user);
+                }
+            });
         })
         .catch((error) => {
             console.error('❌ Google sign in error:', error);
             alert('Google sign in failed: ' + error.message);
+            window.googleSignInInProgress = false;
         });
 }
 
@@ -1906,7 +1917,11 @@ auth.onAuthStateChanged((user) => {
         // User is signed in
         console.log('👤 User is already logged in:', user.email);
         window.currentUser = user;
-        handleSuccessfulLogin(user);
+        
+        // Only auto-load if we're not in the middle of a Google sign-in
+        if (!window.googleSignInInProgress) {
+            handleSuccessfulLogin(user);
+        }
     } else {
         // User is signed out
         console.log('👋 No user logged in, showing login screen');
