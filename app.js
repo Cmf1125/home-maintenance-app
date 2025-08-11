@@ -2423,8 +2423,8 @@ async function loadData() {
             const userData = userDoc.data();
             
             if (userData.homeData && userData.tasks) {
-                homeData = userData.homeData;
-                tasks = userData.tasks;
+                window.homeData = userData.homeData;
+                window.tasks = userData.tasks;
                 
                 // Restore dates - handle both old nextDue and new dueDate formats
                 tasks.forEach(task => {
