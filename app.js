@@ -1185,7 +1185,7 @@ document.getElementById('header-subtitle').textContent = homeData.fullAddress;
     
     // Save to Firebase if user is logged in
     if (window.currentUser) {
-        saveData()
+        saveUserDataToFirebase(window.currentUser.uid, homeData, tasks)
             .then(() => {
                 console.log('💾 User data saved to Firebase');
             })
@@ -2369,25 +2369,28 @@ function exportTaskList() {
 }
 
 function saveData() {
-  if (!window.currentUser) {
-    console.warn('⚠️ No logged in user — skipping save to Firebase');
-    return;
-  }
-
-  const data = {
-    homeData: homeData || {},
-    tasks: tasks || [],
-    version: '2.1'
-  };
-
-  db.collection('users').doc(window.currentUser.uid)
-    .set(data)
-    .then(() => {
-      console.log('💾 Data saved to Firebase');
-    })
-    .catch(err => {
-      console.error('❌ Error saving to Firebase:', err);
-    });
+    // Ensure calendar compatibility before saving
+    if (window.tasks) {
+        window.tasks.forEach(task => {
+            if (task.dueDate && !task.nextDue) {
+                task.nextDue = task.dueDate;
+            }
+        });
+    }
+    
+    const data = { 
+        homeData: homeData, 
+        tasks: tasks,
+        version: '2.1'
+    };
+    
+    try {
+        localStorage.setItem('casaCareData', JSON.stringify(data));
+        console.log('✅ Data saved to browser storage with calendar compatibility');
+    } catch (error) {
+        console.error('❌ Failed to save data:', error);
+        throw error; // Re-throw so caller can handle
+    }
 }
 
 function loadData() {
