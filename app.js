@@ -1185,7 +1185,7 @@ document.getElementById('header-subtitle').textContent = homeData.fullAddress;
     
     // Save to Firebase if user is logged in
     if (window.currentUser) {
-        saveUserDataToFirebase(window.currentUser.uid, homeData, tasks)
+        saveData()
             .then(() => {
                 console.log('💾 User data saved to Firebase');
             })
