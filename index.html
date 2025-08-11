@@ -1828,8 +1828,11 @@ function signInWithGoogle() {
 function handleSuccessfulLogin(user) {
     console.log('🏠 Existing user logged in, loading their data...');
     
-    // Hide login screen
+  // Hide ALL other screens first
     document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('setup-form').classList.add('hidden');
+    document.getElementById('setup-form').style.display = 'none';
+    document.getElementById('onboarding-progress').classList.add('hidden');
     
     // Try to load their existing data
     loadUserData(user.uid).then(hasData => {
@@ -1850,8 +1853,10 @@ function handleSuccessfulLogin(user) {
 function handleNewUserSignup(user) {
     console.log('🆕 New user signed up, starting setup process...');
     
-    // Hide login screen
+   // Hide ALL other screens first
     document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('main-app').classList.add('hidden');
+    document.body.classList.remove('main-app-active');
     
 // Show setup form
 document.getElementById('setup-form').classList.remove('hidden');
