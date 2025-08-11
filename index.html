@@ -1875,6 +1875,7 @@ document.body.classList.remove('main-app-active');
     
     // Store user info globally
     window.currentUser = user;
+    saveData(); // Initial save to Firebase after login
     
     console.log('✅ New user ready for setup');
 }
@@ -1912,7 +1913,7 @@ async function loadUserData(userId) {
 }
 
 // Save user data to Firestore
-async function saveUserDataToFirebase(userId, homeData, tasks) {
+async function saveData() {
     try {
         const userData = {
             homeData: homeData,
@@ -1940,6 +1941,7 @@ auth.onAuthStateChanged((user) => {
         // User is signed in
         console.log('👤 User is already logged in:', user.email);
         window.currentUser = user;
+    saveData(); // Initial save to Firebase after login
         
         // Only auto-load if we're not in the middle of a Google sign-in
         if (!window.googleSignInInProgress) {
