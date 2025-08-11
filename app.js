@@ -2369,37 +2369,25 @@ function exportTaskList() {
 }
 
 function saveData() {
-  // Ensure calendar compatibility before saving
-  if (window.tasks) {
-    window.tasks.forEach(task => {
-      if (task.dueDate && !task.nextDue) task.nextDue = task.dueDate;
-    });
+  if (!window.currentUser) {
+    console.warn('⚠️ No logged in user — skipping save to Firebase');
+    return;
   }
 
   const data = {
-    homeData: homeData,
-    tasks: tasks,
+    homeData: homeData || {},
+    tasks: tasks || [],
     version: '2.1'
   };
 
-  // 1) Save locally (offline-first)
-  try {
-    localStorage.setItem('casaCareData', JSON.stringify(data));
-    console.log('✅ Data saved to browser storage with calendar compatibility');
-  } catch (error) {
-    console.error('❌ Failed to save to localStorage:', error);
-  }
-
-  // 2) Save to Firestore if logged in
-  try {
-    if (window.currentUser && typeof saveUserDataToFirebase === 'function') {
-      saveUserDataToFirebase(window.currentUser.uid, homeData, tasks)
-        .then(() => console.log('💾 Synced to Firebase'))
-        .catch(err => console.error('❌ Firebase save failed:', err));
-    }
-  } catch (e) {
-    console.error('❌ Error invoking Firebase save:', e);
-  }
+  db.collection('users').doc(window.currentUser.uid)
+    .set(data)
+    .then(() => {
+      console.log('💾 Data saved to Firebase');
+    })
+    .catch(err => {
+      console.error('❌ Error saving to Firebase:', err);
+    });
 }
 
 function loadData() {
