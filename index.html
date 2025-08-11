@@ -169,7 +169,7 @@
 <div id="setup-form" class="hidden p-4 main-content pt-20">
     
 <!-- Enhanced Onboarding Progress -->
-<div id="onboarding-progress" class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+<div id="onboarding-progress" class="hidden fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
   <div class="max-w-2xl mx-auto px-4 py-4">
     <!-- Step indicators with icons -->
     <div class="flex items-center justify-between mb-4">
@@ -1847,8 +1847,9 @@ function handleNewUserSignup(user) {
     // Hide login screen
     document.getElementById('login-screen').classList.add('hidden');
     
-    // Show setup form
-    document.getElementById('setup-form').classList.remove('hidden');
+// Show setup form
+document.getElementById('setup-form').classList.remove('hidden');
+document.getElementById('onboarding-progress').classList.remove('hidden');
     
     // Store user info globally
     window.currentUser = user;
