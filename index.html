@@ -1880,23 +1880,34 @@ document.body.classList.remove('main-app-active');
 // Load user data from Firestore
 async function loadUserData(userId) {
     try {
+        console.log('🔍 DEBUG: Loading data for user:', userId);
+        alert('STEP 1: About to query Firebase for user: ' + userId);
+        
         const userDoc = await db.collection('users').doc(userId).get();
+        
+        alert('STEP 2: Firebase query completed. Doc exists: ' + userDoc.exists);
+        
         if (userDoc.exists) {
             const userData = userDoc.data();
+            console.log('📦 DEBUG: Raw data from Firebase:', userData);
+            alert('STEP 3: Got data from Firebase. Has homeData: ' + !!userData.homeData + ', Has tasks: ' + !!userData.tasks + ', Task count: ' + (userData.tasks ? userData.tasks.length : 0));
+            
             if (userData.homeData && userData.tasks) {
                 // Load the data into the app
                 window.homeData = userData.homeData;
                 window.tasks = userData.tasks;
+                alert('STEP 4: Data assigned to window. Final check - homeData set: ' + !!window.homeData + ', tasks count: ' + window.tasks.length);
                 return true;
             }
         }
+        alert('STEP 5: No valid data found');
         return false;
     } catch (error) {
         console.error('❌ Error loading user data:', error);
+        alert('ERROR in loadUserData: ' + error.message);
         return false;
     }
 }
-
 // Save user data to Firestore
 async function saveUserDataToFirebase(userId, homeData, tasks) {
     try {
