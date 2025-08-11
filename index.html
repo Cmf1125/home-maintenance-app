@@ -147,6 +147,12 @@
 <!-- Settings Dropdown Menu -->
 <div id="settings-dropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
     <div class="py-2">
+        <button onclick="signOutUser(); closeSettingsDropdown()" 
+                class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
+            <span>👋</span>
+            <span>Sign Out</span>
+        </button>
+        <div class="border-t border-gray-100 my-1"></div>
         <button onclick="exportTaskList(); closeSettingsDropdown()" 
                 class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
             <span>📋</span>
@@ -159,10 +165,11 @@
             <span>Reset App</span>
         </button>
    </div>
-    </div>
+</div>
+                
 </div> <!-- Closes: relative container -->
-        </div> <!-- Closes: flex items-center justify-between -->
-    </div> <!-- Closes: px-4 py-4 -->
+</div> <!-- Closes: flex items-center justify-between -->
+</div> <!-- Closes: px-4 py-4 -->
 </div> <!-- Closes: bg-white shadow-sm border-b sticky -->
 
 <!-- Simplified Setup Form -->
