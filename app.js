@@ -2303,7 +2303,16 @@ function clearData() {
         homeData = {};
         tasks = [];
         
-        localStorage.removeItem('casaCareData');
+        // Clear from Firebase instead of localStorage
+        if (window.currentUser) {
+            saveUserDataToFirebase(window.currentUser.uid, {}, [])
+                .then(() => {
+                    console.log('✅ Data cleared from Firebase');
+                })
+                .catch((error) => {
+                    console.error('❌ Error clearing Firebase data:', error);
+                });
+        }
         
         document.getElementById('setup-form').style.display = 'block';
         document.getElementById('task-setup').classList.add('hidden');
@@ -2378,59 +2387,79 @@ function saveData() {
         });
     }
     
+    // Check if user is logged in
+    if (!window.currentUser) {
+        console.warn('⚠️ No user logged in, cannot save to Firebase');
+        return;
+    }
+    
     const data = { 
         homeData: homeData, 
         tasks: tasks,
         version: '2.1'
     };
     
-    try {
-        localStorage.setItem('casaCareData', JSON.stringify(data));
-        console.log('✅ Data saved to browser storage with calendar compatibility');
-    } catch (error) {
-        console.error('❌ Failed to save data:', error);
-        throw error; // Re-throw so caller can handle
-    }
+    // Save to Firebase instead of localStorage
+    saveUserDataToFirebase(window.currentUser.uid, homeData, tasks)
+        .then(() => {
+            console.log('✅ Data saved to Firebase successfully');
+        })
+        .catch((error) => {
+            console.error('❌ Failed to save data to Firebase:', error);
+            // Don't throw error to prevent app crashes
+        });
 }
 
-function loadData() {
+async function loadData() {
+    // Check if user is logged in
+    if (!window.currentUser) {
+        console.warn('⚠️ No user logged in, cannot load from Firebase');
+        return false;
+    }
+    
     try {
-        const savedData = localStorage.getItem('casaCareData');
-        if (savedData) {
-            const data = JSON.parse(savedData);
+        const userDoc = await db.collection('users').doc(window.currentUser.uid).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
             
-            homeData = data.homeData || {};
-            tasks = data.tasks || [];
-            
-            // Restore dates - handle both old nextDue and new dueDate formats
-            tasks.forEach(task => {
-                if (task.nextDue) {
-                    task.dueDate = new Date(task.nextDue);
-                    // Keep nextDue for calendar compatibility
-                    task.nextDue = new Date(task.nextDue);
-                } else if (task.dueDate) {
-                    task.dueDate = new Date(task.dueDate);
-                    // Set nextDue for calendar compatibility
-                    task.nextDue = new Date(task.dueDate);
-                }
-                if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
-            });
-            
-            console.log('✅ Data loaded from browser storage with calendar compatibility');
-            return true;
+            if (userData.homeData && userData.tasks) {
+                homeData = userData.homeData;
+                tasks = userData.tasks;
+                
+                // Restore dates - handle both old nextDue and new dueDate formats
+                tasks.forEach(task => {
+                    if (task.nextDue) {
+                        task.dueDate = new Date(task.nextDue);
+                        // Keep nextDue for calendar compatibility
+                        task.nextDue = new Date(task.nextDue);
+                    } else if (task.dueDate) {
+                        task.dueDate = new Date(task.dueDate);
+                        // Set nextDue for calendar compatibility
+                        task.nextDue = new Date(task.dueDate);
+                    }
+                    if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
+                });
+                
+                console.log('✅ Data loaded from Firebase with calendar compatibility');
+                return true;
+            }
         }
+        
+        console.log('ℹ️ No data found in Firebase for this user');
+        return false;
     } catch (error) {
-        console.error('❌ Failed to load data:', error);
+        console.error('❌ Failed to load data from Firebase:', error);
+        return false;
     }
-    return false;
 }
 
-function hasExistingData() {
-    return loadData() && homeData.fullAddress;
+async function hasExistingData() {
+    const dataLoaded = await loadData();
+    return dataLoaded && homeData.fullAddress;
 }
 
 // Enhanced initialization
-function initializeApp() {
+async function initializeApp() {
     console.log('🏠 The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initializing...');
     
     // Make well water function available globally ASAP
@@ -2440,7 +2469,10 @@ function initializeApp() {
     window.tasks = tasks;
     window.homeData = homeData;
     
-    if (hasExistingData()) {
+    // Check for existing data (now async)
+    const hasData = await hasExistingData();
+    
+    if (hasData) {
         // Hide setup screens
         document.getElementById('setup-form').style.display = 'none';
         document.getElementById('task-setup').classList.add('hidden');
@@ -2466,12 +2498,10 @@ function initializeApp() {
         document.getElementById('main-app').classList.add('hidden');
     }
     
-   // ADD THIS LINE at the end:
     initializeDateManagement();
     
     console.log('✅ The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initialized successfully!');
 }
-
 // Export functions to global scope
 window.createMaintenancePlan = createMaintenancePlan;
 window.finishTaskSetup = finishTaskSetup;
