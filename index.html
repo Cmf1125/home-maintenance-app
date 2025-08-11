@@ -1831,6 +1831,32 @@ function signInWithGoogle() {
         });
 }
 
+function signOutUser() {
+    console.log('👋 Signing out user...');
+    
+    auth.signOut().then(() => {
+        console.log('✅ User signed out successfully');
+        
+        // Clear local data
+        window.currentUser = null;
+        window.homeData = {};
+        window.tasks = [];
+        
+        // Show login screen and hide other screens
+        document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('setup-form').classList.add('hidden');
+        document.getElementById('setup-form').style.display = 'none';
+        document.getElementById('main-app').classList.add('hidden');
+        document.body.classList.remove('main-app-active');
+        
+        alert('👋 You have been signed out successfully!');
+        
+    }).catch((error) => {
+        console.error('❌ Sign out error:', error);
+        alert('Error signing out: ' + error.message);
+    });
+}    
+    
 // Handle successful login (existing user)
 function handleSuccessfulLogin(user) {
     console.log('🏠 Existing user logged in, loading their data...');
