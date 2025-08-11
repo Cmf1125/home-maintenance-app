@@ -1924,19 +1924,19 @@ async function loadUserData(userId) {
         if (userDoc.exists) {
             const userData = userDoc.data();
             if (userData.homeData && userData.tasks) {
-                // Load the data into the app
+                // Directly assign to global variables
+                homeData = userData.homeData;
+                tasks = userData.tasks;
                 window.homeData = userData.homeData;
                 window.tasks = userData.tasks;
                 
-                // Restore dates - handle both old nextDue and new dueDate formats
+                // Restore dates
                 window.tasks.forEach(task => {
                     if (task.nextDue) {
                         task.dueDate = new Date(task.nextDue);
-                        // Keep nextDue for calendar compatibility
                         task.nextDue = new Date(task.nextDue);
                     } else if (task.dueDate) {
                         task.dueDate = new Date(task.dueDate);
-                        // Set nextDue for calendar compatibility
                         task.nextDue = new Date(task.dueDate);
                     }
                     if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
