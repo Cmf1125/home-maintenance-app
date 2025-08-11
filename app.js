@@ -1183,6 +1183,16 @@ document.getElementById('header-subtitle').textContent = homeData.fullAddress;
     // Success message
     alert(`🎉 Setup Complete!\n\n✅ ${successCount} tasks scheduled automatically\n📅 Your clean, simple maintenance plan is ready!\n\nCheck your dashboard and calendar now.`);
     
+    // Save to Firebase if user is logged in
+    if (window.currentUser) {
+        saveUserDataToFirebase(window.currentUser.uid, homeData, tasks)
+            .then(() => {
+                console.log('💾 User data saved to Firebase');
+            })
+            .catch((error) => {
+                console.error('❌ Error saving to Firebase:', error);
+            });
+    }
     console.log('🎉 CLEAN SIMPLE TASK SETUP COMPLETION SUCCESSFUL!');
 }
 
