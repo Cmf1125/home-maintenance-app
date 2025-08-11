@@ -147,12 +147,6 @@
 <!-- Settings Dropdown Menu -->
 <div id="settings-dropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
     <div class="py-2">
-        <button onclick="signOutUser(); closeSettingsDropdown()" 
-                class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
-            <span>👋</span>
-            <span>Sign Out</span>
-        </button>
-        <div class="border-t border-gray-100 my-1"></div>
         <button onclick="exportTaskList(); closeSettingsDropdown()" 
                 class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
             <span>📋</span>
@@ -165,10 +159,10 @@
             <span>Reset App</span>
         </button>
    </div>
-</div>
+    </div>
 </div> <!-- Closes: relative container -->
-</div> <!-- Closes: flex items-center justify-between -->
-</div> <!-- Closes: px-4 py-4 -->
+        </div> <!-- Closes: flex items-center justify-between -->
+    </div> <!-- Closes: px-4 py-4 -->
 </div> <!-- Closes: bg-white shadow-sm border-b sticky -->
 
 <!-- Simplified Setup Form -->
@@ -1881,48 +1875,35 @@ document.body.classList.remove('main-app-active');
 
 // Load user data from Firestore
 async function loadUserData(userId) {
-  try {
-    const snap = await db.collection('users').doc(userId).get();
-    if (!snap.exists) {
-      console.log('ℹ️ No existing data for user, starting fresh.');
-      window.homeData = {};
-      window.tasks = [];
-      return;
+    try {
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            if (userData.homeData && userData.tasks) {
+                // Load the data into the app
+                window.homeData = userData.homeData;
+                window.tasks = userData.tasks;
+                return true;
+            }
+        }
+        return false;
+    } catch (error) {
+        console.error('❌ Error loading user data:', error);
+        return false;
     }
-
-    const data = snap.data() || {};
-    const toDate = (v) => {
-      if (!v) return v;
-      if (typeof v.toDate === 'function') return v.toDate();
-      return new Date(v);
-    };
-
-    window.homeData = data.homeData || {};
-    window.tasks = (data.tasks || []).map(t => ({
-      ...t,
-      dueDate: toDate(t.dueDate),
-      nextDue: toDate(t.nextDue),
-      lastCompleted: toDate(t.lastCompleted)
-    }));
-
-    console.log('✅ Data loaded from Firebase');
-  } catch (err) {
-    console.error('❌ Error loading from Firebase:', err);
-  }
 }
 
 // Save user data to Firestore
 async function saveUserDataToFirebase(userId, homeData, tasks) {
     try {
-        const uid = userId || (window.currentUser && window.currentUser.uid);
-        if (!uid) throw new Error('No userId available for Firebase save');
         const userData = {
             homeData: homeData,
             tasks: tasks,
             lastUpdated: new Date().toISOString(),
             userEmail: window.currentUser ? window.currentUser.email : null
         };
-        await db.collection('users').doc(uid).set(userData);
+        
+        await db.collection('users').doc(userId).set(userData);
         console.log('💾 User data saved to Firebase successfully');
         return true;
     } catch (error) {
@@ -1930,7 +1911,6 @@ async function saveUserDataToFirebase(userId, homeData, tasks) {
         throw error;
     }
 }
-
 
 // Listen for authentication state changes
 let authProcessing = false;
