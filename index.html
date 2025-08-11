@@ -1995,5 +1995,149 @@ auth.onAuthStateChanged((user) => {
     
 </script>
 
+            <!-- 🔥 FIREBASE DATE FIX -->
+<script>
+console.log('🔧 Loading Firebase date serialization fix...');
+
+// Helper function to prepare tasks for Firebase (convert Dates to strings)
+function prepareTasksForFirebase(tasks) {
+    return tasks.map(task => {
+        const firebaseTask = { ...task };
+        
+        // Convert Date objects to ISO strings
+        if (firebaseTask.dueDate instanceof Date) {
+            firebaseTask.dueDate = firebaseTask.dueDate.toISOString();
+        }
+        if (firebaseTask.nextDue instanceof Date) {
+            firebaseTask.nextDue = firebaseTask.nextDue.toISOString();
+        }
+        if (firebaseTask.lastCompleted instanceof Date) {
+            firebaseTask.lastCompleted = firebaseTask.lastCompleted.toISOString();
+        }
+        
+        return firebaseTask;
+    });
+}
+
+// Helper function to restore tasks from Firebase (convert strings back to Dates)
+function restoreTasksFromFirebase(tasks) {
+    return tasks.map(task => {
+        const restoredTask = { ...task };
+        
+        // Convert ISO strings back to Date objects
+        if (restoredTask.dueDate && typeof restoredTask.dueDate === 'string') {
+            const date = new Date(restoredTask.dueDate);
+            if (!isNaN(date.getTime())) {
+                restoredTask.dueDate = date;
+                restoredTask.nextDue = date; // Ensure calendar compatibility
+            } else {
+                // If date is invalid, set to today
+                restoredTask.dueDate = new Date();
+                restoredTask.nextDue = new Date();
+                console.warn('⚠️ Invalid date found, reset to today:', task.title);
+            }
+        }
+        
+        if (restoredTask.lastCompleted && typeof restoredTask.lastCompleted === 'string') {
+            const date = new Date(restoredTask.lastCompleted);
+            if (!isNaN(date.getTime())) {
+                restoredTask.lastCompleted = date;
+            } else {
+                restoredTask.lastCompleted = null;
+            }
+        }
+        
+        // Fallback: ensure nextDue exists for calendar compatibility
+        if (!restoredTask.nextDue && restoredTask.dueDate) {
+            restoredTask.nextDue = new Date(restoredTask.dueDate);
+        }
+        
+        return restoredTask;
+    });
+}
+
+// OVERRIDE: Fix the saveUserDataToFirebase function
+window.saveUserDataToFirebase = async function(userId, homeData, tasks) {
+    try {
+        console.log('💾 Saving to Firebase with proper date serialization...');
+        
+        // Prepare tasks for Firebase by converting Dates to strings
+        const firebaseTasks = prepareTasksForFirebase(tasks);
+        
+        const userData = {
+            homeData: homeData,
+            tasks: firebaseTasks, // Now contains ISO strings instead of Date objects
+            lastUpdated: new Date().toISOString(),
+            userEmail: window.currentUser ? window.currentUser.email : null,
+            version: '2.2' // Track this version with proper date handling
+        };
+        
+        await db.collection('users').doc(userId).set(userData);
+        console.log('✅ User data saved to Firebase successfully with proper dates');
+        return true;
+    } catch (error) {
+        console.error('❌ Error saving user data to Firebase:', error);
+        throw error;
+    }
+};
+
+// OVERRIDE: Fix the loadUserData function
+window.loadUserData = async function(userId) {
+    try {
+        console.log('📥 Loading from Firebase with proper date deserialization...');
+        
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            if (userData.homeData && userData.tasks) {
+                // Load the data into the app
+                window.homeData = userData.homeData;
+                
+                // Restore tasks with proper date conversion
+                window.tasks = restoreTasksFromFirebase(userData.tasks);
+                
+                console.log(`✅ Data loaded from Firebase: ${window.tasks.length} tasks restored`);
+                return true;
+            }
+        }
+        console.log('ℹ️ No data found in Firebase for this user');
+        return false;
+    } catch (error) {
+        console.error('❌ Error loading user data from Firebase:', error);
+        return false;
+    }
+};
+
+// OVERRIDE: Fix the local saveData function to use the new Firebase function
+window.saveData = function() {
+    // Ensure calendar compatibility before saving
+    if (window.tasks) {
+        window.tasks.forEach(task => {
+            if (task.dueDate && !task.nextDue) {
+                task.nextDue = task.dueDate;
+            }
+        });
+    }
+    
+    // Check if user is logged in
+    if (!window.currentUser) {
+        console.warn('⚠️ No user logged in, cannot save to Firebase');
+        return;
+    }
+    
+    // Save to Firebase with proper date handling
+    window.saveUserDataToFirebase(window.currentUser.uid, window.homeData, window.tasks)
+        .then(() => {
+            console.log('✅ Data saved to Firebase successfully');
+        })
+        .catch((error) => {
+            console.error('❌ Failed to save data to Firebase:', error);
+        });
+};
+
+console.log('✅ Firebase date serialization fix loaded');
+</script>
+
+            
 </body>
 </html>
