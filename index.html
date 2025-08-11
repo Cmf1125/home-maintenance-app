@@ -1861,37 +1861,34 @@ function signOutUser() {
 function handleSuccessfulLogin(user) {
     console.log('🏠 Existing user logged in, loading their data...');
     
-  // Hide ALL other screens first
+    // Hide ALL other screens first
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('setup-form').classList.add('hidden');
     document.getElementById('setup-form').style.display = 'none';
     document.getElementById('onboarding-progress').classList.add('hidden');
     
     // Try to load their existing data
-loadUserData(user.uid).then(hasData => {
-    if (hasData) {
-        // User has existing data, go straight to dashboard
-        document.getElementById('main-app').classList.remove('hidden');
-        document.body.classList.add('main-app-active');
-        
-        // Update header with loaded address
-        document.getElementById('header-subtitle').textContent = window.homeData.fullAddress;
-        
-        showTab('dashboard');
-        
-        // Refresh dashboard AFTER data is confirmed loaded
-        if (window.enhancedDashboard && window.enhancedDashboard.render) {
-            window.enhancedDashboard.render();
-        } else if (typeof updateDashboard === 'function') {
-            updateDashboard();
+    loadUserData(user.uid).then(hasData => {
+        if (hasData) {
+            // Show main app
+            document.getElementById('main-app').classList.remove('hidden');
+            document.body.classList.add('main-app-active');
+            
+            // NOW update header and dashboard AFTER data is loaded
+            document.getElementById('header-subtitle').textContent = window.homeData.fullAddress;
+            showTab('dashboard');
+            
+            if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                window.enhancedDashboard.render();
+            } else if (typeof updateDashboard === 'function') {
+                updateDashboard();
+            }
+            
+            console.log('✅ Loaded existing user data, showing dashboard');
+        } else {
+            handleNewUserSignup(user);
         }
-        
-        console.log('✅ Loaded existing user data, showing dashboard');
-    } else {
-        // User exists but no data yet, send to setup
-        handleNewUserSignup(user);
-    }
-});
+    });
 }
     
 // Handle new user signup (needs setup)
