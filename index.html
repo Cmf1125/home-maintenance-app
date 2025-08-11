@@ -1805,14 +1805,14 @@ function signInWithGoogle() {
     auth.signInWithPopup(provider)
         .then((result) => {
             console.log('✅ Google sign in success:', result.user.email);
-            // Check if this is a new user
-            if (result.additionalUserInfo.isNewUser) {
-                handleNewUserSignup(result.user);
-            } else {
-                handleSuccessfulLogin(result.user);
-            }
+            // Let the auth state listener handle what happens next
         })
         .catch((error) => {
+            console.error('❌ Google sign in error:', error);
+            alert('Google sign in failed: ' + error.message);
+        });
+}
+    .catch((error) => {
             console.error('❌ Google sign in error:', error);
             alert('Google sign in failed: ' + error.message);
         });
