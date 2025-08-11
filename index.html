@@ -1875,6 +1875,11 @@ function handleSuccessfulLogin(user) {
             document.getElementById('header-subtitle').textContent = window.homeData.fullAddress;
             showTab('dashboard');
             
+            // Force dashboard refresh after data is loaded
+            if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                window.enhancedDashboard.render();
+            }
+            
             console.log('✅ Data loaded, dashboard ready');
         } else {
             handleNewUserSignup(user);
