@@ -166,7 +166,7 @@
 </div> <!-- Closes: bg-white shadow-sm border-b sticky -->
 
 <!-- Simplified Setup Form -->
-<div id="setup-form" class="p-4 main-content pt-20">
+<div id="setup-form" class="hidden p-4 main-content pt-20">
     
 <!-- Enhanced Onboarding Progress -->
 <div id="onboarding-progress" class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
@@ -1427,7 +1427,8 @@
     <script src="enhanced-dashboard.js"></script>
     <script src="documents.js"></script> 
     <script src="appliances.js"></script>
-            <!-- SIMPLE MODAL FIX - Add this before </body> -->
+            
+<!-- SIMPLE MODAL FIX - Add this before </body> -->
 <!-- FIXED MODAL SCRIPT - Replace the previous one with this -->
 <script>
 console.log('🔧 Loading FIXED modal script...');
@@ -1721,6 +1722,163 @@ document.addEventListener('DOMContentLoaded', function() {
 
   console.log('✅ Form section headers added at step starts');
 });
-</script>        
+</script>
+
+<!-- Firebase Configuration -->
+<script>
+// Firebase configuration - you'll need to replace these with your actual values
+const firebaseConfig = {
+  apiKey: "AIzaSyBuBfJvkhiTs0OSFlNE8ZhSTAnOa_sidE0",
+  authDomain: "home-keeper-app.firebaseapp.com",
+  projectId: "home-keeper-app",
+  storageBucket: "home-keeper-app.firebasestorage.app",
+  messagingSenderId: "434638918453",
+  appId: "1:434638918453:web:5fd99aed69ef4a4c2b727c"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+console.log('🔥 Firebase initialized');
+
+// Authentication Functions
+function showLoginForm() {
+    document.getElementById('login-form').classList.remove('hidden');
+    document.getElementById('signup-form').classList.add('hidden');
+}
+
+function showSignupForm() {
+    document.getElementById('login-form').classList.add('hidden');
+    document.getElementById('signup-form').classList.remove('hidden');
+}
+
+function signInUser() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+    }
+    
+    auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            console.log('✅ User signed in:', userCredential.user.email);
+            handleSuccessfulLogin(userCredential.user);
+        })
+        .catch((error) => {
+            console.error('❌ Sign in error:', error);
+            alert('Sign in failed: ' + error.message);
+        });
+}
+
+function createUser() {
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    
+    if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+    }
+    
+    if (password.length < 6) {
+        alert('Password must be at least 6 characters');
+        return;
+    }
+    
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            console.log('✅ User created:', userCredential.user.email);
+            handleNewUserSignup(userCredential.user);
+        })
+        .catch((error) => {
+            console.error('❌ Sign up error:', error);
+            alert('Sign up failed: ' + error.message);
+        });
+}
+
+function signInWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    
+    auth.signInWithPopup(provider)
+        .then((result) => {
+            console.log('✅ Google sign in success:', result.user.email);
+            // Check if this is a new user
+            if (result.additionalUserInfo.isNewUser) {
+                handleNewUserSignup(result.user);
+            } else {
+                handleSuccessfulLogin(result.user);
+            }
+        })
+        .catch((error) => {
+            console.error('❌ Google sign in error:', error);
+            alert('Google sign in failed: ' + error.message);
+        });
+}
+
+// Handle successful login (existing user)
+function handleSuccessfulLogin(user) {
+    console.log('🏠 Existing user logged in, loading their data...');
+    
+    // Hide login screen
+    document.getElementById('login-screen').classList.add('hidden');
+    
+    // Try to load their existing data
+    loadUserData(user.uid).then(hasData => {
+        if (hasData) {
+            // User has existing data, go straight to dashboard
+            document.getElementById('main-app').classList.remove('hidden');
+            document.body.classList.add('main-app-active');
+            showTab('dashboard');
+            console.log('✅ Loaded existing user data, showing dashboard');
+        } else {
+            // User exists but no data yet, send to setup
+            handleNewUserSignup(user);
+        }
+    });
+}
+
+// Handle new user signup (needs setup)
+function handleNewUserSignup(user) {
+    console.log('🆕 New user signed up, starting setup process...');
+    
+    // Hide login screen
+    document.getElementById('login-screen').classList.add('hidden');
+    
+    // Show setup form
+    document.getElementById('setup-form').classList.remove('hidden');
+    
+    // Store user info globally
+    window.currentUser = user;
+    
+    console.log('✅ New user ready for setup');
+}
+
+// Load user data from Firestore
+async function loadUserData(userId) {
+    try {
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            if (userData.homeData && userData.tasks) {
+                // Load the data into the app
+                window.homeData = userData.homeData;
+                window.tasks = userData.tasks;
+                return true;
+            }
+        }
+        return false;
+    } catch (error) {
+        console.error('❌ Error loading user data:', error);
+        return false;
+    }
+}
+</script>
+
+</body>
+</html>
+
 </body>
 </html>
