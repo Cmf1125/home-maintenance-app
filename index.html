@@ -1861,34 +1861,26 @@ function signOutUser() {
 function handleSuccessfulLogin(user) {
     console.log('🏠 Existing user logged in, loading their data...');
     
-    // Hide ALL other screens first
+    // Hide login screen
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('setup-form').classList.add('hidden');
     document.getElementById('setup-form').style.display = 'none';
     document.getElementById('onboarding-progress').classList.add('hidden');
     
-    // Try to load their existing data
-    loadUserData(user.uid).then(hasData => {
-        if (hasData) {
-            // Show main app
-            document.getElementById('main-app').classList.remove('hidden');
-            document.body.classList.add('main-app-active');
-            
-            // NOW update header and dashboard AFTER data is loaded
+    // Show main app
+    document.getElementById('main-app').classList.remove('hidden');
+    document.body.classList.add('main-app-active');
+    
+    // Load data with a delay to ensure everything is ready
+    setTimeout(() => {
+        loadUserData(user.uid).then(() => {
             document.getElementById('header-subtitle').textContent = window.homeData.fullAddress;
             showTab('dashboard');
-            
             if (window.enhancedDashboard && window.enhancedDashboard.render) {
                 window.enhancedDashboard.render();
-            } else if (typeof updateDashboard === 'function') {
-                updateDashboard();
             }
-            
-            console.log('✅ Loaded existing user data, showing dashboard');
-        } else {
-            handleNewUserSignup(user);
-        }
-    });
+        });
+    }, 500);
 }
     
 // Handle new user signup (needs setup)
