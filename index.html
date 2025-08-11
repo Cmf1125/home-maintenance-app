@@ -1828,6 +1828,13 @@ function signInWithGoogle() {
 function handleSuccessfulLogin(user) {
     console.log('🏠 Existing user logged in, loading their data...');
     alert('DEBUG: About to load data for: ' + user.email);
+
+    // PROTECTION: Lock the data once loaded
+    window.dataLocked = false;
+    
+    // Override any future overwrites
+    const originalTasks = window.tasks;
+    const originalHomeData = window.homeData;
     
     // Hide ALL other screens first
     document.getElementById('login-screen').classList.add('hidden');
@@ -1896,6 +1903,16 @@ async function loadUserData(userId) {
                 // Load the data into the app
                 window.homeData = userData.homeData;
                 window.tasks = userData.tasks;
+                // LOCK the data to prevent overwrites
+                window.dataLocked = true;
+                Object.defineProperty(window, 'tasks', {
+                    value: userData.tasks,
+                    writable: false
+                });
+                Object.defineProperty(window, 'homeData', {
+                    value: userData.homeData,
+                    writable: false
+                });
                 alert('STEP 4: Data assigned to window. Final check - homeData set: ' + !!window.homeData + ', tasks count: ' + window.tasks.length);
                 return true;
             }
