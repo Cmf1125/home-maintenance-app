@@ -577,10 +577,10 @@
                 <div class="p-4 border-b border-gray-100 flex items-center justify-between">
                  <h3 id="tasks-list-title" class="text-lg font-bold text-gray-900">Upcoming Tasks</h3>
                 <div class="flex gap-2">
-                    <button onclick="loadUserData(window.currentUser.uid).then(() => { window.enhancedDashboard.render(); })" 
-                class="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-200 text-sm touch-btn">
-                🔄 Refresh
-        </button>
+                   <button onclick="loadUserData(window.currentUser.uid).then(() => { window.enhancedDashboard.render(); document.getElementById('header-subtitle').textContent = window.homeData.fullAddress; })" 
+                        class="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 text-sm touch-btn">
+                    🔄 Load My Data
+            </button>
         <button onclick="addTaskFromDashboard()" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 text-sm touch-btn">
             Add Task
         </button>
@@ -1862,28 +1862,22 @@ function signOutUser() {
     
 // Handle successful login (existing user)
 function handleSuccessfulLogin(user) {
-    console.log('🏠 Existing user logged in, loading their data...');
+    console.log('🏠 User logged in');
     
-    // Hide login screen
+    // Just show the app, don't try to load data automatically
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('setup-form').classList.add('hidden');
     document.getElementById('setup-form').style.display = 'none';
     document.getElementById('onboarding-progress').classList.add('hidden');
     
-    // Show main app
     document.getElementById('main-app').classList.remove('hidden');
     document.body.classList.add('main-app-active');
+    showTab('dashboard');
     
-    // Load data with a delay to ensure everything is ready
+    // Show a load data button instead of automatic loading
     setTimeout(() => {
-        loadUserData(user.uid).then(() => {
-            document.getElementById('header-subtitle').textContent = window.homeData.fullAddress;
-            showTab('dashboard');
-            if (window.enhancedDashboard && window.enhancedDashboard.render) {
-                window.enhancedDashboard.render();
-            }
-        });
-    }, 500);
+        alert('Welcome back! Click the "🔄 Load My Data" button on the dashboard to load your tasks.');
+    }, 1000);
 }
     
 // Handle new user signup (needs setup)
