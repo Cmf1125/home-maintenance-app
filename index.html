@@ -1846,6 +1846,10 @@ function handleNewUserSignup(user) {
 document.getElementById('setup-form').classList.remove('hidden');
 document.getElementById('setup-form').style.display = 'block';
 document.getElementById('onboarding-progress').classList.remove('hidden');
+
+// Make sure main app is hidden
+document.getElementById('main-app').classList.add('hidden');
+document.body.classList.remove('main-app-active');
     
     // Store user info globally
     window.currentUser = user;
