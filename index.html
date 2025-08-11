@@ -1812,11 +1812,6 @@ function signInWithGoogle() {
             alert('Google sign in failed: ' + error.message);
         });
 }
-    .catch((error) => {
-            console.error('❌ Google sign in error:', error);
-            alert('Google sign in failed: ' + error.message);
-        });
-}
 
 // Handle successful login (existing user)
 function handleSuccessfulLogin(user) {
