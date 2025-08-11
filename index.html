@@ -1862,29 +1862,35 @@ function signOutUser() {
     
 // Handle successful login (existing user)
 function handleSuccessfulLogin(user) {
-    console.log('🏠 User logged in');
+    console.log('🏠 User logged in, loading data first...');
     
-    // Just show the app, don't try to load data automatically
+    // Hide login screen immediately
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('setup-form').classList.add('hidden');
     document.getElementById('setup-form').style.display = 'none';
     document.getElementById('onboarding-progress').classList.add('hidden');
     
-    document.getElementById('main-app').classList.remove('hidden');
-    document.body.classList.add('main-app-active');
-    showTab('dashboard');
-    
-    // Show a load data button instead of automatic loading
-    setTimeout(() => {
-        alert('Welcome back! Click the "🔄 Load My Data" button on the dashboard to load your tasks.');
-    }, 1000);
+    // Load data FIRST, then show dashboard
+    loadUserData(user.uid).then(hasData => {
+        if (hasData) {
+            // NOW show the app with data already loaded
+            document.getElementById('main-app').classList.remove('hidden');
+            document.body.classList.add('main-app-active');
+            document.getElementById('header-subtitle').textContent = window.homeData.fullAddress;
+            showTab('dashboard');
+            
+            console.log('✅ Data loaded, dashboard ready');
+        } else {
+            handleNewUserSignup(user);
+        }
+    });
 }
     
 // Handle new user signup (needs setup)
 function handleNewUserSignup(user) {
     console.log('🆕 New user signed up, starting setup process...');
     
-   // Hide ALL other screens first
+    // Hide ALL other screens first
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('main-app').classList.add('hidden');
     document.body.classList.remove('main-app-active');
