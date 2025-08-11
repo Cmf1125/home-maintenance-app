@@ -1827,8 +1827,9 @@ function signInWithGoogle() {
 // Handle successful login (existing user)
 function handleSuccessfulLogin(user) {
     console.log('🏠 Existing user logged in, loading their data...');
+    alert('DEBUG: About to load data for: ' + user.email);
     
-  // Hide ALL other screens first
+    // Hide ALL other screens first
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('setup-form').classList.add('hidden');
     document.getElementById('setup-form').style.display = 'none';
@@ -1836,13 +1837,16 @@ function handleSuccessfulLogin(user) {
     
     // Try to load their existing data
     loadUserData(user.uid).then(hasData => {
+        alert('DEBUG: Data loaded result: ' + hasData);
         if (hasData) {
+            alert('DEBUG: Has data, going to dashboard');
             // User has existing data, go straight to dashboard
             document.getElementById('main-app').classList.remove('hidden');
             document.body.classList.add('main-app-active');
             showTab('dashboard');
             console.log('✅ Loaded existing user data, showing dashboard');
         } else {
+            alert('DEBUG: No data found, going to setup');
             // User exists but no data yet, send to setup
             handleNewUserSignup(user);
         }
