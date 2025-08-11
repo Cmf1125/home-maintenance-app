@@ -1827,14 +1827,6 @@ function signInWithGoogle() {
 // Handle successful login (existing user)
 function handleSuccessfulLogin(user) {
     console.log('🏠 Existing user logged in, loading their data...');
-    alert('DEBUG: About to load data for: ' + user.email);
-
-    // PROTECTION: Lock the data once loaded
-    window.dataLocked = false;
-    
-    // Override any future overwrites
-    const originalTasks = window.tasks;
-    const originalHomeData = window.homeData;
     
     // Hide ALL other screens first
     document.getElementById('login-screen').classList.add('hidden');
@@ -1844,22 +1836,18 @@ function handleSuccessfulLogin(user) {
     
     // Try to load their existing data
     loadUserData(user.uid).then(hasData => {
-        alert('DEBUG: Data loaded result: ' + hasData);
         if (hasData) {
-            alert('DEBUG: Has data, going to dashboard');
             // User has existing data, go straight to dashboard
             document.getElementById('main-app').classList.remove('hidden');
             document.body.classList.add('main-app-active');
             showTab('dashboard');
             console.log('✅ Loaded existing user data, showing dashboard');
         } else {
-            alert('DEBUG: No data found, going to setup');
             // User exists but no data yet, send to setup
             handleNewUserSignup(user);
         }
     });
 }
-
 // Handle new user signup (needs setup)
 function handleNewUserSignup(user) {
     console.log('🆕 New user signed up, starting setup process...');
