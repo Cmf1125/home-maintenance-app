@@ -1873,7 +1873,21 @@ function handleSuccessfulLogin(user) {
             // User has existing data, go straight to dashboard
             document.getElementById('main-app').classList.remove('hidden');
             document.body.classList.add('main-app-active');
+            
+            // Update header with loaded address
+            document.getElementById('header-subtitle').textContent = window.homeData.fullAddress;
+            
             showTab('dashboard');
+            
+            // Refresh dashboard after data loads
+            setTimeout(() => {
+                if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                    window.enhancedDashboard.render();
+                } else if (typeof updateDashboard === 'function') {
+                    updateDashboard();
+                }
+            }, 100);
+            
             console.log('✅ Loaded existing user data, showing dashboard');
         } else {
             // User exists but no data yet, send to setup
@@ -1881,7 +1895,6 @@ function handleSuccessfulLogin(user) {
         }
     });
 }
-
 // Handle new user signup (needs setup)
 function handleNewUserSignup(user) {
     console.log('🆕 New user signed up, starting setup process...');
