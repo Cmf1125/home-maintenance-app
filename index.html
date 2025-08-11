@@ -1883,34 +1883,34 @@ document.body.classList.remove('main-app-active');
 async function loadUserData(userId) {
   try {
     const snap = await db.collection('users').doc(userId).get();
-    if (!snap.exists) return false;
+    if (!snap.exists) {
+      console.log('ℹ️ No existing data for user, starting fresh.');
+      window.homeData = {};
+      window.tasks = [];
+      return;
+    }
 
-    const userData = snap.data() || {};
-    const tasks = Array.isArray(userData.tasks) ? userData.tasks : [];
-
-    // Convert Firestore Timestamps / strings -> JS Date
+    const data = snap.data() || {};
     const toDate = (v) => {
       if (!v) return v;
       if (typeof v.toDate === 'function') return v.toDate();
-      if (typeof v === 'string' || typeof v === 'number') return new Date(v);
-      return v;
+      return new Date(v);
     };
 
-    tasks.forEach(t => {
-      t.dueDate = toDate(t.dueDate);
-      t.nextDue = toDate(t.nextDue);
-      t.lastCompleted = toDate(t.lastCompleted);
-    });
+    window.homeData = data.homeData || {};
+    window.tasks = (data.tasks || []).map(t => ({
+      ...t,
+      dueDate: toDate(t.dueDate),
+      nextDue: toDate(t.nextDue),
+      lastCompleted: toDate(t.lastCompleted)
+    }));
 
-    window.homeData = userData.homeData || {};
-    window.tasks = tasks;
-    return true;
+    console.log('✅ Data loaded from Firebase');
   } catch (err) {
-    console.error('❌ Error loading user data:', err);
-    return false;
+    console.error('❌ Error loading from Firebase:', err);
   }
 }
-            
+
 // Save user data to Firestore
 async function saveUserDataToFirebase(userId, homeData, tasks) {
     try {
