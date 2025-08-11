@@ -1225,8 +1225,8 @@ function showTab(tabName) {
     }
     
     // Ensure global references are current
-    window.tasks = tasks;
-    window.homeData = homeData;
+   // window.tasks = tasks;
+   // window.homeData = homeData;
     
     // Hide ALL views including All Tasks
     const dashboardView = document.getElementById('dashboard-view');
