@@ -2436,13 +2436,9 @@ function initializeApp() {
     // Make well water function available globally ASAP
     window.toggleWellWaterOptions = toggleWellWaterOptions;
     
-   // Only set globals if they're not already loaded from Firebase
-    if (!window.tasks || window.tasks.length === 0) {
-        window.tasks = tasks;
-    }
-    if (!window.homeData || Object.keys(window.homeData).length === 0) {
-        window.homeData = homeData;
-    }
+    // Make tasks and homeData available globally for other scripts
+    window.tasks = tasks;
+    window.homeData = homeData;
     
     if (hasExistingData()) {
         // Hide setup screens
