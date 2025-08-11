@@ -1875,6 +1875,43 @@ async function loadUserData(userId) {
         return false;
     }
 }
+
+// Save user data to Firestore
+async function saveUserDataToFirebase(userId, homeData, tasks) {
+    try {
+        const userData = {
+            homeData: homeData,
+            tasks: tasks,
+            lastUpdated: new Date().toISOString(),
+            userEmail: window.currentUser ? window.currentUser.email : null
+        };
+        
+        await db.collection('users').doc(userId).set(userData);
+        console.log('💾 User data saved to Firebase successfully');
+        return true;
+    } catch (error) {
+        console.error('❌ Error saving user data to Firebase:', error);
+        throw error;
+    }
+}
+
+// Listen for authentication state changes
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        // User is signed in
+        console.log('👤 User is already logged in:', user.email);
+        window.currentUser = user;
+        handleSuccessfulLogin(user);
+    } else {
+        // User is signed out
+        console.log('👋 No user logged in, showing login screen');
+        document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('setup-form').classList.add('hidden');
+        document.getElementById('main-app').classList.add('hidden');
+        document.body.classList.remove('main-app-active');
+    }
+});
+    
 </script>
 
 </body>
