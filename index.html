@@ -1875,7 +1875,6 @@ document.body.classList.remove('main-app-active');
     
     // Store user info globally
     window.currentUser = user;
-    saveData(); // Initial save to Firebase after login
     
     console.log('✅ New user ready for setup');
 }
@@ -1913,16 +1912,17 @@ async function loadUserData(userId) {
 }
 
 // Save user data to Firestore
-async function saveData() {
+async function saveUserDataToFirebase(userId, homeData, tasks) {
     try {
+        const uid = userId || (window.currentUser && window.currentUser.uid);
+        if (!uid) throw new Error('No userId available for Firebase save');
         const userData = {
             homeData: homeData,
             tasks: tasks,
             lastUpdated: new Date().toISOString(),
             userEmail: window.currentUser ? window.currentUser.email : null
         };
-        
-        await db.collection('users').doc(userId).set(userData);
+        await db.collection('users').doc(uid).set(userData);
         console.log('💾 User data saved to Firebase successfully');
         return true;
     } catch (error) {
@@ -1930,6 +1930,7 @@ async function saveData() {
         throw error;
     }
 }
+
 
 // Listen for authentication state changes
 let authProcessing = false;
@@ -1941,7 +1942,6 @@ auth.onAuthStateChanged((user) => {
         // User is signed in
         console.log('👤 User is already logged in:', user.email);
         window.currentUser = user;
-    saveData(); // Initial save to Firebase after login
         
         // Only auto-load if we're not in the middle of a Google sign-in
         if (!window.googleSignInInProgress) {
