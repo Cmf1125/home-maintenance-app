@@ -1749,6 +1749,178 @@ const db = firebase.firestore();
 
 console.log('🔥 Firebase initialized');
 
+// ===== STEP 1: ADD THESE BACKUP FUNCTIONS TO index.html =====
+// Add these BEFORE any existing Firebase functions (don't replace anything yet)
+
+// NEW: Enhanced save function (runs alongside existing one)
+async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
+    try {
+        if (!userId || !window.currentUser) {
+            console.log('🚫 Enhanced save skipped: No user logged in');
+            return false;
+        }
+
+        console.log('💾 Enhanced save: Starting comprehensive save...');
+        
+        // Convert Date objects to Firebase Timestamps for proper storage
+        const firebaseTasks = (tasks || []).map(task => {
+            const firebaseTask = { ...task };
+            
+            if (firebaseTask.dueDate instanceof Date) {
+                firebaseTask.dueDate = firebase.firestore.Timestamp.fromDate(firebaseTask.dueDate);
+            }
+            if (firebaseTask.nextDue instanceof Date) {
+                firebaseTask.nextDue = firebase.firestore.Timestamp.fromDate(firebaseTask.nextDue);
+            }
+            if (firebaseTask.lastCompleted instanceof Date) {
+                firebaseTask.lastCompleted = firebase.firestore.Timestamp.fromDate(firebaseTask.lastCompleted);
+            }
+            
+            return firebaseTask;
+        });
+
+        // Collect ALL user data safely
+        const userData = {
+            homeData: homeData || {},
+            tasks: firebaseTasks,
+            appliances: window.applianceData || [],
+            documents: window.casaCareDocuments?.documents || [],
+            lastUpdated: firebase.firestore.Timestamp.now(),
+            userEmail: window.currentUser.email,
+            version: '2.1',
+            // Keep existing structure for compatibility
+            legacyBackup: true
+        };
+        
+        // Use set with merge to avoid overwriting
+        await db.collection('users').doc(userId).set(userData, { merge: true });
+        console.log('✅ Enhanced save: All data saved successfully');
+        return true;
+    } catch (error) {
+        console.error('❌ Enhanced save error:', error);
+        return false;
+    }
+}
+
+// NEW: Enhanced load function (runs alongside existing one)
+async function loadUserDataEnhanced(userId) {
+    try {
+        if (!userId) {
+            console.log('🚫 Enhanced load skipped: No userId');
+            return false;
+        }
+
+        console.log('📥 Enhanced load: Loading comprehensive data...');
+        
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            
+            if (userData.homeData && userData.tasks) {
+                // Load main data
+                window.homeData = userData.homeData;
+                window.tasks = userData.tasks || [];
+                
+                // Fix dates
+                window.tasks.forEach(task => {
+                    if (task.dueDate && task.dueDate.toDate) {
+                        task.dueDate = task.dueDate.toDate();
+                        task.nextDue = task.dueDate;
+                    } else if (task.dueDate && typeof task.dueDate === 'string') {
+                        task.dueDate = new Date(task.dueDate);
+                        task.nextDue = task.dueDate;
+                    }
+                    
+                    if (task.lastCompleted && task.lastCompleted.toDate) {
+                        task.lastCompleted = task.lastCompleted.toDate();
+                    } else if (task.lastCompleted && typeof task.lastCompleted === 'string') {
+                        task.lastCompleted = new Date(task.lastCompleted);
+                    }
+                });
+
+                // Load appliances safely
+                if (userData.appliances && Array.isArray(userData.appliances)) {
+                    window.applianceData = userData.appliances;
+                    console.log(`📦 Enhanced load: ${userData.appliances.length} appliances loaded`);
+                } else {
+                    window.applianceData = window.applianceData || [];
+                }
+
+                // Load documents safely  
+                if (userData.documents && Array.isArray(userData.documents)) {
+                    // Don't overwrite if documents module isn't ready
+                    if (window.casaCareDocuments) {
+                        window.casaCareDocuments.documents = userData.documents;
+                    }
+                    console.log(`📄 Enhanced load: ${userData.documents.length} documents found`);
+                }
+                
+                console.log(`✅ Enhanced load: Success! ${window.tasks.length} tasks, ${window.applianceData.length} appliances`);
+                return true;
+            }
+        }
+        
+        return false;
+    } catch (error) {
+        console.error('❌ Enhanced load error:', error);
+        return false;
+    }
+}
+
+// NEW: Test function to verify data integrity
+function testDataIntegrity() {
+    console.log('🧪 Testing data integrity...');
+    
+    const results = {
+        homeData: !!window.homeData && !!window.homeData.fullAddress,
+        tasks: Array.isArray(window.tasks) && window.tasks.length >= 0,
+        appliances: Array.isArray(window.applianceData) && window.applianceData.length >= 0,
+        currentUser: !!window.currentUser,
+        timestamp: new Date().toISOString()
+    };
+    
+    console.log('🧪 Data integrity results:', results);
+    return results;
+}
+
+// NEW: Enhanced save that works alongside existing system
+async function saveDataEnhanced() {
+    if (!window.currentUser) {
+        console.log('🚫 Enhanced save skipped: No user');
+        return false;
+    }
+    
+    // Test data integrity first
+    const integrity = testDataIntegrity();
+    if (!integrity.homeData || !integrity.tasks) {
+        console.warn('⚠️ Data integrity check failed, skipping enhanced save');
+        return false;
+    }
+    
+    // Run enhanced save alongside existing
+    const success = await saveUserDataToFirebaseEnhanced(
+        window.currentUser.uid,
+        window.homeData,
+        window.tasks
+    );
+    
+    if (success) {
+        console.log('✅ Enhanced save completed successfully');
+    } else {
+        console.warn('⚠️ Enhanced save failed, existing save will still run');
+    }
+    
+    return success;
+}
+
+// Make functions globally available for testing
+window.saveUserDataToFirebaseEnhanced = saveUserDataToFirebaseEnhanced;
+window.loadUserDataEnhanced = loadUserDataEnhanced;
+window.testDataIntegrity = testDataIntegrity;
+window.saveDataEnhanced = saveDataEnhanced;
+
+console.log('✅ Step 1: Enhanced backup functions loaded');
+
 // Authentication Functions
 function showLoginForm() {
     document.getElementById('login-form').classList.remove('hidden');
