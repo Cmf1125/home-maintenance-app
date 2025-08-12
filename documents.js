@@ -478,7 +478,7 @@ class CasaCareDocuments {
         }
     }
     
-    // ENHANCED: Open file by ID
+    // ENHANCED: Open file by ID with mobile-friendly close button
     openFile(documentId) {
         const doc = this.documents.find(d => d.id == documentId);
         if (!doc) {
@@ -491,6 +491,9 @@ class CasaCareDocuments {
             return;
         }
         
+        // Check if mobile device
+        const isMobile = window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
         // Open file in new window/tab
         const newWindow = window.open('', '_blank');
         if (newWindow) {
@@ -499,66 +502,215 @@ class CasaCareDocuments {
                     <html>
                         <head>
                             <title>${doc.title}</title>
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
                             <style>
                                 body { 
                                     margin: 0; 
+                                    padding: 0;
                                     display: flex; 
                                     justify-content: center; 
                                     align-items: center; 
                                     min-height: 100vh; 
-                                    background: #f0f0f0;
+                                    background: #000;
                                     font-family: system-ui, -apple-system, sans-serif;
+                                    position: relative;
                                 }
                                 img { 
                                     max-width: 95vw; 
                                     max-height: 95vh; 
                                     object-fit: contain;
-                                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-                                    border-radius: 8px;
+                                    touch-action: pan-zoom;
                                 }
-                                .info {
-                                    position: absolute;
-                                    top: 20px;
-                                    left: 20px;
-                                    background: rgba(0,0,0,0.7);
+                                .header {
+                                    position: fixed;
+                                    top: 0;
+                                    left: 0;
+                                    right: 0;
+                                    background: rgba(0,0,0,0.8);
                                     color: white;
-                                    padding: 8px 12px;
-                                    border-radius: 4px;
-                                    font-size: 14px;
+                                    padding: 12px 16px;
+                                    display: flex;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                    z-index: 100;
+                                    backdrop-filter: blur(10px);
                                 }
+                                .title {
+                                    font-size: 16px;
+                                    font-weight: 500;
+                                    flex: 1;
+                                    margin-right: 16px;
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                }
+                                .close-btn {
+                                    background: rgba(255,255,255,0.2);
+                                    border: none;
+                                    color: white;
+                                    width: 40px;
+                                    height: 40px;
+                                    border-radius: 50%;
+                                    font-size: 18px;
+                                    cursor: pointer;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    transition: background-color 0.2s;
+                                    flex-shrink: 0;
+                                }
+                                .close-btn:hover, .close-btn:active {
+                                    background: rgba(255,255,255,0.3);
+                                }
+                                ${isMobile ? `
+                                .instructions {
+                                    position: fixed;
+                                    bottom: 20px;
+                                    left: 50%;
+                                    transform: translateX(-50%);
+                                    background: rgba(0,0,0,0.8);
+                                    color: white;
+                                    padding: 8px 16px;
+                                    border-radius: 20px;
+                                    font-size: 12px;
+                                    opacity: 0.8;
+                                    z-index: 100;
+                                }
+                                ` : ''}
                             </style>
                         </head>
                         <body>
-                            <div class="info">${doc.title}</div>
+                            <div class="header">
+                                <div class="title">${doc.title}</div>
+                                <button class="close-btn" onclick="window.close()" title="Close">×</button>
+                            </div>
                             <img src="${doc.fileData}" alt="${doc.title}">
+                            ${isMobile ? '<div class="instructions">Pinch to zoom • Tap × to close</div>' : ''}
                         </body>
                     </html>
                 `);
             } else if (doc.fileType === 'application/pdf') {
-                newWindow.location = doc.fileData;
-            } else {
-                // For other file types, create a simple viewer
+                // For PDFs, create a wrapper with close button
                 newWindow.document.write(`
                     <html>
                         <head>
                             <title>${doc.title}</title>
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <style>
+                                body { 
+                                    margin: 0; 
+                                    padding: 0;
+                                    font-family: system-ui, -apple-system, sans-serif;
+                                    height: 100vh;
+                                    display: flex;
+                                    flex-direction: column;
+                                }
+                                .header {
+                                    background: #2563eb;
+                                    color: white;
+                                    padding: 12px 16px;
+                                    display: flex;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                    flex-shrink: 0;
+                                }
+                                .title {
+                                    font-size: 16px;
+                                    font-weight: 500;
+                                    flex: 1;
+                                    margin-right: 16px;
+                                }
+                                .close-btn {
+                                    background: rgba(255,255,255,0.2);
+                                    border: none;
+                                    color: white;
+                                    width: 36px;
+                                    height: 36px;
+                                    border-radius: 50%;
+                                    font-size: 18px;
+                                    cursor: pointer;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                }
+                                .close-btn:hover {
+                                    background: rgba(255,255,255,0.3);
+                                }
+                                iframe {
+                                    flex: 1;
+                                    width: 100%;
+                                    border: none;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="header">
+                                <div class="title">📄 ${doc.title}</div>
+                                <button class="close-btn" onclick="window.close()">×</button>
+                            </div>
+                            <iframe src="${doc.fileData}" title="${doc.title}"></iframe>
+                        </body>
+                    </html>
+                `);
+            } else {
+                // For other file types, create a simple viewer with close
+                newWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>${doc.title}</title>
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
                             <style>
                                 body { 
                                     font-family: system-ui, -apple-system, sans-serif;
-                                    padding: 20px;
+                                    padding: 0;
+                                    margin: 0;
                                     background: #f5f5f5;
+                                    min-height: 100vh;
+                                    display: flex;
+                                    flex-direction: column;
+                                }
+                                .header {
+                                    background: #2563eb;
+                                    color: white;
+                                    padding: 12px 16px;
+                                    display: flex;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                }
+                                .title {
+                                    font-size: 16px;
+                                    font-weight: 500;
+                                    flex: 1;
+                                    margin-right: 16px;
+                                }
+                                .close-btn {
+                                    background: rgba(255,255,255,0.2);
+                                    border: none;
+                                    color: white;
+                                    width: 36px;
+                                    height: 36px;
+                                    border-radius: 50%;
+                                    font-size: 18px;
+                                    cursor: pointer;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                }
+                                .close-btn:hover {
+                                    background: rgba(255,255,255,0.3);
                                 }
                                 .container {
-                                    max-width: 800px;
-                                    margin: 0 auto;
+                                    flex: 1;
+                                    max-width: 600px;
+                                    margin: 40px auto;
                                     background: white;
-                                    padding: 40px;
+                                    padding: 40px 20px;
                                     border-radius: 8px;
                                     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                                     text-align: center;
                                 }
                                 .icon { font-size: 64px; margin-bottom: 20px; }
-                                .title { font-size: 24px; font-weight: 600; margin-bottom: 10px; }
+                                .doc-title { font-size: 24px; font-weight: 600; margin-bottom: 10px; }
                                 .subtitle { color: #666; margin-bottom: 30px; }
                                 .download-btn {
                                     background: #2563eb;
@@ -569,14 +721,19 @@ class CasaCareDocuments {
                                     text-decoration: none;
                                     display: inline-block;
                                     font-weight: 500;
+                                    margin: 8px;
                                 }
                                 .download-btn:hover { background: #1d4ed8; }
                             </style>
                         </head>
                         <body>
+                            <div class="header">
+                                <div class="title">📄 ${doc.title}</div>
+                                <button class="close-btn" onclick="window.close()">×</button>
+                            </div>
                             <div class="container">
                                 <div class="icon">📄</div>
-                                <div class="title">${doc.title}</div>
+                                <div class="doc-title">${doc.title}</div>
                                 <div class="subtitle">${doc.fileType || 'Document'}</div>
                                 <a href="${doc.fileData}" download="${doc.fileName}" class="download-btn">
                                     📥 Download File
@@ -590,7 +747,7 @@ class CasaCareDocuments {
             alert('❌ Unable to open file. Please check your popup blocker settings.');
         }
         
-        console.log('📎 File opened:', doc.title);
+        console.log('📎 File opened with mobile-friendly close:', doc.title);
     }
     
     // Enhanced render upload interface (keeping existing functionality)
