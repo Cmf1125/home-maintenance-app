@@ -1,3232 +1,2312 @@
-// The Home Keeper App - Clean Simple Version with All Fixes
-// App data
-let homeData = {};
-let tasks = [];
-let currentEditingTask = null;
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>The Home Keeper - Smart Home Maintenance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="calendar.css">
+    <link rel="stylesheet" href="enhanced-styles.css">
 
-// CRITICAL FIX 1: Well water dropdown - Make function available immediately
-function toggleWellWaterOptions() {
-    const wellWaterCheckbox = document.getElementById('well-water');
-    const wellWaterOptions = document.getElementById('well-water-options');
-    
-    if (wellWaterCheckbox && wellWaterOptions) {
-        if (wellWaterCheckbox.checked) {
-            wellWaterOptions.classList.remove('hidden');
-        } else {
-            wellWaterOptions.classList.add('hidden');
-            // Uncheck all sub-options
-            const subOptions = ['sediment-filter', 'uv-filter', 'water-softener', 'whole-house-filter'];
-            subOptions.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) element.checked = false;
-            });
-
-        }
-    } else {
-        
-    }
-}
-
-// Make it globally available immediately - CRITICAL FIX
-window.toggleWellWaterOptions = toggleWellWaterOptions;
-
-// Climate region detection
-function getClimateRegion(state) {
-    const stateUpper = state.toUpperCase();
-    const regions = {
-        'NORTHEAST_COLD': ['ME', 'NH', 'VT', 'MA', 'RI', 'CT', 'NY', 'NJ', 'PA'],
-        'SOUTHEAST_HUMID': ['DE', 'MD', 'VA', 'WV', 'KY', 'TN', 'NC', 'SC', 'GA', 'FL', 'AL', 'MS', 'AR', 'LA'],
-        'MIDWEST_CONTINENTAL': ['OH', 'IN', 'MI', 'IL', 'WI', 'MN', 'IA', 'MO', 'ND', 'SD', 'NE', 'KS'],
-        'SOUTHWEST_ARID': ['TX', 'OK', 'NM', 'AZ', 'NV', 'UT', 'CO'],
-        'WEST_COAST': ['CA', 'OR', 'WA'],
-        'MOUNTAIN_WEST': ['MT', 'WY', 'ID'],
-        'ALASKA_HAWAII': ['AK', 'HI']
-    };
-    
-    for (const [region, states] of Object.entries(regions)) {
-        if (states.includes(stateUpper)) {
-            return region;
-        }
-    }
-    return 'GENERAL';
-}
-
-// 👇 ADD THE FUNCTION RIGHT HERE 👇
-function getAutoPriority(title, category) {
-    // Safety tasks are always high priority
-    if (category === 'Safety') return 'high';
-    
-    // Critical safety keywords
-    const safetyKeywords = ['smoke', 'detector', 'carbon monoxide', 'chimney', 'boiler', 'fire'];
-    if (safetyKeywords.some(keyword => title.toLowerCase().includes(keyword))) {
-        return 'high';
-    }
-    
-    // Everything else is normal priority
-    return 'normal';
-}
-
-// Global category configuration (shared between setup and dashboard)
-const categoryConfig = {
-    'HVAC': { icon: '🌡️', color: 'blue' },
-    'Water Systems': { icon: '💧', color: 'cyan' },
-    'Exterior': { icon: '🏠', color: 'green' },
-    'Pest Control': { icon: '🐛', color: 'orange' },
-    'Safety': { icon: '⚠️', color: 'red' },
-    'General': { icon: '🔧', color: 'gray' },
-    'Appliance': { icon: '⚙️', color: 'purple' }
-};
-
-// Make it globally available
-window.categoryConfig = categoryConfig;
-
-// Create maintenance plan
-function createMaintenancePlan() {
-    try {
-        // Collect home data
-        homeData = {
-            address: document.getElementById('address')?.value || '123 Main Street',
-            city: document.getElementById('city')?.value || 'Anytown',
-            state: document.getElementById('state')?.value || 'NY',
-            zipcode: document.getElementById('zipcode')?.value || '12345',
-            propertyType: document.getElementById('property-type')?.value || 'single-family',
-            yearBuilt: parseInt(document.getElementById('year-built')?.value) || 2000,
-            sqft: parseInt(document.getElementById('sqft')?.value) || 2000
-        };
-        homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
-
-        // Collect features
-        homeData.features = {
-            centralAC: document.getElementById('central-ac')?.checked || false,
-            miniSplits: document.getElementById('mini-splits')?.checked || false,
-            wallAC: document.getElementById('wall-ac')?.checked || false,
-            electricBaseboard: document.getElementById('electric-baseboard')?.checked || false,
-            boiler: document.getElementById('boiler')?.checked || false,
-            municipalWater: document.getElementById('municipal-water')?.checked || false,
-            wellWater: document.getElementById('well-water')?.checked || false,
-            sedimentFilter: document.getElementById('sediment-filter')?.checked || false,
-            uvFilter: document.getElementById('uv-filter')?.checked || false,
-            waterSoftener: document.getElementById('water-softener')?.checked || false,
-            wholeHouseFilter: document.getElementById('whole-house-filter')?.checked || false,
-            municipalSewer: document.getElementById('municipal-sewer')?.checked || false,
-            septic: document.getElementById('septic')?.checked || false,
-            fireplace: document.getElementById('fireplace')?.checked || false,
-            pool: document.getElementById('pool')?.checked || false,
-            deck: document.getElementById('deck')?.checked || false,
-            garage: document.getElementById('garage')?.checked || false,
-            basement: document.getElementById('basement')?.checked || false,
-            otherFeatures: document.getElementById('other-features')?.value || ''
-        };
-
-        // Generate tasks
-        generateTaskTemplates();
-
-        // Update global references
-        window.homeData = homeData;
-        window.tasks = tasks;
-
-        // Switch to task setup screen
-        const setupForm = document.getElementById('setup-form');
-        const taskSetup = document.getElementById('task-setup');
-
-        if (setupForm) setupForm.style.display = 'none';
-        if (taskSetup) {
-            taskSetup.classList.remove('hidden'); // remove Tailwind hidden
-            taskSetup.style.display = 'block';    // ensure visible
-        }
-
-        // Delay showTaskSetup to allow DOM update
-        setTimeout(showTaskSetup, 0);
-
-        console.log('✅ Successfully moved to task setup screen');
-    } catch (error) {
-        console.error('❌ Error in createMaintenancePlan:', error);
-        alert('❌ Error creating maintenance plan. Check console for details.');
-    }
-}
-// Generate task templates
-function generateTaskTemplates() {
-
-    
-    tasks = [];
-    let id = 1;
-
-    // Essential tasks for all homes
-    const essentialTasks = [
-        {
-            id: id++,
-            title: 'Test Smoke Detectors',
-            category: 'Safety',
-            frequency: 180,
-            cost: 0,
-           priority: getAutoPriority('Test Smoke Detectors', 'Safety'), // ← ADD THIS LINE
-            description: 'Test all smoke and carbon monoxide detectors',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        },
-        {
-            id: id++,
-            title: 'Dryer Vent Cleaning',
-            category: 'Safety',
-            frequency: 365,
-            cost: 100,
-           priority: getAutoPriority('Dryer Vent Cleaning', 'Safety'), // ← ADD THIS LINE
-            description: 'Clean dryer vent to prevent fire hazard',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        }
-    ];
-
-    // Property-type specific tasks
-    const hasExteriorResponsibility = ['single-family', 'townhouse', 'mobile-home'].includes(homeData.propertyType);
-    
-    if (hasExteriorResponsibility) {
-        essentialTasks.push(
-            {
-                id: id++,
-                title: 'Clean Gutters',
-                category: 'Exterior',
-                frequency: 180,
-                cost: 150,
-                 priority: getAutoPriority('Clean Gutters', 'Exterior'), // ← ADD THIS LINE
-                description: 'Clean gutters and downspouts',
-                dueDate: null,
-                lastCompleted: null,
-                isCompleted: false,
-                isTemplate: true
-            },
-            {
-                id: id++,
-                title: 'Inspect Caulking',
-                category: 'General',
-                frequency: 365,
-                cost: 50,
-                 priority: getAutoPriority('Inspect Caulking', 'General'), // ← ADD THIS LINE
-                description: 'Check and replace caulking around windows and doors',
-                dueDate: null,
-                lastCompleted: null,
-                isCompleted: false,
-                isTemplate: true
-            }
-        );
-    } else {
-        essentialTasks.push({
-            id: id++,
-            title: 'Inspect Window Seals',
-            category: 'General',
-            frequency: 365,
-            cost: 0,
-            priority: getAutoPriority('Inspect Window Seats', 'General'), // ← ADD THIS LINE
-            description: 'Check window and door seals for air leaks',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        });
-    }
-
-    tasks.push(...essentialTasks);
-
-    // HVAC Tasks
-    if (homeData.features.centralAC) {
-        tasks.push(
-            {
-                id: id++,
-                title: 'Replace HVAC Filter',
-                category: 'HVAC',
-                frequency: 90,
-                cost: 25,
-                priority: getAutoPriority('Replace HVAC Filter', 'HVAC'), // ← ADD THIS LINE
-                description: 'Replace central air system filter',
-                dueDate: null,
-                lastCompleted: null,
-                isCompleted: false,
-                isTemplate: true
-            },
-            {
-                id: id++,
-                title: 'HVAC Professional Service',
-                category: 'HVAC',
-                frequency: 365,
-                cost: 150,
-                priority: getAutoPriority('HVAC Professional Service', 'HVAC'), // ← ADD THIS LINE
-                description: 'Annual professional HVAC maintenance',
-                dueDate: null,
-                lastCompleted: null,
-                isCompleted: false,
-                isTemplate: true
-            }
-        );
-    }
-
-    if (homeData.features.miniSplits) {
-        tasks.push({
-            id: id++,
-            title: 'Clean Mini-Split Filters',
-            category: 'HVAC',
-            frequency: 60,
-            cost: 0,
-            priority: getAutoPriority('Clean Mini-Split Filters', 'HVAC'), // ← ADD THIS LINE
-            description: 'Clean mini-split unit filters',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        });
-    }
-
-    if (homeData.features.wallAC) {
-        tasks.push({
-            id: id++,
-            title: 'Clean Wall AC Filters',
-            category: 'HVAC',
-            frequency: 30,
-            cost: 0,
-            priority: getAutoPriority('Clean Wall AC Filters', 'HVAC'), // ← ADD THIS LINE
-            description: 'Clean wall air conditioner filters',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        });
-    }
-
-    if (homeData.features.electricBaseboard) {
-        tasks.push({
-            id: id++,
-            title: 'Clean Electric Baseboard Heaters',
-            category: 'HVAC',
-            frequency: 180,
-            cost: 0,
-            priority: getAutoPriority('Clean Electric Baseboard Heaters', 'HVAC'), // ← ADD THIS LINE
-            description: 'Clean dust from electric baseboard heating elements',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        });
-    }
-
-    if (homeData.features.boiler) {
-        tasks.push({
-            id: id++,
-            title: 'Boiler Annual Service',
-            category: 'HVAC',
-            frequency: 365,
-            cost: 200,
-            priority: getAutoPriority('Boiler Annual Service', 'HVAC'), // ← ADD THIS LINE
-            description: 'Professional boiler inspection and maintenance',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        });
-    }
-
-    // Water System Tasks
-    if (homeData.features.wellWater) {
-        tasks.push({
-            id: id++,
-            title: 'Test Well Water',
-            category: 'Water Systems',
-            frequency: 365,
-            cost: 75,
-            priority: getAutoPriority('Test Well Water', 'Water Systems'), // ← ADD THIS LINE
-            description: 'Annual water quality testing',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        });
-
-        if (homeData.features.sedimentFilter) {
-            tasks.push({
-                id: id++,
-                title: 'Replace Sediment Filter',
-                category: 'Water Systems',
-                frequency: 90,
-                cost: 25,
-                priority: getAutoPriority('Replace Sediment Filter', 'Water Systems'), // ← ADD THIS LINE
-                description: 'Replace sediment filter for well water system',
-                dueDate: null,
-                lastCompleted: null,
-                isCompleted: false,
-                isTemplate: true
-            });
-        }
-
-        if (homeData.features.uvFilter) {
-            tasks.push({
-                id: id++,
-                title: 'Replace UV Filter',
-                category: 'Water Systems',
-                frequency: 365,
-                cost: 150,
-                priority: getAutoPriority('Replace UV Filter', 'Water Systems'), // ← ADD THIS LINE
-                description: 'Replace UV filter for water treatment',
-                dueDate: null,
-                lastCompleted: null,
-                isCompleted: false,
-                isTemplate: true
-            });
-        }
-
-        if (homeData.features.waterSoftener) {
-            tasks.push({
-                id: id++,
-                title: 'Refill Water Softener Salt',
-                category: 'Water Systems',
-                frequency: 60,
-                cost: 30,
-                priority: getAutoPriority('Refill Water Softener Salt', 'Water Systems'), // ← ADD THIS LINE
-                description: 'Check and refill water softener salt',
-                dueDate: null,
-                lastCompleted: null,
-                isCompleted: false,
-                isTemplate: true
-            });
-        }
-
-        if (homeData.features.wholeHouseFilter) {
-            tasks.push({
-                id: id++,
-                title: 'Replace Whole House Filter',
-                category: 'Water Systems',
-                frequency: 180,
-                cost: 50,
-                priority: getAutoPriority('Replace Whole House Filter', 'Water Systems'), // ← ADD THIS LINE
-                description: 'Replace whole house water filter',
-                dueDate: null,
-                lastCompleted: null,
-                isCompleted: false,
-                isTemplate: true
-            });
-        }
-    }
-
-    if (homeData.features.septic) {
-        tasks.push({
-            id: id++,
-            title: 'Septic Tank Pumping',
-            category: 'Water Systems',
-            frequency: 1095, // 3 years
-            cost: 400,
-            priority: getAutoPriority('Septic Tank Pumping', 'Water Systems'), // ← ADD THIS LINE
-            description: 'Professional septic pumping',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        });
-    }
-
-    // Other Feature Tasks
-    if (homeData.features.fireplace) {
-        tasks.push({
-            id: id++,
-            title: 'Chimney Inspection & Cleaning',
-            category: 'Safety',
-            frequency: 365,
-            cost: 300,
-            priority: getAutoPriority('Chimney Inspection & Cleaning', 'Safety'), // ← ADD THIS LINE
-            description: 'Professional chimney cleaning and inspection',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        });
-    }
-
-    if (homeData.features.deck) {
-        tasks.push({
-            id: id++,
-            title: 'Deck Staining/Sealing',
-            category: 'Exterior',
-            frequency: 730, // 2 years
-            cost: 200,
-            priority: getAutoPriority('Deck Staining/Sealing', 'Exterior'), // ← ADD THIS LINE
-            description: 'Stain or seal deck to protect from weather',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        });
-    }
-
-    if (homeData.features.pool) {
-        tasks.push({
-            id: id++,
-            title: 'Pool Opening/Closing',
-            category: 'General',
-            frequency: 182, // Twice yearly
-            cost: 300,
-            priority: getAutoPriority('Pool Opening/Closing', 'General'), // ← ADD THIS LINE
-            description: 'Seasonal pool opening and closing',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        });
-    }
-
-    if (homeData.features.garage) {
-        tasks.push({
-            id: id++,
-            title: 'Garage Door Maintenance',
-            category: 'General',
-            frequency: 365,
-            cost: 50,
-            priority: getAutoPriority('Garage Door Maintenance', 'General'), // ← ADD THIS LINE
-            description: 'Lubricate garage door hardware and test safety features',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        });
-    }
-
-    if (homeData.features.basement) {
-        tasks.push({
-            id: id++,
-            title: 'Check Basement for Moisture',
-            category: 'General',
-            frequency: 180,
-            cost: 0,
-            priority: getAutoPriority('Check Basement for Moisture', 'General'), // ← ADD THIS LINE
-            description: 'Inspect basement for signs of moisture, leaks, or mold',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        });
-    }
-// Add these tasks to your generateTaskTemplates() function in app.js
-// (after your existing tasks, before regional tasks)
-
-// PEST CONTROL TASKS (for properties with exterior responsibility)
-if (hasExteriorResponsibility) {
-    const pestControlTasks = [
-        {
-            id: id++,
-            title: 'Quarterly Pest Control Treatment',
-            category: 'Pest Control',
-            frequency: 90,
-            cost: 150,
-            priority: getAutoPriority('Quarterly Pest Control Treatment', 'Pest Control'),
-            description: 'Professional pest control service or DIY perimeter treatment',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        },
-        {
-            id: id++,
-            title: 'Inspect for Termite Signs',
-            category: 'Pest Control',
-            frequency: 365,
-            cost: 0,
-            priority: getAutoPriority('Inspect for Termite Signs', 'Pest Control'),
-            description: 'Check foundation, basement, and crawl space for termite damage',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        }
-    ];
-    
-    tasks.push(...pestControlTasks);
-    
-    // EXTERIOR TASKS (includes yard tasks - all outside work)
-    const exteriorTasks = [
-        {
-            id: id++,
-            title: 'Tree Inspection & Pruning',
-            category: 'Exterior',
-            frequency: 365,
-            cost: 200,
-            priority: getAutoPriority('Tree Inspection & Pruning', 'Exterior'),
-            description: 'Inspect trees for dead branches, especially near house/power lines',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        },
-        {
-            id: id++,
-            title: 'Lawn Fertilizer Application',
-            category: 'Exterior',
-            frequency: 120,
-            cost: 50,
-            priority: getAutoPriority('Lawn Fertilizer Application', 'Exterior'),
-            description: 'Seasonal lawn fertilizing (spring, summer, fall)',
-            dueDate: null,
-            lastCompleted: null,
-            isCompleted: false,
-            isTemplate: true
-        }
-    ];
-    
-    // Only add lawn-specific tasks for single-family/townhouse
-    if (['single-family', 'townhouse'].includes(homeData.propertyType)) {
-        tasks.push(...exteriorTasks);
-    }
-}
-
-    // Generate regional seasonal tasks
-    if (homeData.state) {
-        const climateRegion = getClimateRegion(homeData.state);
-        const regionalTasks = generateRegionalTasks(climateRegion, id, hasExteriorResponsibility);
-        tasks.push(...regionalTasks);
-    }
-}
-
-// Generate regional seasonal tasks
-function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibility) {
-    let regionalTasks = [];
-    let id = startingId;
-
-    switch(climateRegion) {
-        case 'NORTHEAST_COLD':
-            regionalTasks = [
-                {
-                    id: id++,
-                    title: 'Check AC Before Summer',
-                    category: 'Seasonal',
-                    frequency: 365,
-                    cost: 0,
-                    priority: getAutoPriority('Check AC Before Summer', 'Seasonal'), // ← ADD THIS LINE
-                    description: 'Test air conditioning system before hot weather arrives',
-                    season: 'spring',
-                    dueDate: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                },
-                {
-                    id: id++,
-                    title: 'Check Heating Before Winter',
-                    category: 'Seasonal',
-                    frequency: 365,
-                    cost: 0,
-                    priority: getAutoPriority('Check Heating Before Winter', 'Seasonal'), // ← ADD THIS LINE
-                    description: 'Test heating system operation before cold weather',
-                    season: 'fall',
-                    dueDate: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                }
-            ];
-
-            if (hasExteriorResponsibility) {
-                regionalTasks.push({
-                    id: id++,
-                    title: 'Winterize Outdoor Pipes',
-                    category: 'Seasonal',
-                    frequency: 365,
-                    cost: 50,
-                    priority: getAutoPriority('Winterize Outdoor Pipes', 'Seasonal'), // ← ADD THIS LINE
-                    description: 'Shut off and drain outdoor water lines before first freeze',
-                    season: 'fall',
-                    dueDate: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                });
-            }
-            break;
-
-        case 'SOUTHEAST_HUMID':
-            regionalTasks = [
-                {
-                    id: id++,
-                    title: 'AC Pre-Season Tune-Up',
-                    category: 'Seasonal',
-                    frequency: 365,
-                    cost: 150,
-                    priority: getAutoPriority('AC Pre-Season Tune-Up', 'Seasonal'), // ← ADD THIS LINE
-                    description: 'Professional AC maintenance before summer heat',
-                    season: 'spring',
-                    dueDate: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                },
-                {
-                    id: id++,
-                    title: 'Hurricane Emergency Kit Check',
-                    category: 'Seasonal',
-                    frequency: 365,
-                    cost: 50,
-                    priority: getAutoPriority('Hurricane Emergency Kit Check', 'Seasonal'), // ← ADD THIS LINE
-                    description: 'Update emergency supplies for hurricane season',
-                    season: 'spring',
-                    dueDate: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                }
-            ];
-            break;
-
-        case 'WEST_COAST':
-            if (homeData.state.toUpperCase() === 'CA') {
-                regionalTasks = [
-                    {
-                        id: id++,
-                        title: 'Earthquake Emergency Kit Check',
-                        category: 'Seasonal',
-                        frequency: 365,
-                        cost: 50,
-                        priority: getAutoPriority('Earthquake Emergency Kit Check', 'Seasonal'), // ← ADD THIS LINE
-                        description: 'Update emergency supplies and secure items',
-                        season: 'spring',
-                        dueDate: null,
-                        lastCompleted: null,
-                        isCompleted: false,
-                        isTemplate: true
-                    }
-                ];
-            }
-            break;
-
-        default:
-            regionalTasks = [
-                {
-                    id: id++,
-                    title: 'Spring System Check',
-                    category: 'Seasonal',
-                    frequency: 365,
-                    cost: 0,
-                    priority: getAutoPriority('Spring System Check', 'Seasonal'), // ← ADD THIS LINE
-                    description: 'Check HVAC and prepare for warmer weather',
-                    season: 'spring',
-                    dueDate: null,
-                    lastCompleted: null,
-                    isCompleted: false,
-                    isTemplate: true
-                }
-            ];
-    }
-
-    return regionalTasks;
-}
-
-// Show task setup screen
-function showTaskSetup() {
-    
-    // Update property summary
-    updatePropertySummary();
-    
-    // Render task categories
-    renderTaskCategories();
-    updateCompactTaskSummary();
-}
-
-// Update property summary
-    function updatePropertySummary() {
-       // const taskSetupSummary = document.getElementById('task-setup-summary');
-       // if (!taskSetupSummary) {
-          // console.error('❌ Task setup summary element not found');
-         // return;
-      // }
-    
-    const heatingCooling = [];
-    if (homeData.features.centralAC) heatingCooling.push('Central AC/Heat');
-    if (homeData.features.miniSplits) heatingCooling.push('Mini-Splits');
-    if (homeData.features.wallAC) heatingCooling.push('Wall AC');
-    if (homeData.features.electricBaseboard) heatingCooling.push('Electric Baseboard');
-    if (homeData.features.boiler) heatingCooling.push('Boiler');
-
-    const waterSewer = [];
-    if (homeData.features.municipalWater) waterSewer.push('Municipal Water');
-    if (homeData.features.wellWater) {
-        let wellWaterText = 'Well Water';
-        const wellWaterSubs = [];
-        if (homeData.features.sedimentFilter) wellWaterSubs.push('Sediment Filter');
-        if (homeData.features.uvFilter) wellWaterSubs.push('UV Filter');
-        if (homeData.features.waterSoftener) wellWaterSubs.push('Water Softener');
-        if (homeData.features.wholeHouseFilter) wellWaterSubs.push('Whole House Filter');
-        if (wellWaterSubs.length > 0) {
-            wellWaterText += ` (${wellWaterSubs.join(', ')})`;
-        }
-        waterSewer.push(wellWaterText);
-    }
-    if (homeData.features.municipalSewer) waterSewer.push('Municipal Sewer');
-    if (homeData.features.septic) waterSewer.push('Septic System');
-
-    const otherFeatures = [];
-    if (homeData.features.fireplace) otherFeatures.push('Fireplace');
-    if (homeData.features.pool) otherFeatures.push('Pool/Spa');
-    if (homeData.features.deck) otherFeatures.push('Deck/Patio');
-    if (homeData.features.garage) otherFeatures.push('Garage');
-    if (homeData.features.basement) otherFeatures.push('Basement');
-    if (homeData.features.otherFeatures) otherFeatures.push(homeData.features.otherFeatures);
-
-    const climateRegion = getClimateRegion(homeData.state);
-    const regionDisplayNames = {
-        'NORTHEAST_COLD': 'Northeast (Cold Climate)',
-        'SOUTHEAST_HUMID': 'Southeast (Humid Climate)', 
-        'MIDWEST_CONTINENTAL': 'Midwest (Continental Climate)',
-        'SOUTHWEST_ARID': 'Southwest (Arid Climate)',
-        'WEST_COAST': homeData.state.toUpperCase() === 'CA' ? 'California' : 'Pacific Northwest',
-        'MOUNTAIN_WEST': 'Mountain West',
-        'ALASKA_HAWAII': homeData.state.toUpperCase() === 'AK' ? 'Alaska' : 'Hawaii',
-        'GENERAL': 'General Climate'
-    };
-
-    const propertyTypeDisplay = {
-        'single-family': 'Single Family Home',
-        'townhouse': 'Townhouse',
-        'condo': 'Condo',
-        'apartment': 'Apartment',
-        'mobile-home': 'Mobile Home'
-    };
-
-   // taskSetupSummary.innerHTML = `
-       // <div class="space-y-1 text-sm">
-           // <div><strong>🏠 Address:</strong> ${homeData.fullAddress}</div>
-           // <div><strong>🏢 Type:</strong> ${propertyTypeDisplay[homeData.propertyType]} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString()} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt}</div>
-           // ${heatingCooling.length > 0 ? `<div><strong>🌡️ Heating/Cooling:</strong> ${heatingCooling.join(', ')}</div>` : ''}
-           // ${waterSewer.length > 0 ? `<div><strong>💧 Water/Sewer:</strong> ${waterSewer.join(', ')}</div>` : ''}
-           // ${otherFeatures.length > 0 ? `<div><strong>⚙️ Other Features:</strong> ${otherFeatures.join(', ')}</div>` : ''}
-           // <div><strong>🌍 Climate Region:</strong> ${regionDisplayNames[climateRegion]} (includes regional seasonal tasks)</div>
-       // </div>
-    //`;
-}
-
-// FIXED: Clean simple task categories without big button at bottom
-function renderTaskCategories() {
-const taskCategoriesContainer = document.getElementById('task-categories');
-
-if (!taskCategoriesContainer) {
-    console.error('❌ Task containers not found!');
-    return;
-}
-    
-    if (tasks.length === 0) {
-        taskCategoriesContainer.innerHTML = '<div class="text-center text-gray-500 py-8">No tasks generated.</div>';
-        return;
-    }
-
-    // Organize tasks by category
-    const tasksByCategory = {};
-    const seasonalTasks = { spring: [], summer: [], fall: [], winter: [] };
-    
-    tasks.forEach(task => {
-        if (task.category === 'Seasonal') {
-            const season = task.season || 'fall';
-            seasonalTasks[season].push(task);
-        } else {
-            if (!tasksByCategory[task.category]) {
-                tasksByCategory[task.category] = [];
-            }
-            tasksByCategory[task.category].push(task);
-        }
-    });
-
+<!-- Firebase Scripts -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   
-    // Generate summary stats
-    const totalTasks = tasks.length;
-    const totalCost = tasks.reduce((sum, task) => sum + (task.cost * (365 / task.frequency)), 0);
-   const safetyTasks = tasks.filter(t => t.category === 'Safety').length;
-    const seasonalTasksCount = tasks.filter(t => t.category === 'Seasonal').length;
+    <!-- PWA Configuration -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
 
-   // taskSummaryStats.innerHTML = `
-    //     <div class="text-center">
-    //         <div class="text-lg font-bold text-gray-900">${totalTasks}</div>
-    //         <div class="text-xs text-gray-600">Total Tasks</div>
-    //     </div>
-    //     <div class="text-center">
-    //         <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
-    //         <div class="text-xs text-gray-600">Annual Cost</div>
-    //     </div>
-    //     <div class="text-center">
-    //        <div class="text-lg font-bold text-red-600">${safetyTasks}</div>
-    //         <div class="text-xs text-gray-600">Safety Tasks</div>
-    //     </div>
-    //     <div class="text-center">
-    //         <div class="text-lg font-bold text-purple-600">${seasonalTasksCount}</div>
-    //         <div class="text-xs text-gray-600">Seasonal Tasks</div>
-    //     </div>
-    // `;
+<!-- App Capabilities (keeping both for compatibility) -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="The Home Keeper">
 
-    // Category configuration
-    const categoryConfig = {
-        'HVAC': { icon: '🌡️', color: 'blue' },
-        'Water Systems': { icon: '💧', color: 'cyan' },
-        'Exterior': { icon: '🏠', color: 'green' },
-        'Safety': { icon: '⚠️', color: 'red' },
-        'General': { icon: '🔧', color: 'gray' }
-    };
-
-    const seasonConfig = {
-        'spring': { icon: '🌸', name: 'Spring' },
-        'summer': { icon: '☀️', name: 'Summer' },
-        'fall': { icon: '🍂', name: 'Fall' },
-        'winter': { icon: '❄️', name: 'Winter' }
-    };
-
-    let categoriesHTML = '';
-
-    // Render regular categories with simple lists
-    Object.entries(tasksByCategory).forEach(([category, categoryTasks]) => {
-      const config = window.categoryConfig?.[category] || { icon: '📋', color: 'gray' };
-        
-        categoriesHTML += `
-            <div class="bg-white rounded-lg border border-gray-200 mb-4">
-                <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                    <div class="flex items-center justify-between">
-                        <h4 class="font-semibold text-gray-900 flex items-center gap-2">
-                            <span class="text-lg">${config.icon}</span>
-                            ${category}
-                        </h4>
-                        <span class="bg-${config.color}-100 text-${config.color}-700 px-2 py-1 rounded text-xs">
-                            ${categoryTasks.length} tasks
-                        </span>
-                    </div>
-                </div>
-                <div class="p-4">
-                    ${renderSimpleTaskList(categoryTasks)}
-                </div>
+<!-- App Icon -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='180' height='180' fill='%232563eb'/%3E%3Ctext x='90' y='110' font-family='Arial' font-size='50' fill='white' text-anchor='middle'%3E🏠%3C/text%3E%3C/svg%3E">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Smart Installation Banner -->
+<div id="install-banner" class="install-banner hidden">
+    <div class="install-banner-content">
+        <div class="install-banner-icon">📱</div>
+        <div class="install-banner-text">
+            <div class="install-banner-title">Install The Home Keeper</div>
+            <div class="install-banner-instructions" id="install-instructions">
+                Add this app to your home screen for the best experience!
             </div>
-        `;
-    });
-
-    // Render seasonal tasks with simple lists
-    const hasSeasonalTasks = Object.values(seasonalTasks).some(arr => arr.length > 0);
-    
-    if (hasSeasonalTasks) {
-        categoriesHTML += `
-            <div class="bg-white rounded-lg border border-gray-200 mb-4">
-                <div class="bg-gradient-to-r from-purple-100 to-pink-100 px-4 py-3 border-b border-gray-200">
-                    <div class="flex items-center justify-between">
-                        <h4 class="font-semibold text-gray-900 flex items-center gap-2">
-                            <span class="text-lg">🌍</span>
-                            Regional Seasonal Tasks
-                        </h4>
-                        <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">
-                            ${seasonalTasksCount} tasks
-                        </span>
-                    </div>
-                </div>
-                <div class="p-4">
-        `;
-
-        Object.entries(seasonalTasks).forEach(([season, seasonTasks]) => {
-            if (seasonTasks.length > 0) {
-                const config = seasonConfig[season];
-                categoriesHTML += `
-                    <div class="mb-4 last:mb-0">
-                        <h5 class="font-medium text-gray-800 flex items-center gap-2 mb-2">
-                            <span>${config.icon}</span>
-                            ${config.name}
-                        </h5>
-                        ${renderSimpleTaskList(seasonTasks)}
-                    </div>
-                `;
-            }
-        });
-
-        categoriesHTML += `
-                </div>
-            </div>
-        `;
-    }
-
-    // REMOVED: Big "Add Custom Task" button at bottom - cleaner interface
-
-taskCategoriesContainer.innerHTML = categoriesHTML;
-}
-
-// Update the new compact task summary
-function updateCompactTaskSummary() {
-    const annualCostDisplay = document.getElementById('annual-cost-display');
-    const taskSummaryCompact = document.getElementById('task-summary-compact');
-    
-    if (!annualCostDisplay || !taskSummaryCompact) return;
-    
-    // Calculate total cost and category breakdown
-    let totalCost = 0;
-    const categoryStats = {};
-    
-    tasks.forEach(task => {
-        totalCost += task.cost * (365 / task.frequency);
-        
-        const category = task.category || 'General';
-        categoryStats[category] = (categoryStats[category] || 0) + 1;
-    });
-    
-    // Update cost display
-    annualCostDisplay.textContent = `$${Math.round(totalCost)}`;
-    
-// Create category breakdown with total count
-const totalTasks = tasks.length;
-const categoryItems = Object.entries(categoryStats)
-    .sort(([,a], [,b]) => b - a) // Sort by count, highest first
-    .map(([category, count]) => {
-        const categoryInfo = window.categoryConfig?.[category] || { icon: '📋' };
-        return `<span class="inline-block mr-4 mb-1">${categoryInfo.icon} ${category} (${count})</span>`;
-    })
-    .join('');
-
-taskSummaryCompact.innerHTML = `<div class="font-medium text-gray-700 mb-1">${totalTasks} tasks across ${Object.keys(categoryStats).length} categories:</div>${categoryItems}` || 'No tasks generated';
-    }
-
-// CLEAN SIMPLE VERSION: Render simple task list (just titles with edit/delete)
-function renderSimpleTaskList(taskList) {
-    return `
-        <div class="space-y-2">
-            ${taskList.map(task => renderSimpleTaskItem(task)).join('')}
         </div>
-    `;
-}
+        <div class="install-banner-actions">
+            <button id="install-banner-close" class="install-banner-close">×</button>
+        </div>
+    </div>
+</div>
+    <div id="app" class="pb-24 overflow-auto">
 
-// Replace your renderSimpleTaskItem function with this enhanced version:
+<!-- Login Screen (shows first) -->
+<div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+        <div class="text-center mb-8">
+            <div class="text-5xl mb-4">🏠</div>
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">The Home Keeper</h1>
+            <p class="text-gray-600">Smart home maintenance made simple</p>
+        </div>
 
-function renderSimpleTaskItem(task) {
-    const priorityDot = task.priority === 'high' ? '🔴' : 
-                       task.priority === 'medium' ? '🟡' : 
-                       '⚪';
-    
-    return `
-        <div class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors" data-task-id="${task.id}">
-            <!-- Row 1: Dot + Task Name -->
-            <div class="flex items-center gap-2 mb-2">
-                <span class="text-sm">${priorityDot}</span>
-                <span class="font-medium text-gray-900 text-sm flex-1">${task.title}</span>
-            </div>
-            
-            <!-- Row 2: Frequency + Cost -->
-            <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
-                <span>Every ${task.frequency} days</span>
-                ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
-            </div>
-            
-            <!-- Row 3: Review Button -->
-            <div>
-                <button onclick="editTaskFromSetup(${task.id})" 
-                        class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-xs font-medium transition-colors">
-                    Review Task
+        <!-- Login Form -->
+        <div id="login-form">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="login-email" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                           placeholder="your@email.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="login-password" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                           placeholder="••••••••">
+                </div>
+                <button onclick="signInUser()" 
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium">
+                    Sign In
                 </button>
+                <button onclick="signInWithGoogle()" 
+                        class="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 font-medium">
+                    Sign In with Google
+                </button>
+                <div class="text-center">
+                    <button onclick="showSignupForm()" class="text-blue-600 hover:text-blue-800 text-sm">
+                        Don't have an account? Create one
+                    </button>
+                </div>
             </div>
         </div>
-    `;
-}
 
-// Navigation functions
-function goBackToHomeSetup() {
-    document.getElementById('task-setup').classList.add('hidden');
-    document.getElementById('setup-form').style.display = 'block';
-    
-    // Pre-populate form with current data
-    if (homeData.address) document.getElementById('address').value = homeData.address;
-    if (homeData.city) document.getElementById('city').value = homeData.city;
-    if (homeData.state) document.getElementById('state').value = homeData.state;
-    if (homeData.zipcode) document.getElementById('zipcode').value = homeData.zipcode;
-    if (homeData.propertyType) document.getElementById('property-type').value = homeData.propertyType;
-    if (homeData.yearBuilt) document.getElementById('year-built').value = homeData.yearBuilt;
-    if (homeData.sqft) document.getElementById('sqft').value = homeData.sqft;
-    
-    // Set all checkboxes and options
-    if (homeData.features) {
-        Object.entries(homeData.features).forEach(([key, value]) => {
-            const element = document.getElementById(key.replace(/([A-Z])/g, '-$1').toLowerCase());
-            if (element && element.type === 'checkbox') {
-                element.checked = value;
-            }
-        });
-        
-        // Handle text inputs
-        if (homeData.features.otherFeatures) {
-            document.getElementById('other-features').value = homeData.features.otherFeatures;
-        }
-        
-        // Show well water options if needed
-        if (typeof toggleWellWaterOptions === 'function') {
-            toggleWellWaterOptions();
-        }
-    }
-}
-
-// CLEAN SIMPLE VERSION: Complete task setup with smart due dates
-function finishTaskSetup() {
-    console.log('🚀 Starting clean simple task setup completion...');
-    console.log(`📊 Processing ${tasks.length} tasks...`);
-    
-    let successCount = 0;
-    let errorCount = 0;
-    
-    // Process each template task with smart due dates
-    tasks.forEach(task => {
-        if (task.isTemplate) {
-            try {
-                console.log(`⚙️ Processing task: ${task.title}`);
-                
-                // Use smart due date calculation
-                let dueDate;
-                
-                if (task.season) {
-                    // Seasonal tasks
-                    const today = new Date();
-                    const currentMonth = today.getMonth();
-                    let targetMonth;
-                    
-                    switch(task.season) {
-                        case 'spring': targetMonth = 2; break; // March
-                        case 'summer': targetMonth = 5; break; // June
-                        case 'fall': targetMonth = 8; break; // September
-                        case 'winter': targetMonth = 10; break; // November
-                        default: targetMonth = currentMonth;
-                    }
-                    
-                    let targetYear = today.getFullYear();
-                    if (targetMonth < currentMonth || (targetMonth === currentMonth && today.getDate() > 15)) {
-                        targetYear++;
-                    }
-                    
-                    dueDate = new Date(targetYear, targetMonth, 15, 12, 0, 0);
-                } else {
-                    // Regular tasks with smart defaults
-                    const today = new Date();
-                    if (task.priority === 'high') {
-                        dueDate = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000); // 1 week
-                    } else if (task.frequency <= 90) {
-                        dueDate = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000); // 2 weeks
-                    } else {
-                        dueDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000); // 1 month
-                    }
-                }
-                
-                // Validate the date
-                if (isNaN(dueDate.getTime())) {
-                    throw new Error(`Invalid due date for task ${task.title}`);
-                }
-                
-                // Set the due date
-                task.dueDate = dueDate;
-                
-                // CRITICAL: Set nextDue for calendar compatibility
-                task.nextDue = dueDate;
-                
-                // Clean up template flag
-                delete task.isTemplate;
-                task.isCompleted = false;
-                task.lastCompleted = null;
-                
-                console.log(`  ✅ FINAL: Task "${task.title}" due: ${task.dueDate.toLocaleDateString()}`);
-                successCount++;
-                
-            } catch (error) {
-                console.error(`❌ Error processing task ${task.title}:`, error);
-                errorCount++;
-            }
-        }
-    });
-    
-    console.log(`✅ Task processing complete: ${successCount} successful, ${errorCount} errors`);
-    
-    // Verify we have tasks with due dates
-    const tasksWithDates = tasks.filter(t => t.dueDate);
-    
-    console.log(`📊 Final verification: ${tasksWithDates.length} tasks have due dates`);
-    
-    if (tasksWithDates.length === 0) {
-        console.error('❌ CRITICAL: No tasks have due dates after processing!');
-        alert('❌ Error: No tasks were properly scheduled. Please try again.');
-        return;
-    }
-    
-    // Save data immediately
-    try {
-        saveData();
-        console.log('💾 Data saved successfully');
-    } catch (error) {
-        console.error('❌ Error saving data:', error);
-        alert('❌ Error saving data. Please try again.');
-        return;
-    }
-    
-    // Update global references BEFORE switching views
-    window.homeData = homeData;
-    window.tasks = tasks;
-    console.log('🌐 Global references updated');
-    
-  // Switch to main app
-const taskSetupEl = document.getElementById('task-setup');
-if (taskSetupEl) {
-    taskSetupEl.classList.add('hidden');
-    taskSetupEl.style.display = 'none'; // ensures it's fully hidden
-}
-
-document.getElementById('main-app').classList.remove('hidden');
-document.getElementById('header-subtitle').textContent = homeData.fullAddress;
-
-    // Show bottom navigation
-    document.body.classList.add('main-app-active');
-    
-    // Initialize dashboard with error handling
-    try {
-        console.log('🏠 Initializing dashboard...');
-        showTab('dashboard');
-        console.log('✅ Dashboard initialized successfully');
-    } catch (error) {
-        console.error('❌ Error initializing dashboard:', error);
-        // Try basic fallback
-        updateDashboard();
-    }
-    
-    // Success message
-    alert(`🎉 Setup Complete!\n\n✅ ${successCount} tasks scheduled automatically\n📅 Your clean, simple maintenance plan is ready!\n\nCheck your dashboard and calendar now.`);
-    
-    // Save to Firebase if user is logged in
-    if (window.currentUser) {
-        saveUserDataToFirebase(window.currentUser.uid, homeData, tasks)
-            .then(() => {
-                console.log('💾 User data saved to Firebase');
-            })
-            .catch((error) => {
-                console.error('❌ Error saving to Firebase:', error);
-            });
-    }
-    console.log('🎉 CLEAN SIMPLE TASK SETUP COMPLETION SUCCESSFUL!');
-}
-
-// FIXED: Enhanced showTab function that respects All Tasks view
-function showTab(tabName) {
-    console.log(`🔄 Switching to tab: ${tabName}`);
-
-    // UNIFIED: Always ensure header is visible on all main tabs
-    if (['dashboard', 'calendar', 'appliances', 'documents'].includes(tabName)) {
-        // Ensure main-app-active class is set (makes header sticky)
-        document.body.classList.add('main-app-active');
-        // Remove any conflicting header classes
-        document.body.classList.remove('hide-header', 'show-header');
-        
-        console.log('✅ Header made sticky for tab:', tabName);
-    }
-    
-    // 🎯 CRITICAL FIX: Only hide back arrow if we're actually switching away from All Tasks
-    const allTasksView = document.getElementById('all-tasks-view');
-    const isLeavingAllTasks = allTasksView && !allTasksView.classList.contains('hidden');
-    
-    if (isLeavingAllTasks) {
-        console.log('🔍 Leaving All Tasks view - hiding back arrow...');
-        const backButton = document.getElementById('back-to-dashboard');
-        if (backButton) {
-            backButton.classList.add('hidden');
-            backButton.style.display = 'none';
-            console.log('✅ Back arrow hidden when leaving All Tasks');
-        }
-    }
-    
-    // Ensure global references are current
-   // window.tasks = tasks;
-   // window.homeData = homeData;
-    
-    // Hide ALL views including All Tasks
-    const dashboardView = document.getElementById('dashboard-view');
-    const calendarView = document.getElementById('calendar-view');
-    const documentsView = document.getElementById('documents-view');
-    const appliancesView = document.getElementById('appliances-view');
-
-    if (dashboardView) dashboardView.classList.add('hidden');
-    if (calendarView) calendarView.classList.add('hidden');
-    if (documentsView) documentsView.classList.add('hidden');
-    if (appliancesView) appliancesView.classList.add('hidden');
-    if (allTasksView) allTasksView.classList.add('hidden');
-    
-    // Update tab buttons
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-blue-100', 'text-blue-700');
-        btn.classList.add('text-gray-600');
-    });
-    
-    if (tabName === 'dashboard') {
-        // Show dashboard
-        if (dashboardView) {
-            dashboardView.classList.remove('hidden');
-        }
-        
-        // Update tab styling
-        const dashboardTab = document.getElementById('tab-dashboard');
-        if (dashboardTab) {
-            dashboardTab.classList.add('bg-blue-100', 'text-blue-700');
-            dashboardTab.classList.remove('text-gray-600');
-        }
-        
-        console.log('🏠 Initializing enhanced dashboard...');
-        
-        // Enhanced dashboard initialization with fallback
-        try {
-            if (typeof EnhancedDashboard !== 'undefined') {
-                if (!window.enhancedDashboard) {
-                    console.log('🆕 Creating new enhanced dashboard instance...');
-                    window.enhancedDashboard = new EnhancedDashboard();
-                } else {
-                    console.log('🔄 Refreshing existing enhanced dashboard...');
-                    window.enhancedDashboard.render();
-                }
-                console.log('✅ Enhanced dashboard ready');
-            } else {
-                console.warn('⚠️ EnhancedDashboard class not available, using basic dashboard');
-                updateDashboard();
-            }
-        } catch (error) {
-            console.error('❌ Error with enhanced dashboard, falling back to basic:', error);
-            updateDashboard();
-        }
-        
-    } else if (tabName === 'calendar') {
-        // Show calendar
-        if (calendarView) {
-            calendarView.classList.remove('hidden');
-        }
-        
-        // Update tab styling
-        const calendarTab = document.getElementById('tab-calendar');
-        if (calendarTab) {
-            calendarTab.classList.add('bg-blue-100', 'text-blue-700');
-            calendarTab.classList.remove('text-gray-600');
-        }
-        
-        console.log('📅 Initializing calendar...');
-        
-        // Initialize calendar
-        try {
-            if (!window.casaCareCalendar && typeof CasaCareCalendar !== 'undefined') {
-                window.casaCareCalendar = new CasaCareCalendar();
-            } else if (window.casaCareCalendar) {
-                window.casaCareCalendar.refresh();
-            }
-        } catch (error) {
-            console.error('❌ Error initializing calendar:', error);
-        }
-        
-    } else if (tabName === 'documents') {
-        // Show documents
-        if (documentsView) {
-            documentsView.classList.remove('hidden');
-        }
-        
-        // Update tab styling
-        const documentsTab = document.getElementById('tab-documents');
-        if (documentsTab) {
-            documentsTab.classList.add('bg-blue-100', 'text-blue-700');
-            documentsTab.classList.remove('text-gray-600');
-        }
-        
-        console.log('📄 Initializing documents...');
-        
-        // Initialize documents module
-        try {
-            if (!window.casaCareDocuments && typeof CasaCareDocuments !== 'undefined') {
-                console.log('📄 Creating new documents instance...');
-                window.casaCareDocuments = new CasaCareDocuments();
-            } else if (window.casaCareDocuments) {
-                console.log('📄 Refreshing documents...');
-                window.casaCareDocuments.render();
-            }
-        } catch (error) {
-            console.error('❌ Error initializing documents:', error);
-        }
-        
-    } else if (tabName === 'appliances') {
-        // Show appliances view
-        if (appliancesView) {
-            appliancesView.classList.remove('hidden');
-        }
-        
-        // Update tab styling  
-        const appliancesTab = document.getElementById('tab-appliances');
-        if (appliancesTab) {
-            appliancesTab.classList.add('bg-blue-100', 'text-blue-700');
-            appliancesTab.classList.remove('text-gray-600');
-        }
-        
-        console.log('⚙️ Switching to appliances tab...');
-        
-        // Initialize or refresh appliances module
-        try {
-            if (!window.applianceManager) {
-                console.log('⚙️ Appliance manager not found, initializing...');
-                if (typeof window.initializeApplianceManager === 'function') {
-                    window.applianceManager = window.initializeApplianceManager();
-                } else if (typeof ApplianceManager !== 'undefined') {
-                    console.log('⚙️ Creating appliance manager directly...');
-                    window.applianceManager = new ApplianceManager();
-                } else {
-                    console.error('❌ ApplianceManager class not available');
-                    return;
-                }
-            }
-            
-            if (window.applianceManager && typeof window.applianceManager.render === 'function') {
-                console.log('⚙️ Rendering appliances view...');
-                window.applianceManager.render();
-            } else {
-                console.error('❌ Appliance manager render method not available');
-            }
-            
-        } catch (error) {
-            console.error('❌ Error initializing appliances:', error);
-        }
-    }
-    
-    console.log(`✅ Switched to ${tabName} tab`);
-}
-
-// 🎯 ENHANCED: showAllTasks function with better back arrow handling
-function showAllTasks() {
-    console.log('📋 Switching to All Tasks view...');
-    
-    // SIMPLIFIED: Just ensure main-app-active class (header will be sticky automatically)
-    document.body.classList.add('main-app-active');
-    document.body.classList.remove('hide-header', 'show-header');
-    
-    // Hide all other views (including dashboard)
-    const dashboardView = document.getElementById('dashboard-view');
-    const calendarView = document.getElementById('calendar-view');
-    const documentsView = document.getElementById('documents-view');
-    const appliancesView = document.getElementById('appliances-view');
-    const allTasksView = document.getElementById('all-tasks-view');
-
-    if (dashboardView) dashboardView.classList.add('hidden');
-    if (calendarView) calendarView.classList.add('hidden');
-    if (documentsView) documentsView.classList.add('hidden');
-    if (appliancesView) appliancesView.classList.add('hidden');
-    
-    // Show all tasks view
-    if (allTasksView) {
-        allTasksView.classList.remove('hidden');
-        
-        // Show back arrow
-        setTimeout(() => {
-            const backButton = document.getElementById('back-to-dashboard');
-            if (backButton) {
-                backButton.classList.remove('hidden');
-                backButton.style.display = 'flex';
-                backButton.style.visibility = 'visible';
-                backButton.style.opacity = '1';
-                console.log('✅ Back arrow visible with automatically sticky header!');
-            }
-        }, 50);
-        
-    } else {
-        console.error('❌ All tasks view not found');
-        return;
-    }
-    
-    // Update tab styling to show no tab is selected
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-blue-100', 'text-blue-700');
-        btn.classList.add('text-gray-600');
-    });
-    
-    // Render the content
-    renderAllTasksView();
-    
-    console.log('✅ All Tasks view displayed with unified sticky header system');
-}
-
-function renderAllTasksView() {
-    const allTasksView = document.getElementById('all-tasks-view');
-    if (!allTasksView) {
-        console.error('❌ All tasks view element not found');
-        return;
-    }
-    
-   // Calculate stats for All Tasks overview
-let totalCost = 0;
-
-window.tasks.forEach(task => {
-    totalCost += task.cost * (365 / task.frequency);
-});
-    
-    const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
-    
-    // Enhanced All Tasks interface with annual cost
-    allTasksView.innerHTML = `
-        <div class="p-4">
-            <div class="bg-white rounded-xl p-6 shadow-lg max-w-4xl mx-auto">
-<div class="text-center mb-4">
-    <h2 class="text-lg font-bold text-gray-900 mb-3">📋 Manage All Tasks</h2>
-
-<!-- Compact Overview with Add Button -->
-<div class="bg-gray-50 p-3 rounded-lg mb-4">
-    <div class="flex justify-center items-center gap-6 text-sm">
-        <div class="text-center">
-            <div class="text-lg font-bold text-blue-600">${totalTasks}</div>
-            <div class="text-xs text-gray-600">Tasks</div>
+        <!-- Signup Form (hidden initially) -->
+        <div id="signup-form" class="hidden">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="signup-email" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                           placeholder="your@email.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="signup-password" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                           placeholder="••••••••">
+                </div>
+                <button onclick="createUser()" 
+                        class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-medium">
+                    Create Account
+                </button>
+                <button onclick="signInWithGoogle()" 
+                        class="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 font-medium">
+                    Sign Up with Google
+                </button>
+                <div class="text-center">
+                    <button onclick="showLoginForm()" class="text-blue-600 hover:text-blue-800 text-sm">
+                        Already have an account? Sign in
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="text-center">
-            <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
-            <div class="text-xs text-gray-600">Annual Cost</div>
+    </div>
+</div>
+<!-- Header -->
+<div class="bg-white shadow-sm border-b sticky top-0 z-40">
+    <div class="px-4 py-4">
+        <div class="flex items-center justify-between">
+            <!-- Left side: Back arrow (hidden by default) -->
+            <div class="flex items-center gap-3">
+                <button id="back-to-dashboard" onclick="showTab('dashboard')" 
+                        class="hidden text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn" 
+                        title="Back to Dashboard">
+                    ←
+                </button>
+                <div>
+                   <h1 class="text-xl font-bold text-gray-900">The Home Keeper</h1>
+                    <p class="text-sm text-gray-600" id="header-subtitle">Smart home maintenance</p>
+                </div>
+            </div>
+            
+            <!-- Right side: Settings Dropdown -->
+            <div class="relative">
+                <button id="settings-btn" onclick="toggleSettingsDropdown()" 
+                        class="text-2xl hover:bg-gray-100 p-2 rounded-lg touch-btn relative">
+                    ⚙️
+                </button>
+                
+<!-- Settings Dropdown Menu -->
+<div id="settings-dropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+    <div class="py-2">
+        <button onclick="signOutUser(); closeSettingsDropdown()" 
+                class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
+            <span>👋</span>
+            <span>Sign Out</span>
+        </button>
+        <div class="border-t border-gray-100 my-1"></div>
+        <button onclick="exportTaskList(); closeSettingsDropdown()" 
+                class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
+            <span>📋</span>
+            <span>Export Tasks</span>
+        </button>
+        <div class="border-t border-gray-100 my-1"></div>
+        <button onclick="clearData(); closeSettingsDropdown()" 
+                class="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 flex items-center gap-3">
+            <span>🗑️</span>
+            <span>Reset App</span>
+        </button>
+   </div>
+</div>
+                
+</div> <!-- Closes: relative container -->
+</div> <!-- Closes: flex items-center justify-between -->
+</div> <!-- Closes: px-4 py-4 -->
+</div> <!-- Closes: bg-white shadow-sm border-b sticky -->
+
+<!-- Simplified Setup Form -->
+<div id="setup-form" class="hidden p-4 main-content pt-20">
+    
+<!-- Enhanced Onboarding Progress -->
+<div id="onboarding-progress" class="hidden fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+  <div class="max-w-2xl mx-auto px-4 py-4">
+    <!-- Step indicators with icons -->
+    <div class="flex items-center justify-between mb-4">
+      <div id="step-1-indicator" class="flex items-center gap-2 step-indicator active">
+        <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold transition-all duration-300">
+          1
         </div>
-        <button onclick="event.stopPropagation(); window.closeDatePickerModal(); addTaskFromDashboard()" 
-                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-        Add Task
+        <span class="text-sm font-medium text-gray-900">Basic Info</span>
+      </div>
+      
+      <div class="flex-1 mx-4">
+        <div class="h-1 bg-gray-200 rounded-full overflow-hidden">
+          <div id="progress-bar-fill" class="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500 ease-out" style="width: 33%;"></div>
+        </div>
+      </div>
+      
+      <div id="step-2-indicator" class="flex items-center gap-2 step-indicator">
+        <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-sm font-semibold transition-all duration-300">
+          2
+        </div>
+        <span class="text-sm font-medium text-gray-500">Systems</span>
+      </div>
+      
+      <div class="flex-1 mx-4">
+        <div class="h-1 bg-gray-200 rounded-full"></div>
+      </div>
+      
+      <div id="step-3-indicator" class="flex items-center gap-2 step-indicator">
+        <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-sm font-semibold transition-all duration-300">
+          3
+        </div>
+        <span class="text-sm font-medium text-gray-500">Features</span>
+      </div>
+    </div>
+    
+    <!-- Progress text -->
+    <div class="text-center">
+      <span id="progress-label" class="text-sm font-semibold text-gray-700">Step 1 of 3</span>
+      <span class="text-gray-400 mx-2">•</span>
+      <span id="progress-percent" class="text-sm text-blue-600 font-medium">33% Complete</span>
+    </div>
+  </div>
+</div>
+            
+<div class="bg-white rounded-xl p-6 shadow-lg max-w-md mx-auto">
+    <div class="text-center mb-6">
+         <div class="text-4xl mb-4">🏠</div>
+            <h2 class="text-xl font-bold text-gray-900 mb-2">Tell us about your home</h2>
+            <p class="text-gray-600 text-sm">We'll create a personalized maintenance plan</p>
+         </div>
+                
+<div class="space-y-6">
+ <!-- Step 1: Basic home info -->
+    <div class="onboarding-step" data-step="1">
+     <!-- Address -->
+        <div>
+         <label class="block text-sm font-medium text-gray-700 mb-2 mt-2 mt-2">Street Address</label>
+        <input type="text" id="address" placeholder="123 Main Street" 
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
+        </div>
+
+ <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
+  <div class="sm:col-span-6">
+    <label class="block text-sm font-medium text-gray-700 mb-2 mt-2 mt-2 mt-2">City</label>
+    <input type="text" id="city" placeholder="Anytown"
+           class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+  </div>
+  <div class="sm:col-span-3">
+    <label class="block text-sm font-medium text-gray-700 mb-2 mt-2 mt-2 mt-2">State</label>
+    <input type="text" id="state" placeholder="NY" maxlength="2"
+           class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+  </div>
+  <div class="sm:col-span-3">
+    <label class="block text-sm font-medium text-gray-700 mb-2 mt-2 mt-2 mt-2">Zip Code</label>
+    <input type="text" id="zipcode" placeholder="12345"
+           class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+</div>
+</div>
+
+<!-- Property Type + Year Built -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="sm:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2 mt-2 mt-2 mt-2">Property Type</label>
+        <select id="property-type" class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+            <option value="single-family">Single Family Home</option>
+            <option value="townhouse">Townhouse</option>
+            <option value="condo">Condo</option>
+            <option value="apartment">Apartment</option>
+            <option value="mobile-home">Mobile Home</option>
+        </select>
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2 mt-2 mt-2">Year Built</label>
+        <input type="number" id="year-built" value="1995" min="1900" max="2025"
+               class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+    </div>
+</div>
+
+<!-- Square Feet -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="sm:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2 mt-2 mt-2">Square Feet</label>
+        <input type="number" id="sqft" value="2000" min="500" max="10000"
+               class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+    </div>
+    <div class="flex items-end">
+        <button type="button" id="next-to-step-2"
+                class="w-full px-4 py-3 bg-blue-500 text-white rounded-lg">
+            Next →
+        </button>
+    </div>
+</div>
+</div> <!-- ✅ End Step 1 goes HERE -->
+
+                 <!-- Step 2: Systems & features -->
+                <div class="onboarding-step hidden" data-step="2">
+                    <!-- Heating & Cooling Systems -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Heating & Cooling Systems</label>
+                        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="central-ac" class="w-5 h-5">
+                                <span>Central Air/Heat</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="mini-splits" class="w-5 h-5">
+                                <span>Mini-Split Systems</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="wall-ac" class="w-5 h-5">
+                                <span>Wall Air Conditioners</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="electric-baseboard" class="w-5 h-5">
+                                <span>Electric Baseboard Heat</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="boiler" class="w-5 h-5">
+                                <span>Boiler System</span>
+                            </label>
+                        </div>
+                    </div>
+
+                   <!-- Water & Sewer Systems -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Water & Sewer Systems</label>
+                        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="municipal-water" class="w-5 h-5">
+                                <span>Municipal Water</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="well-water" class="w-5 h-5" onchange="toggleWellWaterOptions()">
+                                <span>Well Water</span>
+                            </label>
+                            <!-- Well Water Sub-options -->
+                            <div id="well-water-options" class="ml-8 space-y-2 hidden">
+                                <label class="flex items-center space-x-3 touch-btn">
+                                    <input type="checkbox" id="sediment-filter" class="w-4 h-4">
+                                    <span class="text-sm">Sediment Filtration</span>
+                                </label>
+                                <label class="flex items-center space-x-3 touch-btn">
+                                    <input type="checkbox" id="uv-filter" class="w-4 h-4">
+                                    <span class="text-sm">UV Filtration</span>
+                                </label>
+                                <label class="flex items-center space-x-3 touch-btn">
+                                    <input type="checkbox" id="water-softener" class="w-4 h-4">
+                                    <span class="text-sm">Water Softener</span>
+                                </label>
+                                <label class="flex items-center space-x-3 touch-btn">
+                                    <input type="checkbox" id="whole-house-filter" class="w-4 h-4">
+                                    <span class="text-sm">Whole House Filter</span>
+                                </label>
+                            </div>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="municipal-sewer" class="w-5 h-5">
+                                <span>Municipal Sewer</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="septic" class="w-5 h-5">
+                                <span>Septic System</span>
+                            </label>
+                        </div>
+                         <div class="flex justify-between mt-4">
+                          <button type="button" id="back-to-step-1" class="px-4 py-2 bg-gray-300 rounded-lg">
+                            ← Back
+                          </button>
+                          <button type="button" id="next-to-step-3" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                            Next →
+                          </button>
+                        </div>
+                    </div>
+                    </div> <!-- End of Step 2 container -->
+                    
+             <!-- Step 3: Final details & preferences -->
+              <div class="onboarding-step hidden" data-step="3">
+                    <!-- Other Home Features -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Other Home Features</label>
+                        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="fireplace" class="w-5 h-5">
+                                <span>Fireplace</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="pool" class="w-5 h-5">
+                                <span>Pool/Spa</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="deck" class="w-5 h-5">
+                                <span>Deck/Patio</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="garage" class="w-5 h-5">
+                                <span>Garage</span>
+                            </label>
+                            <label class="flex items-center space-x-3 touch-btn">
+                                <input type="checkbox" id="basement" class="w-5 h-5">
+                                <span>Basement</span>
+                            </label>
+                        </div>
+                    </div>
+
+<!-- Other Features -->
+ <div class="mb-6">
+     <label class="block text-sm font-medium text-gray-700 mb-2 mt-2 mt-2">Other Features</label>
+    <input type="text" id="other-features" placeholder="e.g., Hot tub, Generator, Solar panels..." 
+    class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+    <p class="text-xs text-gray-500 mt-1">List any additional features not mentioned above</p>
+</div>
+
+<!-- Tip box -->
+<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+    <div class="flex items-start gap-3">
+        <div class="text-blue-600 text-lg">💡</div>
+        <div class="text-sm text-blue-800">
+            <strong>Good to know:</strong> Task frequencies can be adjusted later based on your specific needs (pets, usage patterns, manufacturer recommendations, etc.)
+        </div>
+    </div>
+</div> <!-- ✅ Tip box closes here -->
+
+<!-- Buttons row (stack on mobile, side-by-side on desktop) -->
+<div class="mt-4 flex flex-col sm:flex-row gap-3">
+  <button
+    type="button"
+    id="back-to-step-2"
+    class="w-full sm:flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg">
+    ← Back
+  </button>
+
+ <button
+  type="button"
+  onclick="showPropertyConfirmation()"
+  class="w-full sm:flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors touch-btn">
+  🚀 Create My Plan
+</button>
+</div>
+                  
+</div> <!-- This closes Step 3 -->
+</div> <!-- This closes the space-y-6 block -->
+</div> <!-- This closes the white rounded-xl setup card -->
+</div> <!-- This closes #setup-form -->
+
+        <!-- NEW: Property Confirmation Page -->
+<div id="property-confirmation" class="hidden p-4 main-content pt-20">
+    <div class="bg-white rounded-xl p-6 shadow-lg max-w-2xl mx-auto">
+        <div class="text-center mb-6">
+            <div class="text-4xl mb-4">✅</div>
+            <h2 class="text-xl font-bold text-gray-900 mb-2">Confirm Your Property</h2>
+            <p class="text-gray-600 text-sm">Please review your home details before we generate your maintenance plan</p>
+        </div>
+        
+        <!-- Property Details Card -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 mb-6">
+            <h3 class="font-semibold text-blue-900 mb-4 flex items-center gap-2">
+                <span class="text-xl">🏠</span>
+                Your Property Details
+            </h3>
+            <div id="confirmation-summary" class="text-sm text-blue-800 space-y-2">
+                <!-- Property summary will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex gap-3">
+            <button onclick="goBackFromConfirmation()"
+                    class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition-colors touch-btn">
+                ← Edit Details
+            </button>
+            <button onclick="proceedToTaskGeneration()" 
+                    class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-colors touch-btn">
+                ✨ Generate My Tasks
+            </button>
+        </div>
+        
+        <!-- Helper Text -->
+        <div class="mt-6 text-center">
+            <p class="text-xs text-gray-500">
+                We'll create a personalized maintenance schedule based on your home's features and location
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Task Setup Screen -->
+<div id="task-setup" class="hidden p-4 main-content">
+ <div class="bg-white rounded-xl p-6 shadow-lg max-w-4xl mx-auto">
+     <div class="text-center mb-6">
+      <div class="text-4xl mb-4">📋</div>
+             <h2 class="text-xl font-bold text-gray-900 mb-2">Review Your Maintenance Tasks</h2>
+             <p class="text-gray-600 text-sm">We've created a personalized task list organized by category and season.</p>
+        </div>
+
+<!-- Simplified Task Summary -->
+<div class="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4 mb-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h3 class="font-semibold text-gray-900 mb-1">Your Maintenance Plan</h3>
+            <div id="task-summary-compact" class="text-sm text-gray-600">
+                <!-- Compact stats will go here -->
+            </div>
+        </div>
+        <div class="text-right">
+            <div id="annual-cost-display" class="text-2xl font-bold text-green-600">$0</div>
+            <div class="text-xs text-gray-500">Annual Budget</div>
+        </div>
+    </div>
+</div>
+
+<!-- Your Maintenance Schedule -->
+<div class="flex items-center justify-between mb-4">
+    <h3 class="text-lg font-bold text-gray-900">Your Maintenance Schedule</h3>
+    <button onclick="addTaskFromSetup()" 
+            class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+        + Add Task
+    </button>
+</div>
+                
+                <!-- Task Categories -->
+                <div id="task-categories" class="space-y-6">
+                    <!-- Task categories will be populated here -->
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex gap-3 mt-8">
+                    <button onclick="goBackToHomeSetup()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg touch-btn">
+                        ← Back to Home Info
+                    </button>
+                    <button onclick="finishTaskSetup()" class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 touch-btn">
+                        🚀 Complete Setup
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App (Dashboard & Calendar) -->
+        <div id="main-app" class="hidden">
+            <div class="main-content">
+        <!-- Enhanced Dashboard View -->
+        <div id="dashboard-view" class="p-4">
+        <!-- Interactive Stats Grid - Now Sticky and Mobile Optimized -->
+        <div class="sticky top-16 z-30 bg-gray-50 pb-4 mb-6">
+            <div class="grid grid-cols-3 gap-2 sm:gap-4">
+                <div id="overdue-card" class="stat-card bg-white rounded-xl p-3 sm:p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+                    <div class="flex flex-col items-center text-center">
+                    <div class="p-1 sm:p-2 bg-red-100 rounded-lg text-base sm:text-lg mb-1 sm:mb-0">⚠️</div>
+                    <div>
+                        <p id="overdue-count" class="text-lg sm:text-xl font-bold text-red-600">0</p>
+                        <p class="text-xs text-gray-600">Overdue</p>
+                </div>
+            </div>
+        </div>
+    
+        <div id="week-card" class="stat-card bg-white rounded-xl p-3 sm:p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+            <div class="flex flex-col items-center text-center">
+                <div class="p-1 sm:p-2 bg-orange-100 rounded-lg text-base sm:text-lg mb-1 sm:mb-0">📅</div>
+                <div>
+                    <p id="week-count" class="text-lg sm:text-xl font-bold text-orange-600">0</p>
+                    <p class="text-xs text-gray-600">This Week</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="total-card" class="stat-card bg-white rounded-xl p-3 sm:p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
+            <div class="flex flex-col items-center text-center">
+                <div class="p-1 sm:p-2 bg-blue-100 rounded-lg text-base sm:text-lg mb-1 sm:mb-0">📋</div>
+                <div>
+                    <p id="total-count" class="text-lg sm:text-xl font-bold text-blue-600">0</p>
+                    <p class="text-xs text-gray-600">All Tasks</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                    
+                 <!-- Enhanced Tasks Section -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                 <h3 id="tasks-list-title" class="text-lg font-bold text-gray-900">Upcoming Tasks</h3>
+                <div class="flex gap-2">
+        <button onclick="addTaskFromDashboard()" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 text-sm touch-btn">
+            Add Task
         </button>
     </div>
 </div>
                 
-               
-                
-                <!-- Task Categories -->
-                <div id="all-tasks-categories" class="space-y-6">
-                    ${renderAllTaskCategories()}
+                <!-- Tasks List -->
+                <div id="tasks-list">
+                    <!-- Enhanced tasks will be populated here -->
                 </div>
-
-               <!-- Tasks managed through Settings dropdown -->
             </div>
         </div>
-    `;
-    
-    console.log('✅ All Tasks view rendered successfully');
-}
 
-function renderAllTaskCategories() {
-    if (!window.tasks || window.tasks.length === 0) {
-        return '<div class="text-center text-gray-500 py-8">No tasks found.</div>';
-    }
-
-    const activeTasks = window.tasks.filter(task => !task.isCompleted && task.dueDate);
-    const tasksByCategory = {};
-
-    activeTasks.forEach(task => {
-        const category = task.category || 'General';
-        if (!tasksByCategory[category]) tasksByCategory[category] = [];
-        tasksByCategory[category].push(task);
-    });
-
-    if (Object.keys(tasksByCategory).length === 0) {
-        return '<div class="text-center text-gray-500 py-8">🎉 All tasks completed!</div>';
-    }
-
-    const colorClasses = {
-        'Safety': 'bg-red-50 text-red-600',
-        'Exterior': 'bg-green-50 text-green-700',
-        'General': 'bg-gray-50 text-gray-700',
-        'HVAC': 'bg-blue-50 text-blue-700',
-        'Water Systems': 'bg-cyan-50 text-cyan-700',
-        'Pest Control': 'bg-lime-50 text-lime-700',
-        'Seasonal': 'bg-amber-50 text-amber-700',
-        'Appliance': 'bg-purple-50 text-purple-700',
-    };
-
-    return Object.entries(tasksByCategory).map(([categoryId, tasks]) => {
-        const categoryInfo = window.categoryConfig?.[categoryId] || { icon: '📋', color: 'gray' };
-        const categoryCost = tasks.reduce((total, task) => {
-            return total + (task.cost * (365 / task.frequency));
-        }, 0);
-
-        const colorClass = colorClasses[categoryId] || 'bg-white text-gray-900';
-
-        return `
-            <div class="rounded-2xl shadow-md mb-4 overflow-hidden ${colorClass}">
-                <!-- Category Header (Clickable) -->
-                <div class="px-4 py-4 cursor-pointer hover:opacity-80 transition-opacity" 
-                     onclick="toggleCategory('${categoryId}')">
-                    <div class="flex items-center justify-between gap-4">
-                        <!-- Left: icon + category name + task count -->
-                        <div class="flex items-center gap-3">
-                            <div class="text-xl">${categoryInfo.icon}</div>
-                            <div class="flex flex-col items-start text-left">
-                                <div class="text-lg font-semibold leading-snug break-words">${categoryId}</div>
-                                <div class="text-sm text-gray-600">${tasks.length} task${tasks.length !== 1 ? 's' : ''}</div>
-                            </div>
-                        </div>
-
-                        <!-- Right: cost and arrow -->
-                        <div class="flex items-center gap-3">
-                            <span class="bg-white shadow px-3 py-1 rounded-full text-sm font-semibold text-green-600">
-                                $${Math.round(categoryCost)}/yr
-                            </span>
-                            <span id="arrow-${categoryId}" class="text-gray-400 text-xl transition-transform duration-300">&#8250;</span>
-                        </div>
+        <!-- Calendar View -->
+        <div id="calendar-view" class="hidden">
+            <!-- Calendar will be rendered here by calendar.js -->
+        </div>
+        
+        <!-- Appliances View -->
+        <div id="appliances-view" class="hidden">
+            <!-- appliances content will be rendered here -->
+        </div>
+        
+        <!-- Documents View -->
+        <div id="documents-view" class="hidden">
+            <!-- Documents content will be rendered here by documents.js -->
+        </div>
+        
+        <!-- NEW: All Tasks View -->
+        <div id="all-tasks-view" class="hidden">
+            <!-- All tasks management content will go here -->
+            <div class="p-4">
+                <div class="bg-white rounded-xl p-6 shadow-lg">
+                    <h2 class="text-xl font-bold text-center">All Tasks View</h2>
+                    <p class="text-center text-gray-600 mt-2">Coming soon...</p>
+                    <div class="text-center mt-4">
+                        <button onclick="showTab('dashboard')" class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+                            ← Back to Dashboard
+                        </button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Navigation - Simplified -->
+<div class="bottom-nav fixed bottom-0 left-0 right-0 bg-white border-t z-50">
+    <div class="grid grid-cols-4 gap-1 p-2 sm:gap-2 text-base">
+        <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn flex flex-col items-center p-3 rounded-lg bg-blue-100 text-blue-700 touch-btn">
+            <div class="text-lg mb-1">🏠</div>
+            <div class="text-xs">Home</div>
+        </button>
+        <button onclick="showTab('calendar')" id="tab-calendar" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
+            <div class="text-lg mb-1">📅</div>
+            <div class="text-xs">Calendar</div>
+        </button>
+        <button onclick="showTab('appliances')" id="tab-appliances" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
+            <div class="text-lg mb-1">⚙️</div>
+            <div class="text-xs">Appliances</div>
+        </button>
+        <button onclick="showTab('documents')" id="tab-documents" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
+            <div class="text-lg mb-1">📄</div>
+            <div class="text-xs">Documents</div>
+        </button>
+    </div>
+</div>
+            
+ <!-- Task Edit Modal -->
+        <div id="task-edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold" id="task-edit-title">Edit Task</h3>
+                    <button onclick="closeTaskEditModal()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+                </div>
                 
-                <!-- Tasks List (Hidden by default) -->
-                <div id="tasks-${categoryId}" class="hidden border-t border-gray-200 bg-white">
-                    <div class="p-4 space-y-3">
-                        ${tasks.map(task => renderAllTasksTaskItem(task)).join('')}
+                <div class="space-y-4">
+                    <!-- Task Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Task Name *</label>
+                        <input type="text" id="edit-task-name" 
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
+                               placeholder="Enter task name" required>
+                    </div>
+                    
+                   <!-- Description -->
+<div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
+    <textarea id="edit-task-description" 
+              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base" 
+              rows="3" placeholder="Optional: Describe what needs to be done"></textarea>
+</div>
+                    
+                    <!-- Due Date -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Due Date *</label>
+                        <input type="date" id="edit-task-due-date" 
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base" required>
+                    </div>
+                    
+                    <!-- Frequency and Cost Row - IMPROVED -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Frequency (days) *</label>
+                            <input type="number" id="edit-task-frequency" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
+                                   min="1" placeholder="365" required>
+                            <p class="text-xs text-gray-500 mt-1">How often to repeat</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cost ($)</label>
+                            <input type="number" id="edit-task-cost" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"
+                                   min="0" step="0.01" placeholder="0.00">
+                            <p class="text-xs text-gray-500 mt-1">Estimated cost per task</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Category -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select id="edit-task-category" 
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
+                            <option value="General">🔧 General</option>
+                            <option value="HVAC">🌡️ HVAC</option>
+                            <option value="Water Systems">💧 Water Systems</option>
+                            <option value="Exterior">🏠 Exterior</option>
+                            <option value="Pest Control">🐛 Pest Control</option>
+                            <option value="Safety">⚠️ Safety</option>
+                            <option value="Seasonal">🌍 Seasonal</option>
+                            <option value="Appliance">⚙️ Appliance</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">💡 Priority is automatically set: Safety tasks = High, others = Medium</p>
+                    </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex gap-3 mt-6">
+                    <button onclick="deleteTaskFromEdit()" 
+                            class="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-colors touch-btn">
+                        🗑️ Delete
+                    </button>
+                    <button onclick="closeTaskEditModal()" 
+                            class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition-colors touch-btn">
+                        Cancel
+                    </button>
+                    <button onclick="saveTaskFromEdit()" 
+                            class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors touch-btn">
+                        💾 Save Task
+                    </button>
+                </div>
+                
+                <!-- Helper Text -->
+                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p class="text-xs text-blue-800">
+                        <strong>💡 Tip:</strong> Frequency determines how often this task repeats after completion. 
+                        For example, 90 days means the task will be due again 90 days after you mark it complete.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+       <!-- Date Picker Modal -->
+<div id="date-picker-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-xl w-full max-w-sm p-6 shadow-2xl">
+    <div class="text-center mb-6">
+      <h3 class="text-xl font-bold text-gray-900 mb-2">📅 Reschedule Task</h3>
+      <p id="reschedule-task-name" class="text-gray-600 text-sm"></p>
+    </div>
+
+    <div class="space-y-4">
+      <!-- Current Due Date -->
+      <div class="bg-gray-50 rounded-lg p-3">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Current Due Date</label>
+        <p id="current-due-date" class="text-gray-900 font-semibold"></p>
+      </div>
+
+      <!-- New Due Date -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2 mt-2 mt-2">New Due Date</label>
+        <input type="date" id="new-due-date" 
+               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
+      </div>
+
+      <!-- Quick Options -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2 mt-2 mt-2">Quick Options</label>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="setQuickDate(1)" 
+                  class="bg-blue-100 text-blue-700 px-3 py-2 rounded-lg hover:bg-blue-200 text-sm touch-btn">
+            Tomorrow
+          </button>
+          <button type="button" onclick="setQuickDate(7)" 
+                  class="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 text-sm touch-btn">
+            Next Week
+          </button>
+          <button type="button" onclick="setQuickDate(30)" 
+                  class="bg-yellow-100 text-yellow-700 px-3 py-2 rounded-lg hover:bg-yellow-200 text-sm touch-btn">
+            Next Month
+          </button>
+          <button type="button" onclick="setQuickDate(90)" 
+                  class="bg-purple-100 text-purple-700 px-3 py-2 rounded-lg hover:bg-purple-200 text-sm touch-btn">
+            3 Months
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-3 mt-6">
+        <button onclick="closeDatePickerModal()" 
+                class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 touch-btn">
+          Cancel
+        </button>
+        <button onclick="confirmReschedule()" 
+                class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 touch-btn">
+          📅 Reschedule
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Working Category Modal -->
+<div id="category-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 99999; align-items: flex-end; justify-content: center;">
+    <div style="background: white; width: 100%; max-height: 85vh; border-radius: 20px 20px 0 0; overflow: hidden; display: flex; flex-direction: column;">
+        <div style="padding: 1rem; border-bottom: 1px solid #ccc; display: flex; justify-content: space-between; align-items: center;">
+            <h2 id="modal-title" style="margin: 0; font-size: 1.2rem; font-weight: bold;">Category</h2>
+            <button onclick="document.getElementById('category-modal').style.display='none'" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+        </div>
+        <div id="modal-tasks" style="padding: 1rem; overflow-y: auto; flex: 1;">
+            <!-- Tasks go here -->
+        </div>
+    </div>
+</div>
+
+
+            <!-- Editable Home Info Modal -->
+<div id="home-info-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold">🏠 Edit Home Information</h3>
+            <button onclick="closeHomeInfoModal()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+        </div>
+        
+        <div class="space-y-4">
+            <!-- Address -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                <input type="text" id="edit-home-address" 
+                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
+            </div>
+            
+            <!-- City, State, Zip -->
+            <div class="grid grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                    <input type="text" id="edit-home-city" 
+                           class="w-full p-3 border border-gray-300 rounded-lg text-base">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                    <input type="text" id="edit-home-state" maxlength="2"
+                           class="w-full p-3 border border-gray-300 rounded-lg text-base">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Zip</label>
+                    <input type="text" id="edit-home-zipcode" 
+                           class="w-full p-3 border border-gray-300 rounded-lg text-base">
+                </div>
+            </div>
+            
+            <!-- Property Details -->
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
+                    <select id="edit-home-property-type" class="w-full p-3 border border-gray-300 rounded-lg text-base">
+                        <option value="single-family">Single Family Home</option>
+                        <option value="townhouse">Townhouse</option>
+                        <option value="condo">Condo</option>
+                        <option value="apartment">Apartment</option>
+                        <option value="mobile-home">Mobile Home</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Year Built</label>
+                    <input type="number" id="edit-home-year-built" min="1900" max="2025"
+                           class="w-full p-3 border border-gray-300 rounded-lg text-base">
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Square Feet</label>
+                <input type="number" id="edit-home-sqft" min="500" max="10000"
+                       class="w-full p-3 border border-gray-300 rounded-lg text-base">
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex gap-3 mt-6">
+            <button onclick="closeHomeInfoModal()" 
+                    class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition-colors touch-btn">
+                Cancel
+            </button>
+            <button onclick="saveHomeInfo()" 
+                    class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors touch-btn">
+                💾 Save Changes
+            </button>
+        </div>
+        
+        <!-- Info Note -->
+        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-xs text-blue-800">
+                <strong>💡 Note:</strong> Changing these details won't affect your existing tasks, but will be used for any new maintenance plans you create.
+            </p>
+        </div>
+    </div>
+</div>
+    
+  <!-- Task System Override (Working Fix) -->
+<script>
+    console.log('🚨 Loading task system override...');
+
+    // Complete override system
+    window.openTaskEditModal = function(task, isNew) {
+        window.TaskManager.openModal(task, isNew);
+    };
+
+    window.saveTaskFromEdit = function() {
+        window.TaskManager.save();
+    };
+
+    window.closeTaskEditModal = function() {
+        window.TaskManager.close();
+    };
+
+    // TaskManager object
+    window.TaskManager = {
+        currentTask: null,
+        
+        openModal: function(task, isNew) {
+            console.log('📝 Opening modal for:', task.title || 'New Task');
+            
+            this.currentTask = {...task};
+            window.currentEditingTask = this.currentTask;
+            
+            const modal = document.getElementById('task-edit-modal');
+            if (!modal) {
+                alert('❌ Modal not found');
+                return;
+            }
+            
+            // Set title
+            const titleElement = document.getElementById('task-edit-title');
+            if (titleElement) {
+                titleElement.textContent = isNew ? 'Add Task' : 'Edit Task';
+            }
+            
+            // Show/hide delete button
+            const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
+            if (deleteBtn) {
+                deleteBtn.style.display = isNew ? 'none' : 'block';
+            }
+            
+            this.fillForm(task);
+            
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            
+            setTimeout(() => {
+                const nameField = document.getElementById('edit-task-name');
+                if (nameField) nameField.focus();
+            }, 100);
+        },
+        
+        fillForm: function(task) {
+            const fields = [
+                ['edit-task-name', task.title || ''],
+                ['edit-task-description', task.description || ''],
+                ['edit-task-cost', task.cost || 0],
+                ['edit-task-frequency', task.frequency || 365],
+                ['edit-task-category', task.category || 'General']
+            ];
+            
+            fields.forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.value = value;
+                }
+            });
+            
+            const dateField = document.getElementById('edit-task-due-date');
+            if (dateField) {
+                const date = task.dueDate ? new Date(task.dueDate) : new Date();
+                dateField.value = date.toISOString().split('T')[0];
+            }
+        },
+        
+        save: function() {
+            if (!this.currentTask) {
+                alert('❌ No task to save');
+                return;
+            }
+            
+            // Get form values
+            const nameEl = document.getElementById('edit-task-name');
+            const descEl = document.getElementById('edit-task-description');
+            const costEl = document.getElementById('edit-task-cost');
+            const freqEl = document.getElementById('edit-task-frequency');
+            const catEl = document.getElementById('edit-task-category');
+            const dateEl = document.getElementById('edit-task-due-date');
+            
+            if (!nameEl || !descEl || !costEl || !freqEl || !catEl || !dateEl) {
+                alert('❌ Form elements missing');
+                return;
+            }
+            
+            const title = nameEl.value.trim();
+            const description = descEl.value.trim();
+            const cost = parseFloat(costEl.value) || 0;
+            const frequency = parseInt(freqEl.value) || 365;
+            const category = catEl.value || 'General';
+            const dueDateStr = dateEl.value;
+            
+            if (!title) {
+                alert('❌ Task name required');
+                return;
+            }
+            
+            if (frequency <= 0) {
+                alert('❌ Frequency must be > 0');
+                return;
+            }
+            
+            // Auto-calculate priority
+            let priority = 'medium';
+            if (typeof getAutoPriority === 'function') {
+                priority = getAutoPriority(title, category);
+            } else {
+                if (category === 'Safety' || title.toLowerCase().includes('smoke') || title.toLowerCase().includes('detector')) {
+                    priority = 'high';
+                }
+            }
+            
+            const dueDate = dueDateStr ? new Date(dueDateStr + 'T12:00:00') : new Date();
+            
+            // Update task
+            this.currentTask.title = title;
+            this.currentTask.description = description;
+            this.currentTask.cost = cost;
+            this.currentTask.frequency = frequency;
+            this.currentTask.category = category;
+            this.currentTask.priority = priority;
+            this.currentTask.dueDate = dueDate;
+            this.currentTask.nextDue = dueDate;
+            
+            delete this.currentTask.isTemplate;
+            
+            // Add or update
+            const isNew = !window.tasks.find(t => t.id === this.currentTask.id);
+            
+            if (isNew) {
+                window.tasks.push(this.currentTask);
+            } else {
+                const index = window.tasks.findIndex(t => t.id === this.currentTask.id);
+                if (index > -1) {
+                    window.tasks[index] = this.currentTask;
+                }
+            }
+            
+            this.saveAndRefresh();
+            this.close();
+            
+            alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
+        },
+        
+        saveAndRefresh: function() {
+            const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
+            const mainAppVisible = !document.getElementById('main-app').classList.contains('hidden');
+            
+            if (taskSetupVisible) {
+                if (typeof renderTaskCategories === 'function') {
+                    renderTaskCategories();
+                }
+            } else if (mainAppVisible) {
+                if (typeof saveData === 'function') {
+                    saveData();
+                }
+                
+                if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                    window.enhancedDashboard.render();
+                }
+                
+                if (window.casaCareCalendar && window.casaCareCalendar.refresh) {
+                    window.casaCareCalendar.refresh();
+                }
+                
+                // Refresh All Tasks view if visible
+                const allTasksView = document.getElementById('all-tasks-view');
+                if (allTasksView && !allTasksView.classList.contains('hidden')) {
+                    if (typeof renderAllTasksView === 'function') {
+                        renderAllTasksView();
+                    }
+                }
+            }
+        },
+        
+        close: function() {
+            const modal = document.getElementById('task-edit-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+            this.currentTask = null;
+            window.currentEditingTask = null;
+        }
+    };
+
+    // Override functions
+    window.addTaskFromSetup = function() {
+        const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+        const newTask = {
+            id: maxId + 1, title: '', description: '', category: 'General',
+            frequency: 365, cost: 0, priority: 'medium', dueDate: new Date(), isTemplate: true
+        };
+        window.TaskManager.openModal(newTask, true);
+    };
+
+    window.addTaskFromDashboard = function() {
+        const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+        const newTask = {
+            id: maxId + 1, title: '', description: '', category: 'General',
+            frequency: 365, cost: 0, priority: 'medium', dueDate: new Date()
+        };
+        window.TaskManager.openModal(newTask, true);
+    };
+
+    window.editTaskFromSetup = function(taskId) {
+        const task = window.tasks?.find(t => t.id === taskId);
+        if (task) {
+            window.TaskManager.openModal(task, false);
+        }
+    };
+
+    window.deleteTaskFromEdit = function() {
+        if (!window.TaskManager.currentTask) return;
+        
+        const taskTitle = window.TaskManager.currentTask.title || 'Untitled';
+        if (confirm(`Delete "${taskTitle}"?`)) {
+            const index = window.tasks.findIndex(t => t.id === window.TaskManager.currentTask.id);
+            if (index > -1) {
+                window.tasks.splice(index, 1);
+                window.TaskManager.saveAndRefresh();
+                window.TaskManager.close();
+                alert(`✅ "${taskTitle}" deleted!`);
+            }
+        }
+    };
+
+    console.log('✅ Task system override loaded');
+</script>
+<!-- WORKING MODAL SOLUTION -->
+<script>
+    console.log('🔧 Creating NEW working reschedule modal...');
+    
+    // Create a completely new, simple modal that definitely works
+    function createWorkingRescheduleModal() {
+        // Remove any existing working modal
+        const existing = document.getElementById('working-reschedule-modal');
+        if (existing) existing.remove();
+        
+        // Create new modal HTML
+        const modalHTML = `
+            <div id="working-reschedule-modal" style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 99999;
+                font-family: Inter, sans-serif;
+            ">
+                <div style="
+                    background: white;
+                    border-radius: 12px;
+                    padding: 24px;
+                    max-width: 400px;
+                    width: 90%;
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                ">
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <h3 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 600;">📅 Reschedule Task</h3>
+                        <p id="working-task-name" style="margin: 0; color: #666; font-size: 14px;"></p>
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 14px;">Current Due Date</label>
+                        <div id="working-current-date" style="padding: 12px; background: #f3f4f6; border-radius: 8px; font-weight: 600;"></div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 14px;">New Due Date</label>
+                        <input type="date" id="working-new-date" style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 2px solid #e5e7eb;
+                            border-radius: 8px;
+                            font-size: 16px;
+                            box-sizing: border-box;
+                        ">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: 500; margin-bottom: 8px; font-size: 14px;">Quick Options</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <button onclick="setWorkingQuickDate(1)" style="
+                                padding: 8px 12px;
+                                background: #dbeafe;
+                                color: #1e40af;
+                                border: none;
+                                border-radius: 6px;
+                                font-size: 13px;
+                                cursor: pointer;
+                            ">Tomorrow</button>
+                            <button onclick="setWorkingQuickDate(7)" style="
+                                padding: 8px 12px;
+                                background: #dcfce7;
+                                color: #166534;
+                                border: none;
+                                border-radius: 6px;
+                                font-size: 13px;
+                                cursor: pointer;
+                            ">Next Week</button>
+                            <button onclick="setWorkingQuickDate(30)" style="
+                                padding: 8px 12px;
+                                background: #fef3c7;
+                                color: #92400e;
+                                border: none;
+                                border-radius: 6px;
+                                font-size: 13px;
+                                cursor: pointer;
+                            ">Next Month</button>
+                            <button onclick="setWorkingQuickDate(90)" style="
+                                padding: 8px 12px;
+                                background: #f3e8ff;
+                                color: #7c3aed;
+                                border: none;
+                                border-radius: 6px;
+                                font-size: 13px;
+                                cursor: pointer;
+                            ">3 Months</button>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px;">
+                        <button onclick="closeWorkingModal()" style="
+                            flex: 1;
+                            padding: 12px;
+                            background: #f3f4f6;
+                            color: #374151;
+                            border: none;
+                            border-radius: 8px;
+                            font-weight: 500;
+                            cursor: pointer;
+                        ">Cancel</button>
+                        <button onclick="confirmWorkingReschedule()" style="
+                            flex: 1;
+                            padding: 12px;
+                            background: #2563eb;
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            font-weight: 500;
+                            cursor: pointer;
+                        ">📅 Reschedule</button>
                     </div>
                 </div>
             </div>
         `;
-    }).join('');
-}
-function toggleCategoryTasks(button) {
-  const card = button.closest('.bg-white');
-  const list = card.querySelector('.category-task-list');
-  const icon = button.querySelector('span');
-
-  if (!list) return;
-
-  const isExpanded = list.classList.toggle('expanded');
-  icon.style.transform = isExpanded ? 'rotate(90deg)' : 'rotate(0deg)';
-}
-
-function renderAllTasksTaskItem(task) {
-    const now = new Date();
-    const taskDate = new Date(task.dueDate);
-    const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
-    const isOverdue = daysUntilDue < 0;
-    
-    // Enhanced Safety task detection
-    const isSafetyTask = task.category === 'Safety' || task.priority === 'high' || 
-                        task.title.toLowerCase().includes('smoke') || 
-                        task.title.toLowerCase().includes('detector') ||
-                        task.title.toLowerCase().includes('fire') ||
-                        task.title.toLowerCase().includes('carbon');
-    
-    // Debug log for Safety tasks
-    if (isSafetyTask) {
-        console.log(`🟠 Safety task detected: "${task.title}" (category: ${task.category}, priority: ${task.priority})`);
-    }
-    
-    // Enhanced status styling
-    let statusClass = 'bg-gray-50';
-    let urgencyDot = '⚪';
-    
-    if (isOverdue) {
-        statusClass = 'bg-red-50 border-l-4 border-red-400';
-        urgencyDot = '🔴';
-    } else if (isSafetyTask) {
-        statusClass = 'bg-orange-50 border-l-4 border-orange-400';
-        urgencyDot = '🟠';
-    } else if (daysUntilDue <= 7) {
-        statusClass = 'bg-yellow-50 border-l-4 border-yellow-400';
-        urgencyDot = '🟡';
-    }
-    
-    // Clean due date display
-let dueDateDisplay;
-if (isOverdue) {
-    dueDateDisplay = `<span class="text-red-600 font-semibold">Overdue</span>`;
-} else if (daysUntilDue === 0) {
-    dueDateDisplay = `<span class="text-orange-600 font-semibold">Due today</span>`;
-} else if (daysUntilDue === 1) {
-    dueDateDisplay = `<span class="text-orange-600 font-semibold">Due tomorrow</span>`;
-} else {
-    dueDateDisplay = `<span class="text-gray-700">Due ${taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>`;
-}
-    
-    return `
-    <div class="flex flex-col py-3 px-4 ${statusClass} rounded-lg hover:bg-gray-100 transition-colors">
-        <!-- Row 1: Dot + Task Name + Cost -->
-        <div class="flex items-center justify-between gap-2 mb-2">
-            <div class="flex items-center gap-2 flex-1 min-w-0">
-                <span class="text-sm">${urgencyDot}</span>
-                <span class="font-medium text-gray-900 text-sm truncate">${task.title}</span>
-            </div>
-            ${task.cost > 0 ? `<span class="text-green-600 font-medium text-sm">$${task.cost}</span>` : ''}
-        </div>
         
-        <!-- Row 2: Due Date + Frequency + Edit Button -->
-        <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-4 text-xs text-gray-500">
-                <span>${dueDateDisplay}</span>
-                <span>Every ${task.frequency} days</span>
-            </div>
-         <button onclick="editTaskFromAllTasks(${task.id})" 
-            class="bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs px-3 py-1 rounded transition-colors font-medium" 
-            title="Edit task">
-        Edit
-    </button>
-        </div>
-    </div>
-`;
-}
-
-// NEW FUNCTION: Edit task specifically from All Tasks view
-function editTaskFromAllTasks(taskId) {
-    console.log('✏️ Editing task from All Tasks view:', taskId);
-    
-    const task = window.tasks.find(t => t.id === taskId);
-    if (!task) {
-        console.error('❌ Task not found:', taskId);
-        alert('❌ Task not found');
-        return;
+        // Add to page
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
     
-    // Store that we're editing from All Tasks view
-    window.editingFromAllTasks = true;
-    
-    // Open the modal using the existing system
-    if (window.TaskManager && window.TaskManager.openModal) {
-        window.TaskManager.openModal(task, false);
-    } else {
-        console.error('❌ TaskManager not available');
-        alert('❌ Task editor not available');
-    }
-}
-
-// ENHANCED: Override the TaskManager save to refresh All Tasks view
-const originalTaskManagerSave = window.TaskManager?.save;
-if (originalTaskManagerSave && window.TaskManager) {
-    window.TaskManager.save = function() {
-        // Call the original save function
-        const result = originalTaskManagerSave.apply(this, arguments);
-        
-        // If we were editing from All Tasks, refresh that view
-        if (window.editingFromAllTasks) {
-            console.log('🔄 Refreshing All Tasks view after edit...');
-            setTimeout(() => {
-                if (typeof renderAllTasksView === 'function') {
-                    renderAllTasksView();
-                    console.log('✅ All Tasks view refreshed');
-                }
-                window.editingFromAllTasks = false; // Clear the flag
-            }, 100);
+    // Main reschedule function using new modal
+    window.rescheduleTaskFromDashboard = function(taskId, event) {
+        // CRITICAL: Stop any event bubbling immediately
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
         }
         
-        return result;
-    };
-    console.log('✅ TaskManager.save enhanced for All Tasks refresh');
-}
-
-// Make the function globally available
-window.editTaskFromAllTasks = editTaskFromAllTasks;
-
-// Make it globally available
-window.showAllTasks = showAllTasks;
-
-// UPDATE your updateDashboard function to call this setup:
-function updateDashboard() {
-    console.log('🔄 Running basic dashboard update...');
-    
-    if (!window.tasks || window.tasks.length === 0) {
-        console.warn('⚠️ No tasks available for dashboard');
-        return;
-    }
-    
-    const now = new Date();
-    const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    
-    // Calculate stats
-    let overdueCount = 0;
-    let weekCount = 0;
-    
-    window.tasks.forEach(task => {
-        if (!task.isCompleted && task.dueDate) {
-            const taskDate = new Date(task.dueDate);
-            if (taskDate < now) {
-                overdueCount++;
-            }
-            if (taskDate <= oneWeek && taskDate >= now) {
-                weekCount++;
-            }
+        console.log('📅 Opening WORKING reschedule modal for task:', taskId);
+        
+        const task = window.tasks.find(t => t.id === taskId);
+        if (!task) {
+            console.error('❌ Task not found:', taskId);
+            return;
         }
-    });
-    
-    const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
-    
-    // Update DOM elements safely
-    const elements = {
-        'overdue-count': overdueCount,
-        'week-count': weekCount,
-        'total-count': totalTasks
+        
+        // Store current task
+        window.currentRescheduleTask = task;
+        
+        // Ensure modal exists
+        createWorkingRescheduleModal();
+        
+        // Get modal and elements
+        const modal = document.getElementById('working-reschedule-modal');
+        const taskNameEl = document.getElementById('working-task-name');
+        const currentDateEl = document.getElementById('working-current-date');
+        const newDateEl = document.getElementById('working-new-date');
+        
+        // Set content
+        taskNameEl.textContent = `"${task.title}"`;
+        
+        const currentDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
+        currentDateEl.textContent = currentDate.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        newDateEl.value = currentDate.toISOString().split('T')[0];
+        
+        // SHOW the modal
+        modal.style.display = 'flex';
+        
+        // Focus on date input
+        setTimeout(() => {
+            newDateEl.focus();
+            console.log('✅ Working modal should now be visible!');
+        }, 100);
     };
     
-    Object.entries(elements).forEach(([id, value]) => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.textContent = value;
-        }
-    });
-    
-    // Update home address
-    const homeAddressElement = document.getElementById('home-address');
-    if (homeAddressElement && window.homeData?.fullAddress) {
-        homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
-    }
-    
-    // ADD THIS LINE: Set up click handlers for basic dashboard
-    setupBasicDashboardClicks();
-    
-    console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
-}
-
-// Basic dashboard click handler for Total Tasks card
-function setupBasicDashboardClicks() {
-    const totalCard = document.getElementById('total-card');
-    if (totalCard) {
-        // Remove any existing click handlers
-        totalCard.replaceWith(totalCard.cloneNode(true));
-        const newTotalCard = document.getElementById('total-card');
+    // Quick date setter for new modal
+    window.setWorkingQuickDate = function(daysFromNow) {
+        const newDateEl = document.getElementById('working-new-date');
+        if (!newDateEl) return;
         
-        if (newTotalCard) {
-            newTotalCard.addEventListener('click', () => {
-                console.log('📋 Total Tasks clicked (basic dashboard) - navigating to All Tasks');
-                if (typeof showAllTasks === 'function') {
-                    showAllTasks();
-                } else {
-                    console.error('❌ showAllTasks function not found');
-                }
-            });
-            console.log('✅ Basic dashboard Total Tasks click handler added');
-        }
-    }
-}
-
-
-// FIXED: Enhanced Add Task function for setup with better modal handling
-function addTaskFromSetup() {
-    console.log('➕ Adding custom task from setup...');
-    
-    // Verify modal is available
-    const modal = document.getElementById('task-edit-modal');
-    if (!modal) {
-        console.error('❌ Task edit modal not found');
-        alert('❌ Cannot add task: Edit modal not available. Please check that you are on the correct page.');
-        return;
-    }
-    
-    // Find next available ID
-    const maxId = Math.max(...tasks.map(t => t.id), 0);
-    
-    // Create new task object
-    const newTask = {
-        id: maxId + 1,
-        title: '',
-        description: '',
-        category: 'General',
-        frequency: 365,
-        cost: 0,
-        priority: 'medium',
-        dueDate: new Date(),
-        lastCompleted: null,
-        isCompleted: false,
-        isTemplate: true // Important: mark as template so it gets processed correctly
+        const newDate = new Date();
+        newDate.setDate(newDate.getDate() + daysFromNow);
+        newDateEl.value = newDate.toISOString().split('T')[0];
+        
+        // Visual feedback
+        newDateEl.style.background = '#dbeafe';
+        setTimeout(() => newDateEl.style.background = '', 300);
     };
     
-    console.log('📋 New task created:', newTask);
+    // Close working modal
+    window.closeWorkingModal = function() {
+        const modal = document.getElementById('working-reschedule-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+        window.currentRescheduleTask = null;
+    };
     
-    // Open modal for new task
-    openTaskEditModal(newTask, true);
-}
-
-// FIXED: Enhanced task completion with better calendar sync
-function completeTask(taskId) {
-    console.log(`✅ Completing task ${taskId}...`);
+    // Confirm reschedule with new modal
+    window.confirmWorkingReschedule = function() {
+        if (!window.currentRescheduleTask) {
+            alert('❌ No task selected');
+            return;
+        }
+        
+        const newDateEl = document.getElementById('working-new-date');
+        if (!newDateEl?.value) {
+            alert('❌ Please select a new due date');
+            return;
+        }
+        
+        const newDate = new Date(newDateEl.value + 'T12:00:00');
+        if (isNaN(newDate.getTime())) {
+            alert('❌ Invalid date');
+            return;
+        }
+        
+        const taskTitle = window.currentRescheduleTask.title;
+        
+        // Update task
+        window.currentRescheduleTask.dueDate = newDate;
+        window.currentRescheduleTask.nextDue = newDate; // Calendar sync
+        
+        console.log('✅ Task updated:', taskTitle, 'to', newDate.toLocaleDateString());
+        
+        // Save and refresh
+        if (typeof saveData === 'function') {
+            saveData();
+            console.log('💾 Data saved');
+        }
+        
+        if (window.enhancedDashboard?.render) {
+            window.enhancedDashboard.render();
+            console.log('🔄 Dashboard refreshed');
+        }
+        
+        if (window.casaCareCalendar?.refresh) {
+            window.casaCareCalendar.refresh();
+            console.log('📅 Calendar refreshed');
+        }
+        
+        // Close modal and show success
+        window.closeWorkingModal();
+        alert(`✅ "${taskTitle}" rescheduled to ${newDate.toLocaleDateString()}`);
+    };
     
-    const task = tasks.find(t => t.id === taskId);
-    if (!task) {
-        console.error('❌ Task not found:', taskId);
-        alert('❌ Task not found');
-        return;
-    }
-
-    const oldDueDate = task.dueDate ? new Date(task.dueDate) : new Date();
-    
-    // Mark as completed with timestamp
-    task.lastCompleted = new Date();
-    task.isCompleted = false; // Will be due again in the future
-    
-    // Calculate next due date from current due date + frequency
-    const nextDueDate = new Date(oldDueDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
-    
-    // CRITICAL: Set both dueDate and nextDue for full compatibility
-    task.dueDate = nextDueDate;
-    task.nextDue = nextDueDate;
-    
-    console.log(`📅 Task "${task.title}" completed!`);
-    console.log(`  Old due date: ${oldDueDate.toLocaleDateString()}`);
-    console.log(`  Next due date: ${nextDueDate.toLocaleDateString()}`);
-    console.log(`  Frequency: ${task.frequency} days`);
-    console.log(`  Both dueDate and nextDue set: ${task.dueDate} | ${task.nextDue}`);
-    
-    // Save data immediately
-    try {
-        saveData();
-        console.log('💾 Data saved after task completion');
-    } catch (error) {
-        console.error('❌ Error saving data after completion:', error);
-        alert('❌ Error saving task completion');
-        return;
-    }
-    
-    // Update global references
-    window.tasks = tasks;
-    
-    // Refresh enhanced dashboard
-    if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-        console.log('🔄 Refreshing enhanced dashboard...');
-        window.enhancedDashboard.render();
-    } else {
-        console.log('🔄 Refreshing basic dashboard...');
-        updateDashboard();
-    }
-    
-    // CRITICAL: Force calendar refresh with verification
-    if (window.casaCareCalendar) {
-        console.log('📅 Forcing calendar refresh...');
-        try {
-            if (typeof window.casaCareCalendar.refresh === 'function') {
-                window.casaCareCalendar.refresh();
-                console.log('✅ Calendar refresh called successfully');
-            } else if (typeof window.casaCareCalendar.render === 'function') {
-                window.casaCareCalendar.render();
-                console.log('✅ Calendar render called successfully');
+    console.log('✅ NEW working reschedule modal created and ready!');
+</script>
+            
+    <!-- Settings Dropdown Functions -->
+    <script>
+        // Settings Dropdown Functions
+        function toggleSettingsDropdown() {
+            const dropdown = document.getElementById('settings-dropdown');
+            const isHidden = dropdown.classList.contains('hidden');
+            
+            if (isHidden) {
+                dropdown.classList.remove('hidden');
+                // Close dropdown when clicking outside
+                setTimeout(() => {
+                    document.addEventListener('click', closeSettingsOnClickOutside);
+                }, 100);
             } else {
-                console.warn('⚠️ Calendar refresh method not found, trying to recreate...');
-                // Try to recreate calendar if refresh doesn't work
-                if (typeof CasaCareCalendar !== 'undefined') {
-                    window.casaCareCalendar = new CasaCareCalendar();
-                    console.log('✅ Calendar recreated successfully');
-                }
-            }
-        } catch (error) {
-            console.error('❌ Error refreshing calendar:', error);
-        }
-    } else {
-        console.warn('⚠️ Calendar not found, attempting to create...');
-        if (typeof CasaCareCalendar !== 'undefined') {
-            try {
-                window.casaCareCalendar = new CasaCareCalendar();
-                console.log('✅ Calendar created successfully after task completion');
-            } catch (error) {
-                console.error('❌ Error creating calendar:', error);
+                closeSettingsDropdown();
             }
         }
-    }
-    
-    // Success message
-    alert(`✅ Task "${task.title}" completed!\nNext due: ${nextDueDate.toLocaleDateString()}`);
-}
 
-// FIXED: Enhanced Edit Task function for setup with better modal handling
-function editTaskFromSetup(taskId) {
-    console.log(`✏️ Editing task from setup: ${taskId}`);
-    
-    const task = tasks.find(t => t.id === taskId);
-    if (!task) {
-        console.error('❌ Task not found:', taskId);
-        alert('❌ Task not found');
-        return;
-    }
-    
-    console.log('📋 Task found for editing:', task);
-    
-    // Verify modal is available
-    const modal = document.getElementById('task-edit-modal');
-    if (!modal) {
-        console.error('❌ Task edit modal not found');
-        alert('❌ Cannot edit task: Edit modal not available. Please check that you are on the correct page.');
-        return;
-    }
-    
-    // Open the task edit modal
-    openTaskEditModal(task, false);
-}
-
-// Delete task directly
-function deleteTaskDirect(taskId) {
-    if (confirm('Are you sure you want to delete this task?')) {
-        const taskIndex = tasks.findIndex(t => t.id === taskId);
-        if (taskIndex > -1) {
-            const deletedTask = tasks.splice(taskIndex, 1)[0];
-            console.log(`🗑️ Deleted task: ${deletedTask.title}`);
-            
-            // Update global reference
-            window.tasks = tasks;
-            
-            // Re-render task categories
-            renderTaskCategories();
-            
-            alert(`✅ Task "${deletedTask.title}" deleted successfully!`);
+        function closeSettingsDropdown() {
+            const dropdown = document.getElementById('settings-dropdown');
+            dropdown.classList.add('hidden');
+            document.removeEventListener('click', closeSettingsOnClickOutside);
         }
-    }
-}
 
-// FIXED: Enhanced modal functions with better error checking
-function openTaskEditModal(task, isNewTask = false) {
-    console.log('Opening modal for:', task.title || 'New Task');
+        function closeSettingsOnClickOutside(event) {
+            const dropdown = document.getElementById('settings-dropdown');
+            const settingsBtn = document.getElementById('settings-btn');
+            
+            if (!dropdown.contains(event.target) && !settingsBtn.contains(event.target)) {
+                closeSettingsDropdown();
+            }
+        }
+
+        // Make functions globally available
+        window.toggleSettingsDropdown = toggleSettingsDropdown;
+        window.closeSettingsDropdown = closeSettingsDropdown;
+    </script>
+
+    <!-- ✅ Core Scripts go here -->
+    <script src="date-utils.js"></script>
+    <script src="app.js"></script>
+    <script src="calendar.js"></script>
+    <script src="enhanced-dashboard.js"></script>
+    <script src="documents.js"></script> 
+    <script src="appliances.js"></script>
+            
+<!-- SIMPLE MODAL FIX - Add this before </body> -->
+<!-- FIXED MODAL SCRIPT - Replace the previous one with this -->
+<script>
+console.log('🔧 Loading FIXED modal script...');
+
+// 1. TASK EDIT MODAL FUNCTIONS (CORRECTED)
+window.openTaskEditModal = function(task, isNew = false) {
+    console.log('📝 Opening task modal:', task.title || 'New Task', 'isNew:', isNew);
     
     const modal = document.getElementById('task-edit-modal');
-    if (!modal) {
-        alert('Modal not found');
-        return;
+    if (!modal) return;
+    
+    // Store current task
+    window.currentEditingTask = {...task};
+    
+    // FIXED: Set modal title correctly
+    const titleEl = document.getElementById('task-edit-title');
+    if (titleEl) {
+        titleEl.textContent = isNew ? 'Add New Task' : 'Edit Task';
     }
     
-    // Simple show
-    modal.classList.remove('hidden');
-    modal.style.display = 'block';
-    
-    // Fill basic fields
+    // Fill form
     document.getElementById('edit-task-name').value = task.title || '';
     document.getElementById('edit-task-description').value = task.description || '';
     document.getElementById('edit-task-cost').value = task.cost || 0;
     document.getElementById('edit-task-frequency').value = task.frequency || 365;
-    document.getElementById('edit-task-priority').value = task.priority || 'medium';
+    document.getElementById('edit-task-category').value = task.category || 'General';
     
-    currentEditingTask = task;
-    window.currentEditingTask = task;
-}
-
-// Close task edit modal
-function closeTaskEditModal() {
-    const modal = document.getElementById('task-edit-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-    }
-    currentEditingTask = null;
-    window.currentEditingTask = null;
-    console.log('✅ Task edit modal closed');
-}
-
-// Save task from edit modal
-function saveTaskFromEdit() {
-    console.log('💾 Saving task from edit modal...');
+    const dateField = document.getElementById('edit-task-due-date');
+    const date = task.dueDate ? new Date(task.dueDate) : new Date();
+    dateField.value = date.toISOString().split('T')[0];
     
-    if (!currentEditingTask && !window.currentEditingTask) {
-        console.error('❌ No task being edited');
-        alert('❌ No task selected for editing');
-        return;
-    }
-    
-    // Use either local or global currentEditingTask
-    const editingTask = currentEditingTask || window.currentEditingTask;
-    
-    // Get form values - FIXED ORDER: Get category BEFORE using it for priority
-    const title = document.getElementById('edit-task-name').value.trim();
-    const description = document.getElementById('edit-task-description').value.trim();
-    const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
-    const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
-    const category = document.getElementById('edit-task-category')?.value || 'General'; // GET CATEGORY FIRST
-    const priority = getAutoPriority(title, category); // NOW use it for priority
-    const dueDateInput = document.getElementById('edit-task-due-date');
-    
-    console.log('📝 Form values:', { title, description, cost, frequency, category, priority });
-    
-    // Validate inputs
-    if (!title) {
-        alert('❌ Task name is required');
-        document.getElementById('edit-task-name').focus();
-        return;
-    }
-    
-    // Description is optional now
-    
-    if (frequency <= 0) {
-        alert('❌ Frequency must be greater than 0');
-        document.getElementById('edit-task-frequency').focus();
-        return;
-    }
-    
-    // Handle due date
-    let dueDate;
-    if (dueDateInput && dueDateInput.value) {
-        dueDate = new Date(dueDateInput.value + 'T12:00:00');
-        if (isNaN(dueDate.getTime())) {
-            alert('❌ Invalid due date');
-            dueDateInput.focus();
-            return;
-        }
-    } else {
-        dueDate = new Date();
-    }
-    
-    console.log('📅 Due date:', dueDate.toLocaleDateString());
-    
-    // Check if this is a new task
-    const isNewTask = !tasks.find(t => t.id === editingTask.id);
-    console.log('🆕 Is new task:', isNewTask);
-    
-    // Update task properties
-    editingTask.title = title;
-    editingTask.description = description;
-    editingTask.cost = cost;
-    editingTask.frequency = frequency;
-    editingTask.priority = priority;
-    editingTask.category = category;
-    editingTask.dueDate = dueDate;
-    editingTask.nextDue = dueDate; // Calendar compatibility
-    
-    if (isNewTask) {
-        // Add to tasks array
-        tasks.push(editingTask);
-        window.tasks = tasks; // Update global reference
-        console.log('✅ New task added to global array');
-    } else {
-        // Update global reference to ensure changes are reflected
-        window.tasks = tasks;
-        console.log('✅ Existing task updated');
-    }
-    
-    // Determine if we're in setup or main app by checking which screen is visible
-    const taskSetupVisible = !document.getElementById('task-setup').classList.contains('hidden');
-    const mainAppVisible = !document.getElementById('main-app').classList.contains('hidden');
-    
-    if (taskSetupVisible) {
-        // We're in task setup, re-render categories
-        console.log('🔄 Refreshing task setup categories...');
-        renderTaskCategories();
-    } else if (mainAppVisible) {
-        // We're in main app, save and refresh
-        console.log('🔄 Saving data and refreshing main app...');
-        saveData();
-        
-        // Refresh dashboard
-        if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-            window.enhancedDashboard.render();
+    // FIXED: Properly hide delete button for new tasks
+    const deleteBtn = modal.querySelector('button[onclick*="deleteTaskFromEdit"]');
+    if (deleteBtn) {
+        if (isNew) {
+            deleteBtn.style.display = 'none';
         } else {
-            updateDashboard();
-        }
-        
-        // Refresh calendar
-        if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-            window.casaCareCalendar.refresh();
-        }
-    } else {
-        // Default behavior - save everything
-        console.log('🔄 Default save and refresh...');
-        saveData();
-        if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-            window.enhancedDashboard.render();
-        } else {
-            updateDashboard();
+            deleteBtn.style.display = 'block';
         }
     }
-    
-    // Close modal
-    closeTaskEditModal();
-    
-    alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
-    console.log('✅ Task save completed successfully');
-}
-// Delete task from edit modal
-function deleteTaskFromEdit() {
-    if (!currentEditingTask) {
-        console.error('❌ No task being edited');
-        return;
-    }
-    
-    if (confirm(`Are you sure you want to delete "${currentEditingTask.title}"?`)) {
-        const taskIndex = tasks.findIndex(t => t.id === currentEditingTask.id);
-        if (taskIndex > -1) {
-            const deletedTask = tasks.splice(taskIndex, 1)[0];
-            console.log(`🗑️ Deleted task: ${deletedTask.title}`);
-            
-            // Update global reference
-            window.tasks = tasks;
-            
-            // Save data if we're in the main app
-            if (!document.getElementById('main-app').classList.contains('hidden')) {
-                saveData();
-                
-                // Refresh dashboard
-                if (window.enhancedDashboard) {
-                    window.enhancedDashboard.render();
-                } else {
-                    updateDashboard();
-                }
-                
-                // Refresh calendar
-                if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-                    window.casaCareCalendar.refresh();
-                }
-            } else {
-                // We're in task setup, re-render categories
-                renderTaskCategories();
-            }
-            
-            // Close modal
-            closeTaskEditModal();
-            
-            alert(`✅ Task "${deletedTask.title}" deleted successfully!`);
-        }
-    }
-}
-
-// Utility functions
-// Enhanced Home Info Functions - Replace the existing showHomeInfo function
-
-/**
- * Open editable home info modal instead of simple alert
- */
-function showHomeInfo() {
-    console.log('🏠 Opening editable home info modal...');
-    
-    if (!homeData.fullAddress) {
-        alert('🏠 No home information set yet. Complete the setup to add your home details.');
-        return;
-    }
-    
-    // Open the modal
-    const modal = document.getElementById('home-info-modal');
-    if (!modal) {
-        console.error('❌ Home info modal not found');
-        alert('❌ Cannot edit home info: Modal not available.');
-        return;
-    }
-    
-    // Populate the form with current data
-    populateHomeInfoForm();
     
     // Show modal
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
     
-    console.log('✅ Home info modal opened');
-}
+    // Focus name field
+    setTimeout(() => {
+        document.getElementById('edit-task-name').focus();
+    }, 100);
+};
 
-/**
- * Populate the home info form with current data
- */
-function populateHomeInfoForm() {
-    const fields = [
-        ['edit-home-address', homeData.address || ''],
-        ['edit-home-city', homeData.city || ''],
-        ['edit-home-state', homeData.state || ''],
-        ['edit-home-zipcode', homeData.zipcode || ''],
-        ['edit-home-property-type', homeData.propertyType || 'single-family'],
-        ['edit-home-year-built', homeData.yearBuilt || 2000],
-        ['edit-home-sqft', homeData.sqft || 2000]
-    ];
+window.saveTaskFromEdit = function() {
+    const task = window.currentEditingTask;
+    if (!task) return;
     
-    fields.forEach(([id, value]) => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.value = value;
-        } else {
-            console.warn(`⚠️ Element not found: ${id}`);
-        }
-    });
+    // Get values
+    const title = document.getElementById('edit-task-name').value.trim();
+    const description = document.getElementById('edit-task-description').value.trim();
+    const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
+    const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
+    const category = document.getElementById('edit-task-category').value;
+    const dueDateStr = document.getElementById('edit-task-due-date').value;
     
-    console.log('📝 Home info form populated with current data');
-}
+    if (!title) { alert('❌ Name required'); return; }
+    if (!dueDateStr) { alert('❌ Date required'); return; }
+    
+    const dueDate = new Date(dueDateStr + 'T12:00:00');
+    
+    // Update task
+    task.title = title;
+    task.description = description;
+    task.cost = cost;
+    task.frequency = frequency;
+    task.category = category;
+    task.priority = category === 'Safety' ? 'high' : 'medium';
+    task.dueDate = dueDate;
+    task.nextDue = dueDate;
+    delete task.isTemplate;
+    
+    // Add or update in array
+    const isNew = !window.tasks.find(t => t.id === task.id);
+    if (isNew) {
+        window.tasks.push(task);
+    } else {
+        const index = window.tasks.findIndex(t => t.id === task.id);
+        if (index !== -1) window.tasks[index] = task;
+    }
+    
+    // Save and refresh
+    if (typeof saveData === 'function') saveData();
+    if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
+    if (window.casaCareCalendar?.refresh) window.casaCareCalendar.refresh();
+    if (typeof renderTaskCategories === 'function') renderTaskCategories();
+    
+    window.closeTaskEditModal();
+    alert(`✅ Task "${title}" ${isNew ? 'added' : 'updated'}!`);
+};
 
-/**
- * Close the home info modal
- */
-function closeHomeInfoModal() {
-    const modal = document.getElementById('home-info-modal');
+window.closeTaskEditModal = function() {
+    const modal = document.getElementById('task-edit-modal');
     if (modal) {
         modal.classList.add('hidden');
         modal.style.display = 'none';
     }
-    console.log('✅ Home info modal closed');
-}
+    window.currentEditingTask = null;
+};
 
-/**
- * Save the updated home information
- */
-function saveHomeInfo() {
-    console.log('💾 Saving updated home information...');
+window.deleteTaskFromEdit = function() {
+    const task = window.currentEditingTask;
+    if (!task) return;
     
-    // Get form values
-    const newAddress = document.getElementById('edit-home-address').value.trim();
-    const newCity = document.getElementById('edit-home-city').value.trim();
-    const newState = document.getElementById('edit-home-state').value.trim();
-    const newZipcode = document.getElementById('edit-home-zipcode').value.trim();
-    const newPropertyType = document.getElementById('edit-home-property-type').value;
-    const newYearBuilt = parseInt(document.getElementById('edit-home-year-built').value) || 2000;
-    const newSqft = parseInt(document.getElementById('edit-home-sqft').value) || 2000;
-    
-    // Validate required fields
-    if (!newAddress || !newCity || !newState || !newZipcode) {
-        alert('❌ Please fill in all address fields');
-        return;
-    }
-    
-    if (newState.length !== 2) {
-        alert('❌ State must be 2 letters (e.g., NY, CA, TX)');
-        document.getElementById('edit-home-state').focus();
-        return;
-    }
-    
-    // Update homeData object
-    const oldAddress = homeData.fullAddress;
-    
-    homeData.address = newAddress;
-    homeData.city = newCity;
-    homeData.state = newState.toUpperCase();
-    homeData.zipcode = newZipcode;
-    homeData.propertyType = newPropertyType;
-    homeData.yearBuilt = newYearBuilt;
-    homeData.sqft = newSqft;
-    homeData.fullAddress = `${newAddress}, ${newCity}, ${homeData.state} ${newZipcode}`;
-    
-    // Update global reference
-    window.homeData = homeData;
-    
-    // Save to storage
-    try {
-        saveData();
-        console.log('💾 Home data saved successfully');
-    } catch (error) {
-        console.error('❌ Error saving home data:', error);
-        alert('❌ Error saving changes. Please try again.');
-        return;
-    }
-    
-    // Update UI elements that show the address
-    const headerSubtitle = document.getElementById('header-subtitle');
-    if (headerSubtitle) {
-        headerSubtitle.textContent = homeData.fullAddress;
-    }
-    
-    const homeAddressElement = document.getElementById('home-address');
-    if (homeAddressElement) {
-        homeAddressElement.textContent = `Managing maintenance for ${homeData.fullAddress}`;
-    }
-    
-    // Close modal
-    closeHomeInfoModal();
-    
-    // Show success message
-    const addressChanged = oldAddress !== homeData.fullAddress;
-    if (addressChanged) {
-        alert(`✅ Home information updated!\n\nNew address: ${homeData.fullAddress}\n\nYour existing tasks and schedules remain unchanged.`);
-    } else {
-        alert(`✅ Home information updated successfully!\n\nProperty details have been saved.`);
-    }
-    
-    console.log('✅ Home information updated:', homeData.fullAddress);
-}
-
-// Make functions globally available
-window.showHomeInfo = showHomeInfo;
-window.closeHomeInfoModal = closeHomeInfoModal;
-window.saveHomeInfo = saveHomeInfo;
-window.populateHomeInfoForm = populateHomeInfoForm;
-
-function clearData() {
-    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
-        homeData = {};
-        tasks = [];
-        
-        // Clear from Firebase instead of localStorage
-        if (window.currentUser) {
-            saveUserDataToFirebase(window.currentUser.uid, {}, [])
-                .then(() => {
-                    console.log('✅ Data cleared from Firebase');
-                })
-                .catch((error) => {
-                    console.error('❌ Error clearing Firebase data:', error);
-                });
+    if (confirm(`Delete "${task.title}"?`)) {
+        const index = window.tasks.findIndex(t => t.id === task.id);
+        if (index !== -1) {
+            window.tasks.splice(index, 1);
+            if (typeof saveData === 'function') saveData();
+            if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
+            if (typeof renderTaskCategories === 'function') renderTaskCategories();
+            window.closeTaskEditModal();
+            alert(`✅ Task deleted!`);
         }
-        
-        document.getElementById('setup-form').style.display = 'block';
-        document.getElementById('task-setup').classList.add('hidden');
-        document.getElementById('main-app').classList.add('hidden');
-        document.getElementById('header-subtitle').textContent = 'Smart home maintenance';
-
-        // Hide bottom navigation during reset
-        document.body.classList.remove('main-app-active');
-        
-        alert('✅ All data cleared. Starting fresh!');
     }
-}
+};
 
-function exportData() {
-    const data = {
-        homeData: homeData,
-        tasks: tasks,
-        exportDate: new Date().toISOString(),
-        version: '2.1'
+// 2. ADD TASK FUNCTIONS (CORRECTED)
+window.addTaskFromDashboard = function() {
+    console.log('➕ Adding task from dashboard');
+    const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+    const newTask = {
+        id: maxId + 1, 
+        title: '', 
+        description: '', 
+        category: 'General',
+        frequency: 365, 
+        cost: 0, 
+        dueDate: new Date()
     };
+    window.openTaskEditModal(newTask, true); // FIXED: true = isNew
+};
 
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
-    const link = document.createElement("a");
-    link.setAttribute("href", dataStr);
-    link.setAttribute("download", "casa_care_backup.json");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+window.addTaskFromSetup = function() {
+    console.log('➕ Adding task from setup');
+    const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
+    const newTask = {
+        id: maxId + 1, 
+        title: '', 
+        description: '', 
+        category: 'General',
+        frequency: 365, 
+        cost: 0, 
+        dueDate: new Date(), 
+        isTemplate: true
+    };
+    window.openTaskEditModal(newTask, true); // FIXED: true = isNew
+};
+
+// 3. EDIT TASK FUNCTIONS
+window.editTaskFromSetup = function(taskId) {
+    const task = window.tasks?.find(t => t.id === taskId);
+    if (task) window.openTaskEditModal(task, false); // false = not new
+};
+
+window.editTaskFromDashboard = function(taskId) {
+    const task = window.tasks?.find(t => t.id === taskId);
+    if (task) window.openTaskEditModal(task, false); // false = not new
+};
+
+// 4. WORKING RESCHEDULE MODAL (COMPLETELY REWRITTEN)
+window.rescheduleTaskFromDashboard = function(taskId, event) {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
     
-    alert('📄 Data exported successfully!');
-}
-
-// Function to export task list (moved from All Tasks to Settings)
-function exportTaskList() {
-    if (!window.tasks || window.tasks.length === 0) {
-        alert('❌ No tasks to export');
+    console.log('📅 Rescheduling task:', taskId);
+    
+    const task = window.tasks?.find(t => t.id === taskId);
+    if (!task) {
+        alert('❌ Task not found');
         return;
     }
     
-    const activeTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate);
+    // Create simple reschedule modal
+    const existingModal = document.getElementById('simple-reschedule-modal');
+    if (existingModal) existingModal.remove();
     
-    let csvContent = "Task,Description,Category,Priority,Due Date,Cost,Frequency,Last Completed\n";
-    
-    activeTasks.forEach(task => {
-        const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'Not set';
-        const lastCompleted = task.lastCompleted ? new Date(task.lastCompleted).toLocaleDateString() : 'Never';
-        
-        csvContent += `"${task.title}","${task.description}","${task.category}","${task.priority}","${dueDate}","$${task.cost}","${task.frequency} days","${lastCompleted}"\n`;
-    });
-    
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `casa_care_tasks_${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-    
-    console.log('📋 Task list exported from Settings');
-    alert('📋 Task list exported successfully!');
-}
-
-function saveData() {
-    // Ensure calendar compatibility before saving
-    if (window.tasks) {
-        window.tasks.forEach(task => {
-            if (task.dueDate && !task.nextDue) {
-                task.nextDue = task.dueDate;
-            }
-        });
-    }
-    
-    // Check if user is logged in
-    if (!window.currentUser) {
-        console.warn('⚠️ No user logged in, cannot save to Firebase');
-        return;
-    }
-    
-    console.log('💾 Using enhanced save to preserve all data...');
-    
-    // FIXED: Use enhanced save that preserves ALL data types
-    saveUserDataToFirebaseEnhanced(window.currentUser.uid, window.homeData || {}, window.tasks || [])
-        .then((success) => {
-            if (success) {
-                console.log('✅ Enhanced save completed - all data preserved');
-            } else {
-                console.warn('⚠️ Enhanced save failed, trying fallback...');
-                // Fallback to original save
-                return saveUserDataToFirebase(window.currentUser.uid, window.homeData || {}, window.tasks || []);
-            }
-        })
-        .then(() => {
-            console.log('✅ Data saved successfully');
-        })
-        .catch((error) => {
-            console.error('❌ Failed to save data:', error);
-        });
-}
-
-async function loadData() {
-    // Check if user is logged in
-    if (!window.currentUser) {
-        console.warn('⚠️ No user logged in, cannot load from Firebase');
-        return false;
-    }
-    
-    try {
-        const userDoc = await db.collection('users').doc(window.currentUser.uid).get();
-        if (userDoc.exists) {
-            const userData = userDoc.data();
-            
-            if (userData.homeData && userData.tasks) {
-                window.homeData = userData.homeData;
-                window.tasks = userData.tasks;
+    const currentDate = new Date(task.dueDate);
+    const modalHTML = `
+        <div id="simple-reschedule-modal" style="
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
+            z-index: 99999; font-family: Inter, sans-serif;
+        ">
+            <div style="
+                background: white; border-radius: 12px; padding: 24px; 
+                max-width: 400px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            ">
+                <h3 style="margin: 0 0 16px 0; text-align: center; font-size: 18px;">📅 Reschedule Task</h3>
+                <p style="margin: 0 0 16px 0; text-align: center; color: #666;">"${task.title}"</p>
                 
-                // Restore dates - handle both old nextDue and new dueDate formats
-                tasks.forEach(task => {
-                    if (task.nextDue) {
-                        task.dueDate = new Date(task.nextDue);
-                        // Keep nextDue for calendar compatibility
-                        task.nextDue = new Date(task.nextDue);
-                    } else if (task.dueDate) {
-                        task.dueDate = new Date(task.dueDate);
-                        // Set nextDue for calendar compatibility
-                        task.nextDue = new Date(task.dueDate);
-                    }
-                    if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
-                });
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 8px;">Current: ${currentDate.toLocaleDateString()}</label>
+                    <input type="date" id="new-task-date" value="${currentDate.toISOString().split('T')[0]}" style="
+                        width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 16px;
+                    ">
+                </div>
                 
-                console.log('✅ Data loaded from Firebase with calendar compatibility');
-                return true;
-            }
-        }
-        
-        console.log('ℹ️ No data found in Firebase for this user');
-        return false;
-    } catch (error) {
-        console.error('❌ Failed to load data from Firebase:', error);
-        return false;
-    }
-}
-
-async function hasExistingData() {
-    const dataLoaded = await loadData();
-    return dataLoaded && homeData.fullAddress;
-}
-
-// Enhanced initialization
-async function initializeApp() {
-    initializeCasaCareData();
-    console.log('🏠 The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initializing...');
-    
-    // Make well water function available globally ASAP
-    window.toggleWellWaterOptions = toggleWellWaterOptions;
-    
-    // Make tasks and homeData available globally for other scripts
-    window.tasks = tasks;
-    window.homeData = homeData;
-    
-    // Initialize global document data
-    if (!window.documentsData) {
-        window.documentsData = [];
-    }
-    
-    // Check for existing data (now async)
-    const hasData = await hasExistingData();
-    
-    if (hasData) {
-        // Hide setup screens
-        document.getElementById('setup-form').style.display = 'none';
-        document.getElementById('task-setup').classList.add('hidden');
-        document.getElementById('main-app').classList.remove('hidden');
-        
-        // Update header
-        document.getElementById('header-subtitle').textContent = homeData.fullAddress;
-        // Show bottom navigation for returning users
-        document.body.classList.add('main-app-active');
-        
-        // Update global references
-        window.tasks = tasks;
-        window.homeData = homeData;
-        
-        // Show dashboard
-        showTab('dashboard');
-        
-        console.log(`👋 Welcome back! Loaded ${tasks.length} tasks for ${homeData.fullAddress}`);
-    } else {
-        document.getElementById('setup-form').style.display = 'block';
-        document.getElementById('task-setup').classList.add('hidden');
-        document.getElementById('main-app').classList.add('hidden');
-    }
-    
-    initializeDateManagement();
-    
-    console.log('✅ The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initialized successfully!');
-}
-
-// Export functions to global scope
-window.createMaintenancePlan = createMaintenancePlan;
-window.finishTaskSetup = finishTaskSetup;
-window.goBackToHomeSetup = goBackToHomeSetup;
-window.showTab = showTab;
-window.completeTask = completeTask;
-window.addTaskFromDashboard = addTaskFromDashboard;
-window.addTaskFromSetup = addTaskFromSetup;
-window.editTaskFromSetup = editTaskFromSetup;
-window.deleteTaskDirect = deleteTaskDirect;
-window.openTaskEditModal = openTaskEditModal;
-window.closeTaskEditModal = closeTaskEditModal;
-window.saveTaskFromEdit = saveTaskFromEdit;
-window.deleteTaskFromEdit = deleteTaskFromEdit;
-window.showHomeInfo = showHomeInfo;
-window.clearData = clearData;
-window.exportData = exportData;
-window.showAllTasks = showAllTasks;
-window.exportTaskList = exportTaskList;
-
-// NEW: Property confirmation functions
-function showPropertyConfirmation() {
-    // Collect home data (same as before)
-    homeData = {
-        address: document.getElementById('address')?.value || '123 Main Street',
-        city: document.getElementById('city')?.value || 'Anytown',
-        state: document.getElementById('state')?.value || 'NY',
-        zipcode: document.getElementById('zipcode')?.value || '12345',
-        propertyType: document.getElementById('property-type')?.value || 'single-family',
-        yearBuilt: parseInt(document.getElementById('year-built')?.value) || 2000,
-        sqft: parseInt(document.getElementById('sqft')?.value) || 2000
-    };
-    homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
-
-    // Collect features
-    homeData.features = {
-        centralAC: document.getElementById('central-ac')?.checked || false,
-        miniSplits: document.getElementById('mini-splits')?.checked || false,
-        wallAC: document.getElementById('wall-ac')?.checked || false,
-        electricBaseboard: document.getElementById('electric-baseboard')?.checked || false,
-        boiler: document.getElementById('boiler')?.checked || false,
-        municipalWater: document.getElementById('municipal-water')?.checked || false,
-        wellWater: document.getElementById('well-water')?.checked || false,
-        sedimentFilter: document.getElementById('sediment-filter')?.checked || false,
-        uvFilter: document.getElementById('uv-filter')?.checked || false,
-        waterSoftener: document.getElementById('water-softener')?.checked || false,
-        wholeHouseFilter: document.getElementById('whole-house-filter')?.checked || false,
-        municipalSewer: document.getElementById('municipal-sewer')?.checked || false,
-        septic: document.getElementById('septic')?.checked || false,
-        fireplace: document.getElementById('fireplace')?.checked || false,
-        pool: document.getElementById('pool')?.checked || false,
-        deck: document.getElementById('deck')?.checked || false,
-        garage: document.getElementById('garage')?.checked || false,
-        basement: document.getElementById('basement')?.checked || false,
-        otherFeatures: document.getElementById('other-features')?.value || ''
-    };
-
-    // Update confirmation summary
-    updateConfirmationSummary();
-
-    // Show confirmation page
-    document.getElementById('setup-form').style.display = 'none';
-    document.getElementById('property-confirmation').classList.remove('hidden');
-}
-
-function updateConfirmationSummary() {
-    const confirmationSummary = document.getElementById('confirmation-summary');
-    if (!confirmationSummary) return;
-    
-    // Build summary content (reusing your existing logic)
-    const heatingCooling = [];
-    if (homeData.features.centralAC) heatingCooling.push('Central AC/Heat');
-    if (homeData.features.miniSplits) heatingCooling.push('Mini-Splits');
-    if (homeData.features.wallAC) heatingCooling.push('Wall AC');
-    if (homeData.features.electricBaseboard) heatingCooling.push('Electric Baseboard');
-    if (homeData.features.boiler) heatingCooling.push('Boiler');
-
-    const waterSewer = [];
-    if (homeData.features.municipalWater) waterSewer.push('Municipal Water');
-    if (homeData.features.wellWater) {
-        let wellWaterText = 'Well Water';
-        const wellWaterSubs = [];
-        if (homeData.features.sedimentFilter) wellWaterSubs.push('Sediment Filter');
-        if (homeData.features.uvFilter) wellWaterSubs.push('UV Filter');
-        if (homeData.features.waterSoftener) wellWaterSubs.push('Water Softener');
-        if (homeData.features.wholeHouseFilter) wellWaterSubs.push('Whole House Filter');
-        if (wellWaterSubs.length > 0) {
-            wellWaterText += ` (${wellWaterSubs.join(', ')})`;
-        }
-        waterSewer.push(wellWaterText);
-    }
-    if (homeData.features.municipalSewer) waterSewer.push('Municipal Sewer');
-    if (homeData.features.septic) waterSewer.push('Septic System');
-
-    const otherFeatures = [];
-    if (homeData.features.fireplace) otherFeatures.push('Fireplace');
-    if (homeData.features.pool) otherFeatures.push('Pool/Spa');
-    if (homeData.features.deck) otherFeatures.push('Deck/Patio');
-    if (homeData.features.garage) otherFeatures.push('Garage');
-    if (homeData.features.basement) otherFeatures.push('Basement');
-    if (homeData.features.otherFeatures) otherFeatures.push(homeData.features.otherFeatures);
-
-    const propertyTypeDisplay = {
-        'single-family': 'Single Family Home',
-        'townhouse': 'Townhouse',
-        'condo': 'Condo',
-        'apartment': 'Apartment',
-        'mobile-home': 'Mobile Home'
-    };
-
-    confirmationSummary.innerHTML = `
-        <div><strong>📍 Address:</strong> ${homeData.fullAddress}</div>
-        <div><strong>🏢 Type:</strong> ${propertyTypeDisplay[homeData.propertyType]} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString()} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt}</div>
-        ${heatingCooling.length > 0 ? `<div><strong>🌡️ Heating/Cooling:</strong> ${heatingCooling.join(', ')}</div>` : ''}
-        ${waterSewer.length > 0 ? `<div><strong>💧 Water/Sewer:</strong> ${waterSewer.join(', ')}</div>` : ''}
-        ${otherFeatures.length > 0 ? `<div><strong>⚙️ Other Features:</strong> ${otherFeatures.join(', ')}</div>` : ''}
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+                    <button onclick="setNewDate(1)" style="padding: 8px; background: #dbeafe; border: none; border-radius: 6px; cursor: pointer;">Tomorrow</button>
+                    <button onclick="setNewDate(7)" style="padding: 8px; background: #dcfce7; border: none; border-radius: 6px; cursor: pointer;">Next Week</button>
+                    <button onclick="setNewDate(30)" style="padding: 8px; background: #fef3c7; border: none; border-radius: 6px; cursor: pointer;">Next Month</button>
+                    <button onclick="setNewDate(90)" style="padding: 8px; background: #f3e8ff; border: none; border-radius: 6px; cursor: pointer;">3 Months</button>
+                </div>
+                
+                <div style="display: flex; gap: 12px;">
+                    <button onclick="closeRescheduleModal()" style="
+                        flex: 1; padding: 12px; background: #f3f4f6; border: none; border-radius: 8px; cursor: pointer;
+                    ">Cancel</button>
+                    <button onclick="confirmTaskReschedule(${taskId})" style="
+                        flex: 1; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer;
+                    ">Reschedule</button>
+                </div>
+            </div>
+        </div>
     `;
-}
-
-function proceedToTaskGeneration() {
-    console.log('🚀 Proceeding to task generation...');
     
-    // Generate tasks (using your existing function)
-    generateTaskTemplates();
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
     
-    // Update global references
-    window.homeData = homeData;
-    window.tasks = tasks;
+    // Helper functions for this modal
+    window.setNewDate = function(days) {
+        const newDate = new Date();
+        newDate.setDate(newDate.getDate() + days);
+        document.getElementById('new-task-date').value = newDate.toISOString().split('T')[0];
+    };
     
-   // Hide confirmation page, setup form, and progress bar
-    document.getElementById('property-confirmation').classList.add('hidden');
-    document.getElementById('setup-form').style.display = 'none';
-    document.getElementById('onboarding-progress').classList.add('hidden');
+    window.closeRescheduleModal = function() {
+        const modal = document.getElementById('simple-reschedule-modal');
+        if (modal) modal.remove();
+    };
     
-    // Show task setup
-    document.getElementById('task-setup').classList.remove('hidden');
-    document.getElementById('task-setup').style.display = 'block';
-    
-    // Run your existing task setup display
-    setTimeout(showTaskSetup, 0);
-    
-    console.log('✅ Moved to task setup page');
-}
-
-function goBackFromConfirmation() {
-    // Hide confirmation page
-    document.getElementById('property-confirmation').classList.add('hidden');
-    
-    // Show setup form
-    document.getElementById('setup-form').style.display = 'block';
-    
-    // Show Step 3 (the last step where they left off)
-    document.querySelectorAll('.onboarding-step').forEach(step => {
-        step.classList.add('hidden');
-    });
-    const step3 = document.querySelector('.onboarding-step[data-step="3"]');
-    if (step3) {
-        step3.classList.remove('hidden');
-    }
-
-    // Update progress bar to Step 3
-    const totalSteps = 3;
-    const step = 3;
-    const percent = Math.round((step / totalSteps) * 100);
-    document.getElementById('progress-label').textContent = `Step ${step} of ${totalSteps}`;
-    document.getElementById('progress-percent').textContent = `${percent}% Complete`;
-    document.getElementById('progress-bar-fill').style.width = `${percent}%`;
-}
-
-// Initialize app
-document.addEventListener('DOMContentLoaded', initializeApp);
-if (document.readyState !== 'loading') {
-    initializeApp();
-}
-
-console.log('🏠 The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES script loaded successfully!');
-
-// ========================================
-// STEP 4: ORGANIZED NAMESPACE SYSTEM
-// Keeps calendar-critical functions global, organizes UI functions under namespace
-// ========================================
-
-// Create main app namespace
-window.CasaCare = window.CasaCare || {};
-
-// ========================================
-// KEEP THESE GLOBAL (CALENDAR CRITICAL) ✅
-// ========================================
-
-// These MUST stay global for calendar synchronization:
-// window.completeTask - already set by date management system ✅
-// window.saveData - already global ✅
-// window.loadData - already global ✅
-// window.tasks - already global ✅
-// window.homeData - already global ✅
-
-// These are called by HTML onclick handlers, must stay global:
-// window.createMaintenancePlan - already global ✅
-// window.finishTaskSetup - already global ✅
-// window.showTab - already global ✅
-// window.toggleWellWaterOptions - already global ✅
-
-// ========================================
-// ORGANIZE UNDER NAMESPACE (UI FUNCTIONS) 🏗️
-// ========================================
-
-// Setup and navigation functions
-CasaCare.setup = {
-    goBackToHomeSetup: typeof goBackToHomeSetup !== 'undefined' ? goBackToHomeSetup : function() { console.warn('goBackToHomeSetup not defined'); },
-    addTaskFromSetup: typeof addTaskFromSetup !== 'undefined' ? addTaskFromSetup : function() { console.warn('addTaskFromSetup not defined'); },
-    editTaskFromSetup: typeof editTaskFromSetup !== 'undefined' ? editTaskFromSetup : function() { console.warn('editTaskFromSetup not defined'); },
-    deleteTaskDirect: typeof deleteTaskDirect !== 'undefined' ? deleteTaskDirect : function() { console.warn('deleteTaskDirect not defined'); }
-};
-
-// Dashboard functions  
-CasaCare.dashboard = {
-    addTaskFromDashboard: typeof addTaskFromDashboard !== 'undefined' ? addTaskFromDashboard : function() { console.warn('addTaskFromDashboard not defined'); },
-    editTaskFromDashboard: typeof editTaskFromDashboard !== 'undefined' ? editTaskFromDashboard : function() { console.warn('editTaskFromDashboard not defined'); },
-    rescheduleTaskFromDashboard: typeof rescheduleTaskFromDashboard !== 'undefined' ? rescheduleTaskFromDashboard : function() { console.warn('rescheduleTaskFromDashboard not defined'); },
-    exportTaskList: typeof exportTaskList !== 'undefined' ? exportTaskList : function() { console.warn('exportTaskList not defined'); }
-};
-
-// Modal management
-CasaCare.modals = {
-    openTaskEditModal: typeof openTaskEditModal !== 'undefined' ? openTaskEditModal : function() { console.warn('openTaskEditModal not defined'); },
-    closeTaskEditModal: typeof closeTaskEditModal !== 'undefined' ? closeTaskEditModal : function() { console.warn('closeTaskEditModal not defined'); },
-    saveTaskFromEdit: typeof saveTaskFromEdit !== 'undefined' ? saveTaskFromEdit : function() { console.warn('saveTaskFromEdit not defined'); },
-    deleteTaskFromEdit: typeof deleteTaskFromEdit !== 'undefined' ? deleteTaskFromEdit : function() { console.warn('deleteTaskFromEdit not defined'); },
-    
-    // Date picker modal functions
-    closeDatePickerModal: typeof closeDatePickerModal !== 'undefined' ? closeDatePickerModal : function() { console.warn('closeDatePickerModal not defined'); },
-    setQuickDate: typeof setQuickDate !== 'undefined' ? setQuickDate : function() { console.warn('setQuickDate not defined'); },
-    confirmReschedule: typeof confirmReschedule !== 'undefined' ? confirmReschedule : function() { console.warn('confirmReschedule not defined'); }
-};
-
-// Utility functions
-CasaCare.utils = {
-    showHomeInfo: typeof showHomeInfo !== 'undefined' ? showHomeInfo : function() { console.warn('showHomeInfo not defined'); },
-    clearData: typeof clearData !== 'undefined' ? clearData : function() { console.warn('clearData not defined'); },
-    exportData: typeof exportData !== 'undefined' ? exportData : function() { console.warn('exportData not defined'); },
-    closeHomeInfoModal: typeof closeHomeInfoModal !== 'undefined' ? closeHomeInfoModal : function() { console.warn('closeHomeInfoModal not defined'); },
-    saveHomeInfo: typeof saveHomeInfo !== 'undefined' ? saveHomeInfo : function() { console.warn('saveHomeInfo not defined'); },
-    populateHomeInfoForm: typeof populateHomeInfoForm !== 'undefined' ? populateHomeInfoForm : function() { console.warn('populateHomeInfoForm not defined'); },
-    
-};
-
-// Component instances (these stay global for inter-component communication)
-CasaCare.components = {
-    enhancedDashboard: null, // Will be set when dashboard initializes
-    calendar: null, // Will be set when calendar initializes  
-    documents: null // Will be set when documents initializes
-};
-
-// ========================================
-// DEBUGGING AND DIAGNOSTICS 🔍
-// ========================================
-
-CasaCare.debug = {
-    listGlobalFunctions: function() {
-        console.log('🌍 GLOBAL FUNCTIONS (Calendar Critical):');
-        const criticalGlobals = [
-            'completeTask', 'saveData', 'loadData', 'tasks', 'homeData',
-            'createMaintenancePlan', 'finishTaskSetup', 'showTab', 'toggleWellWaterOptions'
-        ];
+    window.confirmTaskReschedule = function(taskId) {
+        const newDateStr = document.getElementById('new-task-date').value;
+        if (!newDateStr) return;
         
-        criticalGlobals.forEach(name => {
-            const exists = typeof window[name] !== 'undefined';
-            const type = typeof window[name];
-            console.log(`  ${name}: ${exists ? '✅' : '❌'} (${type})`);
-        });
-    },
-    
-    listNamespacedFunctions: function() {
-        console.log('🏗️ NAMESPACED FUNCTIONS:');
-        Object.keys(CasaCare).forEach(namespace => {
-            if (typeof CasaCare[namespace] === 'object' && namespace !== 'debug') {
-                console.log(`  CasaCare.${namespace}:`, Object.keys(CasaCare[namespace]));
-            }
-        });
-    },
-    
-    testCalendarSync: function() {
-        console.log('📅 TESTING CALENDAR SYNC:');
+        const newDate = new Date(newDateStr + 'T12:00:00');
+        const task = window.tasks.find(t => t.id === taskId);
         
-        // Test tasks array
-        const tasksExist = Array.isArray(window.tasks);
-        console.log(`  window.tasks: ${tasksExist ? '✅' : '❌'} (${tasksExist ? window.tasks.length : 0} tasks)`);
-        
-        // Test date consistency
-        if (tasksExist && window.tasks.length > 0) {
-            let syncedCount = 0;
-            let totalWithDates = 0;
+        if (task) {
+            task.dueDate = newDate;
+            task.nextDue = newDate;
             
-            window.tasks.forEach(task => {
-                if (task.dueDate || task.nextDue) {
-                    totalWithDates++;
-                    if (task.dueDate && task.nextDue) {
-                        const dueTime = new Date(task.dueDate).getTime();
-                        const nextTime = new Date(task.nextDue).getTime();
-                        if (Math.abs(dueTime - nextTime) <= 1000) {
-                            syncedCount++;
-                        }
-                    }
-                }
-            });
+            if (typeof saveData === 'function') saveData();
+            if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
+            if (window.casaCareCalendar?.refresh) window.casaCareCalendar.refresh();
             
-            console.log(`  Date sync status: ${syncedCount}/${totalWithDates} tasks synced (${syncedCount === totalWithDates ? '✅ PERFECT' : '⚠️ NEEDS ATTENTION'})`);
+            window.closeRescheduleModal();
+            alert(`✅ "${task.title}" rescheduled to ${newDate.toLocaleDateString()}`);
         }
-        
-        // Test calendar object
-        const calendarExists = typeof window.casaCareCalendar === 'object' && window.casaCareCalendar !== null;
-        console.log(`  window.casaCareCalendar: ${calendarExists ? '✅' : '❌'}`);
-        
-        // Test complete task function
-        const completeTaskExists = typeof window.completeTask === 'function';
-        console.log(`  window.completeTask: ${completeTaskExists ? '✅' : '❌'}`);
-        
-        // Test enhanced dashboard
-        const dashboardExists = typeof window.enhancedDashboard === 'object' && window.enhancedDashboard !== null;
-        console.log(`  window.enhancedDashboard: ${dashboardExists ? '✅' : '❌'}`);
-        
-        return {
-            tasksArray: tasksExist,
-            calendarObject: calendarExists, 
-            completeTaskFunction: completeTaskExists,
-            dashboardObject: dashboardExists,
-            tasksCount: tasksExist ? window.tasks.length : 0,
-            syncStatus: tasksExist && window.tasks.length > 0 ? 'tested' : 'no-tasks'
+    };
+};
+
+console.log('✅ FIXED modal script loaded - all buttons should work now!');
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const setupForm = document.getElementById('setup-form');
+  if (!setupForm) return;
+
+  // 1) Remove any previously inserted headers (avoid duplicates)
+  document.querySelectorAll('.onboarding-section-header').forEach(h => h.remove());
+
+  // 2) Insert new headers at the top of Step 2 and Step 3
+  const sections = [
+    { step: 2, heading: '⚙️ Home Systems', subheading: 'Tell us about your heating, cooling, and water systems' },
+    { step: 3, heading: '🏠 Additional Features', subheading: 'Any extra features your home has' }
+  ];
+
+  sections.forEach(({ step, heading, subheading }) => {
+    const stepContainer = document.querySelector(`.onboarding-step[data-step="${step}"]`);
+    if (!stepContainer) return;
+
+    const sectionHeader = document.createElement('div');
+    sectionHeader.className = 'onboarding-section-header mb-4';
+    sectionHeader.innerHTML = `
+      <h3 class="text-lg font-semibold text-gray-900 mb-1">${heading}</h3>
+      <p class="text-sm text-gray-600">${subheading}</p>
+    `;
+    stepContainer.insertAdjacentElement('afterbegin', sectionHeader);
+  });
+
+  console.log('✅ Form section headers added at step starts');
+});
+</script>
+
+<!-- Firebase Configuration -->
+<script>
+// Firebase configuration - you'll need to replace these with your actual values
+const firebaseConfig = {
+  apiKey: "AIzaSyBuBfJvkhiTs0OSFlNE8ZhSTAnOa_sidE0",
+  authDomain: "home-keeper-app.firebaseapp.com",
+  projectId: "home-keeper-app",
+  storageBucket: "home-keeper-app.firebasestorage.app",
+  messagingSenderId: "434638918453",
+  appId: "1:434638918453:web:5fd99aed69ef4a4c2b727c"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+console.log('🔥 Firebase initialized');
+
+// BULLETPROOF DATA MANAGEMENT SYSTEM
+// Replace all existing Firebase functions in index.html with this
+
+// ===========================================
+// STEP 1: UNIFIED DATA OBJECT
+// ===========================================
+
+// Initialize the master data object
+function initializeCasaCareData() {
+    if (!window.casaCareData) {
+        window.casaCareData = {
+            homeData: {},
+            tasks: [],
+            appliances: [],
+            documents: [],
+            version: '3.0',
+            lastSaved: null,
+            lastLoaded: null
         };
-    },
+    }
     
-    fixDateSync: function() {
-        console.log('🔧 ATTEMPTING TO FIX DATE SYNC ISSUES...');
+    // Keep legacy global references for backward compatibility
+    window.homeData = window.casaCareData.homeData;
+    window.tasks = window.casaCareData.tasks;
+    window.applianceData = window.casaCareData.appliances;
+    window.documentsData = window.casaCareData.documents;
+    
+    console.log('✅ CasaCare data structure initialized');
+}
+
+// ===========================================
+// STEP 2: BULLETPROOF SAVE FUNCTION
+// ===========================================
+
+async function saveAllDataBulletproof() {
+    if (!window.currentUser) {
+        console.log('🚫 Save skipped: No user logged in');
+        return false;
+    }
+    
+    try {
+        console.log('💾 Bulletproof save: Starting...');
         
-        if (!window.tasks || !Array.isArray(window.tasks)) {
-            console.log('❌ No tasks array found');
+        // Sync any changes from legacy globals back to master object
+        syncLegacyGlobalsToMaster();
+        
+        // Convert dates to Firebase timestamps for tasks
+        const firebaseTasks = window.casaCareData.tasks.map(task => {
+            const firebaseTask = { ...task };
+            
+            if (firebaseTask.dueDate instanceof Date) {
+                firebaseTask.dueDate = firebase.firestore.Timestamp.fromDate(firebaseTask.dueDate);
+            }
+            if (firebaseTask.nextDue instanceof Date) {
+                firebaseTask.nextDue = firebase.firestore.Timestamp.fromDate(firebaseTask.nextDue);
+            }
+            if (firebaseTask.lastCompleted instanceof Date) {
+                firebaseTask.lastCompleted = firebase.firestore.Timestamp.fromDate(firebaseTask.lastCompleted);
+            }
+            
+            return firebaseTask;
+        });
+        
+        // Prepare data for Firebase
+        const dataToSave = {
+            homeData: window.casaCareData.homeData,
+            tasks: firebaseTasks,
+            appliances: window.casaCareData.appliances,
+            documents: window.casaCareData.documents,
+            version: '3.0',
+            lastUpdated: firebase.firestore.Timestamp.now(),
+            userEmail: window.currentUser.email
+        };
+        
+        // Save to Firebase
+        await db.collection('users').doc(window.currentUser.uid).set(dataToSave, { merge: true });
+        
+        // Update save timestamp
+        window.casaCareData.lastSaved = new Date();
+        
+        console.log(`💾 Bulletproof save: SUCCESS!`);
+        console.log(`   📋 Saved ${dataToSave.tasks.length} tasks`);
+        console.log(`   📦 Saved ${dataToSave.appliances.length} appliances`);
+        console.log(`   📄 Saved ${dataToSave.documents.length} documents`);
+        console.log(`   🏠 Saved home data: ${!!dataToSave.homeData.fullAddress}`);
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Bulletproof save FAILED:', error);
+        alert('❌ Failed to save data to cloud. Please try again.');
+        return false;
+    }
+}
+
+// ===========================================
+// STEP 3: BULLETPROOF LOAD FUNCTION
+// ===========================================
+
+async function loadAllDataBulletproof() {
+    if (!window.currentUser) {
+        console.log('🚫 Load skipped: No user logged in');
+        return false;
+    }
+    
+    try {
+        console.log('📥 Bulletproof load: Starting...');
+        
+        const userDoc = await db.collection('users').doc(window.currentUser.uid).get();
+        
+        if (!userDoc.exists) {
+            console.log('📥 Bulletproof load: No data found for user');
             return false;
         }
         
-        const fixed = ensureTaskDateConsistency(window.tasks);
+        const userData = userDoc.data();
         
-        if (fixed > 0) {
-            try {
-                saveData();
-                console.log(`✅ Fixed ${fixed} tasks and saved data`);
-                
-                // Refresh displays
-                if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-                    window.enhancedDashboard.render();
-                }
-                if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
-                    window.casaCareCalendar.refresh();
-                }
-                
-                return true;
-            } catch (error) {
-                console.error('❌ Error saving fixes:', error);
-                return false;
+        if (!userData.homeData && !userData.tasks && !userData.appliances && !userData.documents) {
+            console.log('📥 Bulletproof load: No app data found');
+            return false;
+        }
+        
+        // Load all data into master object
+        window.casaCareData = {
+            homeData: userData.homeData || {},
+            tasks: userData.tasks || [],
+            appliances: userData.appliances || [],
+            documents: userData.documents || [],
+            version: userData.version || '3.0',
+            lastSaved: null,
+            lastLoaded: new Date()
+        };
+        
+        // Fix dates in tasks
+        window.casaCareData.tasks.forEach(task => {
+            if (task.dueDate && task.dueDate.toDate) {
+                task.dueDate = task.dueDate.toDate();
+                task.nextDue = task.dueDate;
+            } else if (task.dueDate && typeof task.dueDate === 'string') {
+                task.dueDate = new Date(task.dueDate);
+                task.nextDue = task.dueDate;
             }
-        } else {
-            console.log('✅ No sync issues found - all tasks are properly synchronized');
-            return true;
-        }
-    }
-};
-
-// ========================================
-// COMPONENT REFERENCE UPDATES 🔗
-// ========================================
-
-// Update component references when they initialize
-const originalInitializeApp = typeof initializeApp !== 'undefined' ? initializeApp : function() {};
-
-function initializeAppWithNamespace() {
-
-    // Call original initialization
-    if (typeof originalInitializeApp === 'function') {
-        originalInitializeApp();
-    }
-    
-    // Set up component references after a short delay to ensure they're created
-    setTimeout(() => {
-        if (window.enhancedDashboard) {
-            CasaCare.components.enhancedDashboard = window.enhancedDashboard;
-        }
-        if (window.casaCareCalendar) {
-            CasaCare.components.calendar = window.casaCareCalendar;
-        }
-        if (window.casaCareDocuments) {
-            CasaCare.components.documents = window.casaCareDocuments;
-        }
-    }, 100);
-}
-
-// Update the global initializeApp reference
-window.initializeApp = initializeAppWithNamespace;
-
-// ========================================
-// MAKE DEBUG FUNCTIONS EASILY ACCESSIBLE 🧪
-// ========================================
-
-// Make the main debug function globally available (this was missing before!)
-window.debugCasaCare = CasaCare.debug.testCalendarSync;
-window.fixCalendarSync = CasaCare.debug.fixDateSync;
-window.listGlobalFunctions = CasaCare.debug.listGlobalFunctions;
-window.listNamespacedFunctions = CasaCare.debug.listNamespacedFunctions;
-
-// ========================================
-// FINAL INITIALIZATION 🚀
-// ========================================
-
-// ========================================
-// SMART INSTALLATION BANNER SYSTEM
-// Shows device-specific PWA installation instructions
-// ========================================
-
-class InstallationBanner {
-    constructor() {
-        this.banner = null;
-        this.isInstalled = false;
-        this.isDismissed = false;
-        this.init();
-    }
-    
-    init() {
-        // Wait for DOM to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.setup());
-        } else {
-            this.setup();
-        }
-    }
-    
-    setup() {
-        this.banner = document.getElementById('install-banner');
-        if (!this.banner) {
-            console.warn('⚠️ Install banner element not found');
-            return;
-        }
-        
-        // Check if user previously dismissed the banner
-        this.isDismissed = localStorage.getItem('install-banner-dismissed') === 'true';
-        
-        // Check if app is already installed
-        this.checkIfInstalled();
-        
-        // Set up event listeners
-        this.bindEvents();
-        
-        // Show banner if appropriate
-        setTimeout(() => this.showBannerIfNeeded(), 2000); // Delay to not overwhelm new users
-    }
-    
-    bindEvents() {
-        // Close button
-        const closeBtn = document.getElementById('install-banner-close');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => this.dismissBanner());
-        }
-        
-        // Listen for app installation
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // App can be installed
-            this.isInstalled = false;
+            
+            if (task.lastCompleted && task.lastCompleted.toDate) {
+                task.lastCompleted = task.lastCompleted.toDate();
+            } else if (task.lastCompleted && typeof task.lastCompleted === 'string') {
+                task.lastCompleted = new Date(task.lastCompleted);
+            }
         });
         
-        window.addEventListener('appinstalled', (e) => {
-            // App was installed
-            this.isInstalled = true;
-            this.hideBanner();
-        });
-    }
-    
-    checkIfInstalled() {
-        // Check if running as installed PWA
-        if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
-            this.isInstalled = true;
-        }
+        // Update legacy global references
+        syncMasterToLegacyGlobals();
         
-        // Check if launched from home screen (iOS)
-        if (window.navigator.standalone === true) {
-            this.isInstalled = true;
-        }
-    }
-    
-    showBannerIfNeeded() {
-        // Don't show if already installed, dismissed, or no banner element
-        if (this.isInstalled || this.isDismissed || !this.banner) {
-            return;
-        }
+        console.log(`📥 Bulletproof load: SUCCESS!`);
+        console.log(`   📋 Loaded ${window.casaCareData.tasks.length} tasks`);
+        console.log(`   📦 Loaded ${window.casaCareData.appliances.length} appliances`);
+        console.log(`   📄 Loaded ${window.casaCareData.documents.length} documents`);
+        console.log(`   🏠 Loaded home data: ${!!window.casaCareData.homeData.fullAddress}`);
         
-        // Get device-specific instructions
-        const instructions = this.getInstallInstructions();
-        if (!instructions) {
-            return; // Don't show on unsupported browsers
-        }
+        return true;
         
-        // Update banner text
-        const instructionsElement = document.getElementById('install-instructions');
-        if (instructionsElement) {
-            instructionsElement.innerHTML = instructions;
-        }
-        
-        // Show the banner
-        this.showBanner();
-    }
-    
-    getInstallInstructions() {
-        const userAgent = navigator.userAgent;
-        const isIOS = /iPad|iPhone|iPod/.test(userAgent);
-        const isAndroid = /Android/.test(userAgent);
-        const isChrome = /Chrome/.test(userAgent);
-        const isSafari = /Safari/.test(userAgent) && !isChrome;
-        const isFirefox = /Firefox/.test(userAgent);
-        const isEdge = /Edg/.test(userAgent);
-        
-        if (isIOS) {
-            if (isSafari) {
-                return `Tap <strong>Share</strong> <span style="font-size: 16px;">⤴</span> → <strong>"Add to Home Screen"</strong>`;
-            } else if (isChrome) {
-                return `Tap <strong>Share</strong> <span style="font-size: 16px;">⤴</span> → scroll down → <strong>"Add to Home Screen"</strong><br><small style="opacity: 0.8;">💡 For easier installation, try opening in Safari</small>`;
-            } else {
-                return `Open in Safari for best installation experience`;
-            }
-        } else if (isAndroid) {
-            if (isChrome) {
-                return `Tap menu <strong>⋮</strong> → <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong>`;
-            } else if (isFirefox) {
-                return `Tap menu <strong>⋮</strong> → <strong>"Install"</strong> or <strong>"Add to Home Screen"</strong>`;
-            } else {
-                return `Look for <strong>"Add to Home Screen"</strong> or <strong>"Install"</strong> in your browser menu`;
-            }
-        } else {
-            // Desktop
-            if (isChrome || isEdge) {
-                return `Look for the <strong>install icon</strong> <span style="font-size: 16px;">⊕</span> in your address bar`;
-            } else {
-                return `Use Chrome, Edge, or Firefox for the best installation experience`;
-            }
-        }
-        
-        return null; // Don't show on unsupported browsers
-    }
-    
-    showBanner() {
-        if (!this.banner) return;
-        
-        this.banner.classList.remove('hidden');
-        document.body.classList.add('install-banner-visible');
-        
-        // Animate in
-        setTimeout(() => {
-            this.banner.classList.add('show');
-        }, 100);
-        
-        console.log('📱 Install banner shown');
-    }
-    
-    hideBanner() {
-        if (!this.banner) return;
-        
-        this.banner.classList.remove('show');
-        document.body.classList.remove('install-banner-visible');
-        
-        setTimeout(() => {
-            this.banner.classList.add('hidden');
-        }, 300);
-    }
-    
-    dismissBanner() {
-        this.hideBanner();
-        this.isDismissed = true;
-        
-        // Remember dismissal for 7 days
-        const dismissUntil = new Date();
-        dismissUntil.setDate(dismissUntil.getDate() + 7);
-        localStorage.setItem('install-banner-dismissed', 'true');
-        localStorage.setItem('install-banner-dismiss-until', dismissUntil.toISOString());
-        
-        console.log('📱 Install banner dismissed for 7 days');
-    }
-    
-    // Public method to manually show the banner
-    show() {
-        this.isDismissed = false;
-        localStorage.removeItem('install-banner-dismissed');
-        this.showBannerIfNeeded();
+    } catch (error) {
+        console.error('❌ Bulletproof load FAILED:', error);
+        return false;
     }
 }
 
-// Initialize the installation banner system
-let installBanner;
+// ===========================================
+// STEP 4: SYNC FUNCTIONS
+// ===========================================
 
-// Make it available globally for debugging
-window.showInstallBanner = function() {
-    if (installBanner) {
-        installBanner.show();
+// Sync changes from legacy globals back to master object
+function syncLegacyGlobalsToMaster() {
+    if (window.homeData !== window.casaCareData.homeData) {
+        window.casaCareData.homeData = window.homeData || {};
     }
-};
-
-// Initialize when app starts
-document.addEventListener('DOMContentLoaded', () => {
-    installBanner = new InstallationBanner();
-});
-
-// Also initialize if DOM is already ready
-if (document.readyState !== 'loading') {
-    installBanner = new InstallationBanner();
+    if (window.tasks !== window.casaCareData.tasks) {
+        window.casaCareData.tasks = window.tasks || [];
+    }
+    if (window.applianceData !== window.casaCareData.appliances) {
+        window.casaCareData.appliances = window.applianceData || [];
+    }
+    if (window.documentsData !== window.casaCareData.documents) {
+        window.casaCareData.documents = window.documentsData || [];
+    }
 }
 
-console.log('📱 Smart installation banner system loaded');
+// Sync from master object to legacy globals
+function syncMasterToLegacyGlobals() {
+    window.homeData = window.casaCareData.homeData;
+    window.tasks = window.casaCareData.tasks;
+    window.applianceData = window.casaCareData.appliances;
+    window.documentsData = window.casaCareData.documents;
+}
 
-function toggleCategory(categoryId) {
-    const tasksDiv = document.getElementById(`tasks-${categoryId}`);
-    const arrow = document.getElementById(`arrow-${categoryId}`);
+// ===========================================
+// STEP 5: SIMPLE INTERFACE FUNCTIONS
+// ===========================================
+
+// Replace the old saveData function
+function saveData() {
+    return saveAllDataBulletproof();
+}
+
+// Replace the old loadData function  
+function loadData() {
+    return loadAllDataBulletproof();
+}
+
+// Debug function to check all data
+function debugAllData() {
+    console.log('🔍 COMPLETE DATA STATUS:');
+    console.log('Master object:', window.casaCareData);
+    console.log('Legacy globals:');
+    console.log('  homeData:', window.homeData);
+    console.log('  tasks:', window.tasks?.length || 0);
+    console.log('  applianceData:', window.applianceData?.length || 0);
+    console.log('  documentsData:', window.documentsData?.length || 0);
     
-    if (tasksDiv.classList.contains('hidden')) {
-        // Show tasks
-        tasksDiv.classList.remove('hidden');
-        arrow.style.transform = 'rotate(90deg)';
+    return {
+        master: window.casaCareData,
+        legacy: {
+            homeData: !!window.homeData?.fullAddress,
+            tasks: window.tasks?.length || 0,
+            appliances: window.applianceData?.length || 0,
+            documents: window.documentsData?.length || 0
+        }
+    };
+}
+
+// Force save function for testing
+function forceSave() {
+    console.log('🔄 Force saving all data...');
+    syncLegacyGlobalsToMaster();
+    return saveAllDataBulletproof();
+}
+
+// Force load function for testing  
+function forceLoad() {
+    console.log('🔄 Force loading all data...');
+    return loadAllDataBulletproof().then(success => {
+        if (success) {
+            // Update all modules with loaded data
+            updateAllModulesWithLoadedData();
+        }
+        return success;
+    });
+}
+
+// Update all modules after loading data
+function updateAllModulesWithLoadedData() {
+    // Update appliance manager
+    if (window.applianceManager && window.applianceData) {
+        window.applianceManager.appliances = window.applianceData;
+        if (window.applianceManager.render) {
+            window.applianceManager.render();
+        }
+        console.log('✅ Appliance manager updated');
+    }
+    
+    // Update documents manager  
+    if (window.casaCareDocuments && window.documentsData) {
+        window.casaCareDocuments.documents = window.documentsData;
+        if (window.casaCareDocuments.render) {
+            window.casaCareDocuments.render();
+        }
+        console.log('✅ Documents manager updated');
+    }
+    
+    // Update dashboard
+    if (window.enhancedDashboard && window.enhancedDashboard.render) {
+        window.enhancedDashboard.render();
+        console.log('✅ Dashboard updated');
+    }
+    
+    // Update calendar
+    if (window.casaCareCalendar && window.casaCareCalendar.refresh) {
+        window.casaCareCalendar.refresh();
+        console.log('✅ Calendar updated');
+    }
+}
+
+// ===========================================
+// STEP 6: MAKE FUNCTIONS GLOBALLY AVAILABLE
+// ===========================================
+
+// Replace old global functions
+window.saveData = saveData;
+window.loadData = loadData;
+window.saveAllDataBulletproof = saveAllDataBulletproof;
+window.loadAllDataBulletproof = loadAllDataBulletproof;
+window.debugAllData = debugAllData;
+window.forceSave = forceSave;
+window.forceLoad = forceLoad;
+window.initializeCasaCareData = initializeCasaCareData;
+
+console.log('✅ BULLETPROOF DATA MANAGEMENT SYSTEM LOADED');
+console.log('Available commands: debugAllData(), forceSave(), forceLoad()');
+
+// NEW: Enhanced save that works alongside existing system
+async function saveDataEnhanced() {
+    if (!window.currentUser) {
+        console.log('🚫 Enhanced save skipped: No user');
+        return false;
+    }
+    
+    // Test data integrity first
+    const integrity = testDataIntegrity();
+    if (!integrity.homeData || !integrity.tasks) {
+        console.warn('⚠️ Data integrity check failed, skipping enhanced save');
+        return false;
+    }
+    
+    // Run enhanced save alongside existing
+    const success = await saveUserDataToFirebaseEnhanced(
+        window.currentUser.uid,
+        window.homeData,
+        window.tasks
+    );
+    
+    if (success) {
+        console.log('✅ Enhanced save completed successfully');
     } else {
-        // Hide tasks
-        tasksDiv.classList.add('hidden');
-        arrow.style.transform = 'rotate(0deg)';
+        console.warn('⚠️ Enhanced save failed, existing save will still run');
     }
-}
-
-// Make it globally available
-window.toggleCategory = toggleCategory;
-
-// Override functions to use TaskManager
-window.openTaskEditModal = function(task, isNew) {
-    window.TaskManager.openModal(task, isNew);
-};
-
-window.saveTaskFromEdit = function() {
-    window.TaskManager.save();
-};
-
-window.closeTaskEditModal = function() {
-    window.TaskManager.close();
-};
-// Onboarding step navigation
-document.addEventListener('DOMContentLoaded', function () {
-  let currentStep = 1;
-  const totalSteps = 3;
-
-  function showStep(step) {
-    document.querySelectorAll('.onboarding-step').forEach(div => {
-      div.classList.add('hidden');
-      if (parseInt(div.dataset.step) === step) {
-        div.classList.remove('hidden');
-      }
-    });
-
-    // Update progress bar
-    const percent = Math.round((step / totalSteps) * 100);
-    document.getElementById('progress-label').textContent = `Step ${step} of ${totalSteps}`;
-    document.getElementById('progress-percent').textContent = `${percent}%`;
-    document.getElementById('progress-bar-fill').style.width = `${percent}%`;
     
-   // Scroll so the new step sits just below the fixed progress bar
-    const stepEl = document.querySelector(`.onboarding-step[data-step="${step}"]`);
-    const progress = document.getElementById('onboarding-progress');
-    const headerH = progress ? progress.offsetHeight : 0;
-    if (stepEl) {
-      const y = stepEl.getBoundingClientRect().top + window.pageYOffset - headerH - 8; // small buffer
-      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+    return success;
 }
-      }
 
-  // Button listeners
-  const stepButtons = [
-    { id: 'next-to-step-2', action: () => { currentStep = 2; showStep(currentStep); } },
-    { id: 'next-to-step-3', action: () => { currentStep = 3; showStep(currentStep); } },
-    { id: 'back-to-step-1', action: () => { currentStep = 1; showStep(currentStep); } },
-    { id: 'back-to-step-2', action: () => { currentStep = 2; showStep(currentStep); } }
-  ];
-
-  stepButtons.forEach(btn => {
-    const el = document.getElementById(btn.id);
-    if (el) el.addEventListener('click', btn.action);
-  });
-
-  // Show the first step initially
-  showStep(currentStep);
-});
-
-function goBackToHomeSetup() {
-    const taskSetup = document.getElementById('task-setup');
-    if (taskSetup) {
-        taskSetup.classList.add('hidden');
-        taskSetup.style.display = 'none';
+function debugDocumentStatus() {
+    console.log('🔍 DOCUMENT DEBUG STATUS:');
+    console.log('  window.documentsData:', Array.isArray(window.documentsData) ? window.documentsData.length : 'NOT FOUND');
+    console.log('  window.casaCareDocuments instance:', !!window.casaCareDocuments);
+    console.log('  instance.documents:', window.casaCareDocuments?.documents?.length || 'NOT FOUND');
+    
+    if (window.documentsData && window.documentsData.length > 0) {
+        console.log('  First document:', window.documentsData[0]);
     }
+    
+    return {
+        globalDocuments: window.documentsData?.length || 0,
+        instanceDocuments: window.casaCareDocuments?.documents?.length || 0,
+        hasInstance: !!window.casaCareDocuments
+    };
+}
 
-    const setupForm = document.getElementById('setup-form');
-    if (setupForm) {
-        setupForm.style.display = 'block';
-        setupForm.classList.remove('hidden');
+    
+// Make functions globally available for testing
+window.saveUserDataToFirebaseEnhanced = saveUserDataToFirebaseEnhanced;
+window.loadUserDataEnhanced = loadUserDataEnhanced;
+window.testDataIntegrity = testDataIntegrity;
+window.saveDataEnhanced = saveDataEnhanced;
+
+console.log('✅ Step 1: Enhanced backup functions loaded');
+
+// Authentication Functions
+function showLoginForm() {
+    document.getElementById('login-form').classList.remove('hidden');
+    document.getElementById('signup-form').classList.add('hidden');
+}
+
+function showSignupForm() {
+    document.getElementById('login-form').classList.add('hidden');
+    document.getElementById('signup-form').classList.remove('hidden');
+}
+
+function signInUser() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
     }
+    
+    auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            console.log('✅ User signed in:', userCredential.user.email);
+            // handleSuccessfulLogin(userCredential.user);
+        })
+        .catch((error) => {
+            console.error('❌ Sign in error:', error);
+            alert('Sign in failed: ' + error.message);
+        });
+}
 
-    // Show Step 3 only, hide other steps
-    document.querySelectorAll('.onboarding-step').forEach(step => {
-        step.classList.add('hidden');
+function createUser() {
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    
+    if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+    }
+    
+    if (password.length < 6) {
+        alert('Password must be at least 6 characters');
+        return;
+    }
+    
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            console.log('✅ User created:', userCredential.user.email);
+            handleNewUserSignup(userCredential.user);
+        })
+        .catch((error) => {
+            console.error('❌ Sign up error:', error);
+            alert('Sign up failed: ' + error.message);
+        });
+}
+
+function signInWithGoogle() {
+    window.googleSignInInProgress = true; // Flag to prevent auto-login
+    const provider = new firebase.auth.GoogleAuthProvider();
+    
+    auth.signInWithPopup(provider)
+        .then((result) => {
+            console.log('✅ Google sign in success:', result.user.email);
+            window.googleSignInInProgress = false;
+            
+            // Check if this is a new user based on data, not account creation
+            loadAllDataBulletproof().then(hasData => {
+                if (hasData) {
+                    handleSuccessfulLogin(result.user);
+                } else {
+                    handleNewUserSignup(result.user);
+                }
+            });
+        })
+        .catch((error) => {
+            console.error('❌ Google sign in error:', error);
+            alert('Google sign in failed: ' + error.message);
+            window.googleSignInInProgress = false;
+        });
+}
+
+function signOutUser() {
+    console.log('👋 Signing out user...');
+    
+    auth.signOut().then(() => {
+        console.log('✅ User signed out successfully');
+        
+        // Clear local data
+        window.currentUser = null;
+        window.homeData = {};
+        window.tasks = [];
+        
+        // Show login screen and hide other screens
+        document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('setup-form').classList.add('hidden');
+        document.getElementById('setup-form').style.display = 'none';
+        document.getElementById('main-app').classList.add('hidden');
+        document.body.classList.remove('main-app-active');
+        
+        alert('👋 You have been signed out successfully!');
+        
+    }).catch((error) => {
+        console.error('❌ Sign out error:', error);
+        alert('Error signing out: ' + error.message);
     });
-    const step3 = document.querySelector('.onboarding-step[data-step="3"]');
-    if (step3) {
-        step3.classList.remove('hidden');
-    }
-
-    // Update progress bar to Step 3
-    const totalSteps = 3;
-    const step = 3;
-    const percent = Math.round((step / totalSteps) * 100);
-    document.getElementById('progress-label').textContent = `Step ${step} of ${totalSteps}`;
-    document.getElementById('progress-percent').textContent = `${percent}%`;
-    document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+}    
+    
+// Handle successful login (existing user)
+function handleSuccessfulLogin(user) {
+    console.log('🏠 User logged in, loading data first...');
+    
+    // Hide login screen immediately
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('setup-form').classList.add('hidden');
+    document.getElementById('setup-form').style.display = 'none';
+    document.getElementById('onboarding-progress').classList.add('hidden');
+    
+    // Load data FIRST, then show dashboard
+    loadAllDataBulletproof().then(hasData => {
+        if (hasData) {
+            // NOW show the app with data already loaded
+            document.getElementById('main-app').classList.remove('hidden');
+            document.body.classList.add('main-app-active');
+            document.getElementById('header-subtitle').textContent = window.homeData.fullAddress;
+            showTab('dashboard');
+            
+            // Force dashboard refresh after data is loaded
+            if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                window.enhancedDashboard.render();
+            }
+            console.log('✅ Data loaded, dashboard ready');
+            
+            // Update appliance manager with loaded data
+            if (window.applianceManager && window.applianceData) {
+                window.applianceManager.setAppliances(window.applianceData);
+                console.log('✅ Appliance manager updated with loaded data');
+             } 
+            
+            // Update documents manager with loaded data
+            if (window.casaCareDocuments && window.documentsData) {
+                window.casaCareDocuments.documents = window.documentsData;
+                console.log('✅ Documents manager updated with loaded data');
+            }
+            
+        } else {
+            handleNewUserSignup(user);
+        }
+    });
 }
+    
+// Handle new user signup (needs setup)
+function handleNewUserSignup(user) {
+    console.log('🆕 New user signed up, starting setup process...');
+    
+    // Hide ALL other screens first
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('main-app').classList.add('hidden');
+    document.body.classList.remove('main-app-active');
+    
+// Show setup form
+document.getElementById('setup-form').classList.remove('hidden');
+document.getElementById('setup-form').style.display = 'block';
+document.getElementById('onboarding-progress').classList.remove('hidden');
+
+// Make sure main app is hidden
+document.getElementById('main-app').classList.add('hidden');
+document.body.classList.remove('main-app-active');
+    
+    // Store user info globally
+    window.currentUser = user;
+    
+    console.log('✅ New user ready for setup');
+}
+
+// Listen for authentication state changes
+let authProcessing = false;
+auth.onAuthStateChanged((user) => {
+    if (authProcessing) return; // Prevent duplicate processing
+    authProcessing = true;
+    
+    if (user) {
+        // User is signed in
+        console.log('👤 User is already logged in:', user.email);
+        window.currentUser = user;
+        
+        // Only auto-load if we're not in the middle of a Google sign-in
+        if (!window.googleSignInInProgress) {
+            handleSuccessfulLogin(user);
+        }
+    } else {
+        // User is signed out
+        console.log('👋 No user logged in, showing login screen');
+        document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('setup-form').classList.add('hidden');
+        document.getElementById('main-app').classList.add('hidden');
+        document.body.classList.remove('main-app-active');
+    }
+    
+    // Reset the flag after a short delay
+    setTimeout(() => { authProcessing = false; }, 1000);
+});
+    
+</script>
+    
+</body>
+</html>
