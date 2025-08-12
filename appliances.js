@@ -37,10 +37,30 @@ class ApplianceManager {
   this.render();
 }
 
-saveAppliances() {
+async saveAppliances() {
+  try {
+    console.log('💾 Appliances: Using integrated save to preserve all data...');
+    
+    // FIXED: Update global reference first
     window.applianceData = this.appliances;
-    window.casaCareData.appliances = this.appliances;
-    if (window.saveData) window.saveData();
+    
+    if (!window.currentUser) {
+      console.warn('⚠️ Appliances: not logged in, skipping save');
+      return;
+    }
+    
+    // FIXED: Use main save function to preserve ALL data
+    if (typeof window.saveData === 'function') {
+      window.saveData();
+      console.log('✅ Appliances: Saved using integrated system');
+    } else {
+      console.error('❌ Main saveData function not available');
+    }
+    
+  } catch (error) {
+    console.error('❌ Appliances: Error saving:', error);
+    alert('❌ Failed to save appliances. Check console for details.');
+  }
 }
     
     // Update main app data for integration with tasks/calendar
