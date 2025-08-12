@@ -36,32 +36,11 @@ class CasaCareDocuments {
         }
     }
     
-    // FIXED: Save documents using direct global reference like appliances
     saveDocuments() {
-        try {
-            console.log('💾 Documents: Using integrated save to preserve all data...');
-            
-            // FIXED: Update direct global reference like appliances
-            window.documentsData = this.documents;
-            
-            if (!window.currentUser) {
-                console.warn('⚠️ Documents: not logged in, skipping save');
-                return;
-            }
-            
-            // Use main save function to preserve ALL data
-            if (typeof window.saveData === 'function') {
-                window.saveData();
-                console.log('✅ Documents: Saved using integrated system');
-            } else {
-                console.error('❌ Main saveData function not available');
-            }
-            
-        } catch (error) {
-            console.error('❌ Documents: Error saving:', error);
-            alert('❌ Failed to save documents. Please try again.');
-        }
-    }
+    window.documentsData = this.documents;
+    window.casaCareData.documents = this.documents;
+    if (window.saveData) window.saveData();
+}
     
     // Rest of the class methods remain the same...
     // (keeping them for completeness but focusing on the persistence fix)
