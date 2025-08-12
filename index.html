@@ -1749,46 +1749,56 @@ const db = firebase.firestore();
 
 console.log('🔥 Firebase initialized');
 
-// ===== STEP 1: ADD THESE BACKUP FUNCTIONS TO index.html =====
-// Add these BEFORE any existing Firebase functions (don't replace anything yet)
+// BULLETPROOF DATA MANAGEMENT SYSTEM
+// Replace all existing Firebase functions in index.html with this
 
-// FIXED: Enhanced save function with direct document reference
-async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
-    // --- Sanitize helper to prevent Firestore nested entity errors ---
-    function sanitizeForFirestore(value) {
-        const t = Object.prototype.toString.call(value);
-        if (value === undefined || typeof value === 'function') return undefined;
-        if (t === '[object File]' || t === '[object Blob]') return undefined;
-        if (value && (value instanceof Element)) return undefined; // DOM nodes
+// ===========================================
+// STEP 1: UNIFIED DATA OBJECT
+// ===========================================
 
-        if (Array.isArray(value)) {
-            return value
-                .map(sanitizeForFirestore)
-                .filter(v => v !== undefined);
-        }
-        if (value && typeof value === 'object') {
-            const out = {};
-            for (const [k, v] of Object.entries(value)) {
-                const sv = sanitizeForFirestore(v);
-                if (sv !== undefined) out[k] = sv;
-            }
-            return out;
-        }
-        return value; // string, number, boolean, null
+// Initialize the master data object
+function initializeCasaCareData() {
+    if (!window.casaCareData) {
+        window.casaCareData = {
+            homeData: {},
+            tasks: [],
+            appliances: [],
+            documents: [],
+            version: '3.0',
+            lastSaved: null,
+            lastLoaded: null
+        };
     }
+    
+    // Keep legacy global references for backward compatibility
+    window.homeData = window.casaCareData.homeData;
+    window.tasks = window.casaCareData.tasks;
+    window.applianceData = window.casaCareData.appliances;
+    window.documentsData = window.casaCareData.documents;
+    
+    console.log('✅ CasaCare data structure initialized');
+}
 
+// ===========================================
+// STEP 2: BULLETPROOF SAVE FUNCTION
+// ===========================================
+
+async function saveAllDataBulletproof() {
+    if (!window.currentUser) {
+        console.log('🚫 Save skipped: No user logged in');
+        return false;
+    }
+    
     try {
-        if (!userId || !window.currentUser) {
-            console.log('🚫 Enhanced save skipped: No user logged in');
-            return false;
-        }
-
-        console.log('💾 Enhanced save: Starting comprehensive save...');
-
-        // Convert Date objects to Firebase Timestamps for proper storage
-        const firebaseTasks = (tasks || []).map(task => {
+        console.log('💾 Bulletproof save: Starting...');
+        
+        // Sync any changes from legacy globals back to master object
+        syncLegacyGlobalsToMaster();
+        
+        // Convert dates to Firebase timestamps for tasks
+        const firebaseTasks = window.casaCareData.tasks.map(task => {
             const firebaseTask = { ...task };
-
+            
             if (firebaseTask.dueDate instanceof Date) {
                 firebaseTask.dueDate = firebase.firestore.Timestamp.fromDate(firebaseTask.dueDate);
             }
@@ -1798,165 +1808,245 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
             if (firebaseTask.lastCompleted instanceof Date) {
                 firebaseTask.lastCompleted = firebase.firestore.Timestamp.fromDate(firebaseTask.lastCompleted);
             }
-
+            
             return firebaseTask;
         });
-
-        // ✅ Sanitize appliances and documents before saving
-        const safeDocuments  = sanitizeForFirestore(window.documentsData || []);
-        const safeAppliances = sanitizeForFirestore(window.applianceData || []);
-
-        // ✅ Build userData WITHOUT wiping arrays that aren't loaded yet
-const userData = {
-  homeData: homeData || {},
-  tasks: firebaseTasks,
-  lastUpdated: firebase.firestore.Timestamp.now(),
-  userEmail: window.currentUser.email,
-  version: '2.1'
-};
-
-// Be resilient to either global name (applianceData or appliancesData)
-const rawAppliances = (typeof window.applianceData !== 'undefined')
-  ? window.applianceData
-  : (typeof window.appliancesData !== 'undefined' ? window.appliancesData : undefined);
-
-const rawDocuments = (typeof window.documentsData !== 'undefined')
-  ? window.documentsData
-  : undefined;
-
-// Only include if defined, and sanitize before saving
-if (typeof rawAppliances !== 'undefined') {
-  const safeAppliances = sanitizeForFirestore(rawAppliances).map(a => {
-    const out = { ...a };
-    if (out.purchaseDate instanceof Date) {
-      out.purchaseDate = firebase.firestore.Timestamp.fromDate(out.purchaseDate);
-    }
-    return out;
-  });
-  userData.appliances = safeAppliances;
-}
-
-if (typeof rawDocuments !== 'undefined') {
-  const safeDocuments = sanitizeForFirestore(rawDocuments);
-  userData.documents = safeDocuments;
-}
-
-// Debug log
-console.log('About to save →', {
-  appliances: Array.isArray(userData.appliances) ? userData.appliances.length : '(omitted)',
-  documents: Array.isArray(userData.documents) ? userData.documents.length : '(omitted)',
-  tasks: userData.tasks.length
-});
-        // Use set with merge to avoid overwriting
-        await db.collection('users').doc(userId).set(userData, { merge: true });
-        console.log('✅ Enhanced save: All data saved successfully');
+        
+        // Prepare data for Firebase
+        const dataToSave = {
+            homeData: window.casaCareData.homeData,
+            tasks: firebaseTasks,
+            appliances: window.casaCareData.appliances,
+            documents: window.casaCareData.documents,
+            version: '3.0',
+            lastUpdated: firebase.firestore.Timestamp.now(),
+            userEmail: window.currentUser.email
+        };
+        
+        // Save to Firebase
+        await db.collection('users').doc(window.currentUser.uid).set(dataToSave, { merge: true });
+        
+        // Update save timestamp
+        window.casaCareData.lastSaved = new Date();
+        
+        console.log(`💾 Bulletproof save: SUCCESS!`);
+        console.log(`   📋 Saved ${dataToSave.tasks.length} tasks`);
+        console.log(`   📦 Saved ${dataToSave.appliances.length} appliances`);
+        console.log(`   📄 Saved ${dataToSave.documents.length} documents`);
+        console.log(`   🏠 Saved home data: ${!!dataToSave.homeData.fullAddress}`);
+        
         return true;
+        
     } catch (error) {
-        console.error('❌ Enhanced save error:', error);
+        console.error('❌ Bulletproof save FAILED:', error);
+        alert('❌ Failed to save data to cloud. Please try again.');
         return false;
     }
 }
 
-// FIXED: Enhanced load function - appliances load regardless of other data
-async function loadUserDataEnhanced(userId) {
+// ===========================================
+// STEP 3: BULLETPROOF LOAD FUNCTION
+// ===========================================
+
+async function loadAllDataBulletproof() {
+    if (!window.currentUser) {
+        console.log('🚫 Load skipped: No user logged in');
+        return false;
+    }
+    
     try {
-        if (!userId) {
-            console.log('🚫 Enhanced load skipped: No userId');
+        console.log('📥 Bulletproof load: Starting...');
+        
+        const userDoc = await db.collection('users').doc(window.currentUser.uid).get();
+        
+        if (!userDoc.exists) {
+            console.log('📥 Bulletproof load: No data found for user');
             return false;
         }
-
-        console.log('📥 Enhanced load: Loading comprehensive data...');
         
-        const userDoc = await db.collection('users').doc(userId).get();
-        if (userDoc.exists) {
-            const userData = userDoc.data();
-            
-            // Load appliances and documents ALWAYS (not conditional)
-            window.applianceData = Array.isArray(userData.appliances) ? userData.appliances : [];
-            console.log(`📦 Enhanced load: ${window.applianceData.length} appliances loaded`);
-            
-            window.documentsData = Array.isArray(userData.documents) ? userData.documents : [];
-            console.log(`📄 Enhanced load: ${window.documentsData.length} documents loaded`);
-            
-            // Load main data conditionally
-            if (userData.homeData && userData.tasks) {
-                window.homeData = userData.homeData;
-                window.tasks = userData.tasks || [];
-                
-                // Fix dates
-                window.tasks.forEach(task => {
-                    if (task.dueDate && task.dueDate.toDate) {
-                        task.dueDate = task.dueDate.toDate();
-                        task.nextDue = task.dueDate;
-                    } else if (task.dueDate && typeof task.dueDate === 'string') {
-                        task.dueDate = new Date(task.dueDate);
-                        task.nextDue = task.dueDate;
-                    }
-                    
-                    if (task.lastCompleted && task.lastCompleted.toDate) {
-                        task.lastCompleted = task.lastCompleted.toDate();
-                    } else if (task.lastCompleted && typeof task.lastCompleted === 'string') {
-                        task.lastCompleted = new Date(task.lastCompleted);
-                    }
-                });
-  
-                console.log(`✅ Enhanced load: Success! ${window.tasks.length} tasks, ${window.applianceData.length} appliances, ${window.documentsData.length} documents`);
-                return true;
-            } else {
-                console.log(`✅ Enhanced load: Partial success! ${window.applianceData.length} appliances, ${window.documentsData.length} documents (no main data)`);
-                return false;
-            }
+        const userData = userDoc.data();
+        
+        if (!userData.homeData && !userData.tasks && !userData.appliances && !userData.documents) {
+            console.log('📥 Bulletproof load: No app data found');
+            return false;
         }
         
-        console.log('📥 Enhanced load: No data found');
-        return false;
+        // Load all data into master object
+        window.casaCareData = {
+            homeData: userData.homeData || {},
+            tasks: userData.tasks || [],
+            appliances: userData.appliances || [],
+            documents: userData.documents || [],
+            version: userData.version || '3.0',
+            lastSaved: null,
+            lastLoaded: new Date()
+        };
+        
+        // Fix dates in tasks
+        window.casaCareData.tasks.forEach(task => {
+            if (task.dueDate && task.dueDate.toDate) {
+                task.dueDate = task.dueDate.toDate();
+                task.nextDue = task.dueDate;
+            } else if (task.dueDate && typeof task.dueDate === 'string') {
+                task.dueDate = new Date(task.dueDate);
+                task.nextDue = task.dueDate;
+            }
+            
+            if (task.lastCompleted && task.lastCompleted.toDate) {
+                task.lastCompleted = task.lastCompleted.toDate();
+            } else if (task.lastCompleted && typeof task.lastCompleted === 'string') {
+                task.lastCompleted = new Date(task.lastCompleted);
+            }
+        });
+        
+        // Update legacy global references
+        syncMasterToLegacyGlobals();
+        
+        console.log(`📥 Bulletproof load: SUCCESS!`);
+        console.log(`   📋 Loaded ${window.casaCareData.tasks.length} tasks`);
+        console.log(`   📦 Loaded ${window.casaCareData.appliances.length} appliances`);
+        console.log(`   📄 Loaded ${window.casaCareData.documents.length} documents`);
+        console.log(`   🏠 Loaded home data: ${!!window.casaCareData.homeData.fullAddress}`);
+        
+        return true;
+        
     } catch (error) {
-        console.error('❌ Enhanced load error:', error);
+        console.error('❌ Bulletproof load FAILED:', error);
         return false;
     }
-}
-// FIXED: Test function to verify data integrity with documents
-function testDataIntegrity() {
-    console.log('🧪 Testing data integrity...');
-    
-    const results = {
-        homeData: !!window.homeData && !!window.homeData.fullAddress,
-        tasks: Array.isArray(window.tasks) && window.tasks.length >= 0,
-        appliances: Array.isArray(window.applianceData) && window.applianceData.length >= 0,
-        documents: Array.isArray(window.documentsData) && window.documentsData.length >= 0, // ADDED
-        currentUser: !!window.currentUser,
-        timestamp: new Date().toISOString()
-    };
-    
-    console.log('🧪 Data integrity results:', results);
-    return results;
 }
 
-// Debug function to check document status
-function debugDocumentStatus() {
-    console.log('🔍 DOCUMENT DEBUG STATUS:');
-    console.log('  window.documentsData:', Array.isArray(window.documentsData) ? window.documentsData.length : 'NOT FOUND');
-    console.log('  window.casaCareDocuments instance:', !!window.casaCareDocuments);
-    console.log('  instance.documents:', window.casaCareDocuments?.documents?.length || 'NOT FOUND');
-    
-    if (window.documentsData && window.documentsData.length > 0) {
-        console.log('  First document:', window.documentsData[0]);
+// ===========================================
+// STEP 4: SYNC FUNCTIONS
+// ===========================================
+
+// Sync changes from legacy globals back to master object
+function syncLegacyGlobalsToMaster() {
+    if (window.homeData !== window.casaCareData.homeData) {
+        window.casaCareData.homeData = window.homeData || {};
     }
+    if (window.tasks !== window.casaCareData.tasks) {
+        window.casaCareData.tasks = window.tasks || [];
+    }
+    if (window.applianceData !== window.casaCareData.appliances) {
+        window.casaCareData.appliances = window.applianceData || [];
+    }
+    if (window.documentsData !== window.casaCareData.documents) {
+        window.casaCareData.documents = window.documentsData || [];
+    }
+}
+
+// Sync from master object to legacy globals
+function syncMasterToLegacyGlobals() {
+    window.homeData = window.casaCareData.homeData;
+    window.tasks = window.casaCareData.tasks;
+    window.applianceData = window.casaCareData.appliances;
+    window.documentsData = window.casaCareData.documents;
+}
+
+// ===========================================
+// STEP 5: SIMPLE INTERFACE FUNCTIONS
+// ===========================================
+
+// Replace the old saveData function
+function saveData() {
+    return saveAllDataBulletproof();
+}
+
+// Replace the old loadData function  
+function loadData() {
+    return loadAllDataBulletproof();
+}
+
+// Debug function to check all data
+function debugAllData() {
+    console.log('🔍 COMPLETE DATA STATUS:');
+    console.log('Master object:', window.casaCareData);
+    console.log('Legacy globals:');
+    console.log('  homeData:', window.homeData);
+    console.log('  tasks:', window.tasks?.length || 0);
+    console.log('  applianceData:', window.applianceData?.length || 0);
+    console.log('  documentsData:', window.documentsData?.length || 0);
     
     return {
-        globalDocuments: window.documentsData?.length || 0,
-        instanceDocuments: window.casaCareDocuments?.documents?.length || 0,
-        hasInstance: !!window.casaCareDocuments
+        master: window.casaCareData,
+        legacy: {
+            homeData: !!window.homeData?.fullAddress,
+            tasks: window.tasks?.length || 0,
+            appliances: window.applianceData?.length || 0,
+            documents: window.documentsData?.length || 0
+        }
     };
 }
 
-// Make functions globally available
-window.saveUserDataToFirebaseEnhanced = saveUserDataToFirebaseEnhanced;
-window.loadUserDataEnhanced = loadUserDataEnhanced;
-window.testDataIntegrity = testDataIntegrity;
-window.debugDocumentStatus = debugDocumentStatus;
+// Force save function for testing
+function forceSave() {
+    console.log('🔄 Force saving all data...');
+    syncLegacyGlobalsToMaster();
+    return saveAllDataBulletproof();
+}
 
-console.log('✅ FIXED: Enhanced Firebase functions updated for direct document reference');
+// Force load function for testing  
+function forceLoad() {
+    console.log('🔄 Force loading all data...');
+    return loadAllDataBulletproof().then(success => {
+        if (success) {
+            // Update all modules with loaded data
+            updateAllModulesWithLoadedData();
+        }
+        return success;
+    });
+}
+
+// Update all modules after loading data
+function updateAllModulesWithLoadedData() {
+    // Update appliance manager
+    if (window.applianceManager && window.applianceData) {
+        window.applianceManager.appliances = window.applianceData;
+        if (window.applianceManager.render) {
+            window.applianceManager.render();
+        }
+        console.log('✅ Appliance manager updated');
+    }
+    
+    // Update documents manager  
+    if (window.casaCareDocuments && window.documentsData) {
+        window.casaCareDocuments.documents = window.documentsData;
+        if (window.casaCareDocuments.render) {
+            window.casaCareDocuments.render();
+        }
+        console.log('✅ Documents manager updated');
+    }
+    
+    // Update dashboard
+    if (window.enhancedDashboard && window.enhancedDashboard.render) {
+        window.enhancedDashboard.render();
+        console.log('✅ Dashboard updated');
+    }
+    
+    // Update calendar
+    if (window.casaCareCalendar && window.casaCareCalendar.refresh) {
+        window.casaCareCalendar.refresh();
+        console.log('✅ Calendar updated');
+    }
+}
+
+// ===========================================
+// STEP 6: MAKE FUNCTIONS GLOBALLY AVAILABLE
+// ===========================================
+
+// Replace old global functions
+window.saveData = saveData;
+window.loadData = loadData;
+window.saveAllDataBulletproof = saveAllDataBulletproof;
+window.loadAllDataBulletproof = loadAllDataBulletproof;
+window.debugAllData = debugAllData;
+window.forceSave = forceSave;
+window.forceLoad = forceLoad;
+window.initializeCasaCareData = initializeCasaCareData;
+
+console.log('✅ BULLETPROOF DATA MANAGEMENT SYSTEM LOADED');
+console.log('Available commands: debugAllData(), forceSave(), forceLoad()');
 
 // NEW: Enhanced save that works alongside existing system
 async function saveDataEnhanced() {
@@ -2026,24 +2116,23 @@ function showSignupForm() {
 }
 
 function signInUser() {
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-password').value;
-
-  if (!email || !password) {
-    alert('Please enter both email and password');
-    return;
-  }
-
-  auth.signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      console.log('✅ User signed in:', userCredential.user.email);
-      window.currentUser = userCredential.user;
-      handleSuccessfulLogin(userCredential.user); // same flow
-    })
-    .catch((error) => {
-      console.error('❌ Sign in error:', error);
-      alert('Sign in failed: ' + error.message);
-    });
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+    }
+    
+    auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            console.log('✅ User signed in:', userCredential.user.email);
+            // handleSuccessfulLogin(userCredential.user);
+        })
+        .catch((error) => {
+            console.error('❌ Sign in error:', error);
+            alert('Sign in failed: ' + error.message);
+        });
 }
 
 function createUser() {
@@ -2072,22 +2161,28 @@ function createUser() {
 }
 
 function signInWithGoogle() {
-  window.googleSignInInProgress = true; // optional flag
-  const provider = new firebase.auth.GoogleAuthProvider();
-
-  auth.signInWithPopup(provider)
-    .then((result) => {
-      console.log('✅ Google sign in success:', result.user.email);
-      window.currentUser = result.user;
-      handleSuccessfulLogin(result.user); // reuse the same flow
-    })
-    .catch((error) => {
-      console.error('❌ Google sign in error:', error);
-      alert('Google sign in failed: ' + error.message);
-    })
-    .finally(() => {
-      window.googleSignInInProgress = false;
-    });
+    window.googleSignInInProgress = true; // Flag to prevent auto-login
+    const provider = new firebase.auth.GoogleAuthProvider();
+    
+    auth.signInWithPopup(provider)
+        .then((result) => {
+            console.log('✅ Google sign in success:', result.user.email);
+            window.googleSignInInProgress = false;
+            
+            // Check if this is a new user based on data, not account creation
+            loadAllDataBulletproof().then(hasData => {
+                if (hasData) {
+                    handleSuccessfulLogin(result.user);
+                } else {
+                    handleNewUserSignup(result.user);
+                }
+            });
+        })
+        .catch((error) => {
+            console.error('❌ Google sign in error:', error);
+            alert('Google sign in failed: ' + error.message);
+            window.googleSignInInProgress = false;
+        });
 }
 
 function signOutUser() {
@@ -2127,7 +2222,7 @@ function handleSuccessfulLogin(user) {
     document.getElementById('onboarding-progress').classList.add('hidden');
     
     // Load data FIRST, then show dashboard
-    loadUserDataEnhanced(user.uid).then(hasData => {
+    loadAllDataBulletproof().then(hasData => {
         if (hasData) {
             // NOW show the app with data already loaded
             document.getElementById('main-app').classList.remove('hidden');
@@ -2181,81 +2276,6 @@ document.body.classList.remove('main-app-active');
     window.currentUser = user;
     
     console.log('✅ New user ready for setup');
-}
-
-// Load user data from Firestore
-async function loadUserData(userId) {
-    try {
-        const userDoc = await db.collection('users').doc(userId).get();
-        if (userDoc.exists) {
-            const userData = userDoc.data();
-
-// Populate globals so UI/managers have data
-window.homeData = userData.homeData || {};
-window.tasks    = userData.tasks    || [];
-
-// Appliances (convert Timestamps to JS Dates)
-window.applianceData = (userData.appliances || []).map(a => {
-  const out = { ...a };
-  if (out.purchaseDate && out.purchaseDate.toDate) {
-    out.purchaseDate = out.purchaseDate.toDate();
-  }
-  return out;
-});
-
-// Documents
-window.documentsData = userData.documents || [];
-
-// If you have managers, update them now
-if (window.applianceManager && typeof window.applianceManager.setAppliances === 'function') {
-  window.applianceManager.setAppliances(window.applianceData);
-}
-
-return true;
-            }
-        }
-        return false;
-    } catch (error) {
-        console.error('❌ Error loading user data:', error);
-        return false;
-    }
-}
-    
-// Save user data to Firestore
-async function saveUserDataToFirebase(userId, homeData, tasks) {
-    try {
-        // Convert Date objects to Firebase Timestamps for proper storage
-        const firebaseTasks = tasks.map(task => {
-            const firebaseTask = { ...task };
-            
-            // Convert Date objects to Firebase Timestamps
-            if (firebaseTask.dueDate instanceof Date) {
-                firebaseTask.dueDate = firebase.firestore.Timestamp.fromDate(firebaseTask.dueDate);
-            }
-            if (firebaseTask.nextDue instanceof Date) {
-                firebaseTask.nextDue = firebase.firestore.Timestamp.fromDate(firebaseTask.nextDue);
-            }
-            if (firebaseTask.lastCompleted instanceof Date) {
-                firebaseTask.lastCompleted = firebase.firestore.Timestamp.fromDate(firebaseTask.lastCompleted);
-            }
-            
-            return firebaseTask;
-        });
-        
-        const userData = {
-            homeData: homeData,
-            tasks: firebaseTasks,
-            lastUpdated: firebase.firestore.Timestamp.now(),
-            userEmail: window.currentUser ? window.currentUser.email : null
-        };
-        
-        await db.collection('users').doc(userId).set(userData);
-        console.log('💾 User data saved to Firebase successfully');
-        return true;
-    } catch (error) {
-        console.error('❌ Error saving user data to Firebase:', error);
-        throw error;
-    }
 }
 
 // Listen for authentication state changes
