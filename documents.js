@@ -465,6 +465,20 @@ class CasaCareDocuments {
         if (!doc) {
             alert('❌ Document not found');
             return;
+        // Auto-delete from Firebase Storage if fileURL exists
+        const doc = this.documents.find(d => d.id === id);
+        if (doc && doc.fileURL) {
+            try {
+                const storageRef = firebase.storage().refFromURL(doc.fileURL);
+                storageRef.delete().then(() => {
+                    console.log('🗑️ File deleted from storage:', doc.fileURL);
+                }).catch(err => {
+                    console.warn('⚠️ Could not delete file from storage:', err);
+                });
+            } catch (e) {
+                console.error('Error deleting from storage:', e);
+            }
+        }
         }
         
         if (confirm(`Are you sure you want to delete "${doc.title}"?`)) {
