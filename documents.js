@@ -24,13 +24,15 @@ class CasaCareDocuments {
         console.log('✅ Documents Module: Initialized');
     }
     
-    // Load documents from storage
+// Load documents from storage
 loadDocuments() {
     try {
-        // FIXED: Use Firebase data that was already loaded by enhanced load
-        if (window.casaCareDocuments && window.casaCareDocuments.documents) {
-            this.documents = window.casaCareDocuments.documents;
+        // FIXED: Check for Firebase data first, then fall back to localStorage
+        if (window.tempDocumentsData) {
+            this.documents = window.tempDocumentsData;
             console.log(`📄 Documents: Loaded ${this.documents.length} documents from Firebase data`);
+            // Clear the temp data
+            window.tempDocumentsData = null;
         } else {
             this.documents = [];
             console.log('📄 Documents: No Firebase data available, starting with empty array');
