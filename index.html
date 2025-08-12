@@ -2051,8 +2051,13 @@ function handleSuccessfulLogin(user) {
             if (window.enhancedDashboard && window.enhancedDashboard.render) {
                 window.enhancedDashboard.render();
             }
-            
             console.log('✅ Data loaded, dashboard ready');
+            
+            // Update appliance manager with loaded data
+            if (window.applianceManager && window.applianceData) {
+                window.applianceManager.setAppliances(window.applianceData);
+                console.log('✅ Appliance manager updated with loaded data');
+             } 
         } else {
             handleNewUserSignup(user);
         }
