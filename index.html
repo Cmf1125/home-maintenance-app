@@ -1800,17 +1800,6 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
             version: '2.1'
         };
 
-        // FIXED: Use direct global references like appliances
-        const userData = {
-            homeData: homeData || {},
-            tasks: firebaseTasks,
-            appliances: window.applianceData || [],
-            documents: window.documentsData || [], // CHANGED: Direct reference
-            lastUpdated: firebase.firestore.Timestamp.now(),
-            userEmail: window.currentUser.email,
-            version: '2.1'
-        };
-        
         console.log(`📄 Enhanced save: Saving ${userData.documents.length} documents`);
         console.log(`📦 Enhanced save: Saving ${userData.appliances.length} appliances`);
         console.log(`📋 Enhanced save: Saving ${userData.tasks.length} tasks`);
