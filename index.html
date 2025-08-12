@@ -1804,7 +1804,7 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
     }
 }
 
-// FIXED: Enhanced load function with direct document reference
+// FIXED: Enhanced load function - appliances load regardless of other data
 async function loadUserDataEnhanced(userId) {
     try {
         if (!userId) {
@@ -1818,8 +1818,15 @@ async function loadUserDataEnhanced(userId) {
         if (userDoc.exists) {
             const userData = userDoc.data();
             
+            // Load appliances and documents ALWAYS (not conditional)
+            window.applianceData = Array.isArray(userData.appliances) ? userData.appliances : [];
+            console.log(`📦 Enhanced load: ${window.applianceData.length} appliances loaded`);
+            
+            window.documentsData = Array.isArray(userData.documents) ? userData.documents : [];
+            console.log(`📄 Enhanced load: ${window.documentsData.length} documents loaded`);
+            
+            // Load main data conditionally
             if (userData.homeData && userData.tasks) {
-                // Load main data
                 window.homeData = userData.homeData;
                 window.tasks = userData.tasks || [];
                 
@@ -1839,17 +1846,12 @@ async function loadUserDataEnhanced(userId) {
                         task.lastCompleted = new Date(task.lastCompleted);
                     }
                 });
-
-                // FIXED: Load appliances using direct reference
-                window.applianceData = Array.isArray(userData.appliances) ? userData.appliances : [];
-                console.log(`📦 Enhanced load: ${window.applianceData.length} appliances loaded`);
-
-                // FIXED: Load documents using direct reference (like appliances)
-                window.documentsData = Array.isArray(userData.documents) ? userData.documents : [];
-                console.log(`📄 Enhanced load: ${window.documentsData.length} documents loaded`);
   
                 console.log(`✅ Enhanced load: Success! ${window.tasks.length} tasks, ${window.applianceData.length} appliances, ${window.documentsData.length} documents`);
                 return true;
+            } else {
+                console.log(`✅ Enhanced load: Partial success! ${window.applianceData.length} appliances, ${window.documentsData.length} documents (no main data)`);
+                return false;
             }
         }
         
@@ -1860,7 +1862,6 @@ async function loadUserDataEnhanced(userId) {
         return false;
     }
 }
-
 // FIXED: Test function to verify data integrity with documents
 function testDataIntegrity() {
     console.log('🧪 Testing data integrity...');
