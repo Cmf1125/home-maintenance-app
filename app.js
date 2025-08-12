@@ -2464,6 +2464,7 @@ async function hasExistingData() {
 
 // Enhanced initialization
 async function initializeApp() {
+    initializeCasaCareData();
     console.log('🏠 The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initializing...');
     
     // Make well water function available globally ASAP
