@@ -1184,15 +1184,23 @@ document.getElementById('header-subtitle').textContent = homeData.fullAddress;
     alert(`🎉 Setup Complete!\n\n✅ ${successCount} tasks scheduled automatically\n📅 Your clean, simple maintenance plan is ready!\n\nCheck your dashboard and calendar now.`);
     
     // Save to Firebase if user is logged in
-    if (window.currentUser) {
-        saveUserDataToFirebase(window.currentUser.uid, homeData, tasks)
-            .then(() => {
-                console.log('💾 User data saved to Firebase');
-            })
-            .catch((error) => {
-                console.error('❌ Error saving to Firebase:', error);
-            });
-    }
+if (window.currentUser) {
+  // Clear main user doc's homeData/tasks
+  saveUserDataToFirebase(window.currentUser.uid, {}, [])
+    .then(() => {
+      console.log('✅ Data cleared from Firebase');
+
+      // ✅ Also clear appliances subcollection
+      if (window.clearAppliancesFromFirebase) {
+        window.clearAppliancesFromFirebase(window.currentUser.uid)
+          .then(() => console.log('✅ Appliances cleared from Firebase'))
+          .catch(err => console.error('❌ Failed to clear appliances:', err));
+      }
+    })
+    .catch((error) => {
+      console.error('❌ Failed to clear data:', error);
+    });
+}
     console.log('🎉 CLEAN SIMPLE TASK SETUP COMPLETION SUCCESSFUL!');
 }
 
