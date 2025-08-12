@@ -2473,6 +2473,11 @@ async function initializeApp() {
     window.tasks = tasks;
     window.homeData = homeData;
     
+    // Initialize global document data
+    if (!window.documentsData) {
+        window.documentsData = [];
+    }
+    
     // Check for existing data (now async)
     const hasData = await hasExistingData();
     
@@ -2484,7 +2489,6 @@ async function initializeApp() {
         
         // Update header
         document.getElementById('header-subtitle').textContent = homeData.fullAddress;
-
         // Show bottom navigation for returning users
         document.body.classList.add('main-app-active');
         
@@ -2506,6 +2510,7 @@ async function initializeApp() {
     
     console.log('✅ The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initialized successfully!');
 }
+
 // Export functions to global scope
 window.createMaintenancePlan = createMaintenancePlan;
 window.finishTaskSetup = finishTaskSetup;
