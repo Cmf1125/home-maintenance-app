@@ -2466,8 +2466,24 @@ async function loadData() {
 }
 
 async function hasExistingData() {
-    const dataLoaded = await loadData();
-    return dataLoaded && homeData.fullAddress;
+  // Wait for Firebase auth to resolve exactly once
+  return new Promise((resolve) => {
+    const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+      unsubscribe(); // prevent stacking listeners
+
+      if (!user) {
+        console.log('ℹ️ No user signed in');
+        resolve(false);
+        return;
+      }
+
+      console.log('✅ Auth state ready for:', user.email);
+      window.currentUser = user;
+
+      // const dataLoaded = await loadData(); // your existing loadData()
+      resolve(!!(dataLoaded && window.homeData?.fullAddress));
+    });
+  });
 }
 
 // Enhanced initialization
