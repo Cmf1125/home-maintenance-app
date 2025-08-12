@@ -1806,20 +1806,47 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
         const safeDocuments  = sanitizeForFirestore(window.documentsData || []);
         const safeAppliances = sanitizeForFirestore(window.applianceData || []);
 
-        const userData = {
-            homeData: homeData || {},
-            tasks: firebaseTasks,
-            appliances: safeAppliances,
-            documents: safeDocuments,
-            lastUpdated: firebase.firestore.Timestamp.now(),
-            userEmail: window.currentUser.email,
-            version: '2.1'
-        };
+        // ✅ Build userData WITHOUT wiping arrays that aren't loaded yet
+const userData = {
+  homeData: homeData || {},
+  tasks: firebaseTasks,
+  lastUpdated: firebase.firestore.Timestamp.now(),
+  userEmail: window.currentUser.email,
+  version: '2.1'
+};
 
-        console.log(`📄 Enhanced save: Saving ${userData.documents.length} documents`);
-        console.log(`📦 Enhanced save: Saving ${userData.appliances.length} appliances`);
-        console.log(`📋 Enhanced save: Saving ${userData.tasks.length} tasks`);
+// Be resilient to either global name (applianceData or appliancesData)
+const rawAppliances = (typeof window.applianceData !== 'undefined')
+  ? window.applianceData
+  : (typeof window.appliancesData !== 'undefined' ? window.appliancesData : undefined);
 
+const rawDocuments = (typeof window.documentsData !== 'undefined')
+  ? window.documentsData
+  : undefined;
+
+// Only include if defined, and sanitize before saving
+if (typeof rawAppliances !== 'undefined') {
+  const safeAppliances = sanitizeForFirestore(rawAppliances).map(a => {
+    const out = { ...a };
+    if (out.purchaseDate instanceof Date) {
+      out.purchaseDate = firebase.firestore.Timestamp.fromDate(out.purchaseDate);
+    }
+    return out;
+  });
+  userData.appliances = safeAppliances;
+}
+
+if (typeof rawDocuments !== 'undefined') {
+  const safeDocuments = sanitizeForFirestore(rawDocuments);
+  userData.documents = safeDocuments;
+}
+
+// Debug log
+console.log('About to save →', {
+  appliances: Array.isArray(userData.appliances) ? userData.appliances.length : '(omitted)',
+  documents: Array.isArray(userData.documents) ? userData.documents.length : '(omitted)',
+  tasks: userData.tasks.length
+});
         // Use set with merge to avoid overwriting
         await db.collection('users').doc(userId).set(userData, { merge: true });
         console.log('✅ Enhanced save: All data saved successfully');
@@ -2162,33 +2189,29 @@ async function loadUserData(userId) {
         const userDoc = await db.collection('users').doc(userId).get();
         if (userDoc.exists) {
             const userData = userDoc.data();
-            if (userData.homeData && userData.tasks) {
-                // Load the data into the app
-                window.homeData = userData.homeData;
-                window.tasks = userData.tasks;
-                
-                // Handle both Firebase Timestamps and ISO strings
-                window.tasks.forEach(task => {
-                    // Convert Firebase Timestamps to Date objects
-                    if (task.dueDate && task.dueDate.toDate) {
-                        task.dueDate = task.dueDate.toDate();
-                        task.nextDue = task.dueDate;
-                    } else if (task.dueDate && typeof task.dueDate === 'string') {
-                        task.dueDate = new Date(task.dueDate);
-                        task.nextDue = task.dueDate;
-                    } else if (task.nextDue && task.nextDue.toDate) {
-                        task.nextDue = task.nextDue.toDate();
-                        task.dueDate = task.nextDue;
-                    }
-                    
-                    if (task.lastCompleted && task.lastCompleted.toDate) {
-                        task.lastCompleted = task.lastCompleted.toDate();
-                    } else if (task.lastCompleted && typeof task.lastCompleted === 'string') {
-                        task.lastCompleted = new Date(task.lastCompleted);
-                    }
-                });
-                
-                return true;
+
+// Populate globals so UI/managers have data
+window.homeData = userData.homeData || {};
+window.tasks    = userData.tasks    || [];
+
+// Appliances (convert Timestamps to JS Dates)
+window.applianceData = (userData.appliances || []).map(a => {
+  const out = { ...a };
+  if (out.purchaseDate && out.purchaseDate.toDate) {
+    out.purchaseDate = out.purchaseDate.toDate();
+  }
+  return out;
+});
+
+// Documents
+window.documentsData = userData.documents || [];
+
+// If you have managers, update them now
+if (window.applianceManager && typeof window.applianceManager.setAppliances === 'function') {
+  window.applianceManager.setAppliances(window.applianceData);
+}
+
+return true;
             }
         }
         return false;
