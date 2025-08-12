@@ -2039,7 +2039,7 @@ function handleSuccessfulLogin(user) {
     document.getElementById('onboarding-progress').classList.add('hidden');
     
     // Load data FIRST, then show dashboard
-    loadUserData(user.uid).then(hasData => {
+    loadUserDataEnhanced(user.uid).then(hasData => {
         if (hasData) {
             // NOW show the app with data already loaded
             document.getElementById('main-app').classList.remove('hidden');
