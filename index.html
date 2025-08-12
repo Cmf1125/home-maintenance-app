@@ -2054,6 +2054,28 @@ auth.onAuthStateChanged((user) => {
 });
     
 </script>
-    
+<script>
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    window.currentUser = user;
+    console.log('👤 Signed in as', user.email);
+
+    // Load this user's saved homeData and tasks
+    loadUserData(user.uid).then(() => {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('main-app').classList.remove('hidden');
+
+      // Refresh UI components if they exist
+      if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
+      if (window.casaCareCalendar?.refresh) window.casaCareCalendar.refresh();
+    });
+  } else {
+    window.currentUser = null;
+    document.getElementById('main-app').classList.add('hidden');
+    document.getElementById('login-screen').classList.remove('hidden');
+  }
+});
+</script>
+            
 </body>
 </html>
