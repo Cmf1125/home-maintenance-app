@@ -2187,43 +2187,6 @@ async function loadUserData(userId) {
     }
 }
     
-// Save user data to Firestore
-async function saveUserDataToFirebase(userId, homeData, tasks) {
-    try {
-        // Convert Date objects to Firebase Timestamps for proper storage
-        const firebaseTasks = tasks.map(task => {
-            const firebaseTask = { ...task };
-            
-            // Convert Date objects to Firebase Timestamps
-            if (firebaseTask.dueDate instanceof Date) {
-                firebaseTask.dueDate = firebase.firestore.Timestamp.fromDate(firebaseTask.dueDate);
-            }
-            if (firebaseTask.nextDue instanceof Date) {
-                firebaseTask.nextDue = firebase.firestore.Timestamp.fromDate(firebaseTask.nextDue);
-            }
-            if (firebaseTask.lastCompleted instanceof Date) {
-                firebaseTask.lastCompleted = firebase.firestore.Timestamp.fromDate(firebaseTask.lastCompleted);
-            }
-            
-            return firebaseTask;
-        });
-        
-        const userData = {
-            homeData: homeData,
-            tasks: firebaseTasks,
-            lastUpdated: firebase.firestore.Timestamp.now(),
-            userEmail: window.currentUser ? window.currentUser.email : null
-        };
-        
-        await db.collection('users').doc(userId).set(userData);
-        console.log('💾 User data saved to Firebase successfully');
-        return true;
-    } catch (error) {
-        console.error('❌ Error saving user data to Firebase:', error);
-        throw error;
-    }
-}
-
 // Listen for authentication state changes
 let authProcessing = false;
 auth.onAuthStateChanged((user) => {
