@@ -1973,23 +1973,24 @@ function showSignupForm() {
 }
 
 function signInUser() {
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    
-    if (!email || !password) {
-        alert('Please enter both email and password');
-        return;
-    }
-    
-    auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            console.log('✅ User signed in:', userCredential.user.email);
-            // handleSuccessfulLogin(userCredential.user);
-        })
-        .catch((error) => {
-            console.error('❌ Sign in error:', error);
-            alert('Sign in failed: ' + error.message);
-        });
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+
+  if (!email || !password) {
+    alert('Please enter both email and password');
+    return;
+  }
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      console.log('✅ User signed in:', userCredential.user.email);
+      window.currentUser = userCredential.user;
+      handleSuccessfulLogin(userCredential.user); // same flow
+    })
+    .catch((error) => {
+      console.error('❌ Sign in error:', error);
+      alert('Sign in failed: ' + error.message);
+    });
 }
 
 function createUser() {
@@ -2018,28 +2019,22 @@ function createUser() {
 }
 
 function signInWithGoogle() {
-    window.googleSignInInProgress = true; // Flag to prevent auto-login
-    const provider = new firebase.auth.GoogleAuthProvider();
-    
-    auth.signInWithPopup(provider)
-        .then((result) => {
-            console.log('✅ Google sign in success:', result.user.email);
-            window.googleSignInInProgress = false;
-            
-            // Check if this is a new user based on data, not account creation
-            loadUserData(result.user.uid).then(hasData => {
-                if (hasData) {
-                    handleSuccessfulLogin(result.user);
-                } else {
-                    handleNewUserSignup(result.user);
-                }
-            });
-        })
-        .catch((error) => {
-            console.error('❌ Google sign in error:', error);
-            alert('Google sign in failed: ' + error.message);
-            window.googleSignInInProgress = false;
-        });
+  window.googleSignInInProgress = true; // optional flag
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  auth.signInWithPopup(provider)
+    .then((result) => {
+      console.log('✅ Google sign in success:', result.user.email);
+      window.currentUser = result.user;
+      handleSuccessfulLogin(result.user); // reuse the same flow
+    })
+    .catch((error) => {
+      console.error('❌ Google sign in error:', error);
+      alert('Google sign in failed: ' + error.message);
+    })
+    .finally(() => {
+      window.googleSignInInProgress = false;
+    });
 }
 
 function signOutUser() {
