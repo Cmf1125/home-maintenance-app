@@ -119,7 +119,7 @@ function createMaintenancePlan() {
         };
 
         // Generate tasks
-        generateTaskTemplates({ reset: true });
+        generateTaskTemplates();
 
         // Update global references
         window.homeData = homeData;
@@ -144,13 +144,12 @@ function createMaintenancePlan() {
         alert('❌ Error creating maintenance plan. Check console for details.');
     }
 }
+// Generate task templates
+function generateTaskTemplates() {
 
-// Generate task templates (only clears when reset=true)
-function generateTaskTemplates({ reset = false } = {}) {
-  if (reset) {
+    
     tasks = [];
-  }
-  let id = 1;
+    let id = 1;
 
     // Essential tasks for all homes
     const essentialTasks = [
@@ -231,10 +230,12 @@ function generateTaskTemplates({ reset = false } = {}) {
     }
 
     tasks.push(...essentialTasks);
+saveData();
 
     // HVAC Tasks
     if (homeData.features.centralAC) {
         tasks.push(
+saveData();
             {
                 id: id++,
                 title: 'Replace HVAC Filter',
@@ -266,6 +267,7 @@ function generateTaskTemplates({ reset = false } = {}) {
 
     if (homeData.features.miniSplits) {
         tasks.push({
+saveData();
             id: id++,
             title: 'Clean Mini-Split Filters',
             category: 'HVAC',
@@ -282,6 +284,7 @@ function generateTaskTemplates({ reset = false } = {}) {
 
     if (homeData.features.wallAC) {
         tasks.push({
+saveData();
             id: id++,
             title: 'Clean Wall AC Filters',
             category: 'HVAC',
@@ -298,6 +301,7 @@ function generateTaskTemplates({ reset = false } = {}) {
 
     if (homeData.features.electricBaseboard) {
         tasks.push({
+saveData();
             id: id++,
             title: 'Clean Electric Baseboard Heaters',
             category: 'HVAC',
@@ -314,6 +318,7 @@ function generateTaskTemplates({ reset = false } = {}) {
 
     if (homeData.features.boiler) {
         tasks.push({
+saveData();
             id: id++,
             title: 'Boiler Annual Service',
             category: 'HVAC',
@@ -331,6 +336,7 @@ function generateTaskTemplates({ reset = false } = {}) {
     // Water System Tasks
     if (homeData.features.wellWater) {
         tasks.push({
+saveData();
             id: id++,
             title: 'Test Well Water',
             category: 'Water Systems',
@@ -346,6 +352,7 @@ function generateTaskTemplates({ reset = false } = {}) {
 
         if (homeData.features.sedimentFilter) {
             tasks.push({
+saveData();
                 id: id++,
                 title: 'Replace Sediment Filter',
                 category: 'Water Systems',
@@ -362,6 +369,7 @@ function generateTaskTemplates({ reset = false } = {}) {
 
         if (homeData.features.uvFilter) {
             tasks.push({
+saveData();
                 id: id++,
                 title: 'Replace UV Filter',
                 category: 'Water Systems',
@@ -378,6 +386,7 @@ function generateTaskTemplates({ reset = false } = {}) {
 
         if (homeData.features.waterSoftener) {
             tasks.push({
+saveData();
                 id: id++,
                 title: 'Refill Water Softener Salt',
                 category: 'Water Systems',
@@ -394,6 +403,7 @@ function generateTaskTemplates({ reset = false } = {}) {
 
         if (homeData.features.wholeHouseFilter) {
             tasks.push({
+saveData();
                 id: id++,
                 title: 'Replace Whole House Filter',
                 category: 'Water Systems',
@@ -411,6 +421,7 @@ function generateTaskTemplates({ reset = false } = {}) {
 
     if (homeData.features.septic) {
         tasks.push({
+saveData();
             id: id++,
             title: 'Septic Tank Pumping',
             category: 'Water Systems',
@@ -428,6 +439,7 @@ function generateTaskTemplates({ reset = false } = {}) {
     // Other Feature Tasks
     if (homeData.features.fireplace) {
         tasks.push({
+saveData();
             id: id++,
             title: 'Chimney Inspection & Cleaning',
             category: 'Safety',
@@ -444,6 +456,7 @@ function generateTaskTemplates({ reset = false } = {}) {
 
     if (homeData.features.deck) {
         tasks.push({
+saveData();
             id: id++,
             title: 'Deck Staining/Sealing',
             category: 'Exterior',
@@ -460,6 +473,7 @@ function generateTaskTemplates({ reset = false } = {}) {
 
     if (homeData.features.pool) {
         tasks.push({
+saveData();
             id: id++,
             title: 'Pool Opening/Closing',
             category: 'General',
@@ -476,6 +490,7 @@ function generateTaskTemplates({ reset = false } = {}) {
 
     if (homeData.features.garage) {
         tasks.push({
+saveData();
             id: id++,
             title: 'Garage Door Maintenance',
             category: 'General',
@@ -492,6 +507,7 @@ function generateTaskTemplates({ reset = false } = {}) {
 
     if (homeData.features.basement) {
         tasks.push({
+saveData();
             id: id++,
             title: 'Check Basement for Moisture',
             category: 'General',
@@ -540,6 +556,7 @@ if (hasExteriorResponsibility) {
     ];
     
     tasks.push(...pestControlTasks);
+saveData();
     
     // EXTERIOR TASKS (includes yard tasks - all outside work)
     const exteriorTasks = [
@@ -574,6 +591,7 @@ if (hasExteriorResponsibility) {
     // Only add lawn-specific tasks for single-family/townhouse
     if (['single-family', 'townhouse'].includes(homeData.propertyType)) {
         tasks.push(...exteriorTasks);
+saveData();
     }
 }
 
@@ -582,6 +600,7 @@ if (hasExteriorResponsibility) {
         const climateRegion = getClimateRegion(homeData.state);
         const regionalTasks = generateRegionalTasks(climateRegion, id, hasExteriorResponsibility);
         tasks.push(...regionalTasks);
+saveData();
     }
 }
 
@@ -1110,9 +1129,11 @@ function finishTaskSetup() {
                 
                 // Set the due date
                 task.dueDate = dueDate;
+saveData();
                 
                 // CRITICAL: Set nextDue for calendar compatibility
                 task.nextDue = dueDate;
+saveData();
                 
                 // Clean up template flag
                 delete task.isTemplate;
@@ -1133,6 +1154,7 @@ function finishTaskSetup() {
     
     // Verify we have tasks with due dates
     const tasksWithDates = tasks.filter(t => t.dueDate);
+saveData();
     
     console.log(`📊 Final verification: ${tasksWithDates.length} tasks have due dates`);
     
@@ -1449,6 +1471,7 @@ window.tasks.forEach(task => {
 });
     
     const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
+saveData();
     
     // Enhanced All Tasks interface with annual cost
     allTasksView.innerHTML = `
@@ -1496,6 +1519,7 @@ function renderAllTaskCategories() {
     }
 
     const activeTasks = window.tasks.filter(task => !task.isCompleted && task.dueDate);
+saveData();
     const tasksByCategory = {};
 
     activeTasks.forEach(task => {
@@ -1576,6 +1600,7 @@ function toggleCategoryTasks(button) {
 function renderAllTasksTaskItem(task) {
     const now = new Date();
     const taskDate = new Date(task.dueDate);
+saveData();
     const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
     const isOverdue = daysUntilDue < 0;
     
@@ -1717,6 +1742,7 @@ function updateDashboard() {
     window.tasks.forEach(task => {
         if (!task.isCompleted && task.dueDate) {
             const taskDate = new Date(task.dueDate);
+saveData();
             if (taskDate < now) {
                 overdueCount++;
             }
@@ -1727,6 +1753,7 @@ function updateDashboard() {
     });
     
     const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
+saveData();
     
     // Update DOM elements safely
     const elements = {
@@ -1825,6 +1852,7 @@ function completeTask(taskId) {
     }
 
     const oldDueDate = task.dueDate ? new Date(task.dueDate) : new Date();
+saveData();
     
     // Mark as completed with timestamp
     task.lastCompleted = new Date();
@@ -1835,7 +1863,9 @@ function completeTask(taskId) {
     
     // CRITICAL: Set both dueDate and nextDue for full compatibility
     task.dueDate = nextDueDate;
+saveData();
     task.nextDue = nextDueDate;
+saveData();
     
     console.log(`📅 Task "${task.title}" completed!`);
     console.log(`  Old due date: ${oldDueDate.toLocaleDateString()}`);
@@ -1933,6 +1963,7 @@ function deleteTaskDirect(taskId) {
         const taskIndex = tasks.findIndex(t => t.id === taskId);
         if (taskIndex > -1) {
             const deletedTask = tasks.splice(taskIndex, 1)[0];
+saveData();
             console.log(`🗑️ Deleted task: ${deletedTask.title}`);
             
             // Update global reference
@@ -2048,11 +2079,14 @@ function saveTaskFromEdit() {
     editingTask.priority = priority;
     editingTask.category = category;
     editingTask.dueDate = dueDate;
+saveData();
     editingTask.nextDue = dueDate; // Calendar compatibility
+saveData();
     
     if (isNewTask) {
         // Add to tasks array
         tasks.push(editingTask);
+saveData();
         window.tasks = tasks; // Update global reference
         console.log('✅ New task added to global array');
     } else {
@@ -2113,6 +2147,7 @@ function deleteTaskFromEdit() {
         const taskIndex = tasks.findIndex(t => t.id === currentEditingTask.id);
         if (taskIndex > -1) {
             const deletedTask = tasks.splice(taskIndex, 1)[0];
+saveData();
             console.log(`🗑️ Deleted task: ${deletedTask.title}`);
             
             // Update global reference
@@ -2354,11 +2389,13 @@ function exportTaskList() {
     }
     
     const activeTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate);
+saveData();
     
     let csvContent = "Task,Description,Category,Priority,Due Date,Cost,Frequency,Last Completed\n";
     
     activeTasks.forEach(task => {
         const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'Not set';
+saveData();
         const lastCompleted = task.lastCompleted ? new Date(task.lastCompleted).toLocaleDateString() : 'Never';
         
         csvContent += `"${task.title}","${task.description}","${task.category}","${task.priority}","${dueDate}","$${task.cost}","${task.frequency} days","${lastCompleted}"\n`;
@@ -2379,32 +2416,40 @@ function exportTaskList() {
 }
 
 function saveData() {
-  if (!window.currentUser) {
-    console.warn('⚠️ Not signed in; skipping save');
-    return Promise.resolve();
-  }
-
-  const safeTasks = (window.tasks || []).map(t => {
-    const out = { ...t };
-    if (out.dueDate instanceof Date) out.dueDate = firebase.firestore.Timestamp.fromDate(out.dueDate);
-    if (out.nextDue instanceof Date) out.nextDue = firebase.firestore.Timestamp.fromDate(out.nextDue);
-    if (out.lastCompleted instanceof Date) out.lastCompleted = firebase.firestore.Timestamp.fromDate(out.lastCompleted);
-    return out;
-  });
-
-  const userDoc = {
-    homeData: window.homeData || {},
-    tasks: safeTasks,
-    lastUpdated: firebase.firestore.Timestamp.now(),
-    userEmail: window.currentUser?.email || null
-  };
-
-  return db.collection('users')
-    .doc(window.currentUser.uid)
-    .set(userDoc, { merge: true })
-    .then(() => console.log('💾 Saved tasks/homeData for', window.currentUser.uid))
-    .catch(err => console.error('❌ Save error', err));
+    // Ensure calendar compatibility before saving
+    if (window.tasks) {
+        window.tasks.forEach(task => {
+            if (task.dueDate && !task.nextDue) {
+                task.nextDue = task.dueDate;
+saveData();
+saveData();
+            }
+        });
+    }
+    
+    // Check if user is logged in
+    if (!window.currentUser) {
+        console.warn('⚠️ No user logged in, cannot save to Firebase');
+        return;
+    }
+    
+    const data = { 
+        homeData: homeData, 
+        tasks: tasks,
+        version: '2.1'
+    };
+    
+    // Save to Firebase instead of localStorage
+    saveUserDataToFirebase(window.currentUser.uid, homeData, tasks)
+        .then(() => {
+            console.log('✅ Data saved to Firebase successfully');
+        })
+        .catch((error) => {
+            console.error('❌ Failed to save data to Firebase:', error);
+            // Don't throw error to prevent app crashes
+        });
 }
+
 async function loadData() {
     // Check if user is logged in
     if (!window.currentUser) {
@@ -2425,12 +2470,18 @@ async function loadData() {
                 tasks.forEach(task => {
                     if (task.nextDue) {
                         task.dueDate = new Date(task.nextDue);
+saveData();
+saveData();
                         // Keep nextDue for calendar compatibility
                         task.nextDue = new Date(task.nextDue);
+saveData();
                     } else if (task.dueDate) {
                         task.dueDate = new Date(task.dueDate);
+saveData();
                         // Set nextDue for calendar compatibility
                         task.nextDue = new Date(task.dueDate);
+saveData();
+saveData();
                     }
                     if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
                 });
@@ -2620,7 +2671,7 @@ function proceedToTaskGeneration() {
     console.log('🚀 Proceeding to task generation...');
     
     // Generate tasks (using your existing function)
-    generateTaskTemplates({ reset: true });
+    generateTaskTemplates();
     
     // Update global references
     window.homeData = homeData;
@@ -2795,7 +2846,9 @@ CasaCare.debug = {
                     totalWithDates++;
                     if (task.dueDate && task.nextDue) {
                         const dueTime = new Date(task.dueDate).getTime();
+saveData();
                         const nextTime = new Date(task.nextDue).getTime();
+saveData();
                         if (Math.abs(dueTime - nextTime) <= 1000) {
                             syncedCount++;
                         }
