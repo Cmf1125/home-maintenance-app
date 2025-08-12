@@ -1981,7 +1981,7 @@ async function saveUserDataToFirebase(userId, homeData, tasks) {
             userEmail: window.currentUser ? window.currentUser.email : null
         };
         
-        await db.collection('users').doc(userId).set(userData);
+        await db.collection('users').doc(userId).set(userData, { merge: true });
         console.log('💾 User data saved to Firebase successfully');
         return true;
     } catch (error) {
