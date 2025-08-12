@@ -232,8 +232,8 @@ class CasaCareDocuments {
     renderEditModal() {
         return `
             <!-- Document Edit Modal -->
-            <div id="document-edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-                <div class="bg-white rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div id="document-edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4" style="padding-bottom: 120px;">
+                <div class="bg-white rounded-xl w-full max-w-md max-h-[75vh] overflow-y-auto shadow-2xl">
                     <div class="sticky top-0 bg-white p-4 border-b border-gray-200 rounded-t-xl">
                         <div class="flex items-center justify-between">
                             <h3 class="text-xl font-bold text-gray-900">Document Details</h3>
@@ -242,7 +242,7 @@ class CasaCareDocuments {
                         </div>
                     </div>
                     
-                    <div class="p-4 space-y-4">
+                    <div class="p-4 space-y-4" style="padding-bottom: 2rem;">
                         <!-- Document Preview Section -->
                         <div id="document-preview-section" class="text-center p-4 bg-gray-50 rounded-lg">
                             <!-- Will be populated with document preview -->
