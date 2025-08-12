@@ -1912,45 +1912,39 @@ document.body.classList.remove('main-app-active');
 }
 
 // Load user data from Firestore
+// Load user data from Firestore and normalize dates
 async function loadUserData(userId) {
-    try {
-        const userDoc = await db.collection('users').doc(userId).get();
-        if (userDoc.exists) {
-            const userData = userDoc.data();
-            if (userData.homeData && userData.tasks) {
-                // Load the data into the app
-                window.homeData = userData.homeData;
-                window.tasks = userData.tasks;
-                
-                // Handle both Firebase Timestamps and ISO strings
-                window.tasks.forEach(task => {
-                    // Convert Firebase Timestamps to Date objects
-                    if (task.dueDate && task.dueDate.toDate) {
-                        task.dueDate = task.dueDate.toDate();
-                        task.nextDue = task.dueDate;
-                    } else if (task.dueDate && typeof task.dueDate === 'string') {
-                        task.dueDate = new Date(task.dueDate);
-                        task.nextDue = task.dueDate;
-                    } else if (task.nextDue && task.nextDue.toDate) {
-                        task.nextDue = task.nextDue.toDate();
-                        task.dueDate = task.nextDue;
-                    }
-                    
-                    if (task.lastCompleted && task.lastCompleted.toDate) {
-                        task.lastCompleted = task.lastCompleted.toDate();
-                    } else if (task.lastCompleted && typeof task.lastCompleted === 'string') {
-                        task.lastCompleted = new Date(task.lastCompleted);
-                    }
-                });
-                
-                return true;
-            }
-        }
-        return false;
-    } catch (error) {
-        console.error('❌ Error loading user data:', error);
-        return false;
+  try {
+    const doc = await db.collection('users').doc(userId).get();
+    if (!doc.exists) {
+      window.homeData = {};
+      window.tasks = [];
+      return false;
     }
+
+    const data = doc.data() || {};
+    window.homeData = data.homeData || {};
+    window.tasks = Array.isArray(data.tasks) ? data.tasks : [];
+
+    // Convert Firestore Timestamps/strings back into real Date objects
+    window.tasks.forEach(t => {
+      if (t.dueDate?.toDate) t.dueDate = t.dueDate.toDate();
+      else if (typeof t.dueDate === 'string') t.dueDate = new Date(t.dueDate);
+
+      if (t.nextDue?.toDate) t.nextDue = t.nextDue.toDate();
+      else if (typeof t.nextDue === 'string') t.nextDue = new Date(t.nextDue);
+
+      if (t.lastCompleted?.toDate) t.lastCompleted = t.lastCompleted.toDate();
+      else if (typeof t.lastCompleted === 'string') t.lastCompleted = new Date(t.lastCompleted);
+    });
+
+    return true;
+  } catch (error) {
+    console.error('❌ Error loading user data:', error);
+    window.homeData = {};
+    window.tasks = [];
+    return false;
+  }
 }
     
 // Save user data to Firestore
