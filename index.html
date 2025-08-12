@@ -1754,6 +1754,29 @@ console.log('🔥 Firebase initialized');
 
 // FIXED: Enhanced save function with direct document reference
 async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
+    // --- Sanitize helper to prevent Firestore nested entity errors ---
+    function sanitizeForFirestore(value) {
+        const t = Object.prototype.toString.call(value);
+        if (value === undefined || typeof value === 'function') return undefined;
+        if (t === '[object File]' || t === '[object Blob]') return undefined;
+        if (value && (value instanceof Element)) return undefined; // DOM nodes
+
+        if (Array.isArray(value)) {
+            return value
+                .map(sanitizeForFirestore)
+                .filter(v => v !== undefined);
+        }
+        if (value && typeof value === 'object') {
+            const out = {};
+            for (const [k, v] of Object.entries(value)) {
+                const sv = sanitizeForFirestore(v);
+                if (sv !== undefined) out[k] = sv;
+            }
+            return out;
+        }
+        return value; // string, number, boolean, null
+    }
+
     try {
         if (!userId || !window.currentUser) {
             console.log('🚫 Enhanced save skipped: No user logged in');
@@ -1761,11 +1784,11 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
         }
 
         console.log('💾 Enhanced save: Starting comprehensive save...');
-        
+
         // Convert Date objects to Firebase Timestamps for proper storage
         const firebaseTasks = (tasks || []).map(task => {
             const firebaseTask = { ...task };
-            
+
             if (firebaseTask.dueDate instanceof Date) {
                 firebaseTask.dueDate = firebase.firestore.Timestamp.fromDate(firebaseTask.dueDate);
             }
@@ -1775,25 +1798,28 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
             if (firebaseTask.lastCompleted instanceof Date) {
                 firebaseTask.lastCompleted = firebase.firestore.Timestamp.fromDate(firebaseTask.lastCompleted);
             }
-            
+
             return firebaseTask;
         });
 
-        // FIXED: Use direct global references like appliances
+        // ✅ Sanitize appliances and documents before saving
+        const safeDocuments  = sanitizeForFirestore(window.documentsData || []);
+        const safeAppliances = sanitizeForFirestore(window.applianceData || []);
+
         const userData = {
             homeData: homeData || {},
             tasks: firebaseTasks,
-            appliances: window.applianceData || [],
-            documents: window.documentsData || [], // CHANGED: Direct reference
+            appliances: safeAppliances,
+            documents: safeDocuments,
             lastUpdated: firebase.firestore.Timestamp.now(),
             userEmail: window.currentUser.email,
             version: '2.1'
         };
-        
+
         console.log(`📄 Enhanced save: Saving ${userData.documents.length} documents`);
         console.log(`📦 Enhanced save: Saving ${userData.appliances.length} appliances`);
         console.log(`📋 Enhanced save: Saving ${userData.tasks.length} tasks`);
-        
+
         // Use set with merge to avoid overwriting
         await db.collection('users').doc(userId).set(userData, { merge: true });
         console.log('✅ Enhanced save: All data saved successfully');
