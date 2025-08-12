@@ -1846,15 +1846,21 @@ async function loadUserDataEnhanced(userId) {
                     window.applianceData = window.applianceData || [];
                 }
 
-                // Load documents safely  
-                if (userData.documents && Array.isArray(userData.documents)) {
-                    // Don't overwrite if documents module isn't ready
-                    if (window.casaCareDocuments) {
-                        window.casaCareDocuments.documents = userData.documents;
-                    }
-                    console.log(`📄 Enhanced load: ${userData.documents.length} documents found`);
-                }
-                
+// Load documents safely  
+if (userData.documents && Array.isArray(userData.documents)) {
+    // Ensure the global documents object exists
+    if (!window.casaCareDocuments) {
+        window.casaCareDocuments = { documents: [] };
+    }
+    window.casaCareDocuments.documents = userData.documents;
+    console.log(`📄 Enhanced load: ${userData.documents.length} documents loaded into global storage`);
+} else {
+    // Initialize empty if no documents
+    if (!window.casaCareDocuments) {
+        window.casaCareDocuments = { documents: [] };
+    }
+}
+  
                 console.log(`✅ Enhanced load: Success! ${window.tasks.length} tasks, ${window.applianceData.length} appliances`);
                 return true;
             }
