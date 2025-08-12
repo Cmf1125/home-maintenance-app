@@ -27,33 +27,58 @@ class ApplianceManager {
         console.log('✅ Appliance Manager: Initialized');
     }
     
-    // Load appliances from storage
     loadAppliances() {
-        try {
-            const savedAppliances = localStorage.getItem('homeKeeperAppliances');
-            this.appliances = savedAppliances ? JSON.parse(savedAppliances) : [];
-            console.log(`⚙️ Appliances: Loaded ${this.appliances.length} appliances`);
-        } catch (error) {
-            console.error('❌ Appliances: Error loading appliances:', error);
-            this.appliances = [];
-        }
+  // Data is loaded after login via loadAppliancesFromFirebase in index.html
+  this.appliances = Array.isArray(window.applianceData) ? window.applianceData : [];
+  console.log(`⚙️ Appliances: Initialized with ${this.appliances.length} appliances`);
+}
+    setAppliances(appliances) {
+  this.appliances = Array.isArray(appliances) ? appliances : [];
+  this.render();
+}
+    async saveAppliances() {
+  try {
+    if (!window.currentUser || !window.db) {
+      console.warn('⚠️ Appliances: not logged in, skipping Firestore save');
+      return;
     }
-    
-    // Save appliances to storage
-    saveAppliances() {
-        try {
-            localStorage.setItem('homeKeeperAppliances', JSON.stringify(this.appliances));
-            console.log('💾 Appliances: Saved successfully');
-            
-            // Also save to main app data for integration
-            this.updateMainAppData();
-        } catch (error) {
-            console.error('❌ Appliances: Error saving appliances:', error);
-            if (error.name === 'QuotaExceededError') {
-                alert('❌ Storage quota exceeded. Please delete some photos to free up space.');
-            }
-        }
-    }
+    const userId = window.currentUser.uid;
+    const col = window.db.collection('users').doc(userId).collection('appliances');
+
+    // Ensure each appliance has a stable string id
+    this.appliances.forEach(a => {
+      if (!a.id) {
+        a.id = (crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+      }
+      a.id = String(a.id);
+    });
+
+    // Fetch existing docs to detect deletions
+    const existingSnap = await col.get();
+    const existingIds = new Set(existingSnap.docs.map(d => d.id));
+    const currentIds = new Set(this.appliances.map(a => String(a.id)));
+
+    // Batch upserts for current appliances
+    const batch = window.db.batch();
+    this.appliances.forEach(a => {
+      batch.set(col.doc(String(a.id)), a, { merge: true });
+    });
+
+    // Remove docs that are no longer present locally
+    existingIds.forEach(id => {
+      if (!currentIds.has(id)) batch.delete(col.doc(id));
+    });
+
+    await batch.commit();
+    console.log('💾 Appliances: saved to Firestore');
+
+    // Keep main app in sync (this will save tasks/homeData to Firestore)
+    this.updateMainAppData();
+  } catch (error) {
+    console.error('❌ Appliances: Error saving to Firestore:', error);
+    alert('❌ Failed to save appliances. Check console for details.');
+  }
+}
     
     // Update main app data for integration with tasks/calendar
     updateMainAppData() {
