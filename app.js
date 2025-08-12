@@ -119,7 +119,7 @@ function createMaintenancePlan() {
         };
 
         // Generate tasks
-        generateTaskTemplates();
+        generateTaskTemplates({ reset: true });
 
         // Update global references
         window.homeData = homeData;
@@ -145,11 +145,11 @@ function createMaintenancePlan() {
     }
 }
 // Generate task templates
-function generateTaskTemplates() {
-
-    
+function generateTaskTemplates({ reset = false } = {}) {
+  if (reset) {
     tasks = [];
-    let id = 1;
+  }
+  let id = 1;
 
     // Essential tasks for all homes
     const essentialTasks = [
@@ -2671,7 +2671,7 @@ function proceedToTaskGeneration() {
     console.log('🚀 Proceeding to task generation...');
     
     // Generate tasks (using your existing function)
-    generateTaskTemplates();
+    generateTaskTemplates({ reset: true });
     
     // Update global references
     window.homeData = homeData;
