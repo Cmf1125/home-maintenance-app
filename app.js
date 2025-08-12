@@ -2393,20 +2393,24 @@ function saveData() {
         return;
     }
     
-    const data = { 
-        homeData: homeData, 
-        tasks: tasks,
-        version: '2.1'
-    };
+    console.log('💾 Using enhanced save to preserve all data...');
     
-    // Save to Firebase instead of localStorage
-    saveUserDataToFirebase(window.currentUser.uid, homeData, tasks)
+    // FIXED: Use enhanced save that preserves ALL data types
+    saveUserDataToFirebaseEnhanced(window.currentUser.uid, window.homeData || {}, window.tasks || [])
+        .then((success) => {
+            if (success) {
+                console.log('✅ Enhanced save completed - all data preserved');
+            } else {
+                console.warn('⚠️ Enhanced save failed, trying fallback...');
+                // Fallback to original save
+                return saveUserDataToFirebase(window.currentUser.uid, window.homeData || {}, window.tasks || []);
+            }
+        })
         .then(() => {
-            console.log('✅ Data saved to Firebase successfully');
+            console.log('✅ Data saved successfully');
         })
         .catch((error) => {
-            console.error('❌ Failed to save data to Firebase:', error);
-            // Don't throw error to prevent app crashes
+            console.error('❌ Failed to save data:', error);
         });
 }
 
