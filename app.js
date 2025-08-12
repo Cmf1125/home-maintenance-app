@@ -119,7 +119,7 @@ function createMaintenancePlan() {
         };
 
         // Generate tasks
-        generateTaskTemplates();
+        generateTaskTemplates({ reset: true });
 
         // Update global references
         window.homeData = homeData;
@@ -144,12 +144,13 @@ function createMaintenancePlan() {
         alert('❌ Error creating maintenance plan. Check console for details.');
     }
 }
-// Generate task templates
-function generateTaskTemplates() {
 
-    
+// Generate task templates (only clears when reset=true)
+function generateTaskTemplates({ reset = false } = {}) {
+  if (reset) {
     tasks = [];
-    let id = 1;
+  }
+  let id = 1;
 
     // Essential tasks for all homes
     const essentialTasks = [
@@ -2378,38 +2379,32 @@ function exportTaskList() {
 }
 
 function saveData() {
-    // Ensure calendar compatibility before saving
-    if (window.tasks) {
-        window.tasks.forEach(task => {
-            if (task.dueDate && !task.nextDue) {
-                task.nextDue = task.dueDate;
-            }
-        });
-    }
-    
-    // Check if user is logged in
-    if (!window.currentUser) {
-        console.warn('⚠️ No user logged in, cannot save to Firebase');
-        return;
-    }
-    
-    const data = { 
-        homeData: homeData, 
-        tasks: tasks,
-        version: '2.1'
-    };
-    
-    // Save to Firebase instead of localStorage
-    saveUserDataToFirebase(window.currentUser.uid, homeData, tasks)
-        .then(() => {
-            console.log('✅ Data saved to Firebase successfully');
-        })
-        .catch((error) => {
-            console.error('❌ Failed to save data to Firebase:', error);
-            // Don't throw error to prevent app crashes
-        });
-}
+  if (!window.currentUser) {
+    console.warn('⚠️ Not signed in; skipping save');
+    return Promise.resolve();
+  }
 
+  const safeTasks = (window.tasks || []).map(t => {
+    const out = { ...t };
+    if (out.dueDate instanceof Date) out.dueDate = firebase.firestore.Timestamp.fromDate(out.dueDate);
+    if (out.nextDue instanceof Date) out.nextDue = firebase.firestore.Timestamp.fromDate(out.nextDue);
+    if (out.lastCompleted instanceof Date) out.lastCompleted = firebase.firestore.Timestamp.fromDate(out.lastCompleted);
+    return out;
+  });
+
+  const userDoc = {
+    homeData: window.homeData || {},
+    tasks: safeTasks,
+    lastUpdated: firebase.firestore.Timestamp.now(),
+    userEmail: window.currentUser?.email || null
+  };
+
+  return db.collection('users')
+    .doc(window.currentUser.uid)
+    .set(userDoc, { merge: true })
+    .then(() => console.log('💾 Saved tasks/homeData for', window.currentUser.uid))
+    .catch(err => console.error('❌ Save error', err));
+}
 async function loadData() {
     // Check if user is logged in
     if (!window.currentUser) {
@@ -2625,7 +2620,7 @@ function proceedToTaskGeneration() {
     console.log('🚀 Proceeding to task generation...');
     
     // Generate tasks (using your existing function)
-    generateTaskTemplates();
+    generateTaskTemplates({ reset: true });
     
     // Update global references
     window.homeData = homeData;
