@@ -1778,6 +1778,27 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
             
             return firebaseTask;
         });
+        
+        // ADD THIS SECTION HERE:
+        // Filter out documents with large file data that cause Firebase errors
+        const cleanDocuments = (window.documentsData || []).filter(doc => {
+            if (doc.fileData && doc.fileData.length > 500000) {
+                console.warn(`⚠️ Skipping large document: ${doc.title}`);
+                return false;
+            }
+            return true;
+        });
+
+        // THEN UPDATE userData to use cleanDocuments:
+        const userData = {
+            homeData: homeData || {},
+            tasks: firebaseTasks,
+            appliances: window.applianceData || [],
+            documents: cleanDocuments, // <- Change this line
+            lastUpdated: firebase.firestore.Timestamp.now(),
+            userEmail: window.currentUser.email,
+            version: '2.1'
+        };
 
         // FIXED: Use direct global references like appliances
         const userData = {
