@@ -2076,6 +2076,78 @@ firebase.auth().onAuthStateChanged(user => {
   }
 });
 </script>
+<script>
+// ---- Simple view router (global) ----
+(function () {
+  const viewMap = {
+    dashboard: 'dashboard-view',
+    calendar: 'calendar-view',
+    appliances: 'appliances-view',
+    documents: 'documents-view',
+    allTasks: 'all-tasks-view'
+  };
+
+  const tabMap = {
+    dashboard: 'tab-dashboard',
+    calendar: 'tab-calendar',
+    appliances: 'tab-appliances',
+    documents: 'tab-documents'
+  };
+
+  function setVisible(el, show) {
+    if (!el) return;
+    if (show) el.classList.remove('hidden');
+    else el.classList.add('hidden');
+  }
+
+  function setActiveTab(name) {
+    Object.entries(tabMap).forEach(([key, tabId]) => {
+      const tab = document.getElementById(tabId);
+      if (!tab) return;
+      if (key === name) {
+        tab.classList.add('bg-blue-100', 'text-blue-700');
+        tab.classList.remove('text-gray-600');
+      } else {
+        tab.classList.remove('bg-blue-100', 'text-blue-700');
+        tab.classList.add('text-gray-600');
+      }
+    });
+  }
+
+  function updateHeader(name) {
+    const backBtn = document.getElementById('back-to-dashboard');
+    if (backBtn) {
+      // Show the back button on any view that's not the dashboard
+      if (name === 'dashboard') backBtn.classList.add('hidden');
+      else backBtn.classList.remove('hidden');
+    }
+  }
+
+  // Expose globally so your buttons can call it
+  window.showTab = function(name) {
+    // Hide all views
+    Object.values(viewMap).forEach(viewId => {
+      setVisible(document.getElementById(viewId), false);
+    });
+
+    // Show requested view (fallback to dashboard if unknown)
+    const viewId = viewMap[name] || viewMap.dashboard;
+    setVisible(document.getElementById(viewId), true);
+
+    // Sync nav + header
+    setActiveTab(name in tabMap ? name : 'dashboard');
+    updateHeader(name);
+  };
+
+  // Optional: default route on first load (only if main app is visible)
+  document.addEventListener('DOMContentLoaded', () => {
+    const mainApp = document.getElementById('main-app');
+    if (mainApp && !mainApp.classList.contains('hidden')) {
+      window.showTab('dashboard');
+    }
+  });
+})();
+</script>
             
 </body>
 </html>
