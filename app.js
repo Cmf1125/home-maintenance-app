@@ -119,7 +119,7 @@ function createMaintenancePlan() {
         };
 
         // Generate tasks
-        generateTaskTemplates({ reset: true });
+        generateTaskTemplates();
 
         // Update global references
         window.homeData = homeData;
@@ -145,11 +145,11 @@ function createMaintenancePlan() {
     }
 }
 // Generate task templates
-function generateTaskTemplates({ reset = false } = {}) {
-  if (reset) {
+function generateTaskTemplates() {
+
+    
     tasks = [];
-  }
-  let id = 1;
+    let id = 1;
 
     // Essential tasks for all homes
     const essentialTasks = [
@@ -1184,23 +1184,15 @@ document.getElementById('header-subtitle').textContent = homeData.fullAddress;
     alert(`🎉 Setup Complete!\n\n✅ ${successCount} tasks scheduled automatically\n📅 Your clean, simple maintenance plan is ready!\n\nCheck your dashboard and calendar now.`);
     
     // Save to Firebase if user is logged in
-if (window.currentUser) {
-  // Clear main user doc's homeData/tasks
-  saveUserDataToFirebase(window.currentUser.uid, {}, [])
-    .then(() => {
-      console.log('✅ Data cleared from Firebase');
-
-      // ✅ Also clear appliances subcollection
-      if (window.clearAppliancesFromFirebase) {
-        window.clearAppliancesFromFirebase(window.currentUser.uid)
-          .then(() => console.log('✅ Appliances cleared from Firebase'))
-          .catch(err => console.error('❌ Failed to clear appliances:', err));
-      }
-    })
-    .catch((error) => {
-      console.error('❌ Failed to clear data:', error);
-    });
-}
+    if (window.currentUser) {
+        saveUserDataToFirebase(window.currentUser.uid, homeData, tasks)
+            .then(() => {
+                console.log('💾 User data saved to Firebase');
+            })
+            .catch((error) => {
+                console.error('❌ Error saving to Firebase:', error);
+            });
+    }
     console.log('🎉 CLEAN SIMPLE TASK SETUP COMPLETION SUCCESSFUL!');
 }
 
@@ -2633,7 +2625,7 @@ function proceedToTaskGeneration() {
     console.log('🚀 Proceeding to task generation...');
     
     // Generate tasks (using your existing function)
-    generateTaskTemplates({ reset: true });
+    generateTaskTemplates();
     
     // Update global references
     window.homeData = homeData;
