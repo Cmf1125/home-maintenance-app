@@ -1869,6 +1869,49 @@ window.saveApplianceToFirebase = saveApplianceToFirebase;
 window.deleteApplianceFromFirebase = deleteApplianceFromFirebase;
 window.loadAppliancesFromFirebase = loadAppliancesFromFirebase;
 window.clearAppliancesFromFirebase = clearAppliancesFromFirebase;
+    function handleSuccessfulLogin(user) {
+  console.log('🏠 User logged in, loading data first...');
+
+  // Hide login/onboarding screens
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('setup-form').classList.add('hidden');
+  document.getElementById('setup-form').style.display = 'none';
+  document.getElementById('onboarding-progress').classList.add('hidden');
+
+  // Load homeData + tasks from Firestore
+  loadUserData(user.uid).then(hasData => {
+    if (hasData) {
+      // Load appliances from Firestore and hydrate UI
+      loadAppliancesFromFirebase(user.uid)
+        .then(appliances => {
+          window.applianceData = appliances;
+          if (window.applianceManager && typeof window.applianceManager.setAppliances === 'function') {
+            window.applianceManager.setAppliances(appliances);
+          }
+        })
+        .catch(err => {
+          console.error('❌ Error loading appliances:', err);
+          window.applianceData = [];
+        });
+
+      // Show main app UI
+      document.getElementById('main-app').classList.remove('hidden');
+      document.body.classList.add('main-app-active');
+      document.getElementById('header-subtitle').textContent = window.homeData.fullAddress;
+      showTab('dashboard');
+
+      // Refresh dashboard after data load
+      if (window.enhancedDashboard && window.enhancedDashboard.render) {
+        window.enhancedDashboard.render();
+      }
+
+      console.log('✅ Data loaded, dashboard ready');
+    } else {
+      // New user flow
+      handleNewUserSignup(user);
+    }
+  });
+}
 
 /* ========================
    Auth state listener
