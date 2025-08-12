@@ -38,16 +38,33 @@ class CasaCareDocuments {
     
     // Save documents to storage
     saveDocuments() {
-        try {
-            localStorage.setItem('casaCareDocuments', JSON.stringify(this.documents));
-            console.log('💾 Documents: Saved successfully');
-        } catch (error) {
-            console.error('❌ Documents: Error saving documents:', error);
-            if (error.name === 'QuotaExceededError') {
-                alert('❌ Storage quota exceeded. Please delete some documents to free up space.');
-            }
+    try {
+        console.log('💾 Documents: Using integrated save to preserve all data...');
+        
+        // FIXED: Update global reference first
+        if (!window.casaCareDocuments) {
+            window.casaCareDocuments = { documents: [] };
         }
+        window.casaCareDocuments.documents = this.documents;
+        
+        if (!window.currentUser) {
+            console.warn('⚠️ Documents: not logged in, skipping save');
+            return;
+        }
+        
+        // FIXED: Use main save function to preserve ALL data
+        if (typeof window.saveData === 'function') {
+            window.saveData();
+            console.log('✅ Documents: Saved using integrated system');
+        } else {
+            console.error('❌ Main saveData function not available');
+        }
+        
+    } catch (error) {
+        console.error('❌ Documents: Error saving:', error);
+        alert('❌ Failed to save documents. Please try again.');
     }
+}
     
     // Bind events
     bindEvents() {
