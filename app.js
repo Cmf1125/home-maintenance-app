@@ -2466,7 +2466,6 @@ async function loadData() {
 }
 
 async function hasExistingData() {
-  // Wait for Firebase auth to resolve exactly once
   return new Promise((resolve) => {
     const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       unsubscribe(); // prevent stacking listeners
@@ -2480,12 +2479,11 @@ async function hasExistingData() {
       console.log('✅ Auth state ready for:', user.email);
       window.currentUser = user;
 
-      // const dataLoaded = await loadData(); // your existing loadData()
-      resolve(!!(dataLoaded && window.homeData?.fullAddress));
+      const ok = await loadData(); // your existing loadData()
+      resolve(!!(ok && window.homeData?.fullAddress));
     });
   });
 }
-
 // Enhanced initialization
 async function initializeApp() {
     initializeCasaCareData();
