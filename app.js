@@ -2394,6 +2394,15 @@ function saveData() {
     }
     
     console.log('💾 Using enhanced save to preserve all data...');
+
+    // DEBUG: Check exactly what we're about to save
+    console.log('💾 Saving data payload:', {
+        uid: window.currentUser.uid,
+        homeData: window.homeData,
+        tasks: window.tasks,
+        appliances: window.appliancesData,
+        documents: window.documentsData
+    });
     
     // FIXED: Use enhanced save that preserves ALL data types
     saveUserDataToFirebaseEnhanced(window.currentUser.uid, window.homeData || {}, window.tasks || [])
@@ -2413,7 +2422,6 @@ function saveData() {
             console.error('❌ Failed to save data:', error);
         });
 }
-
 async function loadData() {
     // Check if user is logged in
     if (!window.currentUser) {
