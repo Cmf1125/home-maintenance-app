@@ -36,46 +36,29 @@ class ApplianceManager {
   this.appliances = Array.isArray(appliances) ? appliances : [];
   this.render();
 }
-    async saveAppliances() {
+
+async saveAppliances() {
   try {
-    if (!window.currentUser || !window.db) {
-      console.warn('⚠️ Appliances: not logged in, skipping Firestore save');
+    console.log('💾 Appliances: Using integrated save to preserve all data...');
+    
+    // FIXED: Update global reference first
+    window.applianceData = this.appliances;
+    
+    if (!window.currentUser) {
+      console.warn('⚠️ Appliances: not logged in, skipping save');
       return;
     }
-    const userId = window.currentUser.uid;
-    const col = window.db.collection('users').doc(userId).collection('appliances');
-
-    // Ensure each appliance has a stable string id
-    this.appliances.forEach(a => {
-      if (!a.id) {
-        a.id = (crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`);
-      }
-      a.id = String(a.id);
-    });
-
-    // Fetch existing docs to detect deletions
-    const existingSnap = await col.get();
-    const existingIds = new Set(existingSnap.docs.map(d => d.id));
-    const currentIds = new Set(this.appliances.map(a => String(a.id)));
-
-    // Batch upserts for current appliances
-    const batch = window.db.batch();
-    this.appliances.forEach(a => {
-      batch.set(col.doc(String(a.id)), a, { merge: true });
-    });
-
-    // Remove docs that are no longer present locally
-    existingIds.forEach(id => {
-      if (!currentIds.has(id)) batch.delete(col.doc(id));
-    });
-
-    await batch.commit();
-    console.log('💾 Appliances: saved to Firestore');
-
-    // Keep main app in sync (this will save tasks/homeData to Firestore)
-    this.updateMainAppData();
+    
+    // FIXED: Use main save function to preserve ALL data
+    if (typeof window.saveData === 'function') {
+      window.saveData();
+      console.log('✅ Appliances: Saved using integrated system');
+    } else {
+      console.error('❌ Main saveData function not available');
+    }
+    
   } catch (error) {
-    console.error('❌ Appliances: Error saving to Firestore:', error);
+    console.error('❌ Appliances: Error saving:', error);
     alert('❌ Failed to save appliances. Check console for details.');
   }
 }
