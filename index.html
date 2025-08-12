@@ -1425,49 +1425,7 @@
         window.toggleSettingsDropdown = toggleSettingsDropdown;
         window.closeSettingsDropdown = closeSettingsDropdown;
     </script>
-<script>
-// === Auth helpers used by your buttons ===
 
-// Email/password sign in (used by "Sign In" button)
-function signInUser() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass  = document.getElementById('login-password').value;
-  if (!email || !pass) return alert('Please enter email and password');
-  firebase.auth().signInWithEmailAndPassword(email, pass)
-    .then(() => console.log('✅ Email sign-in ok'))
-    .catch(err => alert('Sign-in error: ' + err.message));
-}
-
-// Create account (used by "Create Account" button)
-function createUser() {
-  const email = document.getElementById('signup-email').value.trim();
-  const pass  = document.getElementById('signup-password').value;
-  if (!email || !pass) return alert('Please enter email and password');
-  firebase.auth().createUserWithEmailAndPassword(email, pass)
-    .then(() => console.log('✅ Account created'))
-    .catch(err => alert('Signup error: ' + err.message));
-}
-
-// Google sign in (used by "Sign in with Google")
-function signInWithGoogle() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider)
-    .then(res => console.log('✅ Google sign-in:', res.user?.email))
-    .catch(err => alert('Google sign-in error: ' + err.message));
-}
-
-// Sign out (used by ⚙️ menu → Sign Out)
-function signOutUser() {
-  firebase.auth().signOut()
-    .then(() => {
-      console.log('✅ Signed out');
-      document.getElementById('main-app').classList.add('hidden');
-      document.getElementById('login-screen').classList.remove('hidden');
-    })
-    .catch(err => alert('Sign-out error: ' + err.message));
-}
-</script>
-            
     <!-- ✅ Core Scripts go here -->
     <script src="date-utils.js"></script>
     <script src="app.js"></script>
@@ -1953,39 +1911,46 @@ document.body.classList.remove('main-app-active');
     console.log('✅ New user ready for setup');
 }
 
-// Load user data from Firestore and normalize dates
+// Load user data from Firestore
 async function loadUserData(userId) {
-  try {
-    const doc = await db.collection('users').doc(userId).get();
-    if (!doc.exists) {
-      window.homeData = {};
-      window.tasks = [];
-      return false;
+    try {
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            if (userData.homeData && userData.tasks) {
+                // Load the data into the app
+                window.homeData = userData.homeData;
+                window.tasks = userData.tasks;
+                
+                // Handle both Firebase Timestamps and ISO strings
+                window.tasks.forEach(task => {
+                    // Convert Firebase Timestamps to Date objects
+                    if (task.dueDate && task.dueDate.toDate) {
+                        task.dueDate = task.dueDate.toDate();
+                        task.nextDue = task.dueDate;
+                    } else if (task.dueDate && typeof task.dueDate === 'string') {
+                        task.dueDate = new Date(task.dueDate);
+                        task.nextDue = task.dueDate;
+                    } else if (task.nextDue && task.nextDue.toDate) {
+                        task.nextDue = task.nextDue.toDate();
+                        task.dueDate = task.nextDue;
+                    }
+                    
+                    if (task.lastCompleted && task.lastCompleted.toDate) {
+                        task.lastCompleted = task.lastCompleted.toDate();
+                    } else if (task.lastCompleted && typeof task.lastCompleted === 'string') {
+                        task.lastCompleted = new Date(task.lastCompleted);
+                    }
+                });
+                
+                return true;
+            }
+        }
+        return false;
+    } catch (error) {
+        console.error('❌ Error loading user data:', error);
+        return false;
     }
-
-    const data = doc.data() || {};
-    window.homeData = data.homeData || {};
-    window.tasks = Array.isArray(data.tasks) ? data.tasks : [];
-
-    // Convert Firestore Timestamps/strings back into real Date objects
-    window.tasks.forEach(t => {
-      if (t.dueDate?.toDate) t.dueDate = t.dueDate.toDate();
-      else if (typeof t.dueDate === 'string') t.dueDate = new Date(t.dueDate);
-
-      if (t.nextDue?.toDate) t.nextDue = t.nextDue.toDate();
-      else if (typeof t.nextDue === 'string') t.nextDue = new Date(t.nextDue);
-
-      if (t.lastCompleted?.toDate) t.lastCompleted = t.lastCompleted.toDate();
-      else if (typeof t.lastCompleted === 'string') t.lastCompleted = new Date(t.lastCompleted);
-    });
-
-    return true;
-  } catch (error) {
-    console.error('❌ Error loading user data:', error);
-    window.homeData = {};
-    window.tasks = [];
-    return false;
-  }
 }
     
 // Save user data to Firestore
@@ -2016,7 +1981,7 @@ async function saveUserDataToFirebase(userId, homeData, tasks) {
             userEmail: window.currentUser ? window.currentUser.email : null
         };
         
-        await db.collection('users').doc(userId).set(userData, { merge: true });
+        await db.collection('users').doc(userId).set(userData);
         console.log('💾 User data saved to Firebase successfully');
         return true;
     } catch (error) {
@@ -2054,100 +2019,6 @@ auth.onAuthStateChanged((user) => {
 });
     
 </script>
-<script>
-firebase.auth().onAuthStateChanged(user => {
-  if (user) {
-    window.currentUser = user;
-    console.log('👤 Signed in as', user.email);
-
-    // Load this user's saved homeData and tasks
-    loadUserData(user.uid).then(() => {
-      document.getElementById('login-screen').classList.add('hidden');
-      document.getElementById('main-app').classList.remove('hidden');
-
-      // Refresh UI components if they exist
-      if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
-      if (window.casaCareCalendar?.refresh) window.casaCareCalendar.refresh();
-    });
-  } else {
-    window.currentUser = null;
-    document.getElementById('main-app').classList.add('hidden');
-    document.getElementById('login-screen').classList.remove('hidden');
-  }
-});
-</script>
-<script>
-// ---- Simple view router (global) ----
-(function () {
-  const viewMap = {
-    dashboard: 'dashboard-view',
-    calendar: 'calendar-view',
-    appliances: 'appliances-view',
-    documents: 'documents-view',
-    allTasks: 'all-tasks-view'
-  };
-
-  const tabMap = {
-    dashboard: 'tab-dashboard',
-    calendar: 'tab-calendar',
-    appliances: 'tab-appliances',
-    documents: 'tab-documents'
-  };
-
-  function setVisible(el, show) {
-    if (!el) return;
-    if (show) el.classList.remove('hidden');
-    else el.classList.add('hidden');
-  }
-
-  function setActiveTab(name) {
-    Object.entries(tabMap).forEach(([key, tabId]) => {
-      const tab = document.getElementById(tabId);
-      if (!tab) return;
-      if (key === name) {
-        tab.classList.add('bg-blue-100', 'text-blue-700');
-        tab.classList.remove('text-gray-600');
-      } else {
-        tab.classList.remove('bg-blue-100', 'text-blue-700');
-        tab.classList.add('text-gray-600');
-      }
-    });
-  }
-
-  function updateHeader(name) {
-    const backBtn = document.getElementById('back-to-dashboard');
-    if (backBtn) {
-      // Show the back button on any view that's not the dashboard
-      if (name === 'dashboard') backBtn.classList.add('hidden');
-      else backBtn.classList.remove('hidden');
-    }
-  }
-
-  // Expose globally so your buttons can call it
-  window.showTab = function(name) {
-    // Hide all views
-    Object.values(viewMap).forEach(viewId => {
-      setVisible(document.getElementById(viewId), false);
-    });
-
-    // Show requested view (fallback to dashboard if unknown)
-    const viewId = viewMap[name] || viewMap.dashboard;
-    setVisible(document.getElementById(viewId), true);
-
-    // Sync nav + header
-    setActiveTab(name in tabMap ? name : 'dashboard');
-    updateHeader(name);
-  };
-
-  // Optional: default route on first load (only if main app is visible)
-  document.addEventListener('DOMContentLoaded', () => {
-    const mainApp = document.getElementById('main-app');
-    if (mainApp && !mainApp.classList.contains('hidden')) {
-      window.showTab('dashboard');
-    }
-  });
-})();
-</script>
-            
+    
 </body>
 </html>
