@@ -2394,15 +2394,6 @@ function saveData() {
     }
     
     console.log('💾 Using enhanced save to preserve all data...');
-
-    // DEBUG: Check exactly what we're about to save
-    console.log('💾 Saving data payload:', {
-        uid: window.currentUser.uid,
-        homeData: window.homeData,
-        tasks: window.tasks,
-        appliances: window.appliancesData,
-        documents: window.documentsData
-    });
     
     // FIXED: Use enhanced save that preserves ALL data types
     saveUserDataToFirebaseEnhanced(window.currentUser.uid, window.homeData || {}, window.tasks || [])
@@ -2422,6 +2413,7 @@ function saveData() {
             console.error('❌ Failed to save data:', error);
         });
 }
+
 async function loadData() {
     // Check if user is logged in
     if (!window.currentUser) {
@@ -2466,27 +2458,12 @@ async function loadData() {
 }
 
 async function hasExistingData() {
-  return new Promise((resolve) => {
-    const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-      unsubscribe(); // prevent stacking listeners
-
-      if (!user) {
-        console.log('ℹ️ No user signed in');
-        resolve(false);
-        return;
-      }
-
-      console.log('✅ Auth state ready for:', user.email);
-      window.currentUser = user;
-
-      const ok = await loadData(); // your existing loadData()
-      resolve(!!(ok && window.homeData?.fullAddress));
-    });
-  });
+    const dataLoaded = await loadData();
+    return dataLoaded && homeData.fullAddress;
 }
+
 // Enhanced initialization
 async function initializeApp() {
-    initializeCasaCareData();
     console.log('🏠 The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initializing...');
     
     // Make well water function available globally ASAP
