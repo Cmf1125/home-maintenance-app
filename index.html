@@ -1732,7 +1732,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- Firebase Configuration -->
 <script>
-// Firebase configuration - replace with your actual values
+// Firebase configuration - you'll need to replace these with your actual values
 const firebaseConfig = {
   apiKey: "AIzaSyBuBfJvkhiTs0OSFlNE8ZhSTAnOa_sidE0",
   authDomain: "home-keeper-app.firebaseapp.com",
@@ -1746,210 +1746,278 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-window.db = db; // ✅ make Firestore available to other scripts
 
 console.log('🔥 Firebase initialized');
 
-/* ========================
-   Authentication Functions
-   ======================== */
-// ... keep your existing signInUser, createUser, signInWithGoogle, signOutUser, etc. here ...
-// I’m not removing any of those — just leaving them in place above loadUserData.
+// Authentication Functions
+function showLoginForm() {
+    document.getElementById('login-form').classList.remove('hidden');
+    document.getElementById('signup-form').classList.add('hidden');
+}
 
-/* ========================
-   Load user data from Firestore
-   ======================== */
-async function loadUserData(userId) {
-  try {
-    const userDoc = await db.collection('users').doc(userId).get();
-    if (userDoc.exists) {
-      const userData = userDoc.data();
-      if (userData.homeData && userData.tasks) {
-        window.homeData = userData.homeData;
-        window.tasks = userData.tasks;
+function showSignupForm() {
+    document.getElementById('login-form').classList.add('hidden');
+    document.getElementById('signup-form').classList.remove('hidden');
+}
 
-        // Convert Firestore Timestamps to Date
-        window.tasks.forEach(task => {
-          if (task.dueDate && task.dueDate.toDate) {
-            task.dueDate = task.dueDate.toDate();
-            task.nextDue = task.dueDate;
-          } else if (task.dueDate && typeof task.dueDate === 'string') {
-            task.dueDate = new Date(task.dueDate);
-            task.nextDue = task.dueDate;
-          } else if (task.nextDue && task.nextDue.toDate) {
-            task.nextDue = task.nextDue.toDate();
-            task.dueDate = task.nextDue;
-          }
-          if (task.lastCompleted && task.lastCompleted.toDate) {
-            task.lastCompleted = task.lastCompleted.toDate();
-          } else if (task.lastCompleted && typeof task.lastCompleted === 'string') {
-            task.lastCompleted = new Date(task.lastCompleted);
-          }
-        });
-
-        return true;
-      }
+function signInUser() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
     }
-    return false;
-  } catch (error) {
-    console.error('❌ Error loading user data:', error);
-    return false;
-  }
+    
+    auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            console.log('✅ User signed in:', userCredential.user.email);
+            // handleSuccessfulLogin(userCredential.user);
+        })
+        .catch((error) => {
+            console.error('❌ Sign in error:', error);
+            alert('Sign in failed: ' + error.message);
+        });
 }
 
-/* ========================
-   Save user data to Firestore
-   ======================== */
-async function saveUserDataToFirebase(userId, homeData, tasks) {
-  try {
-    const firebaseTasks = tasks.map(task => {
-      const firebaseTask = { ...task };
-      if (firebaseTask.dueDate instanceof Date) {
-        firebaseTask.dueDate = firebase.firestore.Timestamp.fromDate(firebaseTask.dueDate);
-      }
-      if (firebaseTask.nextDue instanceof Date) {
-        firebaseTask.nextDue = firebase.firestore.Timestamp.fromDate(firebaseTask.nextDue);
-      }
-      if (firebaseTask.lastCompleted instanceof Date) {
-        firebaseTask.lastCompleted = firebase.firestore.Timestamp.fromDate(firebaseTask.lastCompleted);
-      }
-      return firebaseTask;
-    });
-
-    const userData = {
-      homeData: homeData,
-      tasks: firebaseTasks,
-      lastUpdated: firebase.firestore.Timestamp.now(),
-      userEmail: window.currentUser ? window.currentUser.email : null
-    };
-
-    // ✅ merge so we don't overwrite appliances or other fields
-    await db.collection('users').doc(userId).set(userData, { merge: true });
-    console.log('💾 User data saved to Firebase successfully');
-    return true;
-  } catch (error) {
-    console.error('❌ Error saving user data to Firebase:', error);
-    throw error;
-  }
+function createUser() {
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    
+    if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+    }
+    
+    if (password.length < 6) {
+        alert('Password must be at least 6 characters');
+        return;
+    }
+    
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            console.log('✅ User created:', userCredential.user.email);
+            handleNewUserSignup(userCredential.user);
+        })
+        .catch((error) => {
+            console.error('❌ Sign up error:', error);
+            alert('Sign up failed: ' + error.message);
+        });
 }
 
-/* ========================
-   Appliances: Firestore helpers
-   ======================== */
-async function saveApplianceToFirebase(userId, appliance) {
-  const col = db.collection('users').doc(userId).collection('appliances');
-  const id = String(appliance.id);
-  await col.doc(id).set(appliance, { merge: true });
+function signInWithGoogle() {
+    window.googleSignInInProgress = true; // Flag to prevent auto-login
+    const provider = new firebase.auth.GoogleAuthProvider();
+    
+    auth.signInWithPopup(provider)
+        .then((result) => {
+            console.log('✅ Google sign in success:', result.user.email);
+            window.googleSignInInProgress = false;
+            
+            // Check if this is a new user based on data, not account creation
+            loadUserData(result.user.uid).then(hasData => {
+                if (hasData) {
+                    handleSuccessfulLogin(result.user);
+                } else {
+                    handleNewUserSignup(result.user);
+                }
+            });
+        })
+        .catch((error) => {
+            console.error('❌ Google sign in error:', error);
+            alert('Google sign in failed: ' + error.message);
+            window.googleSignInInProgress = false;
+        });
 }
-
-async function deleteApplianceFromFirebase(userId, applianceId) {
-  const col = db.collection('users').doc(userId).collection('appliances');
-  await col.doc(String(applianceId)).delete();
-}
-
-async function loadAppliancesFromFirebase(userId) {
-  const col = db.collection('users').doc(userId).collection('appliances');
-  const snap = await col.get();
-  return snap.docs.map(d => {
-    const data = d.data();
-    return { id: d.id, ...data };
-  });
-}
-
-async function clearAppliancesFromFirebase(userId) {
-  const col = db.collection('users').doc(userId).collection('appliances');
-  const snap = await col.get();
-  const batch = db.batch();
-  snap.forEach(doc => batch.delete(doc.ref));
-  await batch.commit();
-}
-
-// ✅ expose helpers to other scripts
-window.saveApplianceToFirebase = saveApplianceToFirebase;
-window.deleteApplianceFromFirebase = deleteApplianceFromFirebase;
-window.loadAppliancesFromFirebase = loadAppliancesFromFirebase;
-window.clearAppliancesFromFirebase = clearAppliancesFromFirebase;
 
 function signOutUser() {
-  firebase.auth().signOut()
-    .then(() => {
-      console.log('✅ User signed out');
-      document.getElementById('main-app').classList.add('hidden');
-      document.getElementById('login-screen').classList.remove('hidden');
-    })
-    .catch(error => {
-      console.error('❌ Sign-out error:', error);
+    console.log('👋 Signing out user...');
+    
+    auth.signOut().then(() => {
+        console.log('✅ User signed out successfully');
+        
+        // Clear local data
+        window.currentUser = null;
+        window.homeData = {};
+        window.tasks = [];
+        
+        // Show login screen and hide other screens
+        document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('setup-form').classList.add('hidden');
+        document.getElementById('setup-form').style.display = 'none';
+        document.getElementById('main-app').classList.add('hidden');
+        document.body.classList.remove('main-app-active');
+        
+        alert('👋 You have been signed out successfully!');
+        
+    }).catch((error) => {
+        console.error('❌ Sign out error:', error);
+        alert('Error signing out: ' + error.message);
+    });
+}    
+    
+// Handle successful login (existing user)
+function handleSuccessfulLogin(user) {
+    console.log('🏠 User logged in, loading data first...');
+    
+    // Hide login screen immediately
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('setup-form').classList.add('hidden');
+    document.getElementById('setup-form').style.display = 'none';
+    document.getElementById('onboarding-progress').classList.add('hidden');
+    
+    // Load data FIRST, then show dashboard
+    loadUserData(user.uid).then(hasData => {
+        if (hasData) {
+            // NOW show the app with data already loaded
+            document.getElementById('main-app').classList.remove('hidden');
+            document.body.classList.add('main-app-active');
+            document.getElementById('header-subtitle').textContent = window.homeData.fullAddress;
+            showTab('dashboard');
+            
+            // Force dashboard refresh after data is loaded
+            if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                window.enhancedDashboard.render();
+            }
+            
+            console.log('✅ Data loaded, dashboard ready');
+        } else {
+            handleNewUserSignup(user);
+        }
     });
 }
-
-    function handleSuccessfulLogin(user) {
-  console.log('🏠 User logged in, loading data first...');
-
-  // Hide login/onboarding screens
-  document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('setup-form').classList.add('hidden');
-  document.getElementById('setup-form').style.display = 'none';
-  document.getElementById('onboarding-progress').classList.add('hidden');
-
-  // Load homeData + tasks from Firestore
-  loadUserData(user.uid).then(hasData => {
-    if (hasData) {
-      // Load appliances from Firestore and hydrate UI
-      loadAppliancesFromFirebase(user.uid)
-        .then(appliances => {
-          window.applianceData = appliances;
-          if (window.applianceManager && typeof window.applianceManager.setAppliances === 'function') {
-            window.applianceManager.setAppliances(appliances);
-          }
-        })
-        .catch(err => {
-          console.error('❌ Error loading appliances:', err);
-          window.applianceData = [];
-        });
-
-      // Show main app UI
-      document.getElementById('main-app').classList.remove('hidden');
-      document.body.classList.add('main-app-active');
-      document.getElementById('header-subtitle').textContent = window.homeData.fullAddress;
-      showTab('dashboard');
-
-      // Refresh dashboard after data load
-      if (window.enhancedDashboard && window.enhancedDashboard.render) {
-        window.enhancedDashboard.render();
-      }
-
-      console.log('✅ Data loaded, dashboard ready');
-    } else {
-      // New user flow
-      handleNewUserSignup(user);
-    }
-  });
-}
-
-/* ========================
-   Auth state listener
-   ======================== */
-let authProcessing = false;
-auth.onAuthStateChanged((user) => {
-  if (authProcessing) return;
-  authProcessing = true;
-
-  if (user) {
-    console.log('👤 User is already logged in:', user.email);
-    window.currentUser = user;
-    if (!window.googleSignInInProgress) {
-      handleSuccessfulLogin(user);
-    }
-  } else {
-    console.log('👋 No user logged in, showing login screen');
-    document.getElementById('login-screen').classList.remove('hidden');
-    document.getElementById('setup-form').classList.add('hidden');
+    
+// Handle new user signup (needs setup)
+function handleNewUserSignup(user) {
+    console.log('🆕 New user signed up, starting setup process...');
+    
+    // Hide ALL other screens first
+    document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('main-app').classList.add('hidden');
     document.body.classList.remove('main-app-active');
-  }
+    
+// Show setup form
+document.getElementById('setup-form').classList.remove('hidden');
+document.getElementById('setup-form').style.display = 'block';
+document.getElementById('onboarding-progress').classList.remove('hidden');
 
-  setTimeout(() => { authProcessing = false; }, 1000);
+// Make sure main app is hidden
+document.getElementById('main-app').classList.add('hidden');
+document.body.classList.remove('main-app-active');
+    
+    // Store user info globally
+    window.currentUser = user;
+    
+    console.log('✅ New user ready for setup');
+}
+
+// Load user data from Firestore
+async function loadUserData(userId) {
+    try {
+        const userDoc = await db.collection('users').doc(userId).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            if (userData.homeData && userData.tasks) {
+                // Load the data into the app
+                window.homeData = userData.homeData;
+                window.tasks = userData.tasks;
+                
+                // Handle both Firebase Timestamps and ISO strings
+                window.tasks.forEach(task => {
+                    // Convert Firebase Timestamps to Date objects
+                    if (task.dueDate && task.dueDate.toDate) {
+                        task.dueDate = task.dueDate.toDate();
+                        task.nextDue = task.dueDate;
+                    } else if (task.dueDate && typeof task.dueDate === 'string') {
+                        task.dueDate = new Date(task.dueDate);
+                        task.nextDue = task.dueDate;
+                    } else if (task.nextDue && task.nextDue.toDate) {
+                        task.nextDue = task.nextDue.toDate();
+                        task.dueDate = task.nextDue;
+                    }
+                    
+                    if (task.lastCompleted && task.lastCompleted.toDate) {
+                        task.lastCompleted = task.lastCompleted.toDate();
+                    } else if (task.lastCompleted && typeof task.lastCompleted === 'string') {
+                        task.lastCompleted = new Date(task.lastCompleted);
+                    }
+                });
+                
+                return true;
+            }
+        }
+        return false;
+    } catch (error) {
+        console.error('❌ Error loading user data:', error);
+        return false;
+    }
+}
+    
+// Save user data to Firestore
+async function saveUserDataToFirebase(userId, homeData, tasks) {
+    try {
+        // Convert Date objects to Firebase Timestamps for proper storage
+        const firebaseTasks = tasks.map(task => {
+            const firebaseTask = { ...task };
+            
+            // Convert Date objects to Firebase Timestamps
+            if (firebaseTask.dueDate instanceof Date) {
+                firebaseTask.dueDate = firebase.firestore.Timestamp.fromDate(firebaseTask.dueDate);
+            }
+            if (firebaseTask.nextDue instanceof Date) {
+                firebaseTask.nextDue = firebase.firestore.Timestamp.fromDate(firebaseTask.nextDue);
+            }
+            if (firebaseTask.lastCompleted instanceof Date) {
+                firebaseTask.lastCompleted = firebase.firestore.Timestamp.fromDate(firebaseTask.lastCompleted);
+            }
+            
+            return firebaseTask;
+        });
+        
+        const userData = {
+            homeData: homeData,
+            tasks: firebaseTasks,
+            lastUpdated: firebase.firestore.Timestamp.now(),
+            userEmail: window.currentUser ? window.currentUser.email : null
+        };
+        
+        await db.collection('users').doc(userId).set(userData);
+        console.log('💾 User data saved to Firebase successfully');
+        return true;
+    } catch (error) {
+        console.error('❌ Error saving user data to Firebase:', error);
+        throw error;
+    }
+}
+
+// Listen for authentication state changes
+let authProcessing = false;
+auth.onAuthStateChanged((user) => {
+    if (authProcessing) return; // Prevent duplicate processing
+    authProcessing = true;
+    
+    if (user) {
+        // User is signed in
+        console.log('👤 User is already logged in:', user.email);
+        window.currentUser = user;
+        
+        // Only auto-load if we're not in the middle of a Google sign-in
+        if (!window.googleSignInInProgress) {
+            handleSuccessfulLogin(user);
+        }
+    } else {
+        // User is signed out
+        console.log('👋 No user logged in, showing login screen');
+        document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('setup-form').classList.add('hidden');
+        document.getElementById('main-app').classList.add('hidden');
+        document.body.classList.remove('main-app-active');
+    }
+    
+    // Reset the flag after a short delay
+    setTimeout(() => { authProcessing = false; }, 1000);
 });
+    
 </script>
     
 </body>
