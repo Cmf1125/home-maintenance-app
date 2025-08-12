@@ -1746,6 +1746,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+window.db = db; // ✅ allow other files (appliances.js) to use Firestore
 
 console.log('🔥 Firebase initialized');
 
@@ -1868,6 +1869,21 @@ function handleSuccessfulLogin(user) {
     
     // Load data FIRST, then show dashboard
     loadUserData(user.uid).then(hasData => {
+// Load appliances AFTER user doc
+loadAppliancesFromFirebase(user.uid)
+  .then(appliances => {
+    window.applianceData = appliances;
+
+    // If the manager is already created, hydrate it
+    if (window.applianceManager && typeof window.applianceManager.setAppliances === 'function') {
+      window.applianceManager.setAppliances(appliances);
+    }
+  })
+  .catch(err => {
+    console.error('❌ Error loading appliances:', err);
+    window.applianceData = [];
+  });
+        
         if (hasData) {
             // NOW show the app with data already loaded
             document.getElementById('main-app').classList.remove('hidden');
@@ -1990,6 +2006,38 @@ async function saveUserDataToFirebase(userId, homeData, tasks) {
     }
 }
 
+// ===== Appliances: Firestore helpers =====
+async function saveApplianceToFirebase(userId, appliance) {
+  const col = db.collection('users').doc(userId).collection('appliances');
+  const id = String(appliance.id);
+  await col.doc(id).set(appliance, { merge: true });
+}
+
+async function deleteApplianceFromFirebase(userId, applianceId) {
+  const col = db.collection('users').doc(userId).collection('appliances');
+  await col.doc(String(applianceId)).delete();
+}
+
+async function loadAppliancesFromFirebase(userId) {
+  const col = db.collection('users').doc(userId).collection('appliances');
+  const snap = await col.get();
+  return snap.docs.map(d => {
+    const data = d.data();
+    // If you later store any Date fields as Timestamps, convert here:
+    // if (data.purchaseDate?.toDate) data.purchaseDate = data.purchaseDate.toDate();
+    return { id: d.id, ...data };
+  });
+}
+
+// Optional: wipe the appliances subcollection (used by Clear Data)
+async function clearAppliancesFromFirebase(userId) {
+  const col = db.collection('users').doc(userId).collection('appliances');
+  const snap = await col.get();
+  const batch = db.batch();
+  snap.forEach(doc => batch.delete(doc.ref));
+  await batch.commit();
+}
+    
 // Listen for authentication state changes
 let authProcessing = false;
 auth.onAuthStateChanged((user) => {
