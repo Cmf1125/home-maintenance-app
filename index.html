@@ -1752,7 +1752,7 @@ console.log('🔥 Firebase initialized');
 // ===== STEP 1: ADD THESE BACKUP FUNCTIONS TO index.html =====
 // Add these BEFORE any existing Firebase functions (don't replace anything yet)
 
-// NEW: Enhanced save function (runs alongside existing one)
+// FIXED: Enhanced save function with direct document reference
 async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
     try {
         if (!userId || !window.currentUser) {
@@ -1779,18 +1779,20 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
             return firebaseTask;
         });
 
-        // Collect ALL user data safely
+        // FIXED: Use direct global references like appliances
         const userData = {
             homeData: homeData || {},
             tasks: firebaseTasks,
             appliances: window.applianceData || [],
-            documents: window.casaCareDocuments?.documents || [],
+            documents: window.documentsData || [], // CHANGED: Direct reference
             lastUpdated: firebase.firestore.Timestamp.now(),
             userEmail: window.currentUser.email,
-            version: '2.1',
-            // Keep existing structure for compatibility
-            legacyBackup: true
+            version: '2.1'
         };
+        
+        console.log(`📄 Enhanced save: Saving ${userData.documents.length} documents`);
+        console.log(`📦 Enhanced save: Saving ${userData.appliances.length} appliances`);
+        console.log(`📋 Enhanced save: Saving ${userData.tasks.length} tasks`);
         
         // Use set with merge to avoid overwriting
         await db.collection('users').doc(userId).set(userData, { merge: true });
@@ -1802,7 +1804,7 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
     }
 }
 
-// NEW: Enhanced load function (runs alongside existing one)
+// FIXED: Enhanced load function with direct document reference
 async function loadUserDataEnhanced(userId) {
     try {
         if (!userId) {
@@ -1838,28 +1840,20 @@ async function loadUserDataEnhanced(userId) {
                     }
                 });
 
-                // Load appliances safely
-                if (userData.appliances && Array.isArray(userData.appliances)) {
-                    window.applianceData = userData.appliances;
-                    console.log(`📦 Enhanced load: ${userData.appliances.length} appliances loaded`);
-                } else {
-                    window.applianceData = window.applianceData || [];
-                }
+                // FIXED: Load appliances using direct reference
+                window.applianceData = Array.isArray(userData.appliances) ? userData.appliances : [];
+                console.log(`📦 Enhanced load: ${window.applianceData.length} appliances loaded`);
 
-// Load documents safely  
-if (userData.documents && Array.isArray(userData.documents)) {
-    // Store in a temporary global variable for the documents module to pick up
-    window.tempDocumentsData = userData.documents;
-    console.log(`📄 Enhanced load: ${userData.documents.length} documents stored for module pickup`);
-} else {
-    window.tempDocumentsData = [];
-}
+                // FIXED: Load documents using direct reference (like appliances)
+                window.documentsData = Array.isArray(userData.documents) ? userData.documents : [];
+                console.log(`📄 Enhanced load: ${window.documentsData.length} documents loaded`);
   
-                console.log(`✅ Enhanced load: Success! ${window.tasks.length} tasks, ${window.applianceData.length} appliances`);
+                console.log(`✅ Enhanced load: Success! ${window.tasks.length} tasks, ${window.applianceData.length} appliances, ${window.documentsData.length} documents`);
                 return true;
             }
         }
         
+        console.log('📥 Enhanced load: No data found');
         return false;
     } catch (error) {
         console.error('❌ Enhanced load error:', error);
@@ -1867,7 +1861,7 @@ if (userData.documents && Array.isArray(userData.documents)) {
     }
 }
 
-// NEW: Test function to verify data integrity
+// FIXED: Test function to verify data integrity with documents
 function testDataIntegrity() {
     console.log('🧪 Testing data integrity...');
     
@@ -1875,6 +1869,7 @@ function testDataIntegrity() {
         homeData: !!window.homeData && !!window.homeData.fullAddress,
         tasks: Array.isArray(window.tasks) && window.tasks.length >= 0,
         appliances: Array.isArray(window.applianceData) && window.applianceData.length >= 0,
+        documents: Array.isArray(window.documentsData) && window.documentsData.length >= 0, // ADDED
         currentUser: !!window.currentUser,
         timestamp: new Date().toISOString()
     };
@@ -1882,6 +1877,32 @@ function testDataIntegrity() {
     console.log('🧪 Data integrity results:', results);
     return results;
 }
+
+// Debug function to check document status
+function debugDocumentStatus() {
+    console.log('🔍 DOCUMENT DEBUG STATUS:');
+    console.log('  window.documentsData:', Array.isArray(window.documentsData) ? window.documentsData.length : 'NOT FOUND');
+    console.log('  window.casaCareDocuments instance:', !!window.casaCareDocuments);
+    console.log('  instance.documents:', window.casaCareDocuments?.documents?.length || 'NOT FOUND');
+    
+    if (window.documentsData && window.documentsData.length > 0) {
+        console.log('  First document:', window.documentsData[0]);
+    }
+    
+    return {
+        globalDocuments: window.documentsData?.length || 0,
+        instanceDocuments: window.casaCareDocuments?.documents?.length || 0,
+        hasInstance: !!window.casaCareDocuments
+    };
+}
+
+// Make functions globally available
+window.saveUserDataToFirebaseEnhanced = saveUserDataToFirebaseEnhanced;
+window.loadUserDataEnhanced = loadUserDataEnhanced;
+window.testDataIntegrity = testDataIntegrity;
+window.debugDocumentStatus = debugDocumentStatus;
+
+console.log('✅ FIXED: Enhanced Firebase functions updated for direct document reference');
 
 // NEW: Enhanced save that works alongside existing system
 async function saveDataEnhanced() {
@@ -1913,6 +1934,24 @@ async function saveDataEnhanced() {
     return success;
 }
 
+function debugDocumentStatus() {
+    console.log('🔍 DOCUMENT DEBUG STATUS:');
+    console.log('  window.documentsData:', Array.isArray(window.documentsData) ? window.documentsData.length : 'NOT FOUND');
+    console.log('  window.casaCareDocuments instance:', !!window.casaCareDocuments);
+    console.log('  instance.documents:', window.casaCareDocuments?.documents?.length || 'NOT FOUND');
+    
+    if (window.documentsData && window.documentsData.length > 0) {
+        console.log('  First document:', window.documentsData[0]);
+    }
+    
+    return {
+        globalDocuments: window.documentsData?.length || 0,
+        instanceDocuments: window.casaCareDocuments?.documents?.length || 0,
+        hasInstance: !!window.casaCareDocuments
+    };
+}
+
+    
 // Make functions globally available for testing
 window.saveUserDataToFirebaseEnhanced = saveUserDataToFirebaseEnhanced;
 window.loadUserDataEnhanced = loadUserDataEnhanced;
@@ -2058,6 +2097,13 @@ function handleSuccessfulLogin(user) {
                 window.applianceManager.setAppliances(window.applianceData);
                 console.log('✅ Appliance manager updated with loaded data');
              } 
+            
+            // Update documents manager with loaded data
+            if (window.casaCareDocuments && window.documentsData) {
+                window.casaCareDocuments.documents = window.documentsData;
+                console.log('✅ Documents manager updated with loaded data');
+            }
+            
         } else {
             handleNewUserSignup(user);
         }
