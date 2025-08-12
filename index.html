@@ -1869,6 +1869,19 @@ window.saveApplianceToFirebase = saveApplianceToFirebase;
 window.deleteApplianceFromFirebase = deleteApplianceFromFirebase;
 window.loadAppliancesFromFirebase = loadAppliancesFromFirebase;
 window.clearAppliancesFromFirebase = clearAppliancesFromFirebase;
+
+function signOutUser() {
+  firebase.auth().signOut()
+    .then(() => {
+      console.log('✅ User signed out');
+      document.getElementById('main-app').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+    })
+    .catch(error => {
+      console.error('❌ Sign-out error:', error);
+    });
+}
+
     function handleSuccessfulLogin(user) {
   console.log('🏠 User logged in, loading data first...');
 
