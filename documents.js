@@ -41,8 +41,11 @@ class CasaCareDocuments {
         try {
             console.log('💾 Documents: Using integrated save to preserve all data...');
             
-            // FIXED: Update direct global reference like appliances
-            window.documentsData = this.documents;
+           // Keep global docs Firestore‑safe (remove File/Blob/DOM refs)
+            window.documentsData = (this.documents || []).map(doc => {
+              const { file, blob, element, previewEl, node, fileObj, ...clean } = doc;
+              return clean;
+            });
             
             if (!window.currentUser) {
                 console.warn('⚠️ Documents: not logged in, skipping save');
