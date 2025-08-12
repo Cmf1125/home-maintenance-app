@@ -25,16 +25,21 @@ class CasaCareDocuments {
     }
     
     // Load documents from storage
-    loadDocuments() {
-        try {
-            const savedDocs = localStorage.getItem('casaCareDocuments');
-            this.documents = savedDocs ? JSON.parse(savedDocs) : [];
-            console.log(`📄 Documents: Loaded ${this.documents.length} documents`);
-        } catch (error) {
-            console.error('❌ Documents: Error loading documents:', error);
+loadDocuments() {
+    try {
+        // FIXED: Use Firebase data that was already loaded by enhanced load
+        if (window.casaCareDocuments && window.casaCareDocuments.documents) {
+            this.documents = window.casaCareDocuments.documents;
+            console.log(`📄 Documents: Loaded ${this.documents.length} documents from Firebase data`);
+        } else {
             this.documents = [];
+            console.log('📄 Documents: No Firebase data available, starting with empty array');
         }
+    } catch (error) {
+        console.error('❌ Documents: Error loading documents:', error);
+        this.documents = [];
     }
+}
     
     // Save documents to storage
     saveDocuments() {
