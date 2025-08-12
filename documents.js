@@ -36,35 +36,11 @@ class CasaCareDocuments {
         }
     }
     
-    // FIXED: Save documents using direct global reference like appliances
     saveDocuments() {
-        try {
-            console.log('💾 Documents: Using integrated save to preserve all data...');
-            
-           // Keep global docs Firestore‑safe (remove File/Blob/DOM refs)
-            window.documentsData = (this.documents || []).map(doc => {
-              const { file, blob, element, previewEl, node, fileObj, ...clean } = doc;
-              return clean;
-            });
-            
-            if (!window.currentUser) {
-                console.warn('⚠️ Documents: not logged in, skipping save');
-                return;
-            }
-            
-            // Use main save function to preserve ALL data
-            if (typeof window.saveData === 'function') {
-                window.saveData();
-                console.log('✅ Documents: Saved using integrated system');
-            } else {
-                console.error('❌ Main saveData function not available');
-            }
-            
-        } catch (error) {
-            console.error('❌ Documents: Error saving:', error);
-            alert('❌ Failed to save documents. Please try again.');
-        }
-    }
+    window.documentsData = this.documents;
+    window.casaCareData.documents = this.documents;
+    if (window.saveData) window.saveData();
+}
     
     // Rest of the class methods remain the same...
     // (keeping them for completeness but focusing on the persistence fix)
@@ -489,6 +465,20 @@ class CasaCareDocuments {
         if (!doc) {
             alert('❌ Document not found');
             return;
+        // Auto-delete from Firebase Storage if fileURL exists
+        const doc = this.documents.find(d => d.id === id);
+        if (doc && doc.fileURL) {
+            try {
+                const storageRef = firebase.storage().refFromURL(doc.fileURL);
+                storageRef.delete().then(() => {
+                    console.log('🗑️ File deleted from storage:', doc.fileURL);
+                }).catch(err => {
+                    console.warn('⚠️ Could not delete file from storage:', err);
+                });
+            } catch (e) {
+                console.error('Error deleting from storage:', e);
+            }
+        }
         }
         
         if (confirm(`Are you sure you want to delete "${doc.title}"?`)) {
