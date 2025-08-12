@@ -1402,6 +1402,8 @@ function showTab(tabName) {
     
     console.log(`✅ Switched to ${tabName} tab`);
 }
+// ✅ Make showTab available globally
+window.showTab = showTab;
 
 // 🎯 ENHANCED: showAllTasks function with better back arrow handling
 function showAllTasks() {
