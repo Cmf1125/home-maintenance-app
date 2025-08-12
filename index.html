@@ -1425,7 +1425,49 @@
         window.toggleSettingsDropdown = toggleSettingsDropdown;
         window.closeSettingsDropdown = closeSettingsDropdown;
     </script>
+<script>
+// === Auth helpers used by your buttons ===
 
+// Email/password sign in (used by "Sign In" button)
+function signInUser() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-password').value;
+  if (!email || !pass) return alert('Please enter email and password');
+  firebase.auth().signInWithEmailAndPassword(email, pass)
+    .then(() => console.log('✅ Email sign-in ok'))
+    .catch(err => alert('Sign-in error: ' + err.message));
+}
+
+// Create account (used by "Create Account" button)
+function createUser() {
+  const email = document.getElementById('signup-email').value.trim();
+  const pass  = document.getElementById('signup-password').value;
+  if (!email || !pass) return alert('Please enter email and password');
+  firebase.auth().createUserWithEmailAndPassword(email, pass)
+    .then(() => console.log('✅ Account created'))
+    .catch(err => alert('Signup error: ' + err.message));
+}
+
+// Google sign in (used by "Sign in with Google")
+function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider)
+    .then(res => console.log('✅ Google sign-in:', res.user?.email))
+    .catch(err => alert('Google sign-in error: ' + err.message));
+}
+
+// Sign out (used by ⚙️ menu → Sign Out)
+function signOutUser() {
+  firebase.auth().signOut()
+    .then(() => {
+      console.log('✅ Signed out');
+      document.getElementById('main-app').classList.add('hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+    })
+    .catch(err => alert('Sign-out error: ' + err.message));
+}
+</script>
+            
     <!-- ✅ Core Scripts go here -->
     <script src="date-utils.js"></script>
     <script src="app.js"></script>
@@ -1911,7 +1953,6 @@ document.body.classList.remove('main-app-active');
     console.log('✅ New user ready for setup');
 }
 
-// Load user data from Firestore
 // Load user data from Firestore and normalize dates
 async function loadUserData(userId) {
   try {
