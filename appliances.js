@@ -509,8 +509,6 @@ renderApplianceDetail() {
     `;
 }
 
-// Replace your existing handleAddFormSubmit method with this version:
-
 handleAddFormSubmit(event) {
     event.preventDefault();
     
@@ -557,24 +555,25 @@ handleAddFormSubmit(event) {
     // Save to storage
     this.saveAppliances();
 
-   // Ask if they want to generate automatic tasks
+  // Ask if they want to generate automatic tasks
 const askForTasks = confirm(
     `✅ Appliance "${newAppliance.name}" added successfully!\n\n` +
     `Would you like to generate automatic maintenance tasks for this appliance?`
 );
 
 if (askForTasks) {
-    // Just generate tasks, don't add appliance again
+    // Generate tasks and add to global array
     const maintenanceTasks = this.generateMaintenanceTasks(newAppliance);
     
     if (maintenanceTasks.length > 0) {
         window.tasks.push(...maintenanceTasks);
-        if (typeof window.saveData === 'function') {
-            window.saveData();
-        }
+        alert(`🔧 Generated ${maintenanceTasks.length} maintenance tasks!`);
+        
+        // Save again now that we have both appliance AND tasks
+        this.saveAppliances();
     }
-    
-    alert(`🔧 Generated ${maintenanceTasks.length} maintenance tasks!`);
+} else {
+    alert(`✅ Appliance "${newAppliance.name}" added successfully!`);
 }
 
     
