@@ -2170,7 +2170,7 @@ function signInWithGoogle() {
             window.googleSignInInProgress = false;
             
             // Check if this is a new user based on data, not account creation
-            loadUserData(result.user.uid).then(hasData => {
+            loadAllDataBulletproof().then(hasData => {
                 if (hasData) {
                     handleSuccessfulLogin(result.user);
                 } else {
