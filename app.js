@@ -2830,23 +2830,6 @@ function showPropertyConfirmation() {
         garage: document.getElementById('garage')?.checked || false,
         basement: document.getElementById('basement')?.checked || false,
         otherFeatures: document.getElementById('other-features')?.value || ''
-
-        // ===== ADD THESE NEW LINES =====
-    solarPanels: document.getElementById('solar-panels')?.checked || false,
-    backupGenerator: document.getElementById('backup-generator')?.checked || false,
-    batteryStorage: document.getElementById('battery-storage')?.checked || false,
-    smartThermostat: document.getElementById('smart-thermostat')?.checked || false,
-    securitySystem: document.getElementById('security-system')?.checked || false,
-    sprinklerSystem: document.getElementById('sprinkler-system')?.checked || false,
-    outdoorLighting: document.getElementById('outdoor-lighting')?.checked || false,
-    fencing: document.getElementById('fencing')?.checked || false,
-    pavedDriveway: document.getElementById('paved-driveway')?.checked || false,
-    matureLandscaping: document.getElementById('mature-landscaping')?.checked || false,
-    outdoorKitchen: document.getElementById('outdoor-kitchen')?.checked || false,
-    roofAge: parseInt(document.getElementById('roof-age')?.value) || 0,
-    roofType: document.getElementById('roof-type')?.value || 'asphalt',
-    sidingType: document.getElementById('siding-type')?.value || 'vinyl',
-    foundationType: document.getElementById('foundation-type')?.value || 'concrete-slab'
     };
 
     // Update confirmation summary
