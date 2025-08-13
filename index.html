@@ -2462,14 +2462,9 @@ function startDemo() {
 }
 
 function showDemoBanner() {
-    // Check if progress banner exists and get its height
-    const progressBanner = document.getElementById('onboarding-progress');
-    const topOffset = progressBanner ? '80px' : '0px'; // Progress banner is about 80px tall
-    
     const banner = document.createElement('div');
-    banner.className = 'fixed left-0 right-0 bg-green-600 text-white p-3 text-center demo-banner';
-    banner.style.top = topOffset;
-    banner.style.zIndex = '60'; // Higher than progress banner (z-50)
+    banner.className = 'fixed top-0 left-0 right-0 bg-green-600 text-white p-3 text-center demo-banner';
+    banner.style.zIndex = '70'; // Highest - above everything
     
     banner.innerHTML = `
         <div class="flex items-center justify-center gap-2">
@@ -2482,18 +2477,32 @@ function showDemoBanner() {
     
     document.body.appendChild(banner);
     
-    // Adjust body padding based on whether progress banner exists
-    const totalBannerHeight = progressBanner ? '140px' : '60px';
-    document.body.style.paddingTop = totalBannerHeight;
+    // Move progress banner down to make room for demo banner
+    const progressBanner = document.getElementById('onboarding-progress');
+    if (progressBanner) {
+        progressBanner.style.top = '60px'; // Demo banner height
+        progressBanner.style.zIndex = '60'; // Below demo banner
+    }
+    
+    // Adjust body padding for both banners
+    document.body.style.paddingTop = '140px'; // 60px demo + 80px progress
 }
-
+    
 function convertToRealAccount() {
-    // Show signup form to convert demo user
     if (confirm('Create an account to save your maintenance plan?')) {
-        // Remove demo banner and reset padding
+        // Remove demo banner
         const banner = document.querySelector('.demo-banner');
         if (banner) banner.remove();
-        document.body.style.paddingTop = '0';
+        
+        // Reset progress banner position
+        const progressBanner = document.getElementById('onboarding-progress');
+        if (progressBanner) {
+            progressBanner.style.top = '0';
+            progressBanner.style.zIndex = '50';
+        }
+        
+        // Reset body padding to just progress banner
+        document.body.style.paddingTop = '80px';
         
         // Remove setup mode class since we're going back to login
         document.body.classList.remove('setup-active');
@@ -2502,7 +2511,7 @@ function convertToRealAccount() {
         document.getElementById('login-screen').classList.remove('hidden');
         showSignupForm();
         
-        // Keep current form data when they sign up
+        // Keep current form data
         window.demoData = {
             address: document.getElementById('address').value,
             city: document.getElementById('city').value,
@@ -2512,7 +2521,7 @@ function convertToRealAccount() {
         };
     }
 }
-
+    
 // Override save functions for demo mode
 const originalSaveData = window.saveData;
 window.saveData = function() {
