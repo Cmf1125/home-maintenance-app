@@ -2437,25 +2437,6 @@ function showDemoBanner() {
     document.body.style.paddingTop = '75px'; // 37px demo + 38px progress
 }
     
-function convertToRealAccount() {
-    if (confirm('Create an account to save your maintenance plan?')) {
-        // Remove demo banner
-        const banner = document.querySelector('.demo-banner');
-        if (banner) banner.remove();
-        
-        // Reset progress banner position  
-        const progressBanner = document.getElementById('onboarding-progress');
-        if (progressBanner) {
-            progressBanner.style.top = '0';
-        }
-        
-        // Reduced padding
-        document.body.style.paddingTop = '40px'; 
-        
-        // Rest stays the same...
-    }
-}
-    
 // Override save functions for demo mode
 const originalSaveData = window.saveData;
 window.saveData = function() {
