@@ -533,11 +533,21 @@ body.main-app-active .bg-white.shadow-sm.border-b.sticky {
 #onboarding-progress {
     padding: 0.5rem 1rem; /* Reduce from py-3 to py-2 */
 }
-/* Fix settings dropdown z-index */
+/* EMERGENCY UI FIXES */
 #settings-dropdown {
-    z-index: 9999 !important;
+    z-index: 99999 !important;
+    position: fixed !important;
+    top: 60px !important;
+    right: 1rem !important;
 }
-/* Dashboard UI fixes */
+
+/* Fix huge dashboard gap */
+.sticky.top-16.z-30.bg-gray-50.pb-4.mb-6 {
+    margin-top: 0 !important;
+    padding-top: 0.5rem !important;
+}
+
 #dashboard-view {
-    padding-top: 0 !important;
+    margin-top: 0 !important;
+    padding-top: 0.5rem !important;
 }
