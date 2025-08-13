@@ -3229,3 +3229,92 @@ function goBackToHomeSetup() {
     document.getElementById('progress-percent').textContent = `${percent}%`;
     document.getElementById('progress-bar-fill').style.width = `${percent}%`;
 }
+// Real-time task preview functionality
+function updateTaskPreview() {
+    // Get current form state
+    const propertyType = document.getElementById('property-type')?.value || 'single-family';
+    const centralAC = document.getElementById('central-ac')?.checked || false;
+    const miniSplits = document.getElementById('mini-splits')?.checked || false;
+    const wellWater = document.getElementById('well-water')?.checked || false;
+    const septic = document.getElementById('septic')?.checked || false;
+    const fireplace = document.getElementById('fireplace')?.checked || false;
+    const pool = document.getElementById('pool')?.checked || false;
+    
+    // Calculate preview stats
+    let taskCount = 2; // Base safety tasks
+    let annualCost = 100; // Base cost
+    let safetyTasks = 2; // Base safety tasks
+    
+    // Add tasks based on features
+    if (centralAC) { taskCount += 2; annualCost += 175; }
+    if (miniSplits) { taskCount += 1; annualCost += 50; }
+    if (wellWater) { taskCount += 2; annualCost += 150; }
+    if (septic) { taskCount += 1; annualCost += 400; }
+    if (fireplace) { taskCount += 1; annualCost += 300; safetyTasks += 1; }
+    if (pool) { taskCount += 1; annualCost += 300; }
+    
+    // Property type adjustments
+    if (['single-family', 'townhouse'].includes(propertyType)) {
+        taskCount += 3; // Exterior tasks
+        annualCost += 250;
+    }
+    
+    // Update display with animation
+    animateNumber('preview-task-count', taskCount);
+    animateNumber('preview-annual-cost', annualCost, '$');
+    animateNumber('preview-safety-tasks', safetyTasks);
+}
+
+function animateNumber(elementId, newValue, prefix = '') {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    const oldValue = parseInt(element.textContent.replace(/[^0-9]/g, '')) || 0;
+    
+    // Add pulse animation
+    element.style.transform = 'scale(1.1)';
+    element.style.color = '#2563eb';
+    
+    // Animate number change
+    const startTime = Date.now();
+    const duration = 500;
+    
+    function updateNumber() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        const currentValue = Math.round(oldValue + (newValue - oldValue) * progress);
+        element.textContent = prefix + currentValue;
+        
+        if (progress < 1) {
+            requestAnimationFrame(updateNumber);
+        } else {
+            // Reset animation
+            setTimeout(() => {
+                element.style.transform = 'scale(1)';
+                element.style.color = '';
+            }, 200);
+        }
+    }
+    
+    updateNumber();
+}
+
+// Bind to form changes
+document.addEventListener('DOMContentLoaded', function() {
+    // Add listeners to all form inputs
+    const formInputs = document.querySelectorAll('#setup-form input[type="checkbox"], #setup-form select, .property-card');
+    
+    formInputs.forEach(input => {
+        if (input.classList.contains('property-card')) {
+            input.addEventListener('click', () => {
+                setTimeout(updateTaskPreview, 100);
+            });
+        } else {
+            input.addEventListener('change', updateTaskPreview);
+        }
+    });
+    
+    // Initial update
+    setTimeout(updateTaskPreview, 500);
+});
