@@ -1169,16 +1169,22 @@ document.getElementById('header-subtitle').textContent = homeData.fullAddress;
     // Show bottom navigation
     document.body.classList.add('main-app-active');
 
-    // 🧹 ADD THIS CLEANUP CODE HERE:
-// Clean up demo mode and setup classes
+    // 🧹 Clean up demo mode and setup classes
 if (window.isDemoMode) {
     // Remove demo banner
     const banner = document.querySelector('.demo-banner');
     if (banner) banner.remove();
-    document.body.style.paddingTop = '0';
+    
+    // Reset progress banner (though it will be hidden anyway)
+    const progressBanner = document.getElementById('onboarding-progress');
+    if (progressBanner) {
+        progressBanner.style.top = '0';
+        progressBanner.style.zIndex = '50';
+    }
 }
 
-// Switch from setup-active to main-app-active
+// Reset body padding and switch classes
+document.body.style.paddingTop = '0';
 document.body.classList.remove('setup-active');
 document.body.classList.add('main-app-active');
     
