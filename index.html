@@ -193,47 +193,16 @@
 <!-- Simplified Setup Form -->
 <div id="setup-form" class="hidden p-4 main-content pt-20">
     
-<!-- Enhanced Onboarding Progress -->
-<div id="onboarding-progress" class="hidden fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
-  <div class="max-w-2xl mx-auto px-4 py-4">
-    <!-- Step indicators with icons -->
-    <div class="flex items-center justify-between mb-4">
-      <div id="step-1-indicator" class="flex items-center gap-2 step-indicator active">
-        <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold transition-all duration-300">
-          1
-        </div>
-        <span class="text-sm font-medium text-gray-900">Basic Info</span>
-      </div>
-      
-      <div class="flex-1 mx-4">
-        <div class="h-1 bg-gray-200 rounded-full overflow-hidden">
-          <div id="progress-bar-fill" class="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500 ease-out" style="width: 33%;"></div>
-        </div>
-      </div>
-      
-      <div id="step-2-indicator" class="flex items-center gap-2 step-indicator">
-        <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-sm font-semibold transition-all duration-300">
-          2
-        </div>
-        <span class="text-sm font-medium text-gray-500">Systems</span>
-      </div>
-      
-      <div class="flex-1 mx-4">
-        <div class="h-1 bg-gray-200 rounded-full"></div>
-      </div>
-      
-      <div id="step-3-indicator" class="flex items-center gap-2 step-indicator">
-        <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-sm font-semibold transition-all duration-300">
-          3
-        </div>
-        <span class="text-sm font-medium text-gray-500">Features</span>
-      </div>
+<!-- Simple step navigation -->
+<div id="onboarding-progress" class="hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
+  <div class="flex items-center justify-center py-3 px-4">
+    <div class="flex items-center gap-2 text-sm">
+      <span id="step-1-dot" class="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold">1</span>
+      <span class="text-gray-300">→</span>
+      <span id="step-2-dot" class="w-6 h-6 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-semibold">2</span>
+      <span class="text-gray-300">→</span>
+      <span id="step-3-dot" class="w-6 h-6 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-semibold">3</span>
     </div>
-    
-<!-- Simple visual separator -->
-<div class="text-center">
-  <div class="w-8 h-1 bg-gray-200 rounded-full mx-auto"></div>
-</div>
   </div>
 </div>
             
@@ -2381,22 +2350,16 @@ function showSuccessMessage(message) {
 }
 
 function updateProgressIndicators(currentStep) {
-    // Update step indicators
+    // Update simple dots
     for (let i = 1; i <= 3; i++) {
-        const indicator = document.getElementById(`step-${i}-indicator`);
-        if (indicator) {
+        const dot = document.getElementById(`step-${i}-dot`);
+        if (dot) {
             if (i <= currentStep) {
-                indicator.classList.add('active');
-                const circle = indicator.querySelector('.w-8.h-8');
-                if (circle) {
-                    circle.classList.remove('bg-gray-200', 'text-gray-500');
-                    circle.classList.add('bg-blue-500', 'text-white');
-                }
-                const text = indicator.querySelector('span');
-                if (text) {
-                    text.classList.remove('text-gray-500');
-                    text.classList.add('text-gray-900');
-                }
+                dot.classList.remove('bg-gray-200', 'text-gray-500');
+                dot.classList.add('bg-blue-500', 'text-white');
+            } else {
+                dot.classList.remove('bg-blue-500', 'text-white');
+                dot.classList.add('bg-gray-200', 'text-gray-500');
             }
         }
     }
@@ -2452,29 +2415,26 @@ function startDemo() {
 
 function showDemoBanner() {
     const banner = document.createElement('div');
-    banner.className = 'fixed top-0 left-0 right-0 bg-green-600 text-white p-3 text-center demo-banner';
-    banner.style.zIndex = '70'; // Highest - above everything
+    banner.className = 'fixed top-0 left-0 right-0 bg-blue-50 border-b border-blue-200 text-center demo-banner';
+    banner.style.zIndex = '70';
     
     banner.innerHTML = `
-        <div class="flex items-center justify-center gap-2">
-            <span>🚀 Demo Mode - Try all features!</span>
-            <button onclick="convertToRealAccount()" class="bg-white text-green-600 px-3 py-1 rounded text-sm font-medium ml-4">
-                Save My Data
-            </button>
+        <div class="py-2 px-4">
+            <span class="text-sm text-blue-700">🚀 Demo Mode - Exploring features</span>
         </div>
     `;
     
     document.body.appendChild(banner);
     
-    // Move progress banner down to make room for demo banner
+    // Move progress banner down (now much smaller)
     const progressBanner = document.getElementById('onboarding-progress');
     if (progressBanner) {
-        progressBanner.style.top = '60px'; // Demo banner height
-        progressBanner.style.zIndex = '60'; // Below demo banner
+        progressBanner.style.top = '40px'; // Smaller demo banner
+        progressBanner.style.zIndex = '60';
     }
     
-    // Adjust body padding for both banners
-    document.body.style.paddingTop = '120px'; // 60px demo + 60px progress (smaller now)
+    // Much less padding needed now
+    document.body.style.paddingTop = '85px'; // 40px demo + 45px progress
 }
     
 function convertToRealAccount() {
@@ -2483,24 +2443,20 @@ function convertToRealAccount() {
         const banner = document.querySelector('.demo-banner');
         if (banner) banner.remove();
         
-        // Reset progress banner position
+        // Reset progress banner position  
         const progressBanner = document.getElementById('onboarding-progress');
         if (progressBanner) {
             progressBanner.style.top = '0';
-            progressBanner.style.zIndex = '50';
         }
         
-        // Reset body padding to just progress banner
-        document.body.style.paddingTop = '60px';
+        // Much less padding needed
+        document.body.style.paddingTop = '45px';
         
-        // Remove setup mode class since we're going back to login
+        // Rest stays the same...
         document.body.classList.remove('setup-active');
-        
-        // Show signup form
         document.getElementById('login-screen').classList.remove('hidden');
         showSignupForm();
         
-        // Keep current form data
         window.demoData = {
             address: document.getElementById('address').value,
             city: document.getElementById('city').value,
