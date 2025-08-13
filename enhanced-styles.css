@@ -449,3 +449,29 @@ body.install-banner-visible {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-5px); }
 }
+
+/* Property type cards */
+.property-card-inner {
+    transition: all 0.2s ease;
+    text-align: center;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.property-card-inner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+.property-card-inner.selected {
+    border-color: #2563eb !important;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.property-card-inner.selected .text-xs {
+    color: #2563eb !important;
+    font-weight: 600;
+}
