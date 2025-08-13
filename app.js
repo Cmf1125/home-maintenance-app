@@ -2830,6 +2830,29 @@ function showPropertyConfirmation() {
         garage: document.getElementById('garage')?.checked || false,
         basement: document.getElementById('basement')?.checked || false,
         otherFeatures: document.getElementById('other-features')?.value || ''
+
+        // ===== NEW FEATURES - ADD THESE =====
+            // Energy & Smart Systems
+            solarPanels: document.getElementById('solar-panels')?.checked || false,
+            backupGenerator: document.getElementById('backup-generator')?.checked || false,
+            batteryStorage: document.getElementById('battery-storage')?.checked || false,
+            smartThermostat: document.getElementById('smart-thermostat')?.checked || false,
+            securitySystem: document.getElementById('security-system')?.checked || false,
+
+            // Structural Details
+            roofType: document.getElementById('roof-type')?.value || 'asphalt',
+            roofAge: parseInt(document.getElementById('roof-age')?.value) || 0,
+            sidingType: document.getElementById('siding-type')?.value || 'vinyl',
+            foundationType: document.getElementById('foundation-type')?.value || 'concrete-slab',
+
+            // Outdoor Features
+            sprinklerSystem: document.getElementById('sprinkler-system')?.checked || false,
+            outdoorLighting: document.getElementById('outdoor-lighting')?.checked || false,
+            fencing: document.getElementById('fencing')?.checked || false,
+            pavedDriveway: document.getElementById('paved-driveway')?.checked || false,
+            matureLandscaping: document.getElementById('mature-landscaping')?.checked || false,
+            outdoorKitchen: document.getElementById('outdoor-kitchen')?.checked || false
+        
     };
 
     // Update confirmation summary
