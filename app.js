@@ -51,28 +51,6 @@ function getClimateRegion(state) {
     return 'GENERAL';
 }
 
-// Regional cost adjustment system
-function getRegionalCostMultiplier(state) {
-    const stateUpper = state.toUpperCase();
-    
-    // Cost multipliers based on regional labor/material costs
-    const highCostStates = ['CA', 'NY', 'MA', 'CT', 'NJ', 'HI', 'AK', 'DC', 'MD', 'WA'];
-    const lowCostStates = ['MS', 'AL', 'AR', 'WV', 'KY', 'TN', 'OK', 'KS', 'IA', 'NE'];
-    
-    if (highCostStates.includes(stateUpper)) {
-        return 1.3; // 30% higher costs
-    } else if (lowCostStates.includes(stateUpper)) {
-        return 0.8; // 20% lower costs  
-    } else {
-        return 1.0; // National average
-    }
-}
-
-function adjustCostForRegion(baseCost, state) {
-    const multiplier = getRegionalCostMultiplier(state);
-    return Math.round(baseCost * multiplier);
-}
-
 // 👇 ADD THE FUNCTION RIGHT HERE 👇
 function getAutoPriority(title, category) {
     // Safety tasks are always high priority
@@ -124,7 +102,6 @@ function createMaintenancePlan() {
             wallAC: document.getElementById('wall-ac')?.checked || false,
             electricBaseboard: document.getElementById('electric-baseboard')?.checked || false,
             boiler: document.getElementById('boiler')?.checked || false,
-            heatPump: document.getElementById('heat-pump')?.checked || false,
             municipalWater: document.getElementById('municipal-water')?.checked || false,
             wellWater: document.getElementById('well-water')?.checked || false,
             sedimentFilter: document.getElementById('sediment-filter')?.checked || false,
