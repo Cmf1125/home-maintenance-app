@@ -800,6 +800,10 @@ if (hasExteriorResponsibility) {
     }
 }
 
+    // Generate tasks for expanded features
+    const expandedTasks = generateExpandedFeatureTasks();
+    tasks.push(...expandedTasks);
+    
     // Generate regional seasonal tasks
     if (homeData.state) {
         const climateRegion = getClimateRegion(homeData.state);
