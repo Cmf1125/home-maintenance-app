@@ -551,3 +551,17 @@ body.main-app-active .bg-white.shadow-sm.border-b.sticky {
     margin-top: 0 !important;
     padding-top: 0.5rem !important;
 }
+/* Fix dropdown behind stat cards */
+.sticky.top-16.z-30 {
+    z-index: 20 !important; /* Lower the stat cards */
+}
+
+#settings-dropdown {
+    z-index: 50 !important; /* Higher than everything */
+    position: absolute !important;
+}
+
+/* Also lower the stat cards themselves */
+.stat-card {
+    z-index: 1 !important;
+}
