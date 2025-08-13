@@ -193,15 +193,15 @@
 <!-- Simplified Setup Form -->
 <div id="setup-form" class="hidden p-4 main-content pt-20">
     
-<!-- Simple step navigation -->
-<div id="onboarding-progress" class="hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
-  <div class="flex items-center justify-center py-3 px-4">
-    <div class="flex items-center gap-2 text-sm">
-      <span id="step-1-dot" class="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-semibold">1</span>
-      <span class="text-gray-300">→</span>
-      <span id="step-2-dot" class="w-6 h-6 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-semibold">2</span>
-      <span class="text-gray-300">→</span>
-      <span id="step-3-dot" class="w-6 h-6 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-semibold">3</span>
+<!-- Compact blue progress banner -->
+<div id="onboarding-progress" class="hidden fixed top-0 left-0 right-0 z-50 bg-blue-600">
+  <div class="flex items-center justify-center py-2">
+    <div class="flex items-center gap-3">
+      <span id="step-1-dot" class="w-7 h-7 rounded-full bg-white text-blue-600 flex items-center justify-center text-sm font-bold">1</span>
+      <span class="text-blue-200 text-lg">→</span>
+      <span id="step-2-dot" class="w-7 h-7 rounded-full bg-blue-500 text-blue-200 flex items-center justify-center text-sm font-bold border border-blue-400">2</span>
+      <span class="text-blue-200 text-lg">→</span>
+      <span id="step-3-dot" class="w-7 h-7 rounded-full bg-blue-500 text-blue-200 flex items-center justify-center text-sm font-bold border border-blue-400">3</span>
     </div>
   </div>
 </div>
@@ -2189,7 +2189,7 @@ function handleNewUserSignup(user) {
     document.body.classList.add('setup-active');
     
     // Set padding for just progress banner (no demo banner)
-    document.body.style.paddingTop = '35px';
+    document.body.style.paddingTop = '40px';
     
     // Show setup form
     document.getElementById('setup-form').classList.remove('hidden');
@@ -2350,16 +2350,16 @@ function showSuccessMessage(message) {
 }
 
 function updateProgressIndicators(currentStep) {
-    // Update simple dots
+    // Update blue/white dots
     for (let i = 1; i <= 3; i++) {
         const dot = document.getElementById(`step-${i}-dot`);
         if (dot) {
             if (i <= currentStep) {
-                dot.classList.remove('bg-gray-200', 'text-gray-500');
-                dot.classList.add('bg-blue-500', 'text-white');
+                // Active step: white background, blue text
+                dot.className = 'w-7 h-7 rounded-full bg-white text-blue-600 flex items-center justify-center text-sm font-bold';
             } else {
-                dot.classList.remove('bg-blue-500', 'text-white');
-                dot.classList.add('bg-gray-200', 'text-gray-500');
+                // Inactive step: blue background, light blue text
+                dot.className = 'w-7 h-7 rounded-full bg-blue-500 text-blue-200 flex items-center justify-center text-sm font-bold border border-blue-400';
             }
         }
     }
@@ -2420,21 +2420,21 @@ function showDemoBanner() {
     
     banner.innerHTML = `
         <div class="py-2 px-4">
-            <span class="text-sm text-blue-700">🚀 Demo Mode - Exploring features</span>
+            <span class="text-sm text-blue-700 font-medium">🚀 Demo Mode - Exploring features</span>
         </div>
     `;
     
     document.body.appendChild(banner);
     
-    // Move progress banner down (now much smaller)
+    // Move progress banner down 
     const progressBanner = document.getElementById('onboarding-progress');
     if (progressBanner) {
-        progressBanner.style.top = '40px'; // Smaller demo banner
+        progressBanner.style.top = '37px'; // Slightly smaller demo banner
         progressBanner.style.zIndex = '60';
     }
     
-    // Much less padding needed now
-    document.body.style.paddingTop = '75px'; 
+    // Adjusted padding
+    document.body.style.paddingTop = '75px'; // 37px demo + 38px progress
 }
     
 function convertToRealAccount() {
@@ -2450,7 +2450,7 @@ function convertToRealAccount() {
         }
         
         // Reduced padding
-        document.body.style.paddingTop = '35px'; // Was 45px
+        document.body.style.paddingTop = '40px'; 
         
         // Rest stays the same...
     }
