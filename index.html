@@ -2189,7 +2189,7 @@ function handleNewUserSignup(user) {
     document.body.classList.add('setup-active');
     
     // Set padding for just progress banner (no demo banner)
-    document.body.style.paddingTop = '80px';
+    document.body.style.paddingTop = '35px';
     
     // Show setup form
     document.getElementById('setup-form').classList.remove('hidden');
@@ -2434,7 +2434,7 @@ function showDemoBanner() {
     }
     
     // Much less padding needed now
-    document.body.style.paddingTop = '85px'; // 40px demo + 45px progress
+    document.body.style.paddingTop = '70px'; // Tighter spacing
 }
     
 function convertToRealAccount() {
@@ -2449,21 +2449,10 @@ function convertToRealAccount() {
             progressBanner.style.top = '0';
         }
         
-        // Much less padding needed
-        document.body.style.paddingTop = '45px';
+        // Reduced padding
+        document.body.style.paddingTop = '35px'; // Was 45px
         
         // Rest stays the same...
-        document.body.classList.remove('setup-active');
-        document.getElementById('login-screen').classList.remove('hidden');
-        showSignupForm();
-        
-        window.demoData = {
-            address: document.getElementById('address').value,
-            city: document.getElementById('city').value,
-            state: document.getElementById('state').value,
-            zipcode: document.getElementById('zipcode').value,
-            propertyType: document.getElementById('property-type').value
-        };
     }
 }
     
