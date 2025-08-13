@@ -204,6 +204,7 @@ body.main-app-active .bg-white.shadow-sm.border-b.sticky {
     background: white !important;
     backdrop-filter: blur(10px) !important;
     border-bottom: 1px solid #e5e7eb !important;
+    margin-bottom: 0 !important; /* Remove any margin causing gap */
 }
 
 /* Add Home Info Button */
