@@ -1168,6 +1168,19 @@ document.getElementById('header-subtitle').textContent = homeData.fullAddress;
 
     // Show bottom navigation
     document.body.classList.add('main-app-active');
+
+    // 🧹 ADD THIS CLEANUP CODE HERE:
+// Clean up demo mode and setup classes
+if (window.isDemoMode) {
+    // Remove demo banner
+    const banner = document.querySelector('.demo-banner');
+    if (banner) banner.remove();
+    document.body.style.paddingTop = '0';
+}
+
+// Switch from setup-active to main-app-active
+document.body.classList.remove('setup-active');
+document.body.classList.add('main-app-active');
     
     // Initialize dashboard with error handling
     try {
