@@ -2281,6 +2281,120 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+<script>
+function celebrateStepCompletion(currentStep, nextStep) {
+    // Get current step element
+    const currentStepEl = document.querySelector(`.onboarding-step[data-step="${currentStep}"]`);
+    const progressBar = document.getElementById('progress-bar-fill');
+    
+    // Add completion animation to current step
+    currentStepEl.classList.add('step-completed');
+    
+    // Create floating success message
+    showSuccessMessage(getStepMessage(currentStep));
+    
+    // Animate progress bar
+    if (progressBar) {
+        progressBar.classList.add('progress-celebration');
+        const newWidth = Math.round((nextStep / 3) * 100);
+        progressBar.style.width = `${newWidth}%`;
+    }
+    
+    // Update task preview if available
+    if (typeof updateTaskPreview === 'function') {
+        updateTaskPreview();
+    }
+    
+    // Delay the actual step transition for celebration
+    setTimeout(() => {
+        // Update progress indicators
+        updateProgressIndicators(nextStep);
+        
+        // Show next step
+        document.querySelectorAll('.onboarding-step').forEach(step => {
+            step.classList.add('hidden');
+        });
+        
+        const nextStepEl = document.querySelector(`.onboarding-step[data-step="${nextStep}"]`);
+        if (nextStepEl) {
+            nextStepEl.classList.remove('hidden');
             
+            // Smooth scroll to new step
+            nextStepEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Clean up animations
+        currentStepEl.classList.remove('step-completed');
+        if (progressBar) {
+            progressBar.classList.remove('progress-celebration');
+        }
+    }, 600);
+}
+
+function getStepMessage(step) {
+    const messages = {
+        1: "🏠 Great! Your home info is saved!",
+        2: "⚙️ Awesome! Systems configured!",
+        3: "✨ Perfect! Ready to generate your plan!"
+    };
+    return messages[step] || "Step completed!";
+}
+
+function showSuccessMessage(message) {
+    // Create floating message
+    const messageEl = document.createElement('div');
+    messageEl.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 success-message';
+    messageEl.textContent = message;
+    
+    document.body.appendChild(messageEl);
+    
+    // Animate in
+    setTimeout(() => {
+        messageEl.style.transform = 'translate(-50%, 0)';
+        messageEl.style.opacity = '1';
+    }, 100);
+    
+    // Remove after delay
+    setTimeout(() => {
+        messageEl.style.transform = 'translate(-50%, -20px)';
+        messageEl.style.opacity = '0';
+        setTimeout(() => {
+            if (messageEl.parentNode) {
+                document.body.removeChild(messageEl);
+            }
+        }, 300);
+    }, 2000);
+}
+
+function updateProgressIndicators(currentStep) {
+    // Update step indicators
+    for (let i = 1; i <= 3; i++) {
+        const indicator = document.getElementById(`step-${i}-indicator`);
+        if (indicator) {
+            if (i <= currentStep) {
+                indicator.classList.add('active');
+                const circle = indicator.querySelector('.w-8.h-8');
+                if (circle) {
+                    circle.classList.remove('bg-gray-200', 'text-gray-500');
+                    circle.classList.add('bg-blue-500', 'text-white');
+                }
+                const text = indicator.querySelector('span');
+                if (text) {
+                    text.classList.remove('text-gray-500');
+                    text.classList.add('text-gray-900');
+                }
+            }
+        }
+    }
+    
+    // Update progress text
+    const progressLabel = document.getElementById('progress-label');
+    const progressPercent = document.getElementById('progress-percent');
+    if (progressLabel && progressPercent) {
+        progressLabel.textContent = `Step ${currentStep} of 3`;
+        progressPercent.textContent = `${Math.round((currentStep / 3) * 100)}% Complete`;
+    }
+}
+</script>            
 </body>
 </html>
