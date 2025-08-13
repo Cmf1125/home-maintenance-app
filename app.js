@@ -2863,11 +2863,12 @@ function showPropertyConfirmation() {
     document.getElementById('property-confirmation').classList.remove('hidden');
 }
 
+// ENHANCED: updateConfirmationSummary function with new categories
 function updateConfirmationSummary() {
     const confirmationSummary = document.getElementById('confirmation-summary');
     if (!confirmationSummary) return;
     
-    // Build summary content (reusing your existing logic)
+    // Build existing summary content
     const heatingCooling = [];
     if (homeData.features.centralAC) heatingCooling.push('Central AC/Heat');
     if (homeData.features.miniSplits) heatingCooling.push('Mini-Splits');
@@ -2892,13 +2893,70 @@ function updateConfirmationSummary() {
     if (homeData.features.municipalSewer) waterSewer.push('Municipal Sewer');
     if (homeData.features.septic) waterSewer.push('Septic System');
 
-    const otherFeatures = [];
-    if (homeData.features.fireplace) otherFeatures.push('Fireplace');
-    if (homeData.features.pool) otherFeatures.push('Pool/Spa');
-    if (homeData.features.deck) otherFeatures.push('Deck/Patio');
-    if (homeData.features.garage) otherFeatures.push('Garage');
-    if (homeData.features.basement) otherFeatures.push('Basement');
-    if (homeData.features.otherFeatures) otherFeatures.push(homeData.features.otherFeatures);
+    const basicFeatures = [];
+    if (homeData.features.fireplace) basicFeatures.push('Fireplace');
+    if (homeData.features.pool) basicFeatures.push('Pool/Spa');
+    if (homeData.features.deck) basicFeatures.push('Deck/Patio');
+    if (homeData.features.garage) basicFeatures.push('Garage');
+    if (homeData.features.basement) basicFeatures.push('Basement');
+    if (homeData.features.otherFeatures) basicFeatures.push(homeData.features.otherFeatures);
+
+    // NEW: Build Energy & Smart Systems section
+    const energySmart = [];
+    if (homeData.features.solarPanels) energySmart.push('Solar Panels');
+    if (homeData.features.backupGenerator) energySmart.push('Backup Generator');
+    if (homeData.features.batteryStorage) energySmart.push('Battery Storage');
+    if (homeData.features.smartThermostat) energySmart.push('Smart Thermostat');
+    if (homeData.features.securitySystem) energySmart.push('Security System');
+
+    // NEW: Build Structural Details section
+    const structuralDetails = [];
+    if (homeData.features.roofType && homeData.features.roofType !== 'asphalt') {
+        const roofTypeMap = {
+            'metal': 'Metal Roofing',
+            'tile': 'Tile Roof',
+            'slate': 'Slate Roof',
+            'wood': 'Wood Shakes',
+            'flat': 'Flat/Membrane Roof'
+        };
+        structuralDetails.push(roofTypeMap[homeData.features.roofType] || 'Asphalt Shingles');
+    } else {
+        structuralDetails.push('Asphalt Shingles');
+    }
+    
+    if (homeData.features.roofAge > 0) {
+        structuralDetails.push(`${homeData.features.roofAge} year old roof`);
+    }
+    
+    if (homeData.features.sidingType && homeData.features.sidingType !== 'vinyl') {
+        const sidingTypeMap = {
+            'wood': 'Wood Siding',
+            'brick': 'Brick',
+            'stucco': 'Stucco',
+            'fiber-cement': 'Fiber Cement',
+            'stone': 'Stone/Masonry'
+        };
+        structuralDetails.push(sidingTypeMap[homeData.features.sidingType] || 'Vinyl Siding');
+    }
+    
+    if (homeData.features.foundationType && homeData.features.foundationType !== 'concrete-slab') {
+        const foundationTypeMap = {
+            'crawl-space': 'Crawl Space',
+            'full-basement': 'Full Basement',
+            'partial-basement': 'Partial Basement',
+            'pier-beam': 'Pier & Beam'
+        };
+        structuralDetails.push(foundationTypeMap[homeData.features.foundationType] || 'Concrete Slab');
+    }
+
+    // NEW: Build Outdoor Features section
+    const outdoorFeatures = [];
+    if (homeData.features.sprinklerSystem) outdoorFeatures.push('Sprinkler System');
+    if (homeData.features.outdoorLighting) outdoorFeatures.push('Outdoor Lighting');
+    if (homeData.features.fencing) outdoorFeatures.push('Fencing');
+    if (homeData.features.pavedDriveway) outdoorFeatures.push('Paved Driveway');
+    if (homeData.features.matureLandscaping) outdoorFeatures.push('Mature Landscaping');
+    if (homeData.features.outdoorKitchen) outdoorFeatures.push('Outdoor Kitchen');
 
     const propertyTypeDisplay = {
         'single-family': 'Single Family Home',
@@ -2908,13 +2966,42 @@ function updateConfirmationSummary() {
         'mobile-home': 'Mobile Home'
     };
 
-    confirmationSummary.innerHTML = `
+    // Build the enhanced confirmation HTML
+    let summaryHTML = `
         <div><strong>📍 Address:</strong> ${homeData.fullAddress}</div>
         <div><strong>🏢 Type:</strong> ${propertyTypeDisplay[homeData.propertyType]} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString()} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt}</div>
-        ${heatingCooling.length > 0 ? `<div><strong>🌡️ Heating/Cooling:</strong> ${heatingCooling.join(', ')}</div>` : ''}
-        ${waterSewer.length > 0 ? `<div><strong>💧 Water/Sewer:</strong> ${waterSewer.join(', ')}</div>` : ''}
-        ${otherFeatures.length > 0 ? `<div><strong>⚙️ Other Features:</strong> ${otherFeatures.join(', ')}</div>` : ''}
     `;
+
+    // Add existing categories
+    if (heatingCooling.length > 0) {
+        summaryHTML += `<div><strong>🌡️ Heating/Cooling:</strong> ${heatingCooling.join(', ')}</div>`;
+    }
+    
+    if (waterSewer.length > 0) {
+        summaryHTML += `<div><strong>💧 Water/Sewer:</strong> ${waterSewer.join(', ')}</div>`;
+    }
+
+    // Add basic features
+    if (basicFeatures.length > 0) {
+        summaryHTML += `<div><strong>🏠 Basic Features:</strong> ${basicFeatures.join(', ')}</div>`;
+    }
+
+    // NEW: Add Energy & Smart Systems
+    if (energySmart.length > 0) {
+        summaryHTML += `<div><strong>⚡ Energy & Smart Systems:</strong> ${energySmart.join(', ')}</div>`;
+    }
+
+    // NEW: Add Structural Details (show even if basic)
+    if (structuralDetails.length > 0) {
+        summaryHTML += `<div><strong>🏗️ Structural Details:</strong> ${structuralDetails.join(', ')}</div>`;
+    }
+
+    // NEW: Add Outdoor Features
+    if (outdoorFeatures.length > 0) {
+        summaryHTML += `<div><strong>🌳 Outdoor Features:</strong> ${outdoorFeatures.join(', ')}</div>`;
+    }
+
+    confirmationSummary.innerHTML = summaryHTML;
 }
 
 function proceedToTaskGeneration() {
