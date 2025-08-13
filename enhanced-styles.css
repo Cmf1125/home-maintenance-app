@@ -533,7 +533,18 @@ body.main-app-active .bg-white.shadow-sm.border-b.sticky {
 #onboarding-progress {
     padding: 0.5rem 1rem; /* Reduce from py-3 to py-2 */
 }
-/* Settings dropdown fix */
+/* ISSUE 1: Fix dropdown getting cut off */
 #settings-dropdown {
     z-index: 9999 !important;
+    max-height: 300px !important; /* Prevent cutoff */
+    overflow-y: auto !important;  /* Allow scrolling if needed */
+    
+    /* Better positioning to prevent cutoff */
+    position: absolute !important;
+    right: 0;
+    top: 100%;
+    margin-top: 0.5rem;
+    
+    /* Ensure it can extend beyond parent containers */
+    transform: none !important;
 }
