@@ -520,3 +520,16 @@ body:not(.main-app-active) .bg-white.shadow-sm.border-b.sticky {
 body.main-app-active .bg-white.shadow-sm.border-b.sticky {
     display: block !important;
 }
+/* Reduce setup form top spacing */
+#setup-form {
+    padding-top: 0.5rem !important; /* Reduce from default */
+}
+
+#setup-form .max-w-md {
+    margin-top: 0 !important; /* Remove any top margin */
+}
+
+/* Tighter onboarding progress */
+#onboarding-progress {
+    padding: 0.5rem 1rem; /* Reduce from py-3 to py-2 */
+}
