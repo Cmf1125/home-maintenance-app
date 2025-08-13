@@ -533,35 +533,3 @@ body.main-app-active .bg-white.shadow-sm.border-b.sticky {
 #onboarding-progress {
     padding: 0.5rem 1rem; /* Reduce from py-3 to py-2 */
 }
-/* EMERGENCY UI FIXES */
-#settings-dropdown {
-    z-index: 99999 !important;
-    position: fixed !important;
-    top: 60px !important;
-    right: 1rem !important;
-}
-
-/* Fix huge dashboard gap */
-.sticky.top-16.z-30.bg-gray-50.pb-4.mb-6 {
-    margin-top: 0 !important;
-    padding-top: 0.5rem !important;
-}
-
-#dashboard-view {
-    margin-top: 0 !important;
-    padding-top: 0.5rem !important;
-}
-/* Fix dropdown behind stat cards */
-.sticky.top-16.z-30 {
-    z-index: 20 !important; /* Lower the stat cards */
-}
-
-#settings-dropdown {
-    z-index: 50 !important; /* Higher than everything */
-    position: absolute !important;
-}
-
-/* Also lower the stat cards themselves */
-.stat-card {
-    z-index: 1 !important;
-}
