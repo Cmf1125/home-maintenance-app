@@ -1418,7 +1418,7 @@ document.body.classList.add('main-app-active');
     
     // Save to Firebase if user is logged in
     if (window.currentUser) {
-        saveUserDataToFirebase(window.currentUser.uid, homeData, tasks)
+        saveUserDataToFirebaseEnhanced(window.currentUser.uid, homeData, tasks)
             .then(() => {
                 console.log('💾 User data saved to Firebase');
             })
@@ -2538,7 +2538,7 @@ function clearData() {
         
         // Clear from Firebase instead of localStorage
         if (window.currentUser) {
-            saveUserDataToFirebase(window.currentUser.uid, {}, [])
+            saveUserDataToFirebaseEnhanced(window.currentUser.uid, {}, [])
                 .then(() => {
                     console.log('✅ Data cleared from Firebase');
                 })
@@ -2636,7 +2636,7 @@ function saveData() {
             } else {
                 console.warn('⚠️ Enhanced save failed, trying fallback...');
                 // Fallback to original save
-                return saveUserDataToFirebase(window.currentUser.uid, window.homeData || {}, window.tasks || []);
+                return saveUserDataToFirebaseEnhanced(window.currentUser.uid, window.homeData || {}, window.tasks || []);
             }
         })
         .then(() => {
