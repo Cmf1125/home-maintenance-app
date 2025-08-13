@@ -80,6 +80,16 @@
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                            placeholder="••••••••">
                 </div>
+
+<!-- ADD THIS above the "Sign In" button: -->
+<button onclick="startDemo()" 
+        class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-medium mb-3">
+    🚀 Try Demo (No Signup Required)
+</button>
+
+<div class="text-center text-xs text-gray-500 mb-4">
+    or sign in to save your data
+</div>
                 <button onclick="signInUser()" 
                         class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium">
                     Sign In
@@ -1833,6 +1843,10 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
             console.log('🚫 Enhanced save skipped: No user logged in');
             return false;
         }
+        if (window.currentUser?.isDemo || window.currentUser?.isDemoUser) {
+            console.log('🚫 Demo user detected, skipping Firebase save');
+            return false;
+        }
 
         console.log('💾 Enhanced save: Starting comprehensive save...');
         
@@ -2395,6 +2409,112 @@ function updateProgressIndicators(currentStep) {
         progressPercent.textContent = `${Math.round((currentStep / 3) * 100)}% Complete`;
     }
 }
+</script>
+<script>
+function startDemo() {
+    console.log('🚀 Starting demo mode...');
+    
+    // Set demo mode flag
+    window.isDemoMode = true;
+    
+    // Create demo user
+    window.currentUser = {
+    uid: 'demo-user-' + Date.now(), // Unique demo ID
+    email: 'demo@example.com',
+    isDemo: true,
+    isDemoUser: true // Extra safety flag
+};
+    
+    // Hide login screen
+    document.getElementById('login-screen').classList.add('hidden');
+    
+    // Show setup form with demo banner
+    document.getElementById('setup-form').classList.remove('hidden');
+    document.getElementById('setup-form').style.display = 'block';
+    document.getElementById('onboarding-progress').classList.remove('hidden');
+    
+    // Add demo banner
+    showDemoBanner();
+    
+    // Pre-fill some demo data to speed things up
+    setTimeout(() => {
+        document.getElementById('address').value = '123 Demo Street';
+        document.getElementById('city').value = 'Demo City';
+        document.getElementById('state').value = 'CA';
+        document.getElementById('zipcode').value = '90210';
+        document.getElementById('year-built').value = '2010';
+        document.getElementById('sqft').value = '2500';
+        
+        // Auto-select single family
+        const firstPropertyCard = document.querySelector('.property-card');
+        if (firstPropertyCard) {
+            firstPropertyCard.click();
+        }
+        
+        updateTaskPreview();
+    }, 500);
+}
+
+function showDemoBanner() {
+    const banner = document.createElement('div');
+    banner.className = 'fixed top-0 left-0 right-0 bg-green-600 text-white p-3 text-center z-50 demo-banner';
+    banner.innerHTML = `
+        <div class="flex items-center justify-center gap-2">
+            <span>🚀 Demo Mode - Try all features!</span>
+            <button onclick="convertToRealAccount()" class="bg-white text-green-600 px-3 py-1 rounded text-sm font-medium ml-4">
+                Save My Data
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(banner);
+    
+    // Adjust body padding
+    document.body.style.paddingTop = '60px';
+}
+
+function convertToRealAccount() {
+    // Show signup form to convert demo user
+    if (confirm('Create an account to save your maintenance plan?')) {
+        // Remove demo banner
+        const banner = document.querySelector('.demo-banner');
+        if (banner) banner.remove();
+        document.body.style.paddingTop = '0';
+        
+        // Show signup form
+        document.getElementById('login-screen').classList.remove('hidden');
+        showSignupForm();
+        
+        // Keep current form data when they sign up
+        window.demoData = {
+            address: document.getElementById('address').value,
+            city: document.getElementById('city').value,
+            state: document.getElementById('state').value,
+            zipcode: document.getElementById('zipcode').value,
+            propertyType: document.getElementById('property-type').value
+        };
+    }
+}
+
+// Override save functions for demo mode
+const originalSaveData = window.saveData;
+window.saveData = function() {
+    if (window.isDemoMode) {
+        console.log('📝 Demo mode: Data saved locally only');
+        // Store in localStorage for demo
+        localStorage.setItem('demoData', JSON.stringify({
+            homeData: window.homeData,
+            tasks: window.tasks,
+            timestamp: new Date().toISOString()
+        }));
+        return;
+    }
+    
+    // Call original save for real users
+    if (originalSaveData) {
+        originalSaveData();
+    }
+};
 </script>            
 </body>
 </html>
