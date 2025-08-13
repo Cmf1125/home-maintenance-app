@@ -230,12 +230,10 @@
       </div>
     </div>
     
-    <!-- Progress text -->
-    <div class="text-center">
-      <span id="progress-label" class="text-sm font-semibold text-gray-700">Step 1 of 3</span>
-      <span class="text-gray-400 mx-2">•</span>
-      <span id="progress-percent" class="text-sm text-blue-600 font-medium">33% Complete</span>
-    </div>
+<!-- Simple visual separator -->
+<div class="text-center">
+  <div class="w-8 h-1 bg-gray-200 rounded-full mx-auto"></div>
+</div>
   </div>
 </div>
             
@@ -2402,14 +2400,6 @@ function updateProgressIndicators(currentStep) {
             }
         }
     }
-    
-    // Update progress text
-    const progressLabel = document.getElementById('progress-label');
-    const progressPercent = document.getElementById('progress-percent');
-    if (progressLabel && progressPercent) {
-        progressLabel.textContent = `Step ${currentStep} of 3`;
-        progressPercent.textContent = `${Math.round((currentStep / 3) * 100)}% Complete`;
-    }
 }
 </script>
 <script>
@@ -2484,7 +2474,7 @@ function showDemoBanner() {
     }
     
     // Adjust body padding for both banners
-    document.body.style.paddingTop = '140px'; // 60px demo + 80px progress
+    document.body.style.paddingTop = '120px'; // 60px demo + 60px progress (smaller now)
 }
     
 function convertToRealAccount() {
@@ -2501,7 +2491,7 @@ function convertToRealAccount() {
         }
         
         // Reset body padding to just progress banner
-        document.body.style.paddingTop = '80px';
+        document.body.style.paddingTop = '60px';
         
         // Remove setup mode class since we're going back to login
         document.body.classList.remove('setup-active');
