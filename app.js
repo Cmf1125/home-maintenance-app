@@ -603,19 +603,20 @@ const expandedTasks = generateExpandedFeatureTasks();
 tasks.push(...expandedTasks);
     
 // Add this new function to generate tasks for the new features
+
 function generateExpandedFeatureTasks() {
     let expandedTasks = [];
     let id = 1000; // Use high IDs to avoid conflicts
 
-    // Solar Panel Tasks
+    // Solar Panel Tasks → "Exterior" category
     if (homeData.features.solarPanels) {
         expandedTasks.push({
             id: id++,
-            title: 'Solar Panel Cleaning & Inspection',
-            category: 'Energy Systems',
+            title: `Solar Panel Cleaning & Inspection`,
+            category: 'Exterior',
             frequency: 180, // Every 6 months
             cost: 100,
-            priority: getAutoPriority('Solar Panel Cleaning & Inspection', 'Energy Systems'),
+            priority: getAutoPriority('Solar Panel Cleaning & Inspection', 'Exterior'),
             description: 'Clean solar panels and inspect for damage, debris, or shading issues',
             dueDate: null,
             lastCompleted: null,
@@ -625,11 +626,11 @@ function generateExpandedFeatureTasks() {
 
         expandedTasks.push({
             id: id++,
-            title: 'Solar System Performance Check',
-            category: 'Energy Systems',
+            title: `Solar System Performance Check`,
+            category: 'General',
             frequency: 90, // Quarterly
             cost: 0,
-            priority: getAutoPriority('Solar System Performance Check', 'Energy Systems'),
+            priority: getAutoPriority('Solar System Performance Check', 'General'),
             description: 'Review solar system performance data and energy production',
             dueDate: null,
             lastCompleted: null,
@@ -638,11 +639,11 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Backup Generator Tasks
+    // Backup Generator Tasks → "Safety" category
     if (homeData.features.backupGenerator) {
         expandedTasks.push({
             id: id++,
-            title: 'Generator Monthly Test Run',
+            title: `Generator Monthly Test Run`,
             category: 'Safety',
             frequency: 30, // Monthly
             cost: 5,
@@ -656,7 +657,7 @@ function generateExpandedFeatureTasks() {
 
         expandedTasks.push({
             id: id++,
-            title: 'Generator Annual Service',
+            title: `Generator Annual Service`,
             category: 'Safety',
             frequency: 365, // Yearly
             cost: 250,
@@ -669,11 +670,11 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Smart Thermostat Tasks
+    // Smart Thermostat Tasks → "HVAC" category
     if (homeData.features.smartThermostat) {
         expandedTasks.push({
             id: id++,
-            title: 'Smart Thermostat Data Review',
+            title: `Smart Thermostat Data Review`,
             category: 'HVAC',
             frequency: 90, // Quarterly
             cost: 0,
@@ -686,11 +687,28 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Sprinkler System Tasks
+    // Security System Tasks → "Safety" category
+    if (homeData.features.securitySystem) {
+        expandedTasks.push({
+            id: id++,
+            title: `Security System Test`,
+            category: 'Safety',
+            frequency: 90, // Quarterly
+            cost: 0,
+            priority: getAutoPriority('Security System Test', 'Safety'),
+            description: 'Test security system sensors, cameras, and communication',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+    }
+
+    // Sprinkler System Tasks → "Exterior" category
     if (homeData.features.sprinklerSystem) {
         expandedTasks.push({
             id: id++,
-            title: 'Sprinkler System Spring Startup',
+            title: `Sprinkler System Spring Startup`,
             category: 'Exterior',
             frequency: 365,
             cost: 125,
@@ -705,7 +723,7 @@ function generateExpandedFeatureTasks() {
 
         expandedTasks.push({
             id: id++,
-            title: 'Sprinkler System Winterization',
+            title: `Sprinkler System Winterization`,
             category: 'Exterior',
             frequency: 365,
             cost: 100,
@@ -719,11 +737,11 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Outdoor Lighting Tasks
+    // Outdoor Lighting Tasks → "Exterior" category
     if (homeData.features.outdoorLighting) {
         expandedTasks.push({
             id: id++,
-            title: 'Outdoor Lighting Inspection',
+            title: `Outdoor Lighting Inspection`,
             category: 'Exterior',
             frequency: 180, // Every 6 months
             cost: 30,
@@ -736,11 +754,11 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Driveway Maintenance
+    // Driveway Maintenance → "Exterior" category
     if (homeData.features.pavedDriveway) {
         expandedTasks.push({
             id: id++,
-            title: 'Driveway Crack Sealing',
+            title: `Driveway Crack Sealing`,
             category: 'Exterior',
             frequency: 730, // Every 2 years
             cost: 200,
@@ -753,11 +771,11 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Roof Age-Based Tasks
+    // Roof Age-Based Tasks → "Exterior" category
     if (homeData.features.roofAge > 10) {
         expandedTasks.push({
             id: id++,
-            title: 'Professional Roof Inspection',
+            title: `Professional Roof Inspection`,
             category: 'Exterior',
             frequency: homeData.features.roofAge > 20 ? 365 : 730, // Annual if >20 years, biennial if 10-20
             cost: 300,
@@ -770,16 +788,16 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Security System Tasks
-    if (homeData.features.securitySystem) {
+    // Landscaping Maintenance → "Exterior" category
+    if (homeData.features.matureLandscaping) {
         expandedTasks.push({
             id: id++,
-            title: 'Security System Test',
-            category: 'Safety',
-            frequency: 90, // Quarterly
-            cost: 0,
-            priority: getAutoPriority('Security System Test', 'Safety'),
-            description: 'Test security system sensors, cameras, and communication',
+            title: `Mature Tree Pruning`,
+            category: 'Exterior',
+            frequency: 365, // Annual
+            cost: 200,
+            priority: getAutoPriority('Mature Tree Pruning', 'Exterior'),
+            description: 'Professional pruning of mature trees for health and safety',
             dueDate: null,
             lastCompleted: null,
             isCompleted: false,
