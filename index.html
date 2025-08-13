@@ -395,176 +395,196 @@
                     </div> <!-- End of Step 2 container -->
                     
              <!-- Step 3: Final details & preferences -->
-              <div class="onboarding-step hidden" data-step="3">
-                    <!-- Other Home Features -->
+             <div class="onboarding-step hidden" data-step="3">
+    <!-- Basic Features (Always Visible) -->
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-3">Basic Home Features</label>
+        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
+            <label class="flex items-center space-x-3 touch-btn">
+                <input type="checkbox" id="fireplace" class="w-5 h-5">
+                <span>Fireplace</span>
+            </label>
+            <label class="flex items-center space-x-3 touch-btn">
+                <input type="checkbox" id="pool" class="w-5 h-5">
+                <span>Pool/Spa</span>
+            </label>
+            <label class="flex items-center space-x-3 touch-btn">
+                <input type="checkbox" id="deck" class="w-5 h-5">
+                <span>Deck/Patio</span>
+            </label>
+            <label class="flex items-center space-x-3 touch-btn">
+                <input type="checkbox" id="garage" class="w-5 h-5">
+                <span>Garage</span>
+            </label>
+            <label class="flex items-center space-x-3 touch-btn">
+                <input type="checkbox" id="basement" class="w-5 h-5">
+                <span>Basement</span>
+            </label>
+        </div>
+    </div>
+
+<!-- Advanced Features Toggle Section -->
+    <div class="mt-6">
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 cursor-pointer hover:from-blue-100 hover:to-indigo-100 transition-all duration-200" 
+             onclick="toggleAdvancedFeatures()">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-blue-600 rounded-lg text-white text-lg">⚡</div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Other Home Features</label>
-                        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="fireplace" class="w-5 h-5">
-                                <span>Fireplace</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="pool" class="w-5 h-5">
-                                <span>Pool/Spa</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="deck" class="w-5 h-5">
-                                <span>Deck/Patio</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="garage" class="w-5 h-5">
-                                <span>Garage</span>
-                            </label>
-                            <label class="flex items-center space-x-3 touch-btn">
-                                <input type="checkbox" id="basement" class="w-5 h-5">
-                                <span>Basement</span>
-                            </label>
-                        </div>
+                        <h4 class="font-semibold text-blue-900">Advanced Features</h4>
+                        <p class="text-sm text-blue-700">Solar, generators, smart systems, outdoor features</p>
                     </div>
-
-<!-- ========================================
-     ADD THESE SECTIONS TO YOUR STEP 3 in index.html
-     Place them AFTER the existing "Other Home Features" section
-     and BEFORE the "Other Features" text input
-     ======================================== -->
-
-<!-- Energy Systems Section -->
-<div>
-    <label class="block text-sm font-medium text-gray-700 mb-3">Energy & Smart Systems</label>
-    <div class="space-y-3 bg-blue-50 p-4 rounded-lg border border-blue-200">
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="solar-panels" class="w-5 h-5">
-            <span>Solar Panels</span>
-        </label>
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="backup-generator" class="w-5 h-5">
-            <span>Backup Generator</span>
-        </label>
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="battery-storage" class="w-5 h-5">
-            <span>Battery Storage System</span>
-        </label>
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="smart-thermostat" class="w-5 h-5">
-            <span>Smart Thermostat</span>
-        </label>
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="security-system" class="w-5 h-5">
-            <span>Security System</span>
-        </label>
-    </div>
-</div>
-
-<!-- Structural Details Section -->
-<div>
-    <label class="block text-sm font-medium text-gray-700 mb-3">Structural Details</label>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-green-50 p-4 rounded-lg border border-green-200">
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Roof Type</label>
-            <select id="roof-type" class="w-full p-2 border border-gray-300 rounded text-sm">
-                <option value="asphalt">Asphalt Shingles</option>
-                <option value="metal">Metal Roofing</option>
-                <option value="tile">Tile (Clay/Concrete)</option>
-                <option value="slate">Slate</option>
-                <option value="wood">Wood Shakes</option>
-                <option value="flat">Flat/Membrane</option>
-            </select>
-        </div>
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Roof Age (years)</label>
-            <input type="number" id="roof-age" min="0" max="50" 
-                   class="w-full p-2 border border-gray-300 rounded text-sm" 
-                   placeholder="10">
-        </div>
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Exterior Siding</label>
-            <select id="siding-type" class="w-full p-2 border border-gray-300 rounded text-sm">
-                <option value="vinyl">Vinyl Siding</option>
-                <option value="wood">Wood Siding</option>
-                <option value="brick">Brick</option>
-                <option value="stucco">Stucco</option>
-                <option value="fiber-cement">Fiber Cement</option>
-                <option value="stone">Stone/Masonry</option>
-            </select>
-        </div>
-        <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Foundation Type</label>
-            <select id="foundation-type" class="w-full p-2 border border-gray-300 rounded text-sm">
-                <option value="concrete-slab">Concrete Slab</option>
-                <option value="crawl-space">Crawl Space</option>
-                <option value="full-basement">Full Basement</option>
-                <option value="partial-basement">Partial Basement</option>
-                <option value="pier-beam">Pier & Beam</option>
-            </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span id="advanced-toggle-text" class="text-sm font-medium text-blue-800">Show Options</span>
+                    <div id="advanced-toggle-arrow" class="text-blue-600 text-xl transition-transform duration-300">▼</div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Outdoor Features Section -->
-<div>
-    <label class="block text-sm font-medium text-gray-700 mb-3">Outdoor Features</label>
-    <div class="space-y-3 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="sprinkler-system" class="w-5 h-5">
-            <span>Sprinkler/Irrigation System</span>
-        </label>
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="outdoor-lighting" class="w-5 h-5">
-            <span>Outdoor Lighting System</span>
-        </label>
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="fencing" class="w-5 h-5">
-            <span>Fencing</span>
-        </label>
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="paved-driveway" class="w-5 h-5">
-            <span>Paved Driveway</span>
-        </label>
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="mature-landscaping" class="w-5 h-5">
-            <span>Mature Landscaping</span>
-        </label>
-        <label class="flex items-center space-x-3 touch-btn">
-            <input type="checkbox" id="outdoor-kitchen" class="w-5 h-5">
-            <span>Outdoor Kitchen/Grill Area</span>
-        </label>
-    </div>
-</div>
-                  
-<!-- Other Features -->
- <div class="mb-6">
-     <label class="block text-sm font-medium text-gray-700 mb-2 mt-2 mt-2">Other Features</label>
-    <input type="text" id="other-features" placeholder="e.g., Hot tub, Generator, Solar panels..." 
-    class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
-    <p class="text-xs text-gray-500 mt-1">List any additional features not mentioned above</p>
-</div>
+    <!-- Advanced Features Content (Hidden by Default) -->
+    <div id="advanced-features-section" class="hidden mt-4 space-y-4 overflow-hidden transition-all duration-500">
+        
+        <!-- Energy & Smart Systems -->
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+            <h5 class="font-semibold text-green-900 mb-3 flex items-center gap-2">
+                <span class="text-lg">🔋</span>
+                Energy & Smart Systems
+            </h5>
+            <div class="space-y-3">
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="solar-panels" class="w-5 h-5">
+                    <span>Solar Panels</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="backup-generator" class="w-5 h-5">
+                    <span>Backup Generator</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="battery-storage" class="w-5 h-5">
+                    <span>Battery Storage System</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="smart-thermostat" class="w-5 h-5">
+                    <span>Smart Thermostat</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="security-system" class="w-5 h-5">
+                    <span>Security System</span>
+                </label>
+            </div>
+        </div>
 
-<!-- Tip box -->
-<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-    <div class="flex items-start gap-3">
-        <div class="text-blue-600 text-lg">💡</div>
-        <div class="text-sm text-blue-800">
-            <strong>Good to know:</strong> Task frequencies can be adjusted later based on your specific needs (pets, usage patterns, manufacturer recommendations, etc.)
+        <!-- Outdoor Features -->
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h5 class="font-semibold text-yellow-900 mb-3 flex items-center gap-2">
+                <span class="text-lg">🌳</span>
+                Outdoor Features
+            </h5>
+            <div class="space-y-3">
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="sprinkler-system" class="w-5 h-5">
+                    <span>Sprinkler/Irrigation System</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="outdoor-lighting" class="w-5 h-5">
+                    <span>Outdoor Lighting System</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="fencing" class="w-5 h-5">
+                    <span>Fencing</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="paved-driveway" class="w-5 h-5">
+                    <span>Paved Driveway</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="mature-landscaping" class="w-5 h-5">
+                    <span>Mature Landscaping</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="outdoor-kitchen" class="w-5 h-5">
+                    <span>Outdoor Kitchen/Grill Area</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Structural Details -->
+        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <h5 class="font-semibold text-purple-900 mb-3 flex items-center gap-2">
+                <span class="text-lg">🏠</span>
+                Structural Details
+            </h5>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Roof Type</label>
+                    <select id="roof-type" class="w-full p-2 border border-gray-300 rounded text-sm">
+                        <option value="asphalt">Asphalt Shingles</option>
+                        <option value="metal">Metal Roofing</option>
+                        <option value="tile">Tile (Clay/Concrete)</option>
+                        <option value="slate">Slate</option>
+                        <option value="wood">Wood Shakes</option>
+                        <option value="flat">Flat/Membrane</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Roof Age (years)</label>
+                    <input type="number" id="roof-age" min="0" max="50" 
+                           class="w-full p-2 border border-gray-300 rounded text-sm" 
+                           placeholder="10">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Exterior Siding</label>
+                    <select id="siding-type" class="w-full p-2 border border-gray-300 rounded text-sm">
+                        <option value="vinyl">Vinyl Siding</option>
+                        <option value="wood">Wood Siding</option>
+                        <option value="brick">Brick</option>
+                        <option value="stucco">Stucco</option>
+                        <option value="fiber-cement">Fiber Cement</option>
+                        <option value="stone">Stone/Masonry</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Foundation Type</label>
+                    <select id="foundation-type" class="w-full p-2 border border-gray-300 rounded text-sm">
+                        <option value="concrete-slab">Concrete Slab</option>
+                        <option value="crawl-space">Crawl Space</option>
+                        <option value="full-basement">Full Basement</option>
+                        <option value="partial-basement">Partial Basement</option>
+                        <option value="pier-beam">Pier & Beam</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Helpful Note -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p class="text-sm text-blue-800">
+                <strong>💡 Tip:</strong> Don't worry if you're not sure about some details - you can always add or modify features later in the app!
+            </p>
         </div>
     </div>
-</div> <!-- ✅ Tip box closes here -->
 
-<!-- Buttons row (stack on mobile, side-by-side on desktop) -->
-<div class="mt-4 flex flex-col sm:flex-row gap-3">
-  <button
-    type="button"
-    id="back-to-step-2"
-    class="w-full sm:flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg">
-    ← Back
-  </button>
+    <!-- Other Features (Always Visible) -->
+    <div class="mt-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Other Features</label>
+        <input type="text" id="other-features" placeholder="e.g., Hot tub, Workshop, Wine cellar..." 
+               class="w-full px-3 py-3 border border-gray-300 rounded-lg text-base">
+        <p class="text-xs text-gray-500 mt-1">List any other features you'd like to track maintenance for</p>
+    </div>
 
- <button
-  type="button"
-  onclick="showPropertyConfirmation()"
-  class="w-full sm:flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors touch-btn">
-  🚀 Create My Plan
-</button>
+    <!-- Navigation Buttons -->
+    <div class="mt-6 flex flex-col sm:flex-row gap-3">
+        <button type="button" id="back-to-step-2" 
+                class="w-full sm:flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+            ← Back
+        </button>
+        <button type="button" onclick="showPropertyConfirmation()" 
+                class="w-full sm:flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors touch-btn">
+            🚀 Create My Plan
+        </button>
+    </div>
 </div>
                   
 </div> <!-- This closes Step 3 -->
