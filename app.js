@@ -124,6 +124,7 @@ function createMaintenancePlan() {
             wallAC: document.getElementById('wall-ac')?.checked || false,
             electricBaseboard: document.getElementById('electric-baseboard')?.checked || false,
             boiler: document.getElementById('boiler')?.checked || false,
+            heatPump: document.getElementById('heat-pump')?.checked || false,
             municipalWater: document.getElementById('municipal-water')?.checked || false,
             wellWater: document.getElementById('well-water')?.checked || false,
             sedimentFilter: document.getElementById('sediment-filter')?.checked || false,
