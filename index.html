@@ -2213,10 +2213,13 @@ function handleSuccessfulLogin(user) {
 function handleNewUserSignup(user) {
     console.log('🆕 New user signed up, starting setup process...');
     
-    // Hide ALL other screens first
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('main-app').classList.add('hidden');
-    document.body.classList.remove('main-app-active');
+// Hide ALL other screens first
+document.getElementById('login-screen').classList.add('hidden');
+document.getElementById('main-app').classList.add('hidden');
+document.body.classList.remove('main-app-active');
+
+// ADD THIS LINE:
+document.body.classList.add('setup-active');
     
 // Show setup form
 document.getElementById('setup-form').classList.remove('hidden');
@@ -2427,6 +2430,9 @@ function startDemo() {
     
     // Hide login screen
     document.getElementById('login-screen').classList.add('hidden');
+
+     // ADD THIS LINE:
+    document.body.classList.add('setup-active');
     
     // Show setup form with demo banner
     document.getElementById('setup-form').classList.remove('hidden');
@@ -2456,8 +2462,15 @@ function startDemo() {
 }
 
 function showDemoBanner() {
+    // Check if progress banner exists and get its height
+    const progressBanner = document.getElementById('onboarding-progress');
+    const topOffset = progressBanner ? '80px' : '0px'; // Progress banner is about 80px tall
+    
     const banner = document.createElement('div');
-    banner.className = 'fixed top-0 left-0 right-0 bg-green-600 text-white p-3 text-center z-50 demo-banner';
+    banner.className = 'fixed left-0 right-0 bg-green-600 text-white p-3 text-center demo-banner';
+    banner.style.top = topOffset;
+    banner.style.zIndex = '60'; // Higher than progress banner (z-50)
+    
     banner.innerHTML = `
         <div class="flex items-center justify-center gap-2">
             <span>🚀 Demo Mode - Try all features!</span>
@@ -2469,17 +2482,21 @@ function showDemoBanner() {
     
     document.body.appendChild(banner);
     
-    // Adjust body padding
-    document.body.style.paddingTop = '60px';
+    // Adjust body padding based on whether progress banner exists
+    const totalBannerHeight = progressBanner ? '140px' : '60px';
+    document.body.style.paddingTop = totalBannerHeight;
 }
 
 function convertToRealAccount() {
     // Show signup form to convert demo user
     if (confirm('Create an account to save your maintenance plan?')) {
-        // Remove demo banner
+        // Remove demo banner and reset padding
         const banner = document.querySelector('.demo-banner');
         if (banner) banner.remove();
         document.body.style.paddingTop = '0';
+        
+        // Remove setup mode class since we're going back to login
+        document.body.classList.remove('setup-active');
         
         // Show signup form
         document.getElementById('login-screen').classList.remove('hidden');
