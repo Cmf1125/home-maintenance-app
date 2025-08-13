@@ -116,6 +116,27 @@ function createMaintenancePlan() {
             garage: document.getElementById('garage')?.checked || false,
             basement: document.getElementById('basement')?.checked || false,
             otherFeatures: document.getElementById('other-features')?.value || ''
+            // ===== NEW FEATURES - ADD THESE =====
+            // Energy & Smart Systems
+            solarPanels: document.getElementById('solar-panels')?.checked || false,
+            backupGenerator: document.getElementById('backup-generator')?.checked || false,
+            batteryStorage: document.getElementById('battery-storage')?.checked || false,
+            smartThermostat: document.getElementById('smart-thermostat')?.checked || false,
+            securitySystem: document.getElementById('security-system')?.checked || false,
+
+            // Structural Details
+            roofType: document.getElementById('roof-type')?.value || 'asphalt',
+            roofAge: parseInt(document.getElementById('roof-age')?.value) || 0,
+            sidingType: document.getElementById('siding-type')?.value || 'vinyl',
+            foundationType: document.getElementById('foundation-type')?.value || 'concrete-slab',
+
+            // Outdoor Features
+            sprinklerSystem: document.getElementById('sprinkler-system')?.checked || false,
+            outdoorLighting: document.getElementById('outdoor-lighting')?.checked || false,
+            fencing: document.getElementById('fencing')?.checked || false,
+            pavedDriveway: document.getElementById('paved-driveway')?.checked || false,
+            matureLandscaping: document.getElementById('mature-landscaping')?.checked || false,
+            outdoorKitchen: document.getElementById('outdoor-kitchen')?.checked || false
         };
 
         // Generate tasks
@@ -144,6 +165,209 @@ function createMaintenancePlan() {
         alert('❌ Error creating maintenance plan. Check console for details.');
     }
 }
+
+// Add this new function to generate tasks for the new features
+function generateExpandedFeatureTasks() {
+    let expandedTasks = [];
+    let id = 1000; // Use high IDs to avoid conflicts
+
+    // Solar Panel Tasks
+    if (homeData.features.solarPanels) {
+        expandedTasks.push({
+            id: id++,
+            title: 'Solar Panel Cleaning & Inspection',
+            category: 'Energy Systems',
+            frequency: 180, // Every 6 months
+            cost: 100,
+            priority: getAutoPriority('Solar Panel Cleaning & Inspection', 'Energy Systems'),
+            description: 'Clean solar panels and inspect for damage, debris, or shading issues',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+
+        expandedTasks.push({
+            id: id++,
+            title: 'Solar System Performance Check',
+            category: 'Energy Systems',
+            frequency: 90, // Quarterly
+            cost: 0,
+            priority: getAutoPriority('Solar System Performance Check', 'Energy Systems'),
+            description: 'Review solar system performance data and energy production',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+    }
+
+    // Backup Generator Tasks
+    if (homeData.features.backupGenerator) {
+        expandedTasks.push({
+            id: id++,
+            title: 'Generator Monthly Test Run',
+            category: 'Safety',
+            frequency: 30, // Monthly
+            cost: 5,
+            priority: getAutoPriority('Generator Monthly Test Run', 'Safety'),
+            description: 'Run backup generator for 15-20 minutes to ensure proper operation',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+
+        expandedTasks.push({
+            id: id++,
+            title: 'Generator Annual Service',
+            category: 'Safety',
+            frequency: 365, // Yearly
+            cost: 250,
+            priority: getAutoPriority('Generator Annual Service', 'Safety'),
+            description: 'Professional generator maintenance, oil change, and inspection',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+    }
+
+    // Smart Thermostat Tasks
+    if (homeData.features.smartThermostat) {
+        expandedTasks.push({
+            id: id++,
+            title: 'Smart Thermostat Data Review',
+            category: 'HVAC',
+            frequency: 90, // Quarterly
+            cost: 0,
+            priority: getAutoPriority('Smart Thermostat Data Review', 'HVAC'),
+            description: 'Review energy usage data and optimize thermostat settings',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+    }
+
+    // Sprinkler System Tasks
+    if (homeData.features.sprinklerSystem) {
+        expandedTasks.push({
+            id: id++,
+            title: 'Sprinkler System Spring Startup',
+            category: 'Exterior',
+            frequency: 365,
+            cost: 125,
+            priority: getAutoPriority('Sprinkler System Spring Startup', 'Exterior'),
+            description: 'Turn on and test sprinkler system, check for winter damage',
+            season: 'spring',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+
+        expandedTasks.push({
+            id: id++,
+            title: 'Sprinkler System Winterization',
+            category: 'Exterior',
+            frequency: 365,
+            cost: 100,
+            priority: getAutoPriority('Sprinkler System Winterization', 'Exterior'),
+            description: 'Blow out and winterize sprinkler system to prevent freeze damage',
+            season: 'fall',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+    }
+
+    // Outdoor Lighting Tasks
+    if (homeData.features.outdoorLighting) {
+        expandedTasks.push({
+            id: id++,
+            title: 'Outdoor Lighting Inspection',
+            category: 'Exterior',
+            frequency: 180, // Every 6 months
+            cost: 30,
+            priority: getAutoPriority('Outdoor Lighting Inspection', 'Exterior'),
+            description: 'Check outdoor lighting fixtures, replace bulbs, clean fixtures',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+    }
+
+    // Driveway Maintenance
+    if (homeData.features.pavedDriveway) {
+        expandedTasks.push({
+            id: id++,
+            title: 'Driveway Crack Sealing',
+            category: 'Exterior',
+            frequency: 730, // Every 2 years
+            cost: 200,
+            priority: getAutoPriority('Driveway Crack Sealing', 'Exterior'),
+            description: 'Seal cracks in paved driveway to prevent water damage',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+    }
+
+    // Roof Age-Based Tasks
+    if (homeData.features.roofAge > 10) {
+        expandedTasks.push({
+            id: id++,
+            title: 'Professional Roof Inspection',
+            category: 'Exterior',
+            frequency: homeData.features.roofAge > 20 ? 365 : 730, // Annual if >20 years, biennial if 10-20
+            cost: 300,
+            priority: getAutoPriority('Professional Roof Inspection', 'Exterior'),
+            description: `Professional inspection of ${homeData.features.roofAge}-year-old ${homeData.features.roofType} roof`,
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+    }
+
+    // Security System Tasks
+    if (homeData.features.securitySystem) {
+        expandedTasks.push({
+            id: id++,
+            title: 'Security System Test',
+            category: 'Safety',
+            frequency: 90, // Quarterly
+            cost: 0,
+            priority: getAutoPriority('Security System Test', 'Safety'),
+            description: 'Test security system sensors, cameras, and communication',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+    }
+
+    return expandedTasks;
+}
+
+// ========================================
+// UPDATE YOUR generateTaskTemplates() FUNCTION
+// Add this AFTER your existing task generation but BEFORE return/tasks.push
+// ========================================
+
+// In your existing generateTaskTemplates() function, ADD this line near the end:
+// 
+// const expandedTasks = generateExpandedFeatureTasks();
+// tasks.push(...expandedTasks);
+//
+// This will add the new feature-based tasks to your existing task generation
+
+console.log('✅ Step 1: Expanded Features - JavaScript updates ready');
+
 // Generate task templates
 function generateTaskTemplates() {
 
