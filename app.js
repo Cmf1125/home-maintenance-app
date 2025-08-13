@@ -3527,7 +3527,7 @@ function goBackToHomeSetup() {
 }
 // Real-time task preview functionality
 function updateTaskPreview() {
-    // Get current form state
+    // Get current form state - EXISTING FEATURES
     const propertyType = document.getElementById('property-type')?.value || 'single-family';
     const centralAC = document.getElementById('central-ac')?.checked || false;
     const miniSplits = document.getElementById('mini-splits')?.checked || false;
@@ -3535,19 +3535,72 @@ function updateTaskPreview() {
     const septic = document.getElementById('septic')?.checked || false;
     const fireplace = document.getElementById('fireplace')?.checked || false;
     const pool = document.getElementById('pool')?.checked || false;
+    const deck = document.getElementById('deck')?.checked || false;
+    
+    // NEW: Get advanced features state
+    const solarPanels = document.getElementById('solar-panels')?.checked || false;
+    const backupGenerator = document.getElementById('backup-generator')?.checked || false;
+    const smartThermostat = document.getElementById('smart-thermostat')?.checked || false;
+    const securitySystem = document.getElementById('security-system')?.checked || false;
+    const sprinklerSystem = document.getElementById('sprinkler-system')?.checked || false;
+    const outdoorLighting = document.getElementById('outdoor-lighting')?.checked || false;
+    const pavedDriveway = document.getElementById('paved-driveway')?.checked || false;
+    const matureLandscaping = document.getElementById('mature-landscaping')?.checked || false;
+    const roofAge = parseInt(document.getElementById('roof-age')?.value) || 0;
     
     // Calculate preview stats
     let taskCount = 2; // Base safety tasks
     let annualCost = 100; // Base cost
     let safetyTasks = 2; // Base safety tasks
     
-    // Add tasks based on features
+    // EXISTING FEATURES: Add tasks based on features
     if (centralAC) { taskCount += 2; annualCost += 175; }
     if (miniSplits) { taskCount += 1; annualCost += 50; }
     if (wellWater) { taskCount += 2; annualCost += 150; }
     if (septic) { taskCount += 1; annualCost += 400; }
     if (fireplace) { taskCount += 1; annualCost += 300; safetyTasks += 1; }
     if (pool) { taskCount += 1; annualCost += 300; }
+    if (deck) { taskCount += 1; annualCost += 200; }
+    
+    // NEW FEATURES: Add tasks for advanced features
+    if (solarPanels) { 
+        taskCount += 2; // Cleaning & performance check
+        annualCost += 100; 
+    }
+    if (backupGenerator) { 
+        taskCount += 2; // Monthly test + annual service
+        annualCost += 310; // $5 * 12 + $250
+        safetyTasks += 1; // Generator is safety-related
+    }
+    if (smartThermostat) { 
+        taskCount += 1; // Data review
+        annualCost += 0; 
+    }
+    if (securitySystem) { 
+        taskCount += 1; // System test
+        annualCost += 0;
+        safetyTasks += 1; // Security is safety-related
+    }
+    if (sprinklerSystem) { 
+        taskCount += 2; // Spring startup + winterization
+        annualCost += 225; 
+    }
+    if (outdoorLighting) { 
+        taskCount += 1; // Inspection & bulb replacement
+        annualCost += 60; 
+    }
+    if (pavedDriveway) { 
+        taskCount += 1; // Crack sealing every 2 years
+        annualCost += 100; 
+    }
+    if (matureLandscaping) { 
+        taskCount += 1; // Professional tree pruning
+        annualCost += 200; 
+    }
+    if (roofAge > 10) { 
+        taskCount += 1; // Professional roof inspection
+        annualCost += roofAge > 20 ? 300 : 150; // More frequent for older roofs
+    }
     
     // Property type adjustments
     if (['single-family', 'townhouse'].includes(propertyType)) {
