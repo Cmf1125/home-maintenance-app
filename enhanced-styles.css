@@ -511,12 +511,12 @@ body.install-banner-visible {
     opacity: 0;
 }
 
-/* Hide header on login screen */
-body:not(.main-app-active):not(.setup-active) .bg-white.shadow-sm.border-b.sticky {
+/* Hide header during login AND setup - only show on dashboard */
+body:not(.main-app-active) .bg-white.shadow-sm.border-b.sticky {
     display: none !important;
 }
 
-/* Show header during setup */
-body.setup-active .bg-white.shadow-sm.border-b.sticky {
+/* Only show header when main app is active (dashboard) */
+body.main-app-active .bg-white.shadow-sm.border-b.sticky {
     display: block !important;
 }
