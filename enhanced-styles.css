@@ -505,3 +505,8 @@ body.install-banner-visible {
     50% { box-shadow: 0 0 20px rgba(37, 99, 235, 0.5); }
     100% { box-shadow: 0 0 0 rgba(37, 99, 235, 0); }
 }
+.success-message {
+    transition: all 0.3s ease;
+    transform: translate(-50%, -20px);
+    opacity: 0;
+}
