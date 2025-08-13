@@ -2585,6 +2585,73 @@ window.saveData = function() {
         originalSaveData();
     }
 };
-</script>            
+</script> 
+
+<script>
+// Add this JavaScript function to handle the toggle
+function toggleAdvancedFeatures() {
+    const advancedSection = document.getElementById('advanced-features-section');
+    const toggleText = document.getElementById('advanced-toggle-text');
+    const toggleArrow = document.getElementById('advanced-toggle-arrow');
+    
+    const isHidden = advancedSection.classList.contains('hidden');
+    
+    if (isHidden) {
+        // Show advanced features
+        advancedSection.classList.remove('hidden');
+        toggleText.textContent = 'Hide Options';
+        toggleArrow.style.transform = 'rotate(180deg)';
+        
+        // Smooth scroll to show the new content
+        setTimeout(() => {
+            advancedSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest' 
+            });
+        }, 100);
+        
+        // Update task preview if available
+        if (typeof updateTaskPreview === 'function') {
+            setTimeout(updateTaskPreview, 200);
+        }
+    } else {
+        // Hide advanced features
+        advancedSection.classList.add('hidden');
+        toggleText.textContent = 'Show Options';
+        toggleArrow.style.transform = 'rotate(0deg)';
+        
+        // Update task preview
+        if (typeof updateTaskPreview === 'function') {
+            setTimeout(updateTaskPreview, 200);
+        }
+    }
+}
+
+// Optional: Add event listeners to update task preview when advanced features are selected
+document.addEventListener('DOMContentLoaded', function() {
+    // Listen for changes to advanced feature checkboxes
+    const advancedCheckboxes = [
+        'solar-panels', 'backup-generator', 'battery-storage', 'smart-thermostat', 
+        'security-system', 'sprinkler-system', 'outdoor-lighting', 'fencing', 
+        'paved-driveway', 'mature-landscaping', 'outdoor-kitchen'
+    ];
+    
+    advancedCheckboxes.forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox && typeof updateTaskPreview === 'function') {
+            checkbox.addEventListener('change', updateTaskPreview);
+        }
+    });
+    
+    // Listen for changes to structural details
+    const structuralInputs = ['roof-type', 'roof-age', 'siding-type', 'foundation-type'];
+    structuralInputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input && typeof updateTaskPreview === 'function') {
+            input.addEventListener('change', updateTaskPreview);
+        }
+    });
+});
+</script>           
 </body>
 </html>
