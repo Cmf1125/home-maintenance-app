@@ -526,8 +526,15 @@ function generateTaskTemplates() {
             isTemplate: true
         });
     }
-// Add these tasks to your generateTaskTemplates() function in app.js
-// (after your existing tasks, before regional tasks)
+
+    // Generate tasks for expanded features
+    const expandedFeatureTasks = generateExpandedFeatureTasks(id);
+    tasks.push(...expandedFeatureTasks);
+    
+    // Update ID counter
+    if (expandedFeatureTasks.length > 0) {
+        id = Math.max(...tasks.map(t => t.id), 0) + 1;
+    }
 
 // PEST CONTROL TASKS (for properties with exterior responsibility)
 if (hasExteriorResponsibility) {
@@ -598,23 +605,30 @@ if (hasExteriorResponsibility) {
     }
 }
 
-// Generate tasks for expanded features
-const expandedTasks = generateExpandedFeatureTasks();
-tasks.push(...expandedTasks);
-    
-// Add this new function to generate tasks for the new features
+    // Generate regional seasonal tasks
+    if (homeData.state) {
+        const climateRegion = getClimateRegion(homeData.state);
+        const regionalTasks = generateRegionalTasks(climateRegion, id, hasExteriorResponsibility);
+        tasks.push(...regionalTasks);
+    }
+}
 
-function generateExpandedFeatureTasks() {
+// 🔧 ADD THE NEW FUNCTION RIGHT AFTER THIS CLOSING BRACE:
+
+// Generate tasks for expanded features (solar panels, sprinklers, etc.)
+function generateExpandedFeatureTasks(startingId = 1000) {
     let expandedTasks = [];
-    let id = 1000; // Use high IDs to avoid conflicts
-
-    // Solar Panel Tasks → "Exterior" category
-    if (homeData.features.solarPanels) {
+    let id = startingId;
+    
+    const features = homeData?.features || {};
+    
+    // ⚡ Solar Panel Tasks
+    if (features.solarPanels) {
         expandedTasks.push({
             id: id++,
-            title: `Solar Panel Cleaning & Inspection`,
+            title: 'Solar Panel Cleaning & Inspection',
             category: 'Exterior',
-            frequency: 180, // Every 6 months
+            frequency: 180,
             cost: 100,
             priority: getAutoPriority('Solar Panel Cleaning & Inspection', 'Exterior'),
             description: 'Clean solar panels and inspect for damage, debris, or shading issues',
@@ -626,9 +640,9 @@ function generateExpandedFeatureTasks() {
 
         expandedTasks.push({
             id: id++,
-            title: `Solar System Performance Check`,
+            title: 'Solar System Performance Check',
             category: 'General',
-            frequency: 90, // Quarterly
+            frequency: 90,
             cost: 0,
             priority: getAutoPriority('Solar System Performance Check', 'General'),
             description: 'Review solar system performance data and energy production',
@@ -639,13 +653,13 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Backup Generator Tasks → "Safety" category
-    if (homeData.features.backupGenerator) {
+    // 🔋 Backup Generator Tasks
+    if (features.backupGenerator) {
         expandedTasks.push({
             id: id++,
-            title: `Generator Monthly Test Run`,
+            title: 'Generator Monthly Test Run',
             category: 'Safety',
-            frequency: 30, // Monthly
+            frequency: 30,
             cost: 5,
             priority: getAutoPriority('Generator Monthly Test Run', 'Safety'),
             description: 'Run backup generator for 15-20 minutes to ensure proper operation',
@@ -657,9 +671,9 @@ function generateExpandedFeatureTasks() {
 
         expandedTasks.push({
             id: id++,
-            title: `Generator Annual Service`,
+            title: 'Generator Annual Service',
             category: 'Safety',
-            frequency: 365, // Yearly
+            frequency: 365,
             cost: 250,
             priority: getAutoPriority('Generator Annual Service', 'Safety'),
             description: 'Professional generator maintenance, oil change, and inspection',
@@ -670,13 +684,13 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Smart Thermostat Tasks → "HVAC" category
-    if (homeData.features.smartThermostat) {
+    // 🌡️ Smart Thermostat Tasks
+    if (features.smartThermostat) {
         expandedTasks.push({
             id: id++,
-            title: `Smart Thermostat Data Review`,
+            title: 'Smart Thermostat Data Review',
             category: 'HVAC',
-            frequency: 90, // Quarterly
+            frequency: 90,
             cost: 0,
             priority: getAutoPriority('Smart Thermostat Data Review', 'HVAC'),
             description: 'Review energy usage data and optimize thermostat settings',
@@ -687,13 +701,13 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Security System Tasks → "Safety" category
-    if (homeData.features.securitySystem) {
+    // 🛡️ Security System Tasks
+    if (features.securitySystem) {
         expandedTasks.push({
             id: id++,
-            title: `Security System Test`,
+            title: 'Security System Test',
             category: 'Safety',
-            frequency: 90, // Quarterly
+            frequency: 90,
             cost: 0,
             priority: getAutoPriority('Security System Test', 'Safety'),
             description: 'Test security system sensors, cameras, and communication',
@@ -704,11 +718,11 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Sprinkler System Tasks → "Exterior" category
-    if (homeData.features.sprinklerSystem) {
+    // 💧 Sprinkler System Tasks
+    if (features.sprinklerSystem) {
         expandedTasks.push({
             id: id++,
-            title: `Sprinkler System Spring Startup`,
+            title: 'Sprinkler System Spring Startup',
             category: 'Exterior',
             frequency: 365,
             cost: 125,
@@ -723,7 +737,7 @@ function generateExpandedFeatureTasks() {
 
         expandedTasks.push({
             id: id++,
-            title: `Sprinkler System Winterization`,
+            title: 'Sprinkler System Winterization',
             category: 'Exterior',
             frequency: 365,
             cost: 100,
@@ -737,13 +751,13 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Outdoor Lighting Tasks → "Exterior" category
-    if (homeData.features.outdoorLighting) {
+    // 💡 Outdoor Lighting Tasks
+    if (features.outdoorLighting) {
         expandedTasks.push({
             id: id++,
-            title: `Outdoor Lighting Inspection`,
+            title: 'Outdoor Lighting Inspection',
             category: 'Exterior',
-            frequency: 180, // Every 6 months
+            frequency: 180,
             cost: 30,
             priority: getAutoPriority('Outdoor Lighting Inspection', 'Exterior'),
             description: 'Check outdoor lighting fixtures, replace bulbs, clean fixtures',
@@ -754,13 +768,13 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Driveway Maintenance → "Exterior" category
-    if (homeData.features.pavedDriveway) {
+    // 🛣️ Driveway Maintenance Tasks
+    if (features.pavedDriveway) {
         expandedTasks.push({
             id: id++,
-            title: `Driveway Crack Sealing`,
+            title: 'Driveway Crack Sealing',
             category: 'Exterior',
-            frequency: 730, // Every 2 years
+            frequency: 730,
             cost: 200,
             priority: getAutoPriority('Driveway Crack Sealing', 'Exterior'),
             description: 'Seal cracks in paved driveway to prevent water damage',
@@ -771,16 +785,18 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Roof Age-Based Tasks → "Exterior" category
-    if (homeData.features.roofAge > 10) {
+    // 🏠 Roof Inspection (based on age)
+    if (features.roofAge && features.roofAge > 10) {
+        const frequency = features.roofAge > 20 ? 365 : 730;
+        
         expandedTasks.push({
             id: id++,
-            title: `Professional Roof Inspection`,
+            title: 'Professional Roof Inspection',
             category: 'Exterior',
-            frequency: homeData.features.roofAge > 20 ? 365 : 730, // Annual if >20 years, biennial if 10-20
+            frequency: frequency,
             cost: 300,
             priority: getAutoPriority('Professional Roof Inspection', 'Exterior'),
-            description: `Professional inspection of ${homeData.features.roofAge}-year-old ${homeData.features.roofType} roof`,
+            description: `Professional inspection of ${features.roofAge}-year-old ${features.roofType || 'roof'}`,
             dueDate: null,
             lastCompleted: null,
             isCompleted: false,
@@ -788,13 +804,13 @@ function generateExpandedFeatureTasks() {
         });
     }
 
-    // Landscaping Maintenance → "Exterior" category
-    if (homeData.features.matureLandscaping) {
+    // 🌳 Mature Landscaping Tasks
+    if (features.matureLandscaping) {
         expandedTasks.push({
             id: id++,
-            title: `Mature Tree Pruning`,
+            title: 'Mature Tree Pruning',
             category: 'Exterior',
-            frequency: 365, // Annual
+            frequency: 365,
             cost: 200,
             priority: getAutoPriority('Mature Tree Pruning', 'Exterior'),
             description: 'Professional pruning of mature trees for health and safety',
@@ -805,16 +821,11 @@ function generateExpandedFeatureTasks() {
         });
     }
 
+    console.log(`✅ Generated ${expandedTasks.length} tasks for expanded features`);
     return expandedTasks;
 }
-    
-    // Generate regional seasonal tasks
-    if (homeData.state) {
-        const climateRegion = getClimateRegion(homeData.state);
-        const regionalTasks = generateRegionalTasks(climateRegion, id, hasExteriorResponsibility);
-        tasks.push(...regionalTasks);
-    }
-}
+
+// (then continue with the existing generateRegionalTasks function...)
 
 // Generate regional seasonal tasks
 function generateRegionalTasks(climateRegion, startingId, hasExteriorResponsibility) {
