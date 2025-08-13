@@ -3173,6 +3173,7 @@ window.closeTaskEditModal = function() {
     window.TaskManager.close();
 };
 // Onboarding step navigation
+// Fixed showStep function in app.js - replace the existing one
 document.addEventListener('DOMContentLoaded', function () {
   let currentStep = 1;
   const totalSteps = 3;
@@ -3185,23 +3186,28 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-    // Update progress bar
-    const percent = Math.round((step / totalSteps) * 100);
-    document.getElementById('progress-label').textContent = `Step ${step} of ${totalSteps}`;
-    document.getElementById('progress-percent').textContent = `${percent}%`;
-    document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+    // FIXED: Only update progress elements if they exist
+    const progressLabel = document.getElementById('progress-label');
+    const progressPercent = document.getElementById('progress-percent');
+    const progressBarFill = document.getElementById('progress-bar-fill');
     
-   // Scroll so the new step sits just below the fixed progress bar
+    if (progressLabel && progressPercent && progressBarFill) {
+      const percent = Math.round((step / totalSteps) * 100);
+      progressLabel.textContent = `Step ${step} of ${totalSteps}`;
+      progressPercent.textContent = `${percent}%`;
+      progressBarFill.style.width = `${percent}%`;
+    }
+    
+    // Scroll so the new step sits just below any fixed headers
     const stepEl = document.querySelector(`.onboarding-step[data-step="${step}"]`);
-    const progress = document.getElementById('onboarding-progress');
-    const headerH = progress ? progress.offsetHeight : 0;
     if (stepEl) {
-      const y = stepEl.getBoundingClientRect().top + window.pageYOffset - headerH - 8; // small buffer
+      const headerOffset = 80; // Account for any fixed headers
+      const y = stepEl.getBoundingClientRect().top + window.pageYOffset - headerOffset;
       window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
-}
-      }
+    }
+  }
 
-  // Button listeners
+  // Button listeners - FIXED: Add null checks
   const stepButtons = [
     { id: 'next-to-step-2', action: () => { currentStep = 2; showStep(currentStep); } },
     { id: 'next-to-step-3', action: () => { currentStep = 3; showStep(currentStep); } },
@@ -3211,13 +3217,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
   stepButtons.forEach(btn => {
     const el = document.getElementById(btn.id);
-    if (el) el.addEventListener('click', btn.action);
+    if (el) {
+      el.addEventListener('click', btn.action);
+    } else {
+      console.warn(`Button with ID '${btn.id}' not found`);
+    }
   });
 
   // Show the first step initially
   showStep(currentStep);
 });
-
 function goBackToHomeSetup() {
     const taskSetup = document.getElementById('task-setup');
     if (taskSetup) {
