@@ -83,7 +83,7 @@ window.categoryConfig = categoryConfig;
 // Create maintenance plan
 function createMaintenancePlan() {
     try {
-        // Collect home data
+        // Existing home data collection...
         homeData = {
             address: document.getElementById('address')?.value || '123 Main Street',
             city: document.getElementById('city')?.value || 'Anytown',
@@ -95,8 +95,9 @@ function createMaintenancePlan() {
         };
         homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
 
-        // Collect features
+        // ENHANCED: Collect features - ADD THE NEW ONES to your existing features object
         homeData.features = {
+            // ===== EXISTING FEATURES (keep all of these) =====
             centralAC: document.getElementById('central-ac')?.checked || false,
             miniSplits: document.getElementById('mini-splits')?.checked || false,
             wallAC: document.getElementById('wall-ac')?.checked || false,
@@ -115,13 +116,35 @@ function createMaintenancePlan() {
             deck: document.getElementById('deck')?.checked || false,
             garage: document.getElementById('garage')?.checked || false,
             basement: document.getElementById('basement')?.checked || false,
-            otherFeatures: document.getElementById('other-features')?.value || ''
+            otherFeatures: document.getElementById('other-features')?.value || '',
+
+            // ===== NEW FEATURES - ADD THESE =====
+            // Energy & Smart Systems
+            solarPanels: document.getElementById('solar-panels')?.checked || false,
+            backupGenerator: document.getElementById('backup-generator')?.checked || false,
+            batteryStorage: document.getElementById('battery-storage')?.checked || false,
+            smartThermostat: document.getElementById('smart-thermostat')?.checked || false,
+            securitySystem: document.getElementById('security-system')?.checked || false,
+
+            // Structural Details
+            roofType: document.getElementById('roof-type')?.value || 'asphalt',
+            roofAge: parseInt(document.getElementById('roof-age')?.value) || 0,
+            sidingType: document.getElementById('siding-type')?.value || 'vinyl',
+            foundationType: document.getElementById('foundation-type')?.value || 'concrete-slab',
+
+            // Outdoor Features
+            sprinklerSystem: document.getElementById('sprinkler-system')?.checked || false,
+            outdoorLighting: document.getElementById('outdoor-lighting')?.checked || false,
+            fencing: document.getElementById('fencing')?.checked || false,
+            pavedDriveway: document.getElementById('paved-driveway')?.checked || false,
+            matureLandscaping: document.getElementById('mature-landscaping')?.checked || false,
+            outdoorKitchen: document.getElementById('outdoor-kitchen')?.checked || false
         };
 
-        // Generate tasks
+        // Continue with existing task generation...
         generateTaskTemplates();
 
-        // Update global references
+        // Rest of your existing function stays the same...
         window.homeData = homeData;
         window.tasks = tasks;
 
@@ -131,19 +154,18 @@ function createMaintenancePlan() {
 
         if (setupForm) setupForm.style.display = 'none';
         if (taskSetup) {
-            taskSetup.classList.remove('hidden'); // remove Tailwind hidden
-            taskSetup.style.display = 'block';    // ensure visible
+            taskSetup.classList.remove('hidden');
+            taskSetup.style.display = 'block';
         }
 
-        // Delay showTaskSetup to allow DOM update
         setTimeout(showTaskSetup, 0);
-
-        console.log('✅ Successfully moved to task setup screen');
+        console.log('✅ Successfully moved to task setup screen with expanded features');
     } catch (error) {
         console.error('❌ Error in createMaintenancePlan:', error);
         alert('❌ Error creating maintenance plan. Check console for details.');
     }
 }
+
 // Generate task templates
 function generateTaskTemplates() {
 
