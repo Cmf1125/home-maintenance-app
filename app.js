@@ -2829,7 +2829,7 @@ function showPropertyConfirmation() {
         deck: document.getElementById('deck')?.checked || false,
         garage: document.getElementById('garage')?.checked || false,
         basement: document.getElementById('basement')?.checked || false,
-        otherFeatures: document.getElementById('other-features')?.value || ''
+        otherFeatures: document.getElementById('other-features')?.value || '',
 
         // ===== NEW FEATURES - ADD THESE =====
             // Energy & Smart Systems
