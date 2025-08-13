@@ -533,3 +533,11 @@ body.main-app-active .bg-white.shadow-sm.border-b.sticky {
 #onboarding-progress {
     padding: 0.5rem 1rem; /* Reduce from py-3 to py-2 */
 }
+/* Fix settings dropdown z-index */
+#settings-dropdown {
+    z-index: 9999 !important;
+}
+/* Dashboard UI fixes */
+#dashboard-view {
+    padding-top: 0 !important;
+}
