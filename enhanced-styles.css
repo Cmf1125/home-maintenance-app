@@ -415,3 +415,37 @@ body.install-banner-visible {
     box-shadow: 0 8px 25px -5px rgb(8 145 178 / 0.2) !important;
     transform: translateY(-2px) !important;
 }
+
+/* Rotating benefits animation */
+.rotating-benefits {
+    position: relative;
+}
+
+.benefit-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: rotateBenefit 8s infinite;
+    position: absolute;
+    width: 100%;
+    left: 0;
+}
+
+.benefit-item:nth-child(1) { animation-delay: 0s; }
+.benefit-item:nth-child(2) { animation-delay: 2s; }
+.benefit-item:nth-child(3) { animation-delay: 4s; }
+.benefit-item:nth-child(4) { animation-delay: 6s; }
+
+@keyframes rotateBenefit {
+    0%, 20% { opacity: 1; transform: translateY(0); }
+    25%, 100% { opacity: 0; transform: translateY(-20px); }
+}
+
+/* House animation */
+.house-animated {
+    animation: houseFloat 3s ease-in-out infinite;
+}
+
+@keyframes houseFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
