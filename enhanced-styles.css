@@ -500,7 +500,7 @@ input[type="checkbox"]:checked::after {
   display: none !important;
 }
 
-/* Proper positioning above the header */
+/* Proper positioning and visibility */
 #settings-dropdown {
   position: absolute !important;
   right: 0 !important;
@@ -514,4 +514,9 @@ input[type="checkbox"]:checked::after {
   min-width: 12rem !important;
   max-height: 70vh !important; 
   overflow-y: auto !important;
+  overflow: visible !important;
+}
+#app-header {
+  border-radius: 0 !important;
+  overflow: visible !important;
 }
