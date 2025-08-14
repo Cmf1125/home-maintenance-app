@@ -603,3 +603,8 @@ input[type="checkbox"]:checked::after {
   border-bottom: 1px solid #e5e7eb !important;
   background-color: #ffffff !important;
 }
+#dashboard-view,
+.main-content,
+.sticky {
+  overflow: visible !important;
+}
