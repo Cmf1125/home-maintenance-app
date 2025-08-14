@@ -479,3 +479,25 @@ input[type="checkbox"]:checked::after {
     transform: translate(-50%, -20px);
     opacity: 0;
 }
+
+
+/* ========================================
+   FIX SETTINGS DROPDOWN VISIBILITY
+   ======================================== */
+#settings-dropdown {
+    position: absolute;
+    z-index: 9999;
+    top: 100%;
+    right: 0;
+    display: none;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: visible;
+}
+
+.header-container, .sticky-header {
+    overflow: visible !important;
+    position: relative;
+    z-index: 10;
+}
