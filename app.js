@@ -3754,3 +3754,60 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial update
     setTimeout(updateTaskPreview, 500);
 });
+
+// ========================================
+// MOBILE OPTIMIZATION: SCROLL MANAGEMENT
+// ========================================
+
+// Force scroll to top when switching views
+function resetScrollPosition() {
+    // Multiple methods to ensure cross-browser compatibility
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
+    // For iOS Safari
+    setTimeout(() => {
+        window.scrollTo(0, 0);
+    }, 100);
+}
+
+// Override showTab to include scroll reset
+const originalShowTab = window.showTab;
+window.showTab = function(tabName) {
+    console.log(`🔄 Switching to tab: ${tabName} with scroll reset`);
+    
+    // Reset scroll first
+    resetScrollPosition();
+    
+    // Call original function
+    if (originalShowTab) {
+        originalShowTab(tabName);
+    }
+    
+    // Double-check scroll position after a delay
+    setTimeout(() => {
+        resetScrollPosition();
+    }, 200);
+};
+
+// Reset scroll when entering main app
+const originalHandleSuccessfulLogin = handleSuccessfulLogin;
+window.handleSuccessfulLogin = function(user) {
+    resetScrollPosition();
+    if (originalHandleSuccessfulLogin) {
+        originalHandleSuccessfulLogin(user);
+    }
+    setTimeout(resetScrollPosition, 300);
+};
+
+// Reset scroll when completing setup
+const originalFinishTaskSetup = window.finishTaskSetup;
+window.finishTaskSetup = function() {
+    if (originalFinishTaskSetup) {
+        originalFinishTaskSetup();
+    }
+    setTimeout(resetScrollPosition, 500);
+};
+
+console.log('✅ Mobile scroll management loaded');
