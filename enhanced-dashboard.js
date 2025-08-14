@@ -72,41 +72,32 @@ class EnhancedDashboard {
     const tasksSection = tasksList?.closest('.bg-white.rounded-2xl.shadow-lg');
     
     if (tasksSection) {
-        // Add a subtle flash effect to show something happened
-        tasksSection.style.transition = 'all 0.3s ease';
-        tasksSection.style.boxShadow = '0 0 20px rgba(14, 165, 233, 0.4)';
-        tasksSection.style.transform = 'scale(1.01)';
-        
-        // FIXED: Calculate proper offset accounting for sticky header and stats
+        // MOBILE FIX: Use better scroll calculation
         const rect = tasksSection.getBoundingClientRect();
-        const headerHeight = 64; // Height of sticky header (top-16 = 64px)
-        const statsHeight = 120; // Approximate height of sticky stats grid
-        const buffer = 10; // Small buffer for clean spacing
+        const headerHeight = document.querySelector('.sticky')?.offsetHeight || 64;
+        const buffer = 20; // Clean spacing
         
-        const offset = window.pageYOffset + rect.top - (headerHeight + statsHeight + buffer);
+        // Calculate proper offset
+        const targetPosition = window.pageYOffset + rect.top - headerHeight - buffer;
         
-        // Only scroll if the tasks section is not already visible
-        if (rect.top < (headerHeight + statsHeight + buffer)) {
+        // Use smooth scroll with better mobile support
+        if ('scrollBehavior' in document.documentElement.style) {
             window.scrollTo({
-                top: Math.max(0, offset), // Prevent negative scroll
+                top: Math.max(0, targetPosition),
                 behavior: 'smooth'
             });
+        } else {
+            // Fallback for older browsers
+            window.scrollTo(0, Math.max(0, targetPosition));
         }
         
-        // Remove the flash effect after animation
+        // Add visual feedback
+        tasksSection.style.transition = 'box-shadow 0.3s ease';
+        tasksSection.style.boxShadow = '0 0 20px rgba(14, 165, 233, 0.4)';
+        
         setTimeout(() => {
             tasksSection.style.boxShadow = '';
-            tasksSection.style.transform = '';
-        }, 800);
-        
-        // Add a brief highlight to the tasks list content
-        if (tasksList) {
-            tasksList.style.transition = 'background-color 0.3s ease';
-            tasksList.style.backgroundColor = '#f0f9ff';
-            setTimeout(() => {
-                tasksList.style.backgroundColor = '';
-            }, 600);
-        }
+        }, 1000);
     }
 }
     // UPDATE: updateFilterUI() - Remove cost filter title
