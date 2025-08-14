@@ -2735,6 +2735,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-</script>           
+</script>
+<!-- Prevent browser scroll restoration -->
+<script>
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+</script>
 </body>
 </html>
