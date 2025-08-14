@@ -1581,7 +1581,6 @@
 </script>
             
 <script>
-  // Works with either id on the gear button
   function getSettingsButton() {
     return document.getElementById('settings-button') || document.getElementById('settings-btn');
   }
@@ -1589,7 +1588,7 @@
   function portalizeOnce(dd) {
     if (!dd.dataset.portaled) {
       dd.dataset.portaled = '1';
-      dd.classList.add('portalized');   // fixed + width via CSS above
+      dd.classList.add('portalized');   // fixed + width via CSS
       document.body.appendChild(dd);
     }
   }
@@ -1597,28 +1596,29 @@
   function positionDropdown(dd, btn) {
     const r = btn.getBoundingClientRect();
 
-    // Ensure we can measure width
+    // Menu is already in the DOM. Make it measurable but invisible.
     const wasHidden = dd.classList.contains('hidden');
     if (wasHidden) dd.classList.remove('hidden');
+    const prevVis = dd.style.visibility;
     dd.style.visibility = 'hidden';
-    dd.style.left = '-9999px';
-    dd.style.top  = '-9999px';
 
-    // Width = actual or fallback 12rem (192px)
-    const menuRect = dd.getBoundingClientRect();
+    // Measure actual width (fallback to 192px = 12rem)
+    const menuRect  = dd.getBoundingClientRect();
     const menuWidth = Math.max(192, Math.round(menuRect.width || 192));
 
-    // Place right-aligned to the gear, clamped to viewport
+    // Right-align to the gear, clamp to viewport
     const gap = 8;
     const vw  = window.innerWidth || document.documentElement.clientWidth;
     let left  = Math.round(r.right - menuWidth);
     left = Math.max(8, Math.min(left, vw - menuWidth - 8));
     const top = Math.round(r.bottom + gap);
 
+    // Apply final position
     dd.style.left = left + 'px';
     dd.style.top  = top  + 'px';
-    dd.style.visibility = '';
 
+    // Restore visibility state for caller to decide show/hide
+    dd.style.visibility = prevVis || '';
     if (wasHidden) dd.classList.add('hidden');
   }
 
@@ -1631,9 +1631,19 @@
 
     if (isHidden) {
       portalizeOnce(dd);
-      positionDropdown(dd, btn);
-      dd.classList.remove('hidden');
 
+      // Prepare: make it invisible but measurable, position it, then reveal next frame
+      dd.classList.remove('hidden');
+      const prevVis = dd.style.visibility;
+      dd.style.visibility = 'hidden';
+      positionDropdown(dd, btn);
+
+      // Show in place—no zip
+      requestAnimationFrame(() => {
+        dd.style.visibility = prevVis || '';
+      });
+
+      // Listeners
       setTimeout(() => {
         document.addEventListener('click', closeSettingsOnClickOutside);
         window.addEventListener('resize', repositionIfOpen);
@@ -1662,23 +1672,20 @@
   function repositionIfOpen() {
     const dd  = document.getElementById('settings-dropdown');
     const btn = getSettingsButton();
-    if (dd && btn && !dd.classList.contains('hidden')) positionDropdown(dd, btn);
+    if (dd && btn && !dd.classList.contains('hidden')) {
+      // keep it visible while we reposition to avoid flicker
+      const prevVis = dd.style.visibility;
+      dd.style.visibility = 'hidden';
+      positionDropdown(dd, btn);
+      requestAnimationFrame(() => { dd.style.visibility = prevVis || ''; });
+    }
   }
 
-  // Sign out wrapper — calls your existing logout function name
-  function handleSignOut() {
-    if (typeof signOutUser === 'function') return signOutUser();
-    if (typeof logoutUser === 'function')   return logoutUser();
-    if (typeof handleLogout === 'function') return handleLogout();
-    if (typeof signOut === 'function')      return signOut();
-    console.warn('No sign-out function found. Define signOutUser()/logoutUser()/handleLogout()/signOut().');
-  }
-
-  // Expose globally if other code calls these
+  // Expose globally
   window.toggleSettingsDropdown = toggleSettingsDropdown;
-  window.closeSettingsDropdown = closeSettingsDropdown;
-  window.handleSignOut = handleSignOut;
+  window.closeSettingsDropdown  = closeSettingsDropdown;
 </script>
+
 
     <!-- ✅ Core Scripts go here -->
     <script src="date-utils.js"></script>
