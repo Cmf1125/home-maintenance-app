@@ -189,10 +189,12 @@
 
       <div class="border-t border-gray-100 my-1"></div>
 
-      <button onclick="handleSignOut(); closeSettingsDropdown()"
-              class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
-        <span>🚪</span><span>Sign out</span>
-      </button>
+<button
+  onclick="signOutUser(); closeSettingsDropdown()"
+  class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3 text-red-600"
+>
+  <span>🚪</span><span>Sign out</span>
+</button>
     </div>
   </div>
 </div>
@@ -2342,6 +2344,7 @@ function signOutUser() {
         alert('Error signing out: ' + error.message);
     });
 }    
+window.signOutUser = signOutUser;   // <-- make it callable from HTML
     
 // Handle successful login (existing user)
 function handleSuccessfulLogin(user) {
