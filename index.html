@@ -1575,43 +1575,67 @@
     console.log('✅ NEW working reschedule modal created and ready!');
 </script>
             
-    <!-- Settings Dropdown Functions -->
-    <script>
-        // Settings Dropdown Functions
-        function toggleSettingsDropdown() {
-            const dropdown = document.getElementById('settings-dropdown');
-            const isHidden = dropdown.classList.contains('hidden');
-            
-            if (isHidden) {
-                dropdown.classList.remove('hidden');
-                // Close dropdown when clicking outside
-                setTimeout(() => {
-                    document.addEventListener('click', closeSettingsOnClickOutside);
-                }, 100);
-            } else {
-                closeSettingsDropdown();
-            }
-        }
+<!-- Settings Dropdown Functions -->
+<script>
+  function toggleSettingsDropdown() {
+    const dd  = document.getElementById('settings-dropdown');
+    const btn = document.getElementById('settings-btn'); // your existing button id
+    if (!dd || !btn) return;
 
-        function closeSettingsDropdown() {
-            const dropdown = document.getElementById('settings-dropdown');
-            dropdown.classList.add('hidden');
-            document.removeEventListener('click', closeSettingsOnClickOutside);
-        }
+    const isHidden = dd.classList.contains('hidden');
 
-        function closeSettingsOnClickOutside(event) {
-            const dropdown = document.getElementById('settings-dropdown');
-            const settingsBtn = document.getElementById('settings-btn');
-            
-            if (!dropdown.contains(event.target) && !settingsBtn.contains(event.target)) {
-                closeSettingsDropdown();
-            }
-        }
+    if (isHidden) {
+      // First time: portal the dropdown to <body> so no ancestor can clip it
+      if (!dd.dataset.portaled) {
+        dd.dataset.portaled = '1';
+        dd.classList.add('portalized');            // gives it position: fixed !important
+        document.body.appendChild(dd);
+      }
 
-        // Make functions globally available
-        window.toggleSettingsDropdown = toggleSettingsDropdown;
-        window.closeSettingsDropdown = closeSettingsDropdown;
-    </script>
+      // Position it just below the gear, right-aligned
+      const r = btn.getBoundingClientRect();
+      const menuWidth = dd.offsetWidth || 192;     // 12rem fallback
+      dd.style.top  = Math.round(r.bottom + 8) + 'px';               // 8px gap
+      dd.style.left = Math.round(Math.max(8, r.right - menuWidth)) + 'px';
+
+      dd.classList.remove('hidden');
+      setTimeout(() => document.addEventListener('click', closeSettingsOnClickOutside), 0);
+    } else {
+      closeSettingsDropdown();
+    }
+  }
+
+  function closeSettingsDropdown() {
+    const dd = document.getElementById('settings-dropdown');
+    if (dd && !dd.classList.contains('hidden')) {
+      dd.classList.add('hidden');
+    }
+    document.removeEventListener('click', closeSettingsOnClickOutside);
+  }
+
+  function closeSettingsOnClickOutside(event) {
+    const dd  = document.getElementById('settings-dropdown');
+    const btn = document.getElementById('settings-btn');
+    if (!dd || !btn) return;
+    if (!dd.contains(event.target) && !btn.contains(event.target)) {
+      closeSettingsDropdown();
+    }
+  }
+
+  // Reposition on resize so it stays docked to the gear
+  window.addEventListener('resize', () => {
+    const dd = document.getElementById('settings-dropdown');
+    if (dd && !dd.classList.contains('hidden')) {
+      toggleSettingsDropdown();     // closes
+      toggleSettingsDropdown();     // re-opens & repositions
+    }
+  });
+
+  // Make functions globally available
+  window.toggleSettingsDropdown = toggleSettingsDropdown;
+  window.closeSettingsDropdown = closeSettingsDropdown;
+</script>
+
 
     <!-- ✅ Core Scripts go here -->
     <script src="date-utils.js"></script>
