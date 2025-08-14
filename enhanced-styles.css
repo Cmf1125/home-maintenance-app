@@ -190,23 +190,6 @@ input[type="checkbox"]:checked::after {
     display: none !important;
 }
 
-/* UNIFIED: Hide header during onboarding only */
-body:not(.main-app-active) .bg-white.shadow-sm.border-b.sticky {
-    display: none !important;
-}
-
-/* UNIFIED: Show sticky header when main app is active (like bottom nav) */
-body.main-app-active .bg-white.shadow-sm.border-b.sticky {
-    display: block !important;
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 50 !important;
-    background: white !important;
-    backdrop-filter: blur(10px) !important;
-    border-bottom: 1px solid #e5e7eb !important;
-    margin-bottom: 0 !important; /* Remove any margin causing gap */
-}
-
 /* Add Home Info Button */
 .gradient-bg {
     position: relative;
@@ -332,11 +315,6 @@ body.main-app-active .bg-white.shadow-sm.border-b.sticky {
         height: 24px;
         font-size: 14px;
     }
-}
-
-/* Adjust main content when banner is visible */
-body.install-banner-visible {
-    padding-top: 60px;
 }
 
 @media (max-width: 768px) {
@@ -521,19 +499,7 @@ body:not(.main-app-active) .bg-white.shadow-sm.border-b.sticky {
 body.main-app-active .bg-white.shadow-sm.border-b.sticky {
     display: block !important;
 }
-/* Reduce setup form top spacing */
-#setup-form {
-    padding-top: 0.5rem !important; /* Reduce from default */
-}
 
-#setup-form .max-w-md {
-    margin-top: 0 !important; /* Remove any top margin */
-}
-
-/* Tighter onboarding progress */
-#onboarding-progress {
-    padding: 0.5rem 1rem; /* Reduce from py-3 to py-2 */
-}
 /* ISSUE 1: Fix dropdown getting cut off */
 #settings-dropdown {
     z-index: 9999 !important;
@@ -556,14 +522,6 @@ body.main-app-active .bg-white.shadow-sm.border-b.sticky {
 /* FIX 1: Remove body padding conflicts */
 body {
     padding-top: 0 !important;
-}
-
-/* FIX 2: Clean header positioning */
-.bg-white.shadow-sm.border-b.sticky {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 60 !important;
-    margin: 0 !important;
 }
 
 /* FIX 3: Remove main content top padding */
