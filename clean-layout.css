@@ -83,6 +83,10 @@ body.main-app-active .bg-white.shadow-sm.border-b.sticky {
     position: sticky !important;
     top: 0 !important;
     z-index: 50 !important;
+   /* MOBILE ADDITIONS - ADD THESE LINES ONLY: */
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    will-change: transform;
 }
 
 body.main-app-active {
@@ -91,6 +95,8 @@ body.main-app-active {
 
 body.main-app-active .main-content {
     padding-bottom: 100px; /* Space for bottom nav */
+   /* ADD THIS LINE: */
+    scroll-padding-top: 70px; /* Account for sticky header */
 }
 
 /* Hide ALL banners in main app */
