@@ -1577,9 +1577,14 @@
             
 <!-- Settings Dropdown Functions -->
 <script>
+  // Helper: find the gear button regardless of which id you used
+  function getSettingsButton() {
+    return document.getElementById('settings-button') || document.getElementById('settings-btn');
+  }
+
   function toggleSettingsDropdown() {
     const dd  = document.getElementById('settings-dropdown');
-    const btn = document.getElementById('settings-btn'); // your existing button id
+    const btn = getSettingsButton();
     if (!dd || !btn) return;
 
     const isHidden = dd.classList.contains('hidden');
@@ -1588,17 +1593,19 @@
       // First time: portal the dropdown to <body> so no ancestor can clip it
       if (!dd.dataset.portaled) {
         dd.dataset.portaled = '1';
-        dd.classList.add('portalized');            // gives it position: fixed !important
+        dd.classList.add('portalized'); // CSS gives this position: fixed !important
         document.body.appendChild(dd);
       }
 
       // Position it just below the gear, right-aligned
       const r = btn.getBoundingClientRect();
-      const menuWidth = dd.offsetWidth || 192;     // 12rem fallback
-      dd.style.top  = Math.round(r.bottom + 8) + 'px';               // 8px gap
+      // If hidden, offsetWidth can be 0; use fallback 192px (12rem)
+      const menuWidth = dd.offsetWidth || 192;
+      dd.style.top  = Math.round(r.bottom + 8) + 'px';                 // 8px gap
       dd.style.left = Math.round(Math.max(8, r.right - menuWidth)) + 'px';
 
       dd.classList.remove('hidden');
+      // Defer adding the listener so the opening click doesn't immediately close it
       setTimeout(() => document.addEventListener('click', closeSettingsOnClickOutside), 0);
     } else {
       closeSettingsDropdown();
@@ -1615,7 +1622,7 @@
 
   function closeSettingsOnClickOutside(event) {
     const dd  = document.getElementById('settings-dropdown');
-    const btn = document.getElementById('settings-btn');
+    const btn = getSettingsButton();
     if (!dd || !btn) return;
     if (!dd.contains(event.target) && !btn.contains(event.target)) {
       closeSettingsDropdown();
@@ -1626,8 +1633,8 @@
   window.addEventListener('resize', () => {
     const dd = document.getElementById('settings-dropdown');
     if (dd && !dd.classList.contains('hidden')) {
-      toggleSettingsDropdown();     // closes
-      toggleSettingsDropdown();     // re-opens & repositions
+      toggleSettingsDropdown(); // closes
+      toggleSettingsDropdown(); // re-opens & repositions
     }
   });
 
