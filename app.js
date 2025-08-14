@@ -3761,15 +3761,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Force scroll to top when switching views
 function resetScrollPosition() {
+    // Disable smooth scrolling temporarily for instant reset
+    const html = document.documentElement;
+    const originalBehavior = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto';
+    
     // Multiple methods to ensure cross-browser compatibility
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
     
-    // For iOS Safari
+    // Restore smooth scrolling
+    html.style.scrollBehavior = originalBehavior;
+    
+    // For iOS Safari - double check
     setTimeout(() => {
         window.scrollTo(0, 0);
-    }, 100);
+    }, 50);
 }
 
 // Override showTab to include scroll reset
@@ -3777,7 +3785,7 @@ const originalShowTab = window.showTab;
 window.showTab = function(tabName) {
     console.log(`🔄 Switching to tab: ${tabName} with scroll reset`);
     
-    // Reset scroll first
+    // Reset scroll FIRST
     resetScrollPosition();
     
     // Call original function
@@ -3785,20 +3793,8 @@ window.showTab = function(tabName) {
         originalShowTab(tabName);
     }
     
-    // Double-check scroll position after a delay
-    setTimeout(() => {
-        resetScrollPosition();
-    }, 200);
-};
-
-// Reset scroll when entering main app
-const originalHandleSuccessfulLogin = handleSuccessfulLogin;
-window.handleSuccessfulLogin = function(user) {
-    resetScrollPosition();
-    if (originalHandleSuccessfulLogin) {
-        originalHandleSuccessfulLogin(user);
-    }
-    setTimeout(resetScrollPosition, 300);
+    // Reset again after content loads
+    setTimeout(resetScrollPosition, 100);
 };
 
 // Reset scroll when completing setup
@@ -3807,7 +3803,8 @@ window.finishTaskSetup = function() {
     if (originalFinishTaskSetup) {
         originalFinishTaskSetup();
     }
-    setTimeout(resetScrollPosition, 500);
+    // Reset scroll when entering main app
+    setTimeout(resetScrollPosition, 300);
 };
 
 console.log('✅ Mobile scroll management loaded');
