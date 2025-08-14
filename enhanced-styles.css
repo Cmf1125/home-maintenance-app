@@ -520,3 +520,12 @@ input[type="checkbox"]:checked::after {
   border-radius: 0 !important;
   overflow: visible !important;
 }
+/* === Header visual clean-up === */
+#app-header {
+  border-radius: 0 !important;
+  overflow: visible !important;
+  box-shadow: none !important;      /* remove raised shadow */
+  border-bottom: 1px solid #e5e7eb !important; /* subtle divider instead */
+  background-color: #ffffff !important;       /* keep clean white */
+}
+
