@@ -500,6 +500,84 @@ input[type="checkbox"]:checked::after {
   display: none !important;
 }
 
+/* ===== Settings dropdown: guaranteed visibility ===== */
+
+/* Ensure the gear button container can host absolute children */
+#settings-wrapper,
+.bg-white.shadow-sm.border-b.sticky .relative {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Do not let any ancestor clip the menu */
+.bg-white.shadow-sm.border-b.sticky,
+.header,
+#app-header {
+  overflow: visible !important;
+}
+
+/* Remove clipping from the dashboard card container */
+.bg-white.rounded-2xl.shadow-lg.overflow-hidden {
+  overflow: visible !important;
+}
+
+/* Tailwind's .hidden should still hide it */
+#settings-dropdown.hidden {
+  display: none !important;
+}
+
+/* ===== Settings dropdown: guaranteed visibility ===== */
+
+/* Ensure the gear button container can host absolute children */
+#settings-wrapper,
+.bg-white.shadow-sm.border-b.sticky .relative {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Do not let any ancestor clip the menu */
+.bg-white.shadow-sm.border-b.sticky,
+.header,
+#app-header {
+  overflow: visible !important;
+}
+
+/* Remove clipping from the dashboard card container */
+.bg-white.rounded-2xl.shadow-lg.overflow-hidden {
+  overflow: visible !important;
+}
+
+/* Tailwind's .hidden should still hide it */
+#settings-dropdown.hidden {
+  display: none !important;
+}
+
+/* ===== Settings dropdown: guaranteed visibility ===== */
+
+/* Ensure the gear button container can host absolute children */
+#settings-wrapper,
+.bg-white.shadow-sm.border-b.sticky .relative {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Do not let any ancestor clip the menu */
+.bg-white.shadow-sm.border-b.sticky,
+.header,
+#app-header {
+  overflow: visible !important;
+}
+
+/* Remove clipping from the dashboard card container */
+.bg-white.rounded-2xl.shadow-lg.overflow-hidden {
+  overflow: visible !important;
+}
+
+/* Tailwind's .hidden should still hide it */
+#settings-dropdown.hidden {
+  display: none !important;
+}
+
 /* Proper positioning and visibility */
 #settings-dropdown {
   position: absolute !important;
@@ -516,16 +594,12 @@ input[type="checkbox"]:checked::after {
   overflow-y: auto !important;
   overflow: visible !important;
 }
-#app-header {
-  border-radius: 0 !important;
-  overflow: visible !important;
-}
-/* === Header visual clean-up === */
-#app-header {
-  border-radius: 0 !important;
-  overflow: visible !important;
-  box-shadow: none !important;      /* remove raised shadow */
-  border-bottom: 1px solid #e5e7eb !important; /* subtle divider instead */
-  background-color: #ffffff !important;       /* keep clean white */
-}
 
+/* Header visual cleanup */
+#app-header {
+  border-radius: 0 !important;
+  overflow: visible !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  background-color: #ffffff !important;
+}
