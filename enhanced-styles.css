@@ -549,3 +549,106 @@ body.main-app-active .bg-white.shadow-sm.border-b.sticky {
     /* Ensure it can extend beyond parent containers */
     transform: none !important;
 }
+/* ========================================
+   CLEAN CSS FIXES - Add to enhanced-styles.css
+   ======================================== */
+
+/* FIX 1: Remove body padding conflicts */
+body {
+    padding-top: 0 !important;
+}
+
+/* FIX 2: Clean header positioning */
+.bg-white.shadow-sm.border-b.sticky {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 60 !important;
+    margin: 0 !important;
+}
+
+/* FIX 3: Remove main content top padding */
+.main-content {
+    padding-top: 0 !important;
+}
+
+/* Add small breathing room to main views */
+#dashboard-view,
+#calendar-view,
+#documents-view,
+#appliances-view,
+#all-tasks-view {
+    padding-top: 1rem !important;
+    margin-top: 0 !important;
+}
+
+/* FIX 4: Settings dropdown z-index */
+#settings-dropdown {
+    z-index: 9999 !important;
+    position: absolute !important;
+    right: 0 !important;
+    top: 100% !important;
+    margin-top: 0.5rem !important;
+}
+
+/* FIX 5: Banner positioning adjustments */
+.install-banner {
+    z-index: 70 !important;
+}
+
+#onboarding-progress {
+    z-index: 65 !important;
+}
+
+/* When install banner is visible, push header down */
+body.install-banner-visible .bg-white.shadow-sm.border-b.sticky {
+    top: 60px !important;
+}
+
+/* When progress banner is visible during setup */
+body:not(.main-app-active) .bg-white.shadow-sm.border-b.sticky {
+    top: 40px !important;
+}
+
+/* Both banners visible (demo mode setup) */
+body.install-banner-visible:not(.main-app-active) .bg-white.shadow-sm.border-b.sticky {
+    top: 100px !important;
+}
+
+/* FIX 6: Sticky stats grid positioning */
+#dashboard-view .sticky {
+    top: 84px !important; /* Below header + buffer */
+    z-index: 30 !important;
+}
+
+/* Adjust sticky stats when banners are present */
+body.install-banner-visible #dashboard-view .sticky {
+    top: 144px !important;
+}
+
+body:not(.main-app-active) #dashboard-view .sticky {
+    top: 124px !important;
+}
+
+body.install-banner-visible:not(.main-app-active) #dashboard-view .sticky {
+    top: 184px !important;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    body.install-banner-visible .bg-white.shadow-sm.border-b.sticky {
+        top: 50px !important;
+    }
+    
+    body:not(.main-app-active) .bg-white.shadow-sm.border-b.sticky {
+        top: 35px !important;
+    }
+    
+    #dashboard-view .sticky {
+        top: 74px !important;
+    }
+    
+    #settings-dropdown {
+        right: -0.5rem !important;
+        width: 12rem !important;
+    }
+}
