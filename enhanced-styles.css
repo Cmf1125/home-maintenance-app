@@ -633,3 +633,11 @@ input[type="checkbox"]:checked::after {
   border-bottom: 1px solid #e5e7eb !important;
   background-color: #ffffff !important;
 }
+
+/* When the dropdown is portaled to <body>, pin it with fixed positioning */
+#settings-dropdown.portalized {
+  position: fixed !important;
+  width: 12rem !important;     /* match w-48 */
+  max-width: 90vw !important;  /* guard on tiny screens */
+}
+
