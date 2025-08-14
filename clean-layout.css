@@ -1,0 +1,90 @@
+/* Reset and base layout */
+body {
+    padding-top: 0 !important;
+    margin: 0;
+}
+
+.main-content {
+    padding-top: 0 !important;
+    padding-bottom: 20px;
+}
+
+/* JOURNEY 1: Login (no header, no banners) */
+body:has(#login-screen:not(.hidden)) .bg-white.shadow-sm.border-b.sticky,
+.login-active .bg-white.shadow-sm.border-b.sticky {
+    display: none !important;
+}
+
+/* JOURNEY 2: Setup (banners, no header) */
+body:not(.main-app-active) .bg-white.shadow-sm.border-b.sticky {
+    display: none !important;
+}
+
+body:not(.main-app-active) {
+    padding-top: 40px; /* Progress banner space */
+}
+
+body:not(.main-app-active).demo-mode {
+    padding-top: 75px; /* Demo + progress banner space */
+}
+
+#onboarding-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    height: 40px;
+}
+
+.demo-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 70;
+    height: 35px;
+}
+
+body.demo-mode #onboarding-progress {
+    top: 35px;
+}
+
+/* JOURNEY 3: Main App (header, no banners) */
+body.main-app-active .bg-white.shadow-sm.border-b.sticky {
+    display: block !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 50 !important;
+}
+
+body.main-app-active {
+    padding-top: 0 !important;
+}
+
+body.main-app-active .main-content {
+    padding-bottom: 100px;
+}
+
+body.main-app-active .demo-banner,
+body.main-app-active #onboarding-progress {
+    display: none !important;
+}
+
+/* Settings dropdown fix */
+#settings-dropdown {
+    position: absolute !important;
+    right: 0 !important;
+    top: 100% !important;
+    z-index: 9999 !important;
+}
+
+/* Bottom nav */
+.bottom-nav {
+    display: none;
+}
+
+body.main-app-active .bottom-nav {
+    display: block;
+}
+
