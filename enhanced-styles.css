@@ -633,11 +633,13 @@ input[type="checkbox"]:checked::after {
   border-bottom: 1px solid #e5e7eb !important;
   background-color: #ffffff !important;
 }
-
-/* When the dropdown is portaled to <body>, pin it with fixed positioning */
+/* When the dropdown is portaled to <body>, keep it dropdown-sized */
 #settings-dropdown.portalized {
   position: fixed !important;
-  width: 12rem !important;     /* match w-48 */
-  max-width: 90vw !important;  /* guard on tiny screens */
+  width: 12rem !important;      /* same as w-48 */
+  max-width: 90vw !important;   /* guard on tiny screens */
+  left: 0; top: 0;               /* JS will position these */
 }
 
+/* Optional: tighter, cleaner menu look */
+#settings-dropdown { box-shadow: 0 10px 25px rgba(0,0,0,.15); border-radius: 0.5rem; }
