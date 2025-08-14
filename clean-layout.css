@@ -1,7 +1,12 @@
-/* Reset and base layout */
+/* Clean Layout CSS - Updated to Fix All Issues */
+
+/* ========================================
+   RESET AND BASE LAYOUT
+   ======================================== */
 body {
     padding-top: 0 !important;
     margin: 0;
+    overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 .main-content {
@@ -9,17 +14,59 @@ body {
     padding-bottom: 20px;
 }
 
-/* JOURNEY 1: Login (no header, no banners) */
+/* ========================================
+   JOURNEY 1: LOGIN PAGE (Clean - No Header, No Banners)
+   ======================================== */
 body:has(#login-screen:not(.hidden)) .bg-white.shadow-sm.border-b.sticky,
 .login-active .bg-white.shadow-sm.border-b.sticky {
     display: none !important;
 }
 
-/* JOURNEY 2: Setup (banners, no header) */
+body:has(#login-screen:not(.hidden)) {
+    padding-top: 0 !important;
+}
+
+body:has(#login-screen:not(.hidden)) .install-banner,
+body:has(#login-screen:not(.hidden)) #onboarding-progress {
+    display: none !important;
+}
+
+/* ========================================
+   JOURNEY 2: SETUP FLOW (Banners Only - No Header)
+   ======================================== */
 body:not(.main-app-active) .bg-white.shadow-sm.border-b.sticky {
     display: none !important;
 }
 
+/* Progress banner always shows during setup */
+body:not(.main-app-active) #onboarding-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    height: 40px;
+    display: block !important;
+}
+
+/* Demo banner only for demo users */
+body:not(.main-app-active).demo-mode .demo-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 70;
+    height: 35px;
+    display: block !important;
+}
+
+/* Adjust progress banner position when demo banner is present */
+body:not(.main-app-active).demo-mode #onboarding-progress {
+    top: 35px;
+    z-index: 60;
+}
+
+/* Set body padding for banners during setup */
 body:not(.main-app-active) {
     padding-top: 40px; /* Progress banner space */
 }
@@ -28,29 +75,9 @@ body:not(.main-app-active).demo-mode {
     padding-top: 75px; /* Demo + progress banner space */
 }
 
-#onboarding-progress {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 60;
-    height: 40px;
-}
-
-.demo-banner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 70;
-    height: 35px;
-}
-
-body.demo-mode #onboarding-progress {
-    top: 35px;
-}
-
-/* JOURNEY 3: Main App (header, no banners) */
+/* ========================================
+   JOURNEY 3: MAIN APP (Sticky Header Only - No Banners)
+   ======================================== */
 body.main-app-active .bg-white.shadow-sm.border-b.sticky {
     display: block !important;
     position: sticky !important;
@@ -63,28 +90,139 @@ body.main-app-active {
 }
 
 body.main-app-active .main-content {
-    padding-bottom: 100px;
+    padding-bottom: 100px; /* Space for bottom nav */
 }
 
+/* Hide ALL banners in main app */
 body.main-app-active .demo-banner,
-body.main-app-active #onboarding-progress {
+body.main-app-active #onboarding-progress,
+body.main-app-active .install-banner {
     display: none !important;
 }
 
-/* Settings dropdown fix */
+/* ========================================
+   CRITICAL: SETTINGS DROPDOWN FIXES
+   ======================================== */
+/* Ensure header container doesn't have overflow hidden */
+.bg-white.shadow-sm.border-b.sticky {
+    overflow: visible !important;
+}
+
+.bg-white.shadow-sm.border-b.sticky > div {
+    overflow: visible !important;
+}
+
+/* Settings button container */
+.bg-white.shadow-sm.border-b.sticky .relative {
+    overflow: visible !important;
+    position: relative !important;
+}
+
+/* Settings dropdown positioning */
 #settings-dropdown {
     position: absolute !important;
     right: 0 !important;
     top: 100% !important;
     z-index: 9999 !important;
+    margin-top: 0.5rem !important;
+    transform: none !important;
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    min-width: 12rem !important;
+    max-height: 400px !important;
+    overflow-y: auto !important;
+    width: auto !important;
 }
 
-/* Bottom nav */
+/* ========================================
+   BOTTOM NAVIGATION
+   ======================================== */
 .bottom-nav {
-    display: none;
+    display: none; /* Hidden by default */
 }
 
 body.main-app-active .bottom-nav {
     display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
 }
 
+/* ========================================
+   MODAL Z-INDEX FIXES
+   ======================================== */
+#task-edit-modal,
+#date-picker-modal,
+#home-info-modal {
+    z-index: 99999 !important;
+}
+
+/* ========================================
+   MOBILE ADJUSTMENTS
+   ======================================== */
+@media (max-width: 768px) {
+    /* Mobile banner adjustments */
+    body:not(.main-app-active) {
+        padding-top: 35px; /* Smaller mobile banners */
+    }
+    
+    body:not(.main-app-active).demo-mode {
+        padding-top: 65px; /* Demo + progress */
+    }
+    
+    #onboarding-progress {
+        height: 35px;
+    }
+    
+    .demo-banner {
+        height: 30px;
+    }
+    
+    body:not(.main-app-active).demo-mode #onboarding-progress {
+        top: 30px;
+    }
+    
+    /* Mobile settings dropdown */
+    #settings-dropdown {
+        right: -0.5rem !important;
+        width: 12rem !important;
+        max-width: calc(100vw - 2rem) !important;
+    }
+    
+    /* Mobile main content */
+    body.main-app-active .main-content {
+        padding-bottom: 120px;
+    }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+.no-scroll {
+    overflow: hidden !important;
+}
+
+.force-visible {
+    overflow: visible !important;
+}
+
+/* ========================================
+   DEBUG HELPERS (Remove in Production)
+   ======================================== */
+/*
+.debug-banner {
+    border: 2px solid red !important;
+}
+
+.debug-header {
+    border: 2px solid blue !important;
+}
+
+.debug-dropdown {
+    border: 2px solid green !important;
+}
+*/
