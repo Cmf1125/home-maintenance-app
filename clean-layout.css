@@ -226,3 +226,109 @@ body.main-app-active .bottom-nav {
     border: 2px solid green !important;
 }
 */
+/* ========================================
+   CRITICAL FIXES FOR HEADER GAP AND DROPDOWN
+   Add this to the bottom of clean-layout.css
+   ======================================== */
+
+/* FIX 1: Remove the gap between header and content */
+body.main-app-active {
+    padding-top: 0 !important;
+}
+
+/* FIX 2: Ensure main content starts right after header */
+body.main-app-active .main-content {
+    padding-top: 0 !important;
+    padding-bottom: 100px; /* Keep bottom nav space */
+}
+
+/* FIX 3: Fix the sticky stats grid positioning */
+body.main-app-active .sticky.top-16 {
+    top: 0 !important; /* Remove the 64px offset that creates the gap */
+    padding-top: 1rem !important; /* Add internal padding instead */
+}
+
+/* FIX 4: Ensure header allows dropdown to show */
+.bg-white.shadow-sm.border-b.sticky {
+    overflow: visible !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 50 !important;
+}
+
+.bg-white.shadow-sm.border-b.sticky > div {
+    overflow: visible !important;
+}
+
+.bg-white.shadow-sm.border-b.sticky .relative {
+    overflow: visible !important;
+    position: relative !important;
+}
+
+/* FIX 5: Ensure settings dropdown appears above everything */
+#settings-dropdown {
+    position: absolute !important;
+    right: 0 !important;
+    top: 100% !important;
+    z-index: 99999 !important; /* Increased z-index */
+    margin-top: 0.5rem !important;
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25) !important; /* Stronger shadow */
+    min-width: 12rem !important;
+    max-height: 400px !important;
+    overflow-y: auto !important;
+    width: auto !important;
+}
+
+/* FIX 6: Mobile adjustments */
+@media (max-width: 768px) {
+    /* Reduce dashboard padding on mobile */
+    #dashboard-view {
+        padding: 0.5rem !important;
+    }
+    
+    /* Fix mobile stats grid */
+    body.main-app-active .sticky.top-16 {
+        top: 0 !important;
+        padding-top: 0.75rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    /* Ensure dropdown works on mobile */
+    #settings-dropdown {
+        right: -0.5rem !important;
+        width: 12rem !important;
+        max-width: calc(100vw - 2rem) !important;
+    }
+    
+    /* Adjust main content for mobile */
+    body.main-app-active .main-content {
+        padding-bottom: 120px !important;
+    }
+}
+
+/* FIX 7: Force removal of any conflicting padding */
+body.main-app-active #dashboard-view .sticky {
+    top: 0 !important;
+}
+
+/* FIX 8: Ensure no margins create gaps */
+body.main-app-active .main-content > div:first-child {
+    margin-top: 0 !important;
+}
+
+/* FIX 9: Debug helper - remove after testing */
+/* Uncomment these lines temporarily to see the layout boxes */
+/*
+.bg-white.shadow-sm.border-b.sticky {
+    border: 2px solid red !important;
+}
+.sticky.top-16 {
+    border: 2px solid blue !important;
+}
+.main-content {
+    border: 2px solid green !important;
+}
+*/
