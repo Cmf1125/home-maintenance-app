@@ -1,3 +1,47 @@
+/* ========================================
+   MOBILE OPTIMIZATION FIXES
+   ======================================== */
+
+/* Fix smooth scrolling globally */
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+body {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    /* Prevent momentum scrolling issues on iOS */
+    overscroll-behavior: none;
+}
+
+/* Fix scroll restoration - always start at top */
+html, body {
+    scroll-padding-top: 0;
+}
+
+/* Improve touch scrolling performance */
+* {
+    -webkit-overflow-scrolling: touch;
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    -o-transform: translateZ(0);
+    transform: translateZ(0);
+}
+
+/* Fix sticky header positioning on mobile */
+.sticky {
+    position: -webkit-sticky;
+    position: sticky;
+    will-change: transform;
+}
+
+/* Ensure smooth transitions */
+.transition-all {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 .gradient-bg { 
     background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); 
 }
