@@ -227,108 +227,98 @@ body.main-app-active .bottom-nav {
 }
 */
 /* ========================================
-   CRITICAL FIXES FOR HEADER GAP AND DROPDOWN
-   Add this to the bottom of clean-layout.css
+   AGGRESSIVE FIXES FOR HEADER GAP AND DROPDOWN
+   Add this to the VERY BOTTOM of clean-layout.css
    ======================================== */
 
-/* FIX 1: Remove the gap between header and content */
-body.main-app-active {
-    padding-top: 0 !important;
+/* NUCLEAR OPTION: Force remove all gaps and fix positioning */
+body.main-app-active #dashboard-view {
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
-/* FIX 2: Ensure main content starts right after header */
-body.main-app-active .main-content {
-    padding-top: 0 !important;
-    padding-bottom: 100px; /* Keep bottom nav space */
-}
-
-/* FIX 3: Fix the sticky stats grid positioning */
+/* Fix the stats grid - remove the 64px gap completely */
+body.main-app-active .sticky[class*="top-16"],
 body.main-app-active .sticky.top-16 {
-    top: 0 !important; /* Remove the 64px offset that creates the gap */
-    padding-top: 1rem !important; /* Add internal padding instead */
+    top: 0 !important;
+    position: static !important; /* Remove sticky behavior causing issues */
+    background: transparent !important;
+    padding: 1rem !important;
+    margin: 0 !important;
+    z-index: auto !important;
 }
 
-/* FIX 4: Ensure header allows dropdown to show */
-.bg-white.shadow-sm.border-b.sticky {
-    overflow: visible !important;
+/* Force header to proper height and remove overflow issues */
+body.main-app-active .bg-white.shadow-sm.border-b {
     position: sticky !important;
     top: 0 !important;
-    z-index: 50 !important;
+    z-index: 9998 !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
 }
 
-.bg-white.shadow-sm.border-b.sticky > div {
+/* Force ALL containers in header to allow overflow */
+body.main-app-active .bg-white.shadow-sm.border-b * {
     overflow: visible !important;
 }
 
-.bg-white.shadow-sm.border-b.sticky .relative {
-    overflow: visible !important;
-    position: relative !important;
-}
-
-/* FIX 5: Ensure settings dropdown appears above everything */
+/* Settings dropdown - MAXIMUM z-index and positioning */
 #settings-dropdown {
-    position: absolute !important;
-    right: 0 !important;
-    top: 100% !important;
-    z-index: 99999 !important; /* Increased z-index */
-    margin-top: 0.5rem !important;
+    position: fixed !important;
+    top: 60px !important; /* Fixed position from top */
+    right: 1rem !important;
+    z-index: 99999 !important;
     background: white !important;
-    border: 1px solid #e5e7eb !important;
-    border-radius: 8px !important;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25) !important; /* Stronger shadow */
-    min-width: 12rem !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35) !important;
+    min-width: 200px !important;
     max-height: 400px !important;
     overflow-y: auto !important;
     width: auto !important;
+    transform: none !important;
 }
 
-/* FIX 6: Mobile adjustments */
-@media (max-width: 768px) {
-    /* Reduce dashboard padding on mobile */
-    #dashboard-view {
-        padding: 0.5rem !important;
-    }
-    
-    /* Fix mobile stats grid */
-    body.main-app-active .sticky.top-16 {
-        top: 0 !important;
-        padding-top: 0.75rem !important;
-        margin-bottom: 1rem !important;
-    }
-    
-    /* Ensure dropdown works on mobile */
-    #settings-dropdown {
-        right: -0.5rem !important;
-        width: 12rem !important;
-        max-width: calc(100vw - 2rem) !important;
-    }
-    
-    /* Adjust main content for mobile */
-    body.main-app-active .main-content {
-        padding-bottom: 120px !important;
-    }
-}
-
-/* FIX 7: Force removal of any conflicting padding */
-body.main-app-active #dashboard-view .sticky {
-    top: 0 !important;
-}
-
-/* FIX 8: Ensure no margins create gaps */
-body.main-app-active .main-content > div:first-child {
+/* Remove any padding that might cause gaps */
+body.main-app-active .main-content {
+    padding-top: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
     margin-top: 0 !important;
 }
 
-/* FIX 9: Debug helper - remove after testing */
-/* Uncomment these lines temporarily to see the layout boxes */
+/* Force dashboard content to start immediately after header */
+body.main-app-active #dashboard-view > div:first-child {
+    margin-top: 0 !important;
+    padding-top: 1rem !important;
+}
+
+/* Mobile fixes */
+@media (max-width: 768px) {
+    body.main-app-active #dashboard-view {
+        padding: 0.5rem !important;
+    }
+    
+    #settings-dropdown {
+        top: 55px !important;
+        right: 0.5rem !important;
+        min-width: 180px !important;
+    }
+}
+
+/* DEBUG: Uncomment these to see what's happening */
 /*
-.bg-white.shadow-sm.border-b.sticky {
-    border: 2px solid red !important;
+body.main-app-active .bg-white.shadow-sm.border-b {
+    background: red !important;
+    opacity: 0.5 !important;
 }
-.sticky.top-16 {
-    border: 2px solid blue !important;
+body.main-app-active .sticky {
+    background: blue !important;
+    opacity: 0.5 !important;
 }
-.main-content {
-    border: 2px solid green !important;
+#dashboard-view {
+    background: green !important;
+    opacity: 0.5 !important;
 }
 */
