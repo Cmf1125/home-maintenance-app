@@ -1575,11 +1575,46 @@
     console.log('✅ NEW working reschedule modal created and ready!');
 </script>
             
-<!-- Settings Dropdown Functions -->
 <script>
-  // Helper: find the gear button regardless of which id you used
+  // Works with either id on the gear button
   function getSettingsButton() {
     return document.getElementById('settings-button') || document.getElementById('settings-btn');
+  }
+
+  function portalizeOnce(dd) {
+    if (!dd.dataset.portaled) {
+      dd.dataset.portaled = '1';
+      dd.classList.add('portalized'); // fixed positioning in CSS
+      document.body.appendChild(dd);
+    }
+  }
+
+  function positionDropdown(dd, btn) {
+    const r = btn.getBoundingClientRect();
+    // Make the menu measurable without flashing
+    const prevHidden = dd.classList.contains('hidden');
+    if (prevHidden) dd.classList.remove('hidden');
+    dd.style.visibility = 'hidden';
+    dd.style.top = '-9999px';
+    dd.style.left = '-9999px';
+
+    // Measure width; fallback to 192px (12rem)
+    const menuRect = dd.getBoundingClientRect();
+    const menuWidth = Math.max(192, Math.round(menuRect.width || 192));
+
+    // Align right edge of menu to right edge of button, keep inside viewport with 8px padding
+    const gap = 8;
+    const vw = window.innerWidth || document.documentElement.clientWidth;
+    let left = Math.round(r.right - menuWidth);
+    left = Math.max(8, Math.min(left, vw - menuWidth - 8));
+    const top = Math.round(r.bottom + gap);
+
+    // Apply final position
+    dd.style.left = left + 'px';
+    dd.style.top = top + 'px';
+    dd.style.visibility = ''; // back to visible
+
+    if (prevHidden) dd.classList.add('hidden'); // restore hidden; caller will unhide
   }
 
   function toggleSettingsDropdown() {
@@ -1590,23 +1625,16 @@
     const isHidden = dd.classList.contains('hidden');
 
     if (isHidden) {
-      // First time: portal the dropdown to <body> so no ancestor can clip it
-      if (!dd.dataset.portaled) {
-        dd.dataset.portaled = '1';
-        dd.classList.add('portalized'); // CSS gives this position: fixed !important
-        document.body.appendChild(dd);
-      }
-
-      // Position it just below the gear, right-aligned
-      const r = btn.getBoundingClientRect();
-      // If hidden, offsetWidth can be 0; use fallback 192px (12rem)
-      const menuWidth = dd.offsetWidth || 192;
-      dd.style.top  = Math.round(r.bottom + 8) + 'px';                 // 8px gap
-      dd.style.left = Math.round(Math.max(8, r.right - menuWidth)) + 'px';
-
+      portalizeOnce(dd);
+      positionDropdown(dd, btn);
       dd.classList.remove('hidden');
-      // Defer adding the listener so the opening click doesn't immediately close it
-      setTimeout(() => document.addEventListener('click', closeSettingsOnClickOutside), 0);
+
+      // Attach listeners after open so the opening click doesn't immediately close it
+      setTimeout(() => {
+        document.addEventListener('click', closeSettingsOnClickOutside);
+        window.addEventListener('resize', repositionIfOpen);
+        window.addEventListener('scroll', repositionIfOpen, { passive: true });
+      }, 0);
     } else {
       closeSettingsDropdown();
     }
@@ -1618,6 +1646,8 @@
       dd.classList.add('hidden');
     }
     document.removeEventListener('click', closeSettingsOnClickOutside);
+    window.removeEventListener('resize', repositionIfOpen);
+    window.removeEventListener('scroll', repositionIfOpen);
   }
 
   function closeSettingsOnClickOutside(event) {
@@ -1629,19 +1659,19 @@
     }
   }
 
-  // Reposition on resize so it stays docked to the gear
-  window.addEventListener('resize', () => {
-    const dd = document.getElementById('settings-dropdown');
-    if (dd && !dd.classList.contains('hidden')) {
-      toggleSettingsDropdown(); // closes
-      toggleSettingsDropdown(); // re-opens & repositions
+  function repositionIfOpen() {
+    const dd  = document.getElementById('settings-dropdown');
+    const btn = getSettingsButton();
+    if (dd && btn && !dd.classList.contains('hidden')) {
+      positionDropdown(dd, btn);
     }
-  });
+  }
 
-  // Make functions globally available
+  // Make globally available (your code expects this)
   window.toggleSettingsDropdown = toggleSettingsDropdown;
   window.closeSettingsDropdown = closeSettingsDropdown;
 </script>
+
 
 
     <!-- ✅ Core Scripts go here -->
