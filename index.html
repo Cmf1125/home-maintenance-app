@@ -1589,37 +1589,37 @@
   function portalizeOnce(dd) {
     if (!dd.dataset.portaled) {
       dd.dataset.portaled = '1';
-      dd.classList.add('portalized'); // fixed positioning in CSS
+      dd.classList.add('portalized');   // fixed + width via CSS above
       document.body.appendChild(dd);
     }
   }
 
   function positionDropdown(dd, btn) {
     const r = btn.getBoundingClientRect();
-    // Make the menu measurable without flashing
-    const prevHidden = dd.classList.contains('hidden');
-    if (prevHidden) dd.classList.remove('hidden');
-    dd.style.visibility = 'hidden';
-    dd.style.top = '-9999px';
-    dd.style.left = '-9999px';
 
-    // Measure width; fallback to 192px (12rem)
+    // Ensure we can measure width
+    const wasHidden = dd.classList.contains('hidden');
+    if (wasHidden) dd.classList.remove('hidden');
+    dd.style.visibility = 'hidden';
+    dd.style.left = '-9999px';
+    dd.style.top  = '-9999px';
+
+    // Width = actual or fallback 12rem (192px)
     const menuRect = dd.getBoundingClientRect();
     const menuWidth = Math.max(192, Math.round(menuRect.width || 192));
 
-    // Align right edge of menu to right edge of button, keep inside viewport with 8px padding
+    // Place right-aligned to the gear, clamped to viewport
     const gap = 8;
-    const vw = window.innerWidth || document.documentElement.clientWidth;
-    let left = Math.round(r.right - menuWidth);
+    const vw  = window.innerWidth || document.documentElement.clientWidth;
+    let left  = Math.round(r.right - menuWidth);
     left = Math.max(8, Math.min(left, vw - menuWidth - 8));
     const top = Math.round(r.bottom + gap);
 
-    // Apply final position
     dd.style.left = left + 'px';
-    dd.style.top = top + 'px';
-    dd.style.visibility = ''; // back to visible
+    dd.style.top  = top  + 'px';
+    dd.style.visibility = '';
 
-    if (prevHidden) dd.classList.add('hidden'); // restore hidden; caller will unhide
+    if (wasHidden) dd.classList.add('hidden');
   }
 
   function toggleSettingsDropdown() {
@@ -1634,7 +1634,6 @@
       positionDropdown(dd, btn);
       dd.classList.remove('hidden');
 
-      // Attach listeners after open so the opening click doesn't immediately close it
       setTimeout(() => {
         document.addEventListener('click', closeSettingsOnClickOutside);
         window.addEventListener('resize', repositionIfOpen);
@@ -1647,37 +1646,39 @@
 
   function closeSettingsDropdown() {
     const dd = document.getElementById('settings-dropdown');
-    if (dd && !dd.classList.contains('hidden')) {
-      dd.classList.add('hidden');
-    }
+    if (dd && !dd.classList.contains('hidden')) dd.classList.add('hidden');
     document.removeEventListener('click', closeSettingsOnClickOutside);
     window.removeEventListener('resize', repositionIfOpen);
     window.removeEventListener('scroll', repositionIfOpen);
   }
 
-  function closeSettingsOnClickOutside(event) {
+  function closeSettingsOnClickOutside(e) {
     const dd  = document.getElementById('settings-dropdown');
     const btn = getSettingsButton();
     if (!dd || !btn) return;
-    if (!dd.contains(event.target) && !btn.contains(event.target)) {
-      closeSettingsDropdown();
-    }
+    if (!dd.contains(e.target) && !btn.contains(e.target)) closeSettingsDropdown();
   }
 
   function repositionIfOpen() {
     const dd  = document.getElementById('settings-dropdown');
     const btn = getSettingsButton();
-    if (dd && btn && !dd.classList.contains('hidden')) {
-      positionDropdown(dd, btn);
-    }
+    if (dd && btn && !dd.classList.contains('hidden')) positionDropdown(dd, btn);
   }
 
-  // Make globally available (your code expects this)
+  // Sign out wrapper — calls your existing logout function name
+  function handleSignOut() {
+    if (typeof signOutUser === 'function') return signOutUser();
+    if (typeof logoutUser === 'function')   return logoutUser();
+    if (typeof handleLogout === 'function') return handleLogout();
+    if (typeof signOut === 'function')      return signOut();
+    console.warn('No sign-out function found. Define signOutUser()/logoutUser()/handleLogout()/signOut().');
+  }
+
+  // Expose globally if other code calls these
   window.toggleSettingsDropdown = toggleSettingsDropdown;
   window.closeSettingsDropdown = closeSettingsDropdown;
+  window.handleSignOut = handleSignOut;
 </script>
-
-
 
     <!-- ✅ Core Scripts go here -->
     <script src="date-utils.js"></script>
