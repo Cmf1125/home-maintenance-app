@@ -479,3 +479,39 @@ input[type="checkbox"]:checked::after {
     transform: translate(-50%, -20px);
     opacity: 0;
 }
+/* ===== Settings dropdown: guaranteed visibility ===== */
+
+/* Ensure the gear button container can host absolute children */
+#settings-wrapper,
+.bg-white.shadow-sm.border-b.sticky .relative {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Do not let any ancestor clip the menu */
+.bg-white.shadow-sm.border-b.sticky,
+.header,
+#app-header {
+  overflow: visible !important;
+}
+
+/* Tailwind's .hidden should still hide it */
+#settings-dropdown.hidden {
+  display: none !important;
+}
+
+/* Proper positioning above the header */
+#settings-dropdown {
+  position: absolute !important;
+  right: 0 !important;
+  top: 100% !important;        /* directly below the gear */
+  margin-top: 0.5rem !important;
+  z-index: 99999 !important;   /* beat any stacking context */
+  background: #fff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 25px rgba(0,0,0,.15) !important;
+  min-width: 12rem !important;
+  max-height: 70vh !important; 
+  overflow-y: auto !important;
+}
