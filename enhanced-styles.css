@@ -643,3 +643,7 @@ input[type="checkbox"]:checked::after {
 
 /* Optional: tighter, cleaner menu look */
 #settings-dropdown { box-shadow: 0 10px 25px rgba(0,0,0,.15); border-radius: 0.5rem; }
+
+/* Prevent any slide/fade animations on the dropdown itself */
+#settings-dropdown { transition: none !important; }
+
