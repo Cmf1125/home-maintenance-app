@@ -992,3 +992,8 @@ input[type="text"], input[type="number"] {
         transform: scale(0.98);
     }
 }
+/* Fix scroll restoration - pages should start at top */
+html {
+    scroll-behavior: smooth;
+    scroll-restoration: manual;
+}
