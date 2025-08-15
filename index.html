@@ -731,7 +731,7 @@
         <div id="main-app" class="hidden">
             <div class="main-content">
         <!-- Enhanced Dashboard View -->
-        <div id="dashboard-view" class="p-4">
+        <div id="dashboard-view">
         <!-- Interactive Stats Grid - Now Sticky and Mobile Optimized -->
         <div class="sticky top-16 z-30 bg-gray-50 pb-4 mb-6">
             <div class="grid grid-cols-3 gap-2 sm:gap-4">
@@ -2782,46 +2782,44 @@ document.addEventListener('DOMContentLoaded', function() {
     window.refreshHeaderOffset = setHeaderHeightVar;
   })();
 </script>
+
 <script>
   (function () {
     function computeTopOffset() {
-      // All elements we tagged as top bars
+      // All elements you tagged as bars that overlay content
       var bars = document.querySelectorAll('[data-sticky="topbar"]');
       var total = 0;
 
       bars.forEach(function (el) {
-        var style = window.getComputedStyle(el);
-        // Only count those that are visible
-        if (style.display === 'none' || style.visibility === 'hidden') return;
-
-        // If positioned fixed/sticky and touching the top, use its box height.
+        var cs = getComputedStyle(el);
         var rect = el.getBoundingClientRect();
-        var isFixedLike = (style.position === 'fixed' || style.position === 'sticky');
-        if (isFixedLike && Math.round(rect.top) <= 0) {
+        var isFixed = cs.position === 'fixed';
+        var isStickyStuck = (cs.position === 'sticky' && Math.round(rect.top) <= 0);
+
+        // Only count overlaying bars
+        if (isFixed || isStickyStuck) {
           total += Math.round(rect.height);
-        } else {
-          // If it's in normal flow above the content, its height still contributes
-          total += Math.round(el.offsetHeight);
         }
       });
 
       document.documentElement.style.setProperty('--top-offset', total + 'px');
     }
 
-    // Recompute on load & resize
+    // Run on load & resize
     window.addEventListener('load', computeTopOffset);
     window.addEventListener('resize', computeTopOffset);
 
-    // Auto-recompute whenever any top bar changes height (e.g., step 1→2)
+    // Update automatically when a bar changes size
     if ('ResizeObserver' in window) {
       var ro = new ResizeObserver(computeTopOffset);
       document.querySelectorAll('[data-sticky="topbar"]').forEach(function (el) { ro.observe(el); });
     }
 
-    // Expose a manual hook if you toggle banners via JS
+    // Expose a manual hook for when you show/hide demo banner/stepper via JS
     window.refreshTopOffset = computeTopOffset;
   })();
 </script>
+
 
 </body>
 </html>
