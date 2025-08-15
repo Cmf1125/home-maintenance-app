@@ -203,9 +203,6 @@
 </div> <!-- Closes: px-4 py-4 -->
 </div> <!-- Closes: bg-white shadow-sm border-b sticky -->
 
-<!-- Inline topbar (progress/demo notice renders here; not fixed) -->
-<div id="inline-topbar" aria-live="polite"></div>
-
 <!-- Simplified Setup Form -->
 <div id="setup-form" class="hidden p-4 main-content pt-20">
     
@@ -2335,7 +2332,6 @@ function signOutUser() {
         // Show login screen and hide other screens
         document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('setup-form').classList.add('hidden');
-        clearInlineTopbar(); // remove onboarding inline UI
         document.getElementById('setup-form').style.display = 'none';
         document.getElementById('main-app').classList.add('hidden');
         document.body.classList.remove('main-app-active');
@@ -2358,8 +2354,6 @@ function handleSuccessfulLogin(user) {
     document.getElementById('setup-form').classList.add('hidden');
     document.getElementById('setup-form').style.display = 'none';
     document.getElementById('onboarding-progress').classList.add('hidden');
-    clearInlineTopbar();
-
     
     // Load data FIRST, then show dashboard
     loadUserDataEnhanced(user.uid).then(hasData => {
@@ -2406,16 +2400,13 @@ function handleNewUserSignup(user) {
     // Add setup mode class
     document.body.classList.add('setup-active');
     
-   // Show setup form
-document.getElementById('setup-form').classList.remove('hidden');
-document.getElementById('setup-form').style.display = 'block';
-
-// Inline progress (new user)
-renderInlineTopbar({
-  step: 1,
-  total: 3,
-  label: 'Step 1 of 3: Property'
-});
+    // Set padding for just progress banner (no demo banner)
+    document.body.style.paddingTop = '40px';
+    
+    // Show setup form
+    document.getElementById('setup-form').classList.remove('hidden');
+    document.getElementById('setup-form').style.display = 'block';
+    document.getElementById('onboarding-progress').classList.remove('hidden');
     
     // Store user info globally
     window.currentUser = user;
@@ -2443,7 +2434,6 @@ auth.onAuthStateChanged((user) => {
         console.log('👋 No user logged in, showing login screen');
         document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('setup-form').classList.add('hidden');
-        clearInlineTopbar();
         document.getElementById('main-app').classList.add('hidden');
         document.body.classList.remove('main-app-active');
     }
@@ -2602,20 +2592,15 @@ function startDemo() {
     document.getElementById('login-screen').classList.add('hidden');
 
      // ADD THIS LINE:
-document.body.classList.add('setup-active');
-
-// Show setup form (inline topbar instead of fixed banners)
-document.getElementById('setup-form').classList.remove('hidden');
-document.getElementById('setup-form').style.display = 'block';
-
-// Inline demo + progress
-renderInlineTopbar({
-  demo: true,
-  step: 1,
-  total: 3,
-  label: 'Step 1 of 3: Property'
-});
-
+    document.body.classList.add('setup-active');
+    
+    // Show setup form with demo banner
+    document.getElementById('setup-form').classList.remove('hidden');
+    document.getElementById('setup-form').style.display = 'block';
+    document.getElementById('onboarding-progress').classList.remove('hidden');
+    
+    // Add demo banner
+    showDemoBanner();
     
     // Pre-fill some demo data to speed things up
     setTimeout(() => {
@@ -2637,8 +2622,27 @@ renderInlineTopbar({
 }
 
 function showDemoBanner() {
-  // Banners deprecated — using inline topbar now
-  return;
+    const banner = document.createElement('div');
+    banner.className = 'fixed top-0 left-0 right-0 bg-blue-50 border-b border-blue-200 text-center demo-banner';
+    banner.style.zIndex = '70';
+    
+    banner.innerHTML = `
+        <div class="py-2 px-4">
+            <span class="text-sm text-blue-700 font-medium">🚀 Demo Mode - Exploring features</span>
+        </div>
+    `;
+    
+    document.body.appendChild(banner);
+    
+    // Move progress banner down 
+    const progressBanner = document.getElementById('onboarding-progress');
+    if (progressBanner) {
+        progressBanner.style.top = '37px'; // Slightly smaller demo banner
+        progressBanner.style.zIndex = '60';
+    }
+    
+    // Adjusted padding
+    document.body.style.paddingTop = '75px'; // 37px demo + 38px progress
 }
     
 // Override save functions for demo mode
@@ -2727,98 +2731,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-</script>
-<script>
-  function renderInlineTopbar(opts) {
-    const host = document.getElementById('inline-topbar');
-    if (!host) return;
-
-    const {
-      demo = false,
-      step = null,
-      total = null,
-      label = null
-    } = opts || {};
-
-    let html = '';
-
-    if (demo) {
-      html += `
-        <div class="inline-demo">
-          🚀 Demo Mode — Exploring features
-        </div>
-      `;
-    }
-
-    if (Number(step) >= 1 && Number(total) >= 1) {
-      const pct = Math.max(0, Math.min(100, Math.round((step / total) * 100)));
-      const safeLabel = label ? String(label) : \`Step \${step} of \${total}\`;
-      html += `
-        <div class="inline-progress" role="status" aria-label="Onboarding progress">
-          <div class="track"><div class="fill" style="width:${pct}%"></div></div>
-          <div class="meta">
-            <span>${safeLabel}</span>
-            <span>${pct}%</span>
-          </div>
-        </div>
-      `;
-    }
-
-    host.innerHTML = html;
-  }
-
-  function clearInlineTopbar() {
-    const host = document.getElementById('inline-topbar');
-    if (host) host.innerHTML = '';
-  }
-</script>
-<script>
-  // Titles to show next to the progress bar
-  const STEP_TITLES = {
-    1: 'Property',
-    2: 'Systems',
-    3: 'Finalize'
-  };
-
-  // Call this whenever the visible onboarding step changes
-  function updateInlineTopbar(step, isDemoUser = (window.isDemoMode === true)) {
-    renderInlineTopbar({
-      demo: !!isDemoUser,                  // demo users see the notice + progress
-      step: Number(step),
-      total: 3,
-      label: `Step ${step} of 3: ${STEP_TITLES[step] || ''}`
-    });
-  }
-  window.updateInlineTopbar = updateInlineTopbar; // (optional) make it callable elsewhere
-
-  // --- No HTML changes needed: we just hook into your existing buttons ---
-  document.addEventListener('DOMContentLoaded', () => {
-    // When setup form first appears, start at step 1
-    const setupForm = document.getElementById('setup-form');
-    const isVisible = setupForm && !setupForm.classList.contains('hidden');
-    if (isVisible) updateInlineTopbar(1);
-
-    // NEXT buttons (you already have these in your HTML)
-    document.getElementById('next-to-step-2')?.addEventListener('click', () => {
-      updateInlineTopbar(2);
-    });
-    document.getElementById('next-to-step-3')?.addEventListener('click', () => {
-      updateInlineTopbar(3);
-    });
-
-    // BACK buttons
-    document.getElementById('back-to-step-1')?.addEventListener('click', () => {
-      updateInlineTopbar(1);
-    });
-    document.getElementById('back-to-step-2')?.addEventListener('click', () => {
-      updateInlineTopbar(2);
-    });
-  });
-
-  // Optional: if you already have celebrateStepCompletion(from, to),
-  // you can add ONE line inside it instead of the listeners above:
-  //   updateInlineTopbar(to, window.isDemoMode === true);
-</script>
-
+</script>           
 </body>
 </html>
