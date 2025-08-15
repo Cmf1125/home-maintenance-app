@@ -2478,54 +2478,50 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <script>
 function celebrateStepCompletion(currentStep, nextStep) {
-    // Get current step element
-    const currentStepEl = document.querySelector(`.onboarding-step[data-step="${currentStep}"]`);
+    console.log(`✅ Completing step ${currentStep}, moving to step ${nextStep}`);
+    
+    // Update progress indicators ONLY (no floating messages)
+    updateProgressIndicators(nextStep);
+    
+    // Update progress bar
     const progressBar = document.getElementById('progress-bar-fill');
-    
-    // Add completion animation to current step
-    currentStepEl.classList.add('step-completed');
-    
-    // Create floating success message
-    showSuccessMessage(getStepMessage(currentStep));
-    
-    // Animate progress bar
     if (progressBar) {
-        progressBar.classList.add('progress-celebration');
         const newWidth = Math.round((nextStep / 3) * 100);
         progressBar.style.width = `${newWidth}%`;
     }
     
-    // Update task preview if available
+    // Update task preview if available (quietly)
     if (typeof updateTaskPreview === 'function') {
         updateTaskPreview();
     }
     
-    // Delay the actual step transition for celebration
+    // Clean step transition (no celebration animations)
     setTimeout(() => {
-        // Update progress indicators
-        updateProgressIndicators(nextStep);
-        
-        // Show next step
+        // Hide all steps
         document.querySelectorAll('.onboarding-step').forEach(step => {
             step.classList.add('hidden');
         });
         
+        // Show next step
         const nextStepEl = document.querySelector(`.onboarding-step[data-step="${nextStep}"]`);
         if (nextStepEl) {
             nextStepEl.classList.remove('hidden');
             
             // Smooth scroll to new step
-            nextStepEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            nextStepEl.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
         }
         
-        // Clean up animations
-        currentStepEl.classList.remove('step-completed');
-        if (progressBar) {
-            progressBar.classList.remove('progress-celebration');
-        }
-    }, 600);
+    }, 100); // Much shorter delay
 }
 
+// REPLACE showSuccessMessage with this simple version:
+function showSuccessMessage(message) {
+    // No more green floating bubbles - just log
+    console.log('Step completed:', message);
+}
 function getStepMessage(step) {
     const messages = {
         1: "🏠 Great! Your home info is saved!",
