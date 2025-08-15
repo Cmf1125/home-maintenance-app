@@ -209,7 +209,7 @@
 <div id="setup-form" class="hidden p-4 main-content pt-20">
     
 <!-- Compact blue progress banner -->
-<div id="onboarding-progress" class="hidden fixed top-0 left-0 right-0 z-50 bg-blue-600">
+<div id="onboarding-progress" class="hidden fixed top-0 left-0 right-0 z-50 bg-blue-600" data-sticky="topbar">
   <div class="flex items-center justify-center py-2">
     <div class="flex items-center gap-3">
       <span id="step-1-dot" class="w-7 h-7 rounded-full bg-white text-blue-600 flex items-center justify-center text-sm font-bold">1</span>
@@ -2628,27 +2628,33 @@ function startDemo() {
 }
 
 function showDemoBanner() {
-    const banner = document.createElement('div');
-    banner.className = 'fixed top-0 left-0 right-0 bg-blue-50 border-b border-blue-200 text-center demo-banner';
-    banner.style.zIndex = '70';
-    
-    banner.innerHTML = `
-        <div class="py-2 px-4">
-            <span class="text-sm text-blue-700 font-medium">🚀 Demo Mode - Exploring features</span>
-        </div>
-    `;
-    
-    document.body.appendChild(banner);
-    
-    // Move progress banner down 
-    const progressBanner = document.getElementById('onboarding-progress');
-    if (progressBanner) {
-        progressBanner.style.top = '37px'; // Slightly smaller demo banner
-        progressBanner.style.zIndex = '60';
-    }
-    
-    // Adjusted padding
-    document.body.style.paddingTop = '75px'; // 37px demo + 38px progress
+  const banner = document.createElement('div');
+  banner.className = 'fixed top-0 left-0 right-0 bg-blue-50 border-b border-blue-200 text-center demo-banner';
+  banner.style.zIndex = '70';
+  banner.setAttribute('data-sticky', 'topbar'); // <-- measure this bar
+
+  banner.innerHTML = `
+    <div class="py-2 px-4">
+      <span class="text-sm text-blue-700 font-medium">🚀 Demo Mode - Exploring features</span>
+    </div>
+  `;
+
+  document.body.appendChild(banner);
+
+  // Mark the progress/stepper bar as a topbar too
+  const progressBanner = document.getElementById('onboarding-progress');
+  if (progressBanner) {
+    progressBanner.setAttribute('data-sticky', 'topbar'); // <-- important
+    // Remove hard-coded offsets so our auto-offset can do its job
+    progressBanner.style.top = '';     // was '37px'
+    progressBanner.style.zIndex = '';  // was '60'
+  }
+
+  // Remove the body padding hack; our script will compute the real offset
+  document.body.style.paddingTop = '';
+
+  // Recompute the combined top offset (banner + stepper)
+  if (window.refreshTopOffset) window.refreshTopOffset();
 }
     
 // Override save functions for demo mode
