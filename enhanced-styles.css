@@ -646,34 +646,3 @@ input[type="checkbox"]:checked::after {
 
 /* Prevent any slide/fade animations on the dropdown itself */
 #settings-dropdown { transition: none !important; }
-
-/* Inline topbar row */
-#inline-topbar { padding: 0 1rem; }
-
-/* Demo notice pill */
-.inline-demo {
-  margin: 0.5rem 0 0.75rem;
-  padding: 0.5rem 0.75rem;
-  background: #eff6ff;            /* blue-50 */
-  border: 1px solid #bfdbfe;      /* blue-200 */
-  border-radius: 0.5rem;
-  color: #1d4ed8;                 /* blue-700 */
-  font-weight: 500;
-}
-
-/* Inline progress (bar + label) */
-.inline-progress { margin: 0.5rem 0 0.75rem; }
-.inline-progress .track {
-  height: 8px; border-radius: 9999px; background: #e5e7eb; /* gray-200 */
-}
-.inline-progress .fill {
-  height: 8px; border-radius: 9999px; background: #3b82f6; /* blue-500 */
-  width: 0%;
-  transition: width 150ms linear;
-}
-.inline-progress .meta {
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 0.875rem; color: #374151; /* gray-700 */
-  margin-top: 0.5rem;
-}
-
