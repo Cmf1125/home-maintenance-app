@@ -2335,6 +2335,7 @@ function signOutUser() {
         // Show login screen and hide other screens
         document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('setup-form').classList.add('hidden');
+        clearInlineTopbar(); // remove onboarding inline UI
         document.getElementById('setup-form').style.display = 'none';
         document.getElementById('main-app').classList.add('hidden');
         document.body.classList.remove('main-app-active');
@@ -2357,6 +2358,8 @@ function handleSuccessfulLogin(user) {
     document.getElementById('setup-form').classList.add('hidden');
     document.getElementById('setup-form').style.display = 'none';
     document.getElementById('onboarding-progress').classList.add('hidden');
+    clearInlineTopbar();
+
     
     // Load data FIRST, then show dashboard
     loadUserDataEnhanced(user.uid).then(hasData => {
@@ -2440,6 +2443,7 @@ auth.onAuthStateChanged((user) => {
         console.log('👋 No user logged in, showing login screen');
         document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('setup-form').classList.add('hidden');
+        clearInlineTopbar();
         document.getElementById('main-app').classList.add('hidden');
         document.body.classList.remove('main-app-active');
     }
