@@ -47,7 +47,7 @@
         </div>
     </div>
 </div>
-    <div id="app" class="overflow-auto">
+    <div id="app-root" class="app-shell">
 
 <!-- Login Screen (shows first) -->
 <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
@@ -727,7 +727,7 @@
 
         <!-- Main App (Dashboard & Calendar) -->
         <div id="main-app" class="hidden">
-            <div class="main-content">
+            <div id="app-content" class="main-content">
         <!-- Enhanced Dashboard View -->
         <div id="dashboard-view" class="p-4">
         <!-- Interactive Stats Grid - Now Sticky and Mobile Optimized -->
@@ -1696,7 +1696,44 @@
     <script src="documents.js"></script> 
     <script src="appliances.js"></script>
             
-<!-- SIMPLE MODAL FIX - Add this before </body> -->
+<!-- SIMPLE MODAL FIX - Add this before 
+<!-- Mobile scroll + header sync (injected) -->
+<script>
+  (function () {
+    const SCROLLER_ID = 'app-content';
+    const HEADER_ID   = 'app-header';
+    function setHeaderHeightVar() {
+      const header = document.getElementById(HEADER_ID);
+      const h = header ? header.offsetHeight : 56;
+      document.documentElement.style.setProperty('--header-h', h + 'px');
+    }
+    function scrollAppToTop() {
+      const scroller = document.getElementById(SCROLLER_ID);
+      if (scroller) scroller.scrollTop = 0;
+    }
+    // Patch showTab if present to ensure top-of-content on navigation
+    const _origShowTab = window.showTab;
+    if (typeof _origShowTab === 'function') {
+      window.showTab = function() {
+        const result = _origShowTab.apply(this, arguments);
+        setHeaderHeightVar();
+        scrollAppToTop();
+        return result;
+      };
+    }
+    // Initial sync
+    window.addEventListener('load', setHeaderHeightVar);
+    window.addEventListener('resize', setHeaderHeightVar);
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    // Expose helpers if you want to call them manually
+    window._scrollAppToTop = scrollAppToTop;
+    window._setHeaderHeightVar = setHeaderHeightVar;
+  })();
+</script>
+
+</body> -->
 <!-- FIXED MODAL SCRIPT - Replace the previous one with this -->
 <script>
 console.log('🔧 Loading FIXED modal script...');
@@ -2736,5 +2773,42 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>           
+
+<!-- Mobile scroll + header sync (injected) -->
+<script>
+  (function () {
+    const SCROLLER_ID = 'app-content';
+    const HEADER_ID   = 'app-header';
+    function setHeaderHeightVar() {
+      const header = document.getElementById(HEADER_ID);
+      const h = header ? header.offsetHeight : 56;
+      document.documentElement.style.setProperty('--header-h', h + 'px');
+    }
+    function scrollAppToTop() {
+      const scroller = document.getElementById(SCROLLER_ID);
+      if (scroller) scroller.scrollTop = 0;
+    }
+    // Patch showTab if present to ensure top-of-content on navigation
+    const _origShowTab = window.showTab;
+    if (typeof _origShowTab === 'function') {
+      window.showTab = function() {
+        const result = _origShowTab.apply(this, arguments);
+        setHeaderHeightVar();
+        scrollAppToTop();
+        return result;
+      };
+    }
+    // Initial sync
+    window.addEventListener('load', setHeaderHeightVar);
+    window.addEventListener('resize', setHeaderHeightVar);
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    // Expose helpers if you want to call them manually
+    window._scrollAppToTop = scrollAppToTop;
+    window._setHeaderHeightVar = setHeaderHeightVar;
+  })();
+</script>
+
 </body>
 </html>
