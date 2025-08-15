@@ -2402,9 +2402,6 @@ function handleNewUserSignup(user) {
     // Add setup mode class
     document.body.classList.add('setup-active');
     
-    // Set padding for just progress banner (no demo banner)
-    document.body.style.paddingTop = '40px';
-    
     // Show setup form
     document.getElementById('setup-form').classList.remove('hidden');
     document.getElementById('setup-form').style.display = 'block';
@@ -2645,13 +2642,7 @@ function showDemoBanner() {
   const progressBanner = document.getElementById('onboarding-progress');
   if (progressBanner) {
     progressBanner.setAttribute('data-sticky', 'topbar'); // <-- important
-    // Remove hard-coded offsets so our auto-offset can do its job
-    progressBanner.style.top = '';     // was '37px'
-    progressBanner.style.zIndex = '';  // was '60'
   }
-
-  // Remove the body padding hack; our script will compute the real offset
-  document.body.style.paddingTop = '';
 
   // Recompute the combined top offset (banner + stepper)
   if (window.refreshTopOffset) window.refreshTopOffset();
@@ -2789,6 +2780,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Optional helper if you ever need to force a refresh manually
     window.refreshHeaderOffset = setHeaderHeightVar;
+  })();
+</script>
+<script>
+  (function () {
+    function computeTopOffset() {
+      // All elements we tagged as top bars
+      var bars = document.querySelectorAll('[data-sticky="topbar"]');
+      var total = 0;
+
+      bars.forEach(function (el) {
+        var style = window.getComputedStyle(el);
+        // Only count those that are visible
+        if (style.display === 'none' || style.visibility === 'hidden') return;
+
+        // If positioned fixed/sticky and touching the top, use its box height.
+        var rect = el.getBoundingClientRect();
+        var isFixedLike = (style.position === 'fixed' || style.position === 'sticky');
+        if (isFixedLike && Math.round(rect.top) <= 0) {
+          total += Math.round(rect.height);
+        } else {
+          // If it's in normal flow above the content, its height still contributes
+          total += Math.round(el.offsetHeight);
+        }
+      });
+
+      document.documentElement.style.setProperty('--top-offset', total + 'px');
+    }
+
+    // Recompute on load & resize
+    window.addEventListener('load', computeTopOffset);
+    window.addEventListener('resize', computeTopOffset);
+
+    // Auto-recompute whenever any top bar changes height (e.g., step 1→2)
+    if ('ResizeObserver' in window) {
+      var ro = new ResizeObserver(computeTopOffset);
+      document.querySelectorAll('[data-sticky="topbar"]').forEach(function (el) { ro.observe(el); });
+    }
+
+    // Expose a manual hook if you toggle banners via JS
+    window.refreshTopOffset = computeTopOffset;
   })();
 </script>
 
