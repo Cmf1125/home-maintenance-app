@@ -2735,6 +2735,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-</script>           
+</script>
+<script>
+  (function () {
+    function _scrollToTop() {
+      // Scroll the page itself to the top (works regardless of which container scrolls)
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    // Make available for manual calls if needed
+    window._scrollToTop = _scrollToTop;
+
+    // If your app uses showTab('dashboard' | 'calendar' | ...), wrap it to always start at top
+    if (typeof window.showTab === 'function') {
+      const _orig = window.showTab;
+      window.showTab = function () {
+        const ret = _orig.apply(this, arguments);
+        // Give the DOM a tick to render, then jump to top
+        requestAnimationFrame(_scrollToTop);
+        return ret;
+      };
+    }
+
+    // Optional: when you finish login or exit setup, call this:
+    //   window._scrollToTop();
+  })();
+</script>
+
 </body>
 </html>
