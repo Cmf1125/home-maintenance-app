@@ -647,3 +647,19 @@ input[type="checkbox"]:checked::after {
 /* Prevent any slide/fade animations on the dropdown itself */
 #settings-dropdown { transition: none !important; }
 
+/* ===== Mobile scroll polish (safe, minimal) ===== */
+
+/* Let the browser do momentum scrolling where it actually scrolls */
+html, body {
+  -webkit-overflow-scrolling: touch;   /* iOS momentum */
+  -webkit-text-size-adjust: 100%;      /* avoid font zoom jumps */
+}
+
+/* Reduce edge ‘rubber-band’ chaining if a nested scroller exists somewhere */
+html, body {
+  overscroll-behavior-y: contain;      /* keeps bounce modest on mobile */
+}
+
+/* Avoid accidental animations that can feel jerky */
+* { scroll-behavior: auto; }           /* we control smoothness via JS when desired */
+
