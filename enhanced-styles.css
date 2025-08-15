@@ -663,3 +663,18 @@ html, body {
 /* Avoid accidental animations that can feel jerky */
 * { scroll-behavior: auto; }           /* we control smoothness via JS when desired */
 
+/* Keep a single source of truth for header height */
+:root { --header-h: 56px; } /* fallback */
+
+/* The spacer takes the exact header height (banner + stepper included) */
+#header-offset { height: var(--header-h); }
+
+/* (You likely already have this) */
+#app-header { position: sticky; top: 0; z-index: 50; }
+
+/* Mobile polish (safe) */
+html, body {
+  -webkit-text-size-adjust: 100%;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
