@@ -2762,6 +2762,29 @@ document.addEventListener('DOMContentLoaded', function() {
     //   window._scrollToTop();
   })();
 </script>
+<script>
+  (function () {
+    function setHeaderHeightVar() {
+      var header = document.getElementById('app-header');
+      var h = header ? header.offsetHeight : 56;
+      document.documentElement.style.setProperty('--header-h', h + 'px');
+    }
+
+    // Keep the value correct on load/resize and whenever header size changes
+    window.addEventListener('load', setHeaderHeightVar);
+    window.addEventListener('resize', setHeaderHeightVar);
+
+    // Auto-update when banners/steppers show/hide/change height
+    var header = document.getElementById('app-header');
+    if (header && 'ResizeObserver' in window) {
+      var ro = new ResizeObserver(setHeaderHeightVar);
+      ro.observe(header);
+    }
+
+    // Optional helper if you ever need to force a refresh manually
+    window.refreshHeaderOffset = setHeaderHeightVar;
+  })();
+</script>
 
 </body>
 </html>
