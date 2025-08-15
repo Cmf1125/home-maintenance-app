@@ -322,3 +322,99 @@ body.main-app-active .sticky {
     opacity: 0.5 !important;
 }
 */
+/* COMPLETE BANNER SPACING FIX - Add this to clean-layout.css */
+
+/* ========================================
+   SETUP FORM CONTENT SPACING FIXES
+   ======================================== */
+
+/* CRITICAL FIX 1: Remove conflicting padding from setup-form */
+#setup-form.main-content.pt-20 {
+    padding-top: 1rem !important; /* Override the pt-20 class */
+}
+
+/* CRITICAL FIX 2: Add proper spacing to the white card container */
+#setup-form .bg-white.rounded-xl.p-6.shadow-lg.max-w-md.mx-auto {
+    margin-top: 1.5rem !important; /* Space below banners */
+}
+
+/* CRITICAL FIX 3: Ensure all onboarding steps have proper spacing */
+.onboarding-step {
+    margin-top: 0 !important; /* Reset any inherited margin */
+    padding-top: 0 !important; /* Reset any inherited padding */
+}
+
+/* CRITICAL FIX 4: The step content container gets breathing room */
+#setup-form .space-y-6 {
+    margin-top: 0.5rem !important;
+}
+
+/* MOBILE: Extra space for mobile setup */
+@media (max-width: 768px) {
+    #setup-form .bg-white.rounded-xl.p-6.shadow-lg.max-w-md.mx-auto {
+        margin-top: 2rem !important; /* More space on mobile */
+    }
+    
+    /* Extra mobile spacing for step content */
+    #setup-form .space-y-6 {
+        margin-top: 1rem !important;
+    }
+}
+
+/* ========================================
+   PROPERTY CONFIRMATION & TASK SETUP
+   ======================================== */
+
+/* These were already working, but keeping for completeness */
+#property-confirmation .bg-white.rounded-xl.p-6.shadow-lg,
+#task-setup .bg-white.rounded-xl.p-6.shadow-lg {
+    margin-top: 1.5rem !important;
+}
+
+@media (max-width: 768px) {
+    #property-confirmation .bg-white.rounded-xl.p-6.shadow-lg,
+    #task-setup .bg-white.rounded-xl.p-6.shadow-lg {
+        margin-top: 2rem !important;
+    }
+}
+
+/* ========================================
+   DASHBOARD PROTECTION (NO GAPS)
+   ======================================== */
+
+/* CRITICAL: Ensure dashboard never gets setup spacing */
+body.main-app-active #dashboard-view,
+body.main-app-active .main-content {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* CRITICAL: Stats grid should sit right under header */
+body.main-app-active .sticky.top-16 {
+    top: 0 !important;
+    position: static !important;
+    background: transparent !important;
+    padding: 1rem !important;
+    margin: 0 !important;
+    z-index: auto !important;
+}
+
+/* ========================================
+   REMOVE CELEBRATION ANIMATIONS
+   ======================================== */
+
+.success-message {
+    display: none !important;
+}
+
+.step-completed {
+    /* Remove animation */
+}
+
+.checkmark-animation {
+    /* Remove animation */
+}
+
+.progress-celebration {
+    /* Remove animation */
+}
