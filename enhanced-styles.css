@@ -647,3 +647,67 @@ input[type="checkbox"]:checked::after {
 /* Prevent any slide/fade animations on the dropdown itself */
 #settings-dropdown { transition: none !important; }
 
+/* ========== Mobile foundation & scrolling ========== */
+
+/* Prevent body from rubber-banding; make a single controlled scroller */
+html, body {
+  height: 100%;
+  overflow: hidden;                 /* no body scroll */
+  -webkit-text-size-adjust: 100%;   /* avoid zoom jumps on iOS */
+}
+
+/* App shell fills the viewport and uses a single inner scroller */
+#app-root, .app-shell {
+  min-height: 100dvh;               /* modern viewport unit for mobile */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sticky header stays at top; content scrolls underneath */
+#app-header {
+  position: sticky; top: 0;
+  z-index: 50;                      /* above content */
+  /* visual tidy; adjust to taste */
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 0;
+  box-shadow: none;
+  background: #fff;
+}
+
+/* The ONLY scrollable area */
+#app-content {
+  flex: 1 1 auto;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;  /* momentum on iOS */
+  overscroll-behavior: contain;       /* reduce bounce/edge glow on Android/Chrome */
+  scroll-behavior: auto;              /* we’ll control when to smooth */
+  scroll-padding-top: var(--header-h, 56px); /* anchors start below header */
+}
+
+/* Ensure screens/panels start below banners/headers */
+.screen,
+.view,
+.tab-panel {
+  padding-top: 0;                     /* content itself has no fake offset */
+  scroll-margin-top: var(--header-h, 56px);
+}
+
+/* Optional: slightly stronger hover for menu items (touch-friendly) */
+.touch-btn { -webkit-tap-highlight-color: rgba(0,0,0,0.05); }
+
+/* Avoid accidental transitions that cause “jumps” */
+#settings-dropdown { transition: none !important; }
+
+/* Avoid extra scrollbars inside cards/lists */
+.card, .panel, .list {
+  overflow: visible; /* allow children to show; the container scrolls */
+}
+
+/* Larger touch targets for mobile */
+button, .btn, .touch-btn, .nav-item {
+  min-height: 44px;           /* Apple HIG */
+  padding: 10px 12px;
+}
+
+/* Comfortable base font on mobile */
+html { font-size: 16px; }
