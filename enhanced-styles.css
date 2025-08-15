@@ -678,3 +678,23 @@ html, body {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
 }
+
+/* --- Content should start below any top bars (banner/stepper/header) --- */
+:root { --top-offset: 0px; }
+
+/* Apply the computed offset to your main content area(s).
+   If you have a single wrapper like #main-app or a #app-content, include it here. */
+#setup-form,
+#property-confirmation,
+#task-setup,
+#main-app,
+#dashboard-view,
+#appliances-view,
+#documents-view,
+#all-tasks-view {
+  padding-top: var(--top-offset);
+}
+
+/* Make sure we don't accidentally animate this */
+* { scroll-behavior: auto; }
+
