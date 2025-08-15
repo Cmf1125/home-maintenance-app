@@ -202,14 +202,12 @@
 </div> <!-- Closes: flex items-center justify-between -->
 </div> <!-- Closes: px-4 py-4 -->
 </div> <!-- Closes: bg-white shadow-sm border-b sticky -->
-<!-- Auto spacer so content always starts below the header/banner -->
-<div id="header-offset" aria-hidden="true"></div>
 
 <!-- Simplified Setup Form -->
 <div id="setup-form" class="hidden p-4 main-content pt-20">
     
 <!-- Compact blue progress banner -->
-<div id="onboarding-progress" class="hidden fixed top-0 left-0 right-0 z-50 bg-blue-600" data-sticky="topbar">
+<div id="onboarding-progress" class="hidden fixed top-0 left-0 right-0 z-50 bg-blue-600">
   <div class="flex items-center justify-center py-2">
     <div class="flex items-center gap-3">
       <span id="step-1-dot" class="w-7 h-7 rounded-full bg-white text-blue-600 flex items-center justify-center text-sm font-bold">1</span>
@@ -731,7 +729,7 @@
         <div id="main-app" class="hidden">
             <div class="main-content">
         <!-- Enhanced Dashboard View -->
-        <div id="dashboard-view">
+        <div id="dashboard-view" class="p-4">
         <!-- Interactive Stats Grid - Now Sticky and Mobile Optimized -->
         <div class="sticky top-16 z-30 bg-gray-50 pb-4 mb-6">
             <div class="grid grid-cols-3 gap-2 sm:gap-4">
@@ -2402,6 +2400,9 @@ function handleNewUserSignup(user) {
     // Add setup mode class
     document.body.classList.add('setup-active');
     
+    // Set padding for just progress banner (no demo banner)
+    document.body.style.paddingTop = '40px';
+    
     // Show setup form
     document.getElementById('setup-form').classList.remove('hidden');
     document.getElementById('setup-form').style.display = 'block';
@@ -2625,27 +2626,27 @@ function startDemo() {
 }
 
 function showDemoBanner() {
-  const banner = document.createElement('div');
-  banner.className = 'fixed top-0 left-0 right-0 bg-blue-50 border-b border-blue-200 text-center demo-banner';
-  banner.style.zIndex = '70';
-  banner.setAttribute('data-sticky', 'topbar'); // <-- measure this bar
-
-  banner.innerHTML = `
-    <div class="py-2 px-4">
-      <span class="text-sm text-blue-700 font-medium">🚀 Demo Mode - Exploring features</span>
-    </div>
-  `;
-
-  document.body.appendChild(banner);
-
-  // Mark the progress/stepper bar as a topbar too
-  const progressBanner = document.getElementById('onboarding-progress');
-  if (progressBanner) {
-    progressBanner.setAttribute('data-sticky', 'topbar'); // <-- important
-  }
-
-  // Recompute the combined top offset (banner + stepper)
-  if (window.refreshTopOffset) window.refreshTopOffset();
+    const banner = document.createElement('div');
+    banner.className = 'fixed top-0 left-0 right-0 bg-blue-50 border-b border-blue-200 text-center demo-banner';
+    banner.style.zIndex = '70';
+    
+    banner.innerHTML = `
+        <div class="py-2 px-4">
+            <span class="text-sm text-blue-700 font-medium">🚀 Demo Mode - Exploring features</span>
+        </div>
+    `;
+    
+    document.body.appendChild(banner);
+    
+    // Move progress banner down 
+    const progressBanner = document.getElementById('onboarding-progress');
+    if (progressBanner) {
+        progressBanner.style.top = '37px'; // Slightly smaller demo banner
+        progressBanner.style.zIndex = '60';
+    }
+    
+    // Adjusted padding
+    document.body.style.paddingTop = '75px'; // 37px demo + 38px progress
 }
     
 // Override save functions for demo mode
@@ -2734,92 +2735,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-</script>
-<script>
-  (function () {
-    function _scrollToTop() {
-      // Scroll the page itself to the top (works regardless of which container scrolls)
-      window.scrollTo({ top: 0, behavior: 'auto' });
-    }
-    // Make available for manual calls if needed
-    window._scrollToTop = _scrollToTop;
-
-    // If your app uses showTab('dashboard' | 'calendar' | ...), wrap it to always start at top
-    if (typeof window.showTab === 'function') {
-      const _orig = window.showTab;
-      window.showTab = function () {
-        const ret = _orig.apply(this, arguments);
-        // Give the DOM a tick to render, then jump to top
-        requestAnimationFrame(_scrollToTop);
-        return ret;
-      };
-    }
-
-    // Optional: when you finish login or exit setup, call this:
-    //   window._scrollToTop();
-  })();
-</script>
-<script>
-  (function () {
-    function setHeaderHeightVar() {
-      var header = document.getElementById('app-header');
-      var h = header ? header.offsetHeight : 56;
-      document.documentElement.style.setProperty('--header-h', h + 'px');
-    }
-
-    // Keep the value correct on load/resize and whenever header size changes
-    window.addEventListener('load', setHeaderHeightVar);
-    window.addEventListener('resize', setHeaderHeightVar);
-
-    // Auto-update when banners/steppers show/hide/change height
-    var header = document.getElementById('app-header');
-    if (header && 'ResizeObserver' in window) {
-      var ro = new ResizeObserver(setHeaderHeightVar);
-      ro.observe(header);
-    }
-
-    // Optional helper if you ever need to force a refresh manually
-    window.refreshHeaderOffset = setHeaderHeightVar;
-  })();
-</script>
-
-<script>
-  (function () {
-    function computeTopOffset() {
-      // All elements you tagged as bars that overlay content
-      var bars = document.querySelectorAll('[data-sticky="topbar"]');
-      var total = 0;
-
-      bars.forEach(function (el) {
-        var cs = getComputedStyle(el);
-        var rect = el.getBoundingClientRect();
-        var isFixed = cs.position === 'fixed';
-        var isStickyStuck = (cs.position === 'sticky' && Math.round(rect.top) <= 0);
-
-        // Only count overlaying bars
-        if (isFixed || isStickyStuck) {
-          total += Math.round(rect.height);
-        }
-      });
-
-      document.documentElement.style.setProperty('--top-offset', total + 'px');
-    }
-
-    // Run on load & resize
-    window.addEventListener('load', computeTopOffset);
-    window.addEventListener('resize', computeTopOffset);
-
-    // Update automatically when a bar changes size
-    if ('ResizeObserver' in window) {
-      var ro = new ResizeObserver(computeTopOffset);
-      document.querySelectorAll('[data-sticky="topbar"]').forEach(function (el) { ro.observe(el); });
-    }
-
-    // Expose a manual hook for when you show/hide demo banner/stepper via JS
-    window.refreshTopOffset = computeTopOffset;
-  })();
-</script>
-
-
+</script>           
 </body>
 </html>
