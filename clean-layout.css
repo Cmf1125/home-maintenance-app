@@ -28,6 +28,11 @@ body:has(#login-screen:not(.hidden)):not(.main-app-active) {
     bottom: 0 !important;
     z-index: 9999 !important;
     background: #f9fafb !important;
+    padding-top: 2rem !important; /* Override any centering */
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    display: block !important; /* Override flex centering */
+    overflow-y: auto !important; /* Allow scrolling */
 }
 
 /* Only override specific elements that might add top spacing */
