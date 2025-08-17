@@ -9,6 +9,32 @@ body {
     overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
+/* LOGIN SCREEN: AGGRESSIVE RESET - No spacing at all */
+body:has(#login-screen:not(.hidden)) {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Force override any conflicting styles */
+body:has(#login-screen:not(.hidden)):not(.main-app-active) {
+    padding-top: 0 !important;
+}
+
+#login-screen:not(.hidden) {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 9999 !important;
+    background: #f9fafb !important;
+}
+
+/* Only override specific elements that might add top spacing */
+body:has(#login-screen:not(.hidden)) .main-content {
+    padding-top: 0 !important;
+}
+
 .main-content {
     padding-top: 0 !important;
     padding-bottom: 20px;
@@ -38,42 +64,49 @@ body:not(.main-app-active) .bg-white.shadow-sm.border-b.sticky {
     display: none !important;
 }
 
-/* Progress banner always shows during setup */
+/* Progress banner always shows during setup - FIXED STICKY */
 body:not(.main-app-active) #onboarding-progress {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
+    width: 100%;
     z-index: 60;
     height: 40px;
     display: block !important;
 }
 
-/* Demo banner only for demo users */
+/* Demo banner only for demo users - FIXED STICKY (ON TOP) */
 body:not(.main-app-active).demo-mode .demo-banner {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 70;
-    height: 35px;
+    width: 100%;
+    z-index: 70; /* Higher z-index to be on top */
+    height: 40px;
     display: block !important;
+    border: none !important;
 }
 
-/* Adjust progress banner position when demo banner is present */
+/* When both banners are present, progress banner sits below demo banner */
 body:not(.main-app-active).demo-mode #onboarding-progress {
-    top: 35px;
+    position: fixed;
+    top: 40px; /* Sits below 40px demo banner */
+    left: 0;
+    right: 0;
     z-index: 60;
 }
 
-/* Set body padding for banners during setup */
+/* Add padding to body when banners are present */
 body:not(.main-app-active) {
-    padding-top: 40px; /* Progress banner space */
+    padding-top: 40px !important; /* Space for progress banner */
 }
 
 body:not(.main-app-active).demo-mode {
-    padding-top: 75px; /* Demo + progress banner space */
+    padding-top: 80px !important; /* Space for both banners */
 }
+
 
 /* ========================================
    JOURNEY 3: MAIN APP (Sticky Header Only - No Banners)
@@ -165,26 +198,23 @@ body.main-app-active .bottom-nav {
    MOBILE ADJUSTMENTS
    ======================================== */
 @media (max-width: 768px) {
-    /* Mobile banner adjustments */
+    /* Mobile banner adjustments - no padding needed with pushdown */
     body:not(.main-app-active) {
-        padding-top: 35px; /* Smaller mobile banners */
+        padding-top: 0;
     }
     
     body:not(.main-app-active).demo-mode {
-        padding-top: 65px; /* Demo + progress */
+        padding-top: 0;
     }
     
     #onboarding-progress {
-        height: 35px;
+        height: 40px;
     }
     
     .demo-banner {
-        height: 30px;
+        height: 40px; /* Match progress banner height */
     }
-    
-    body:not(.main-app-active).demo-mode #onboarding-progress {
-        top: 30px;
-    }
+}
     
     /* Mobile settings dropdown */
     #settings-dropdown {

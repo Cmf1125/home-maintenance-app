@@ -204,10 +204,10 @@
 </div> <!-- Closes: bg-white shadow-sm border-b sticky -->
 
 <!-- Simplified Setup Form -->
-<div id="setup-form" class="hidden p-4 main-content pt-20">
+<div id="setup-form" class="hidden p-4 main-content">
     
 <!-- Compact blue progress banner -->
-<div id="onboarding-progress" class="hidden fixed top-0 left-0 right-0 z-50 bg-blue-600">
+<div id="onboarding-progress" class="hidden fixed top-0 left-0 right-0 bg-blue-600" style="z-index: 60; height: 40px;">
   <div class="flex items-center justify-center py-2">
     <div class="flex items-center gap-3">
       <span id="step-1-dot" class="w-7 h-7 rounded-full bg-white text-blue-600 flex items-center justify-center text-sm font-bold">1</span>
@@ -2336,6 +2336,19 @@ function signOutUser() {
         document.getElementById('main-app').classList.add('hidden');
         document.body.classList.remove('main-app-active');
         
+        // Force reset all spacing for login screen
+        document.body.style.paddingTop = '0';
+        document.body.style.marginTop = '0';
+        
+        // Make sure login screen starts at absolute top
+        const loginScreen = document.getElementById('login-screen');
+        if (loginScreen) {
+            loginScreen.style.position = 'absolute';
+            loginScreen.style.top = '0';
+            loginScreen.style.left = '0';
+            loginScreen.style.right = '0';
+        }
+        
         alert('👋 You have been signed out successfully!');
         
     }).catch((error) => {
@@ -2436,6 +2449,21 @@ auth.onAuthStateChanged((user) => {
         document.getElementById('setup-form').classList.add('hidden');
         document.getElementById('main-app').classList.add('hidden');
         document.body.classList.remove('main-app-active');
+        
+        // NUCLEAR OPTION: Force login screen to absolute top
+        const loginScreen = document.getElementById('login-screen');
+        if (loginScreen) {
+            loginScreen.style.position = 'fixed';
+            loginScreen.style.top = '0';
+            loginScreen.style.left = '0';
+            loginScreen.style.right = '0';
+            loginScreen.style.bottom = '0';
+            loginScreen.style.zIndex = '9999';
+        }
+        
+        // Remove ALL CSS classes and force reset
+        document.body.className = '';
+        document.body.style.cssText = 'padding: 0 !important; margin: 0 !important; overflow-x: hidden;';
     }
     
     // Reset the flag after a short delay
@@ -2623,8 +2651,9 @@ function startDemo() {
 
 function showDemoBanner() {
     const banner = document.createElement('div');
-    banner.className = 'fixed top-0 left-0 right-0 bg-blue-50 border-b border-blue-200 text-center demo-banner';
+    banner.className = 'fixed top-0 left-0 right-0 bg-blue-50 text-center demo-banner';
     banner.style.zIndex = '70';
+    banner.style.height = '35px';
     
     banner.innerHTML = `
         <div class="py-2 px-4">
@@ -2634,15 +2663,19 @@ function showDemoBanner() {
     
     document.body.appendChild(banner);
     
-    // Move progress banner down 
+    // Move progress banner down to sit flush below demo banner
     const progressBanner = document.getElementById('onboarding-progress');
     if (progressBanner) {
-        progressBanner.style.top = '37px'; // Slightly smaller demo banner
+        progressBanner.style.position = 'fixed';
+        progressBanner.style.top = '35px';
+        progressBanner.style.left = '0';
+        progressBanner.style.right = '0';
         progressBanner.style.zIndex = '60';
+        progressBanner.style.height = '40px';
     }
     
-    // Adjusted padding
-    document.body.style.paddingTop = '75px'; // 37px demo + 38px progress
+    // Set body padding for both banners (35px demo + 40px progress = 75px)
+    document.body.style.paddingTop = '75px';
 }
     
 // Override save functions for demo mode
