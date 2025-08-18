@@ -175,6 +175,18 @@
     class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
   >
     <div class="py-2">
+  <!-- Documents - Featured prominently -->
+  <button onclick="showTab('documents'); closeSettingsDropdown()"
+          class="w-full text-left px-4 py-2 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-3">
+    <span>📄</span>
+    <div class="flex-1">
+      <div class="font-medium">Documents</div>
+      <div class="text-xs text-gray-500">Manuals, warranties, receipts</div>
+    </div>
+  </button>
+  
+  <div class="border-t border-gray-100 my-1"></div>
+  
   <button onclick="exportTaskList(); closeSettingsDropdown()"
           class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
     <span>📋</span><span>Export Tasks</span>
@@ -793,6 +805,72 @@
             <!-- appliances content will be rendered here -->
         </div>
         
+        <!-- Marketplace View -->
+        <div id="marketplace-view" class="hidden p-4">
+            <div class="max-w-4xl mx-auto">
+                <!-- Header -->
+                <div class="text-center mb-6">
+                    <h1 class="text-2xl font-bold text-gray-900 mb-2">🛍️ Home Maintenance Shop</h1>
+                    <p class="text-gray-600">Essential tools and supplies for your home maintenance tasks</p>
+                </div>
+
+                <!-- Featured Categories -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                    <!-- HVAC Category -->
+                    <div class="bg-white rounded-xl p-6 shadow-lg border border-blue-100">
+                        <div class="text-center mb-4">
+                            <div class="text-4xl mb-2">🌡️</div>
+                            <h3 class="text-lg font-semibold text-gray-900">HVAC & Air Quality</h3>
+                            <p class="text-sm text-gray-600">Filters, thermostats, maintenance tools</p>
+                        </div>
+                        <div class="space-y-3" id="hvac-products">
+                            <!-- HVAC products will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Water Systems Category -->
+                    <div class="bg-white rounded-xl p-6 shadow-lg border border-cyan-100">
+                        <div class="text-center mb-4">
+                            <div class="text-4xl mb-2">💧</div>
+                            <h3 class="text-lg font-semibold text-gray-900">Water Systems</h3>
+                            <p class="text-sm text-gray-600">Filters, testing kits, treatments</p>
+                        </div>
+                        <div class="space-y-3" id="water-products">
+                            <!-- Water products will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Safety & Security Category -->
+                    <div class="bg-white rounded-xl p-6 shadow-lg border border-red-100">
+                        <div class="text-center mb-4">
+                            <div class="text-4xl mb-2">⚠️</div>
+                            <h3 class="text-lg font-semibold text-gray-900">Safety & Security</h3>
+                            <p class="text-sm text-gray-600">Detectors, alarms, emergency supplies</p>
+                        </div>
+                        <div class="space-y-3" id="safety-products">
+                            <!-- Safety products will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Essential Tool Kits -->
+                <div class="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-6 mb-8 border border-orange-200">
+                    <h2 class="text-xl font-bold text-gray-900 mb-4">🔧 Essential Tool Kits</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="toolkit-products">
+                        <!-- Tool kits will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Seasonal Maintenance -->
+                <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 border border-green-200">
+                    <h2 class="text-xl font-bold text-gray-900 mb-4">🌱 Seasonal Maintenance</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="seasonal-products">
+                        <!-- Seasonal products will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Documents View -->
         <div id="documents-view" class="hidden">
             <!-- Documents content will be rendered here by documents.js -->
@@ -831,9 +909,9 @@
             <div class="text-lg mb-1">⚙️</div>
             <div class="text-xs">Appliances</div>
         </button>
-        <button onclick="showTab('documents')" id="tab-documents" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-            <div class="text-lg mb-1">📄</div>
-            <div class="text-xs">Documents</div>
+        <button onclick="showTab('marketplace')" id="tab-marketplace" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
+            <div class="text-lg mb-1">🛍️</div>
+            <div class="text-xs">Shop</div>
         </button>
     </div>
 </div>
@@ -1690,6 +1768,7 @@
 
     <!-- ✅ Core Scripts go here -->
     <script src="date-utils.js"></script>
+    <script src="marketplace.js"></script>
     <script src="app.js"></script>
     <script src="calendar.js"></script>
     <script src="enhanced-dashboard.js"></script>

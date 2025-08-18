@@ -1465,7 +1465,7 @@ function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
 
     // UNIFIED: Always ensure header is visible on all main tabs
-    if (['dashboard', 'calendar', 'appliances', 'documents'].includes(tabName)) {
+    if (['dashboard', 'calendar', 'appliances', 'documents', 'marketplace'].includes(tabName)) {
         // Ensure main-app-active class is set (makes header sticky)
         document.body.classList.add('main-app-active');
         // Remove any conflicting header classes
@@ -1497,11 +1497,13 @@ function showTab(tabName) {
     const calendarView = document.getElementById('calendar-view');
     const documentsView = document.getElementById('documents-view');
     const appliancesView = document.getElementById('appliances-view');
+    const marketplaceView = document.getElementById('marketplace-view');
 
     if (dashboardView) dashboardView.classList.add('hidden');
     if (calendarView) calendarView.classList.add('hidden');
     if (documentsView) documentsView.classList.add('hidden');
     if (appliancesView) appliancesView.classList.add('hidden');
+    if (marketplaceView) marketplaceView.classList.add('hidden');
     if (allTasksView) allTasksView.classList.add('hidden');
     
     // Update tab buttons
@@ -1638,6 +1640,31 @@ function showTab(tabName) {
             
         } catch (error) {
             console.error('❌ Error initializing appliances:', error);
+        }
+    } else if (tabName === 'marketplace') {
+        // Show marketplace view
+        if (marketplaceView) {
+            marketplaceView.classList.remove('hidden');
+        }
+        
+        // Update tab styling  
+        const marketplaceTab = document.getElementById('tab-marketplace');
+        if (marketplaceTab) {
+            marketplaceTab.classList.add('bg-blue-100', 'text-blue-700');
+            marketplaceTab.classList.remove('text-gray-600');
+        }
+        
+        console.log('🛍️ Switching to marketplace tab...');
+        
+        // Initialize marketplace products
+        try {
+            if (window.marketplaceManager && typeof window.marketplaceManager.renderMarketplace === 'function') {
+                window.marketplaceManager.renderMarketplace();
+            } else {
+                console.log('🛍️ Marketplace manager not found, using basic display');
+            }
+        } catch (error) {
+            console.error('❌ Error initializing marketplace:', error);
         }
     }
     
