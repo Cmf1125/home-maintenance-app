@@ -2080,6 +2080,15 @@ window.rescheduleTaskFromDashboard = function(taskId, event) {
             task.dueDate = newDate;
             task.nextDue = newDate;
             
+            // Debug logging for Google Calendar sync
+            console.log('🔍 Debug - Google Calendar status:', {
+                hasGoogleCalendarSync: !!window.googleCalendarSync,
+                isConnected: window.googleCalendarSync?.isConnected(),
+                taskHasEventId: !!task.googleEventId,
+                taskId: task.id,
+                taskTitle: task.title
+            });
+            
             // Sync reschedule to Google Calendar if connected
             if (window.googleCalendarSync && window.googleCalendarSync.isConnected() && task.googleEventId) {
                 console.log('📅 Syncing reschedule to Google Calendar...');
