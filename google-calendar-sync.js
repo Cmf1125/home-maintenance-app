@@ -1,4 +1,4 @@
-// Google Calendar Integration Module
+// Google Calendar Integration Module - Modern Google Identity Services
 // Syncs maintenance tasks with user's Google Calendar
 
 console.log('📅 Loading Google Calendar Sync module...');
@@ -7,15 +7,41 @@ class GoogleCalendarSync {
     constructor() {
         // Google API Configuration
         this.CLIENT_ID = '111292310649-ck87c3fe6t549623rmkarrmqnnjnsqh0.apps.googleusercontent.com';
-        this.API_KEY = ''; // Optional - can work without API key for OAuth flow
         this.DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
         this.SCOPES = 'https://www.googleapis.com/auth/calendar';
         
         this.isSignedIn = false;
         this.gapi = null;
-        this.maintenanceCalendarId = null; // Will store the ID of our "Home Maintenance" calendar
+        this.accessToken = null;
+        this.maintenanceCalendarId = null;
         
         console.log('📅 Google Calendar Sync initialized');
+        
+        // Initialize when page loads
+        this.initializeWhenReady();
+    }
+
+    // Wait for scripts to load then initialize
+    async initializeWhenReady() {
+        // Wait for both Google APIs to load
+        await this.waitForGoogleAPIs();
+        await this.initializeGoogleAPI();
+    }
+
+    // Wait for Google scripts to be available
+    waitForGoogleAPIs() {
+        return new Promise((resolve) => {
+            const checkAPIs = () => {
+                if (window.gapi && window.google && window.google.accounts) {
+                    console.log('✅ Google APIs ready');
+                    resolve();
+                } else {
+                    console.log('⏳ Waiting for Google APIs...');
+                    setTimeout(checkAPIs, 100);
+                }
+            };
+            checkAPIs();
+        });
     }
 
     // Initialize Google API
@@ -23,43 +49,18 @@ class GoogleCalendarSync {
         try {
             console.log('🔄 Initializing Google Calendar API...');
             
-            // Load Google API script if not already loaded
-            if (!window.gapi) {
-                await this.loadGoogleAPIScript();
-            }
-
             this.gapi = window.gapi;
 
-            // Load auth2 and client
-            await new Promise((resolve) => {
-                this.gapi.load('auth2', resolve);
-            });
-            
+            // Initialize the API client
             await new Promise((resolve) => {
                 this.gapi.load('client', resolve);
             });
 
-            const initConfig = {
-                clientId: this.CLIENT_ID,
-                discoveryDocs: [this.DISCOVERY_DOC],
-                scope: this.SCOPES
-            };
-
-            // Only add API key if it exists
-            if (this.API_KEY) {
-                initConfig.apiKey = this.API_KEY;
-            }
-
-            await this.gapi.client.init(initConfig);
-
-            // Check if user is already signed in
-            const authInstance = this.gapi.auth2.getAuthInstance();
-            if (authInstance) {
-                this.isSignedIn = authInstance.isSignedIn.get();
-            }
+            await this.gapi.client.init({
+                discoveryDocs: [this.DISCOVERY_DOC]
+            });
 
             console.log('✅ Google Calendar API initialized');
-            console.log('🔐 Signed in status:', this.isSignedIn);
             return true;
         } catch (error) {
             console.error('❌ Error initializing Google Calendar API:', error);
@@ -67,49 +68,47 @@ class GoogleCalendarSync {
         }
     }
 
-    // Load Google API script dynamically
-    loadGoogleAPIScript() {
-        return new Promise((resolve, reject) => {
-            if (window.gapi) {
-                resolve();
-                return;
-            }
-
-            const script = document.createElement('script');
-            script.src = 'https://apis.google.com/js/api.js';
-            script.onload = () => {
-                console.log('📦 Google API script loaded');
-                resolve();
-            };
-            script.onerror = reject;
-            document.head.appendChild(script);
-        });
-    }
-
-    // Sign in to Google Calendar
+    // Sign in to Google Calendar using modern OAuth
     async signInToGoogle() {
         try {
             if (!this.gapi) {
-                const initialized = await this.initializeGoogleAPI();
-                if (!initialized) {
-                    throw new Error('Failed to initialize Google API');
-                }
+                throw new Error('Google API not initialized');
             }
 
             console.log('🔐 Signing in to Google Calendar...');
-            const authInstance = this.gapi.auth2.getAuthInstance();
-            
-            if (!authInstance.isSignedIn.get()) {
-                await authInstance.signIn();
-            }
 
-            this.isSignedIn = true;
-            console.log('✅ Successfully signed in to Google Calendar');
+            // Use Google Identity Services for OAuth
+            return new Promise((resolve, reject) => {
+                const tokenClient = window.google.accounts.oauth2.initTokenClient({
+                    client_id: this.CLIENT_ID,
+                    scope: this.SCOPES,
+                    callback: async (response) => {
+                        if (response.error) {
+                            console.error('OAuth error:', response.error);
+                            this.showUserError('Failed to connect to Google Calendar');
+                            reject(new Error(response.error));
+                            return;
+                        }
 
-            // Create or find the Home Maintenance calendar
-            await this.setupMaintenanceCalendar();
+                        console.log('✅ OAuth token received');
+                        this.accessToken = response.access_token;
+                        this.isSignedIn = true;
 
-            return true;
+                        // Set the access token for API calls
+                        this.gapi.client.setToken({ access_token: this.accessToken });
+
+                        // Create or find the Home Maintenance calendar
+                        await this.setupMaintenanceCalendar();
+                        
+                        this.showUserMessage('✅ Connected to Google Calendar!');
+                        resolve(true);
+                    }
+                });
+
+                // Request access token
+                tokenClient.requestAccessToken();
+            });
+
         } catch (error) {
             console.error('❌ Error signing in to Google Calendar:', error);
             this.showUserError('Failed to connect to Google Calendar. Please try again.');
@@ -120,13 +119,17 @@ class GoogleCalendarSync {
     // Sign out from Google Calendar
     async signOutFromGoogle() {
         try {
-            if (this.gapi && this.isSignedIn) {
-                const authInstance = this.gapi.auth2.getAuthInstance();
-                await authInstance.signOut();
-                this.isSignedIn = false;
-                this.maintenanceCalendarId = null;
-                console.log('👋 Signed out from Google Calendar');
+            if (this.accessToken && window.google && window.google.accounts.oauth2) {
+                window.google.accounts.oauth2.revoke(this.accessToken);
             }
+            
+            this.isSignedIn = false;
+            this.accessToken = null;
+            this.maintenanceCalendarId = null;
+            this.gapi.client.setToken(null);
+            
+            console.log('👋 Signed out from Google Calendar');
+            this.showUserMessage('Disconnected from Google Calendar');
         } catch (error) {
             console.error('❌ Error signing out:', error);
         }
@@ -362,7 +365,6 @@ class GoogleCalendarSync {
 
     // Show user-friendly messages
     showUserMessage(message) {
-        // You can customize this to match your app's notification system
         console.log('📢', message);
         // Could integrate with your existing toast/notification system
     }
@@ -374,7 +376,7 @@ class GoogleCalendarSync {
 
     // Check connection status
     isConnected() {
-        return this.isSignedIn && this.maintenanceCalendarId;
+        return this.isSignedIn && this.accessToken && this.maintenanceCalendarId;
     }
 
     // Get connection info for UI
@@ -382,8 +384,7 @@ class GoogleCalendarSync {
         return {
             connected: this.isConnected(),
             calendarId: this.maintenanceCalendarId,
-            userEmail: this.isSignedIn && this.gapi ? 
-                this.gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getEmail() : null
+            userEmail: null // Would need additional API call to get user info
         };
     }
 }
