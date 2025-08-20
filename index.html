@@ -1880,6 +1880,43 @@ window.saveTaskFromEdit = function() {
         if (index !== -1) window.tasks[index] = task;
     }
     
+    // Sync to Google Calendar if connected
+    if (window.googleCalendarSync && window.googleCalendarSync.isConnected()) {
+        if (isNew) {
+            // New task - create calendar event
+            console.log('📅 Syncing new task to Google Calendar...');
+            window.googleCalendarSync.syncTaskToCalendar(task).then((eventId) => {
+                if (eventId) {
+                    task.googleEventId = eventId;
+                    if (typeof saveData === 'function') saveData();
+                    console.log('✅ New task synced to Google Calendar');
+                }
+            }).catch(error => {
+                console.error('❌ Failed to sync new task to Google Calendar:', error);
+            });
+        } else if (task.googleEventId) {
+            // Existing task with calendar event - update it
+            console.log('📅 Updating Google Calendar event for edited task...');
+            window.googleCalendarSync.updateCalendarEvent(task).then(() => {
+                console.log('✅ Google Calendar event updated for edited task');
+            }).catch(error => {
+                console.error('❌ Failed to update Google Calendar event:', error);
+            });
+        } else {
+            // Existing task without calendar event - create one
+            console.log('📅 Creating Google Calendar event for edited task...');
+            window.googleCalendarSync.syncTaskToCalendar(task).then((eventId) => {
+                if (eventId) {
+                    task.googleEventId = eventId;
+                    if (typeof saveData === 'function') saveData();
+                    console.log('✅ Google Calendar event created for edited task');
+                }
+            }).catch(error => {
+                console.error('❌ Failed to create Google Calendar event:', error);
+            });
+        }
+    }
+    
     // Save and refresh
     if (typeof saveData === 'function') saveData();
     if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
@@ -2042,6 +2079,16 @@ window.rescheduleTaskFromDashboard = function(taskId, event) {
         if (task) {
             task.dueDate = newDate;
             task.nextDue = newDate;
+            
+            // Sync reschedule to Google Calendar if connected
+            if (window.googleCalendarSync && window.googleCalendarSync.isConnected() && task.googleEventId) {
+                console.log('📅 Syncing reschedule to Google Calendar...');
+                window.googleCalendarSync.updateCalendarEvent(task).then(() => {
+                    console.log('✅ Google Calendar event updated for reschedule');
+                }).catch(error => {
+                    console.error('❌ Failed to update Google Calendar event:', error);
+                });
+            }
             
             if (typeof saveData === 'function') saveData();
             if (window.enhancedDashboard?.render) window.enhancedDashboard.render();
