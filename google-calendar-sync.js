@@ -186,10 +186,19 @@ class GoogleCalendarSync {
 
             // Ensure proper date format (YYYY-MM-DD for all-day events)
             let dueDate = task.dueDate;
-            if (dueDate && !dueDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                // Convert to proper format if needed
-                const date = new Date(dueDate);
-                dueDate = date.toISOString().split('T')[0];
+            if (dueDate) {
+                // Convert to string if it's not already
+                if (typeof dueDate !== 'string') {
+                    const date = new Date(dueDate);
+                    dueDate = date.toISOString().split('T')[0];
+                } else if (!dueDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    // Convert to proper format if needed
+                    const date = new Date(dueDate);
+                    dueDate = date.toISOString().split('T')[0];
+                }
+            } else {
+                // Default to today if no due date
+                dueDate = new Date().toISOString().split('T')[0];
             }
 
             // Prepare event details
@@ -289,9 +298,19 @@ class GoogleCalendarSync {
 
             // Ensure proper date format
             let dueDate = task.dueDate;
-            if (dueDate && !dueDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                const date = new Date(dueDate);
-                dueDate = date.toISOString().split('T')[0];
+            if (dueDate) {
+                // Convert to string if it's not already
+                if (typeof dueDate !== 'string') {
+                    const date = new Date(dueDate);
+                    dueDate = date.toISOString().split('T')[0];
+                } else if (!dueDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    // Convert to proper format if needed
+                    const date = new Date(dueDate);
+                    dueDate = date.toISOString().split('T')[0];
+                }
+            } else {
+                // Default to today if no due date
+                dueDate = new Date().toISOString().split('T')[0];
             }
 
             const eventData = {
