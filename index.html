@@ -2059,21 +2059,9 @@ window.rescheduleTaskFromDashboard = function(taskId, event) {
     
     // Helper functions for this modal
     window.setNewDate = function(days) {
-        const today = new Date();
         const newDate = new Date();
         newDate.setDate(newDate.getDate() + days);
-        const newDateString = newDate.toISOString().split('T')[0];
-        
-        console.log(`📅 Quick date: Adding ${days} days to today (${today.toLocaleDateString()}) = ${newDate.toLocaleDateString()}`);
-        console.log(`📅 Setting date field to: ${newDateString}`);
-        
-        const dateField = document.getElementById('new-task-date');
-        if (dateField) {
-            dateField.value = newDateString;
-            console.log(`📅 Date field now shows: ${dateField.value}`);
-        } else {
-            console.error('❌ Date field not found!');
-        }
+        document.getElementById('new-task-date').value = newDate.toISOString().split('T')[0];
     };
     
     window.closeRescheduleModal = function() {
@@ -2091,15 +2079,6 @@ window.rescheduleTaskFromDashboard = function(taskId, event) {
         if (task) {
             task.dueDate = newDate;
             task.nextDue = newDate;
-            
-            // Debug logging for Google Calendar sync
-            console.log('🔍 Debug - Google Calendar status:', {
-                hasGoogleCalendarSync: !!window.googleCalendarSync,
-                isConnected: window.googleCalendarSync?.isConnected(),
-                taskHasEventId: !!task.googleEventId,
-                taskId: task.id,
-                taskTitle: task.title
-            });
             
             // Sync reschedule to Google Calendar if connected
             if (window.googleCalendarSync && window.googleCalendarSync.isConnected() && task.googleEventId) {
