@@ -158,6 +158,30 @@ class MarketplaceManager {
                         description: 'Professional caulking kit'
                     }
                 ]
+            },
+            'dryer vent': {
+                products: [
+                    {
+                        name: 'Dryer Vent Cleaning Kit with Brush',
+                        price: '$24.99', // TODO: Update with real Amazon price
+                        rating: '4.3/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_DRYER_KIT', // TODO: Research on Amazon
+                        category: 'HVAC',
+                        description: 'Complete dryer vent cleaning system',
+                        priority: 'HIGH', // Safety-related, annual maintenance
+                        estCommission: '$2-4'
+                    },
+                    {
+                        name: 'Flexible Dryer Vent Brush (10ft)',
+                        price: '$19.99', // TODO: Update with real Amazon price
+                        rating: '4.2/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_DRYER_BRUSH', // TODO: Research on Amazon
+                        category: 'HVAC',
+                        description: 'Long flexible brush for deep cleaning',
+                        priority: 'MEDIUM',
+                        estCommission: '$1-3'
+                    }
+                ]
             }
         };
     }
