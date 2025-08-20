@@ -182,28 +182,30 @@ class GoogleCalendarSync {
             }
 
             console.log('📅 Syncing task to Google Calendar:', task.title);
+            console.log('📅 Task due date:', task.dueDate);
+
+            // Ensure proper date format (YYYY-MM-DD for all-day events)
+            let dueDate = task.dueDate;
+            if (dueDate && !dueDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                // Convert to proper format if needed
+                const date = new Date(dueDate);
+                dueDate = date.toISOString().split('T')[0];
+            }
 
             // Prepare event details
             const eventData = {
                 summary: `🏠 ${task.title}`,
                 description: this.createEventDescription(task),
                 start: {
-                    date: task.dueDate, // All-day event
-                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                    date: dueDate // All-day event requires YYYY-MM-DD format
                 },
                 end: {
-                    date: task.dueDate, // All-day event
-                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                    date: dueDate // All-day event requires YYYY-MM-DD format
                 },
-                colorId: this.getCategoryColor(task.category),
-                extendedProperties: {
-                    private: {
-                        homeKeeperTaskId: task.id.toString(),
-                        homeKeeperCategory: task.category,
-                        homeKeeperPriority: task.priority || 'normal'
-                    }
-                }
+                colorId: this.getCategoryColor(task.category)
             };
+
+            console.log('📅 Event data:', eventData);
 
             // Create the event
             const event = await this.gapi.client.calendar.events.insert({
@@ -219,7 +221,7 @@ class GoogleCalendarSync {
                 if (taskIndex !== -1) {
                     window.tasks[taskIndex].googleEventId = event.result.id;
                     // Save to Firebase if user is logged in
-                    if (window.currentUser) {
+                    if (window.currentUser && typeof saveData === 'function') {
                         saveData();
                     }
                 }
@@ -228,6 +230,7 @@ class GoogleCalendarSync {
             return event.result.id;
         } catch (error) {
             console.error('❌ Error syncing task to Google Calendar:', error);
+            console.error('❌ Full error details:', JSON.stringify(error, null, 2));
             return null;
         }
     }
@@ -284,16 +287,21 @@ class GoogleCalendarSync {
 
             console.log('🔄 Updating Google Calendar event for:', task.title);
 
+            // Ensure proper date format
+            let dueDate = task.dueDate;
+            if (dueDate && !dueDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                const date = new Date(dueDate);
+                dueDate = date.toISOString().split('T')[0];
+            }
+
             const eventData = {
                 summary: `🏠 ${task.title}`,
                 description: this.createEventDescription(task),
                 start: {
-                    date: task.dueDate,
-                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                    date: dueDate
                 },
                 end: {
-                    date: task.dueDate,
-                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                    date: dueDate
                 },
                 colorId: this.getCategoryColor(task.category)
             };
