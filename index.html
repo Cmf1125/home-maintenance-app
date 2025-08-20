@@ -2059,9 +2059,21 @@ window.rescheduleTaskFromDashboard = function(taskId, event) {
     
     // Helper functions for this modal
     window.setNewDate = function(days) {
+        const today = new Date();
         const newDate = new Date();
         newDate.setDate(newDate.getDate() + days);
-        document.getElementById('new-task-date').value = newDate.toISOString().split('T')[0];
+        const newDateString = newDate.toISOString().split('T')[0];
+        
+        console.log(`📅 Quick date: Adding ${days} days to today (${today.toLocaleDateString()}) = ${newDate.toLocaleDateString()}`);
+        console.log(`📅 Setting date field to: ${newDateString}`);
+        
+        const dateField = document.getElementById('new-task-date');
+        if (dateField) {
+            dateField.value = newDateString;
+            console.log(`📅 Date field now shows: ${dateField.value}`);
+        } else {
+            console.error('❌ Date field not found!');
+        }
     };
     
     window.closeRescheduleModal = function() {
