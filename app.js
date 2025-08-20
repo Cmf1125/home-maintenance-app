@@ -30,6 +30,144 @@ function toggleWellWaterOptions() {
 // Make it globally available immediately - CRITICAL FIX
 window.toggleWellWaterOptions = toggleWellWaterOptions;
 
+// ========================================
+// GOOGLE CALENDAR INTEGRATION FUNCTIONS
+// ========================================
+
+// Toggle Google Calendar sync connection
+async function toggleGoogleCalendarSync() {
+    try {
+        if (!window.googleCalendarSync) {
+            console.error('❌ Google Calendar Sync not available');
+            alert('Google Calendar integration is not available. Please refresh the page.');
+            return;
+        }
+
+        const syncStatus = window.googleCalendarSync.getConnectionInfo();
+        
+        if (syncStatus.connected) {
+            // User wants to disconnect
+            const confirm = window.confirm('Disconnect Google Calendar sync? Your existing calendar events will remain, but new tasks won\'t be synced.');
+            if (confirm) {
+                await window.googleCalendarSync.signOutFromGoogle();
+                updateCalendarSyncUI();
+                console.log('👋 Disconnected from Google Calendar');
+            }
+        } else {
+            // User wants to connect
+            console.log('🔄 Connecting to Google Calendar...');
+            const success = await window.googleCalendarSync.signInToGoogle();
+            
+            if (success) {
+                updateCalendarSyncUI();
+                
+                // Ask if they want to sync existing tasks
+                const syncExisting = window.confirm('Would you like to sync your existing maintenance tasks to Google Calendar?');
+                if (syncExisting) {
+                    await window.googleCalendarSync.syncAllTasks();
+                }
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error with Google Calendar sync:', error);
+        alert('Error connecting to Google Calendar. Please check your internet connection and try again.');
+    }
+}
+
+// Update the calendar sync UI based on connection status
+function updateCalendarSyncUI() {
+    const syncTextElement = document.getElementById('calendar-sync-text');
+    const syncStatusElement = document.getElementById('calendar-sync-status');
+    
+    if (!window.googleCalendarSync || !syncTextElement || !syncStatusElement) {
+        return;
+    }
+
+    const connectionInfo = window.googleCalendarSync.getConnectionInfo();
+    
+    if (connectionInfo.connected) {
+        syncTextElement.textContent = 'Google Calendar Connected';
+        syncStatusElement.textContent = connectionInfo.userEmail ? 
+            `Syncing to: ${connectionInfo.userEmail}` : 
+            'Tasks sync to your calendar';
+        syncStatusElement.className = 'text-xs text-green-600';
+    } else {
+        syncTextElement.textContent = 'Connect Google Calendar';
+        syncStatusElement.textContent = 'Sync tasks to your calendar';
+        syncStatusElement.className = 'text-xs text-gray-500';
+    }
+}
+
+// Hook into existing task functions to sync with Google Calendar
+
+// Enhanced task completion to sync with calendar
+async function completeTaskWithCalendarSync(taskId) {
+    // Complete the task normally first
+    completeTask(taskId);
+    
+    // Then handle Google Calendar sync
+    if (window.googleCalendarSync && window.googleCalendarSync.isConnected()) {
+        const task = window.tasks.find(t => t.id === taskId);
+        if (task && task.googleEventId) {
+            await window.googleCalendarSync.deleteCalendarEvent(task);
+        }
+    }
+}
+
+// Enhanced task creation to sync with calendar
+async function addTaskWithCalendarSync(taskData) {
+    // Add the task normally first
+    const taskId = addTask(taskData);
+    
+    // Then sync to Google Calendar if connected
+    if (window.googleCalendarSync && window.googleCalendarSync.isConnected() && taskId) {
+        const task = window.tasks.find(t => t.id === taskId);
+        if (task) {
+            await window.googleCalendarSync.syncTaskToCalendar(task);
+        }
+    }
+    
+    return taskId;
+}
+
+// Enhanced task editing to sync changes with calendar  
+async function updateTaskWithCalendarSync(taskId, updates) {
+    // Update the task normally first
+    const taskIndex = window.tasks.findIndex(t => t.id === taskId);
+    if (taskIndex === -1) return;
+    
+    // Apply updates
+    Object.assign(window.tasks[taskIndex], updates);
+    
+    // Save data
+    if (window.currentUser) {
+        saveData();
+    }
+    
+    // Then sync changes to Google Calendar if connected
+    if (window.googleCalendarSync && window.googleCalendarSync.isConnected()) {
+        const task = window.tasks[taskIndex];
+        if (task.googleEventId) {
+            await window.googleCalendarSync.updateCalendarEvent(task);
+        } else {
+            // Task doesn't have a calendar event yet, create one
+            await window.googleCalendarSync.syncTaskToCalendar(task);
+        }
+    }
+    
+    // Refresh UI
+    if (window.enhancedDashboard) {
+        window.enhancedDashboard.render();
+    }
+}
+
+// Make functions globally available
+window.toggleGoogleCalendarSync = toggleGoogleCalendarSync;
+window.updateCalendarSyncUI = updateCalendarSyncUI;
+window.completeTaskWithCalendarSync = completeTaskWithCalendarSync;
+window.addTaskWithCalendarSync = addTaskWithCalendarSync;
+window.updateTaskWithCalendarSync = updateTaskWithCalendarSync;
+
 // Climate region detection
 function getClimateRegion(state) {
     const stateUpper = state.toUpperCase();

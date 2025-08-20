@@ -187,6 +187,18 @@
   
   <div class="border-t border-gray-100 my-1"></div>
   
+  <!-- Google Calendar Sync -->
+  <button id="google-calendar-btn" onclick="toggleGoogleCalendarSync(); closeSettingsDropdown()"
+          class="w-full text-left px-4 py-2 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-3">
+    <span>📅</span>
+    <div class="flex-1">
+      <div class="font-medium" id="calendar-sync-text">Connect Google Calendar</div>
+      <div class="text-xs text-gray-500" id="calendar-sync-status">Sync tasks to your calendar</div>
+    </div>
+  </button>
+  
+  <div class="border-t border-gray-100 my-1"></div>
+  
   <button onclick="exportTaskList(); closeSettingsDropdown()"
           class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
     <span>📋</span><span>Export Tasks</span>
@@ -1769,6 +1781,7 @@
     <!-- ✅ Core Scripts go here -->
     <script src="date-utils.js"></script>
     <script src="marketplace.js"></script>
+    <script src="google-calendar-sync.js"></script>
     <script src="app.js"></script>
     <script src="calendar.js"></script>
     <script src="enhanced-dashboard.js"></script>
