@@ -228,6 +228,259 @@ class MarketplaceManager {
                         estCommission: '$2-3'
                     }
                 ]
+            },
+            // HVAC Feature Products
+            'mini split': {
+                products: [
+                    {
+                        name: 'Mini Split Filter Replacement Set',
+                        price: '$24.99', // TODO: Update with real Amazon price
+                        rating: '4.4/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_MINI_SPLIT_FILTER', // TODO: Research on Amazon
+                        category: 'HVAC',
+                        description: 'Compatible filters for most mini split systems',
+                        priority: 'HIGH',
+                        estCommission: '$2-4'
+                    },
+                    {
+                        name: 'Mini Split Cleaning Spray Kit',
+                        price: '$19.99', // TODO: Update with real Amazon price
+                        rating: '4.3/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_MINI_SPLIT_CLEANER', // TODO: Research on Amazon
+                        category: 'HVAC',
+                        description: 'Professional cleaning solution for mini splits',
+                        priority: 'MEDIUM',
+                        estCommission: '$1-3'
+                    }
+                ]
+            },
+            'wall ac': {
+                products: [
+                    {
+                        name: 'Universal Wall AC Filter Pack',
+                        price: '$18.99', // TODO: Update with real Amazon price
+                        rating: '4.2/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_WALL_AC_FILTER', // TODO: Research on Amazon
+                        category: 'HVAC',
+                        description: 'Multiple sizes for wall AC units',
+                        priority: 'HIGH',
+                        estCommission: '$1-3'
+                    }
+                ]
+            },
+            'baseboard': {
+                products: [
+                    {
+                        name: 'Baseboard Heater Cleaning Kit',
+                        price: '$16.99', // TODO: Update with real Amazon price
+                        rating: '4.1/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_BASEBOARD_CLEANER', // TODO: Research on Amazon
+                        category: 'HVAC',
+                        description: 'Specialized tools for baseboard heater maintenance',
+                        priority: 'MEDIUM',
+                        estCommission: '$1-2'
+                    }
+                ]
+            },
+            'boiler': {
+                products: [
+                    {
+                        name: 'Boiler Treatment Chemical Kit',
+                        price: '$34.99', // TODO: Update with real Amazon price
+                        rating: '4.5/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_BOILER_TREATMENT', // TODO: Research on Amazon
+                        category: 'HVAC',
+                        description: 'Annual boiler system maintenance chemicals',
+                        priority: 'HIGH',
+                        estCommission: '$2-5'
+                    }
+                ]
+            },
+            // Water System Feature Products
+            'well water': {
+                products: [
+                    {
+                        name: 'Well Water Test Kit',
+                        price: '$24.99', // TODO: Update with real Amazon price
+                        rating: '4.4/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_WELL_TEST_KIT', // TODO: Research on Amazon
+                        category: 'Water Systems',
+                        description: 'Comprehensive water quality testing',
+                        priority: 'HIGH',
+                        estCommission: '$2-4'
+                    }
+                ]
+            },
+            'sediment filter': {
+                products: [
+                    {
+                        name: 'Sediment Filter Cartridge 3-Pack',
+                        price: '$29.99', // TODO: Update with real Amazon price
+                        rating: '4.6/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_SEDIMENT_FILTER', // TODO: Research on Amazon
+                        category: 'Water Systems',
+                        description: 'Standard 10-inch sediment filters',
+                        priority: 'HIGH',
+                        estCommission: '$2-4'
+                    }
+                ]
+            },
+            'uv filter': {
+                products: [
+                    {
+                        name: 'UV Sterilizer Replacement Lamp',
+                        price: '$39.99', // TODO: Update with real Amazon price
+                        rating: '4.5/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_UV_LAMP', // TODO: Research on Amazon
+                        category: 'Water Systems',
+                        description: 'Annual replacement UV lamp for water sterilization',
+                        priority: 'HIGH',
+                        estCommission: '$3-6'
+                    }
+                ]
+            },
+            'water softener': {
+                products: [
+                    {
+                        name: 'Water Softener Salt (40 lb bag)',
+                        price: '$8.99', // TODO: Update with real Amazon price
+                        rating: '4.7/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_WATER_SOFTENER_SALT', // TODO: Research on Amazon
+                        category: 'Water Systems',
+                        description: 'High purity salt for water softener systems',
+                        priority: 'HIGH',
+                        estCommission: '$0.50-1'
+                    },
+                    {
+                        name: 'Water Softener Cleaner & Sanitizer',
+                        price: '$12.99', // TODO: Update with real Amazon price
+                        rating: '4.4/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_SOFTENER_CLEANER', // TODO: Research on Amazon
+                        category: 'Water Systems',
+                        description: 'Annual cleaning and sanitizing solution',
+                        priority: 'MEDIUM',
+                        estCommission: '$1-2'
+                    }
+                ]
+            },
+            'septic': {
+                products: [
+                    {
+                        name: 'Septic Tank Treatment (12 months)',
+                        price: '$24.99', // TODO: Update with real Amazon price
+                        rating: '4.3/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_SEPTIC_TREATMENT', // TODO: Research on Amazon
+                        category: 'Water Systems',
+                        description: 'Biological septic system treatment',
+                        priority: 'HIGH',
+                        estCommission: '$2-4'
+                    }
+                ]
+            },
+            // Home Feature Products
+            'fireplace': {
+                products: [
+                    {
+                        name: 'Chimney Cleaning Log',
+                        price: '$16.99', // TODO: Update with real Amazon price
+                        rating: '4.2/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_CHIMNEY_LOG', // TODO: Research on Amazon
+                        category: 'Safety',
+                        description: 'Reduces creosote buildup in chimneys',
+                        priority: 'MEDIUM',
+                        estCommission: '$1-2'
+                    }
+                ]
+            },
+            'chimney': {
+                products: [
+                    {
+                        name: 'Chimney Cap and Screen Kit',
+                        price: '$49.99', // TODO: Update with real Amazon price
+                        rating: '4.4/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_CHIMNEY_CAP', // TODO: Research on Amazon
+                        category: 'Safety',
+                        description: 'Prevent animals and debris from entering',
+                        priority: 'HIGH',
+                        estCommission: '$4-8'
+                    }
+                ]
+            },
+            'pool': {
+                products: [
+                    {
+                        name: 'Pool Chemical Test Kit',
+                        price: '$19.99', // TODO: Update with real Amazon price
+                        rating: '4.5/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_POOL_TEST_KIT', // TODO: Research on Amazon
+                        category: 'Pool & Spa',
+                        description: 'Complete water testing solution',
+                        priority: 'HIGH',
+                        estCommission: '$1-3'
+                    },
+                    {
+                        name: 'Pool Shock Treatment (6-Pack)',
+                        price: '$34.99', // TODO: Update with real Amazon price
+                        rating: '4.6/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_POOL_SHOCK', // TODO: Research on Amazon
+                        category: 'Pool & Spa',
+                        description: 'Essential pool sanitizer',
+                        priority: 'HIGH',
+                        estCommission: '$2-5'
+                    }
+                ]
+            },
+            'deck': {
+                products: [
+                    {
+                        name: 'Deck Stain and Sealer (1 gallon)',
+                        price: '$39.99', // TODO: Update with real Amazon price
+                        rating: '4.4/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_DECK_STAIN', // TODO: Research on Amazon
+                        category: 'Exterior',
+                        description: 'Weather protection for wood decks',
+                        priority: 'HIGH',
+                        estCommission: '$3-6'
+                    },
+                    {
+                        name: 'Deck Cleaning Solution',
+                        price: '$22.99', // TODO: Update with real Amazon price
+                        rating: '4.3/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_DECK_CLEANER', // TODO: Research on Amazon
+                        category: 'Exterior',
+                        description: 'Removes dirt, mildew, and old stain',
+                        priority: 'MEDIUM',
+                        estCommission: '$2-3'
+                    }
+                ]
+            },
+            'garage': {
+                products: [
+                    {
+                        name: 'Garage Door Lubricant Kit',
+                        price: '$18.99', // TODO: Update with real Amazon price
+                        rating: '4.5/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_GARAGE_LUBE', // TODO: Research on Amazon
+                        category: 'General',
+                        description: 'Complete garage door maintenance kit',
+                        priority: 'MEDIUM',
+                        estCommission: '$1-3'
+                    }
+                ]
+            },
+            'basement': {
+                products: [
+                    {
+                        name: 'Basement Dehumidifier',
+                        price: '$149.99', // TODO: Update with real Amazon price
+                        rating: '4.4/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_DEHUMIDIFIER', // TODO: Research on Amazon
+                        category: 'General',
+                        description: 'Prevent moisture and mold in basements',
+                        priority: 'HIGH',
+                        estCommission: '$8-15'
+                    }
+                ]
             }
         };
     }
