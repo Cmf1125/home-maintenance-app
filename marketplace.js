@@ -62,18 +62,18 @@ class MarketplaceManager {
             'smoke detector': {
                 products: [
                     {
-                        name: 'First Alert Smoke Detector (2-Pack)',
-                        price: '$19.99', 
-                        rating: '4.4/5',
-                        amazonASIN: 'REPLACE_WITH_REAL_ASIN', // Go to Amazon, find product, copy ASIN from URL
+                        name: 'SITERWELL Smoke Detector(2-Pack)',
+                        price: '$26.39', 
+                        rating: '4.5/5',
+                        amazonASIN: 'B0DJNGHB58', // Go to Amazon, find product, copy ASIN from URL
                         category: 'Safety',
                         description: 'Battery-powered photoelectric sensor'
                     },
                     {
-                        name: 'Kidde 10-Year Smoke Detector',
-                        price: '$34.99',
+                        name: 'First Alert Carbon Monoxide Detector',
+                        price: '$19.99',
                         rating: '4.6/5',
-                        amazonASIN: 'B00F0DTAOG',
+                        amazonASIN: 'B000N8OYXI',
                         category: 'Safety',
                         description: 'Long-life battery, no maintenance'
                     }
@@ -162,25 +162,15 @@ class MarketplaceManager {
             'dryer vent': {
                 products: [
                     {
-                        name: 'Dryer Vent Cleaning Kit with Brush',
-                        price: '$24.99', // TODO: Update with real Amazon price
-                        rating: '4.3/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_DRYER_KIT', // TODO: Research on Amazon
-                        category: 'HVAC',
+                        name: 'Sealegend 37-Piece 33-Feet Dryer Vent Cleaner Kit',
+                        price: '$27.95', // TODO: Update with real Amazon price
+                        rating: '4.5/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B09HH2CVG5', // TODO: Research on Amazon
+                        category: 'Safety',
                         description: 'Complete dryer vent cleaning system',
                         priority: 'HIGH', // Safety-related, annual maintenance
                         estCommission: '$2-4'
                     },
-                    {
-                        name: 'Flexible Dryer Vent Brush (10ft)',
-                        price: '$19.99', // TODO: Update with real Amazon price
-                        rating: '4.2/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_DRYER_BRUSH', // TODO: Research on Amazon
-                        category: 'HVAC',
-                        description: 'Long flexible brush for deep cleaning',
-                        priority: 'MEDIUM',
-                        estCommission: '$1-3'
-                    }
                 ]
             }
         };
