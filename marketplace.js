@@ -163,14 +163,70 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Sealegend 37-Piece 33-Feet Dryer Vent Cleaner Kit',
-                        price: '$27.95', // TODO: Update with real Amazon price
-                        rating: '4.5/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'B09HH2CVG5', // TODO: Research on Amazon
+                        price: '$27.95',
+                        rating: '4.5/5',
+                        amazonASIN: 'B09HH2CVG5',
                         category: 'Safety',
                         description: 'Complete dryer vent cleaning system',
                         priority: 'HIGH', // Safety-related, annual maintenance
                         estCommission: '$2-4'
-                    },
+                    }
+                ]
+            },
+            'battery': {
+                products: [
+                    {
+                        name: 'Energizer AA/AAA Battery Variety Pack',
+                        price: '$19.99', // TODO: Update with real Amazon price
+                        rating: '4.6/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_BATTERIES', // TODO: Research on Amazon
+                        category: 'General',
+                        description: 'Long-lasting batteries for smoke detectors and devices',
+                        priority: 'HIGH', // Recurring need
+                        estCommission: '$1-3'
+                    }
+                ]
+            },
+            'filter': {
+                products: [
+                    {
+                        name: 'Universal Air Filter Multi-Pack',
+                        price: '$34.99', // TODO: Update with real Amazon price
+                        rating: '4.4/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_UNIVERSAL_FILTER', // TODO: Research on Amazon
+                        category: 'HVAC',
+                        description: 'Common sizes for HVAC and air purifier systems',
+                        priority: 'HIGH',
+                        estCommission: '$2-5'
+                    }
+                ]
+            },
+            'clean': {
+                products: [
+                    {
+                        name: 'All-Purpose Cleaning Kit',
+                        price: '$27.99', // TODO: Update with real Amazon price
+                        rating: '4.3/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_CLEANING_KIT', // TODO: Research on Amazon
+                        category: 'General',
+                        description: 'Multi-surface cleaner perfect for maintenance tasks',
+                        priority: 'MEDIUM',
+                        estCommission: '$2-4'
+                    }
+                ]
+            },
+            'pipe': {
+                products: [
+                    {
+                        name: 'Pipe Insulation Kit',
+                        price: '$22.99', // TODO: Update with real Amazon price
+                        rating: '4.2/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'RESEARCH_NEEDED_PIPE_INSULATION', // TODO: Research on Amazon
+                        category: 'Water Systems',
+                        description: 'Prevent pipe freezing and improve efficiency',
+                        priority: 'SEASONAL',
+                        estCommission: '$2-3'
+                    }
                 ]
             }
         };
