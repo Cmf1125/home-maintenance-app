@@ -36,10 +36,10 @@ class MarketplaceManager {
             'hvac filter': {
                 products: [
                     {
-                        name: 'Filtrete 16x25x1 Air Filter (6-Pack)',
-                        price: '$24.99', // TODO: Update with real Amazon price
-                        rating: '4.5/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_FILTRETE', // TODO: Research on Amazon
+                        name: 'Filtrete 16x25x1 Air Filter (4-Pack)',
+                        price: '$39.58', // TODO: Update with real Amazon price
+                        rating: '4.8/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B005GZ89WU', // TODO: Research on Amazon
                         category: 'HVAC',
                         description: 'Captures dust, pollen, and allergens',
                         sizes: ['16x25x1', '20x25x1', '16x20x1'],
@@ -47,13 +47,13 @@ class MarketplaceManager {
                         estCommission: '$2-5'
                     },
                     {
-                        name: 'Nordic Pure 16x25x1 MERV 12 (12-Pack)',
-                        price: '$49.99', // TODO: Update with real Amazon price
+                        name: 'Simply 20x20x1 Air Filter, Merv 8 (6-Pack)',
+                        price: '$35.07', // TODO: Update with real Amazon price
                         rating: '4.7/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_NORDIC', // TODO: Research on Amazon
+                        amazonASIN: 'B07G2KT7FN', // TODO: Research on Amazon
                         category: 'HVAC',
                         description: 'Premium filtration for better air quality',
-                        sizes: ['16x25x1', '20x25x1', '16x20x1'],
+                        sizes: ['20x20x1'],
                         priority: 'HIGH',
                         estCommission: '$3-8'
                     }
@@ -102,18 +102,18 @@ class MarketplaceManager {
             'water filter': {
                 products: [
                     {
-                        name: 'Whole House Sediment Filter (3-Pack)',
-                        price: '$24.99',
-                        rating: '4.5/5',
-                        amazonASIN: 'B001E5PY5Q',
+                        name: 'Viqua CMB-510-HF Sediment Filter 5 Micron 4.5" x 10"',
+                        price: '$25.99',
+                        rating: '4.7/5',
+                        amazonASIN: 'B00ZD30POA',
                         category: 'Water',
                         description: 'Removes sediment and rust'
                     },
                     {
-                        name: 'UV Water Sterilizer System',
-                        price: '$199.99',
-                        rating: '4.8/5',
-                        amazonASIN: 'B08XWATER1',
+                        name: 'Viqua S200RL-HO Replacement UV Lamp for VH200 System',
+                        price: '$93.67',
+                        rating: '4.6/5',
+                        amazonASIN: 'B002WDMHPO',
                         category: 'Water',
                         description: 'Kills bacteria and viruses'
                     }
@@ -177,9 +177,9 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Energizer AA/AAA Battery Variety Pack',
-                        price: '$19.99', // TODO: Update with real Amazon price
-                        rating: '4.6/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_BATTERIES', // TODO: Research on Amazon
+                        price: '$19.63', // TODO: Update with real Amazon price
+                        rating: '4.8/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B087GMJXMC', // TODO: Research on Amazon
                         category: 'General',
                         description: 'Long-lasting batteries for smoke detectors and devices',
                         priority: 'HIGH', // Recurring need
@@ -190,10 +190,10 @@ class MarketplaceManager {
             'filter': {
                 products: [
                     {
-                        name: 'Universal Air Filter Multi-Pack',
-                        price: '$34.99', // TODO: Update with real Amazon price
-                        rating: '4.4/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_UNIVERSAL_FILTER', // TODO: Research on Amazon
+                        name: 'Aerostar 20x25x1 MERV 13 - 6 Count',
+                        price: '$64.95', // TODO: Update with real Amazon price
+                        rating: '4.6/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B01CR9JLDI', // TODO: Research on Amazon
                         category: 'HVAC',
                         description: 'Common sizes for HVAC and air purifier systems',
                         priority: 'HIGH',
@@ -204,12 +204,22 @@ class MarketplaceManager {
             'clean': {
                 products: [
                     {
-                        name: 'All-Purpose Cleaning Kit',
-                        price: '$27.99', // TODO: Update with real Amazon price
-                        rating: '4.3/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_CLEANING_KIT', // TODO: Research on Amazon
+                        name: 'ARM & HAMMER Baking Soda 2.7lb',
+                        price: '$6.79', // TODO: Update with real Amazon price
+                        rating: '4.8/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B0CJCXLDSP', // TODO: Research on Amazon
                         category: 'General',
-                        description: 'Multi-surface cleaner perfect for maintenance tasks',
+                        description: 'All purpose for cleaning with vinegar',
+                        priority: 'MEDIUM',
+                        estCommission: '$2-4'
+                    }
+                     {
+                        name: '30% Vinegar – Pure Concentrated Active-Force Vinegar for Cleaning 128 oz (2)',
+                        price: '$39.48', // TODO: Update with real Amazon price
+                        rating: '4.8/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B0DNV967D8', // TODO: Research on Amazon
+                        category: 'General',
+                        description: 'All purpose for cleaning',
                         priority: 'MEDIUM',
                         estCommission: '$2-4'
                     }
@@ -218,10 +228,10 @@ class MarketplaceManager {
             'pipe': {
                 products: [
                     {
-                        name: 'Pipe Insulation Kit',
-                        price: '$22.99', // TODO: Update with real Amazon price
-                        rating: '4.2/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_PIPE_INSULATION', // TODO: Research on Amazon
+                        name: 'Frost King HC3A Automatic Electric Heat Kit Heating Cables, 3 Feet, Black',
+                        price: '$21.16', // TODO: Update with real Amazon price
+                        rating: '4.6/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B000IKSQ8U', // TODO: Research on Amazon
                         category: 'Water Systems',
                         description: 'Prevent pipe freezing and improve efficiency',
                         priority: 'SEASONAL',
@@ -233,34 +243,34 @@ class MarketplaceManager {
             'mini split': {
                 products: [
                     {
-                        name: 'Mini Split Filter Replacement Set',
-                        price: '$24.99', // TODO: Update with real Amazon price
+                        name: 'Mini Split Filter Bundle Compatible with Mitsubishi Electric MAC-2330FT-E and MAC-3000FT-E',
+                        price: '$36.99', // TODO: Update with real Amazon price
                         rating: '4.4/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_MINI_SPLIT_FILTER', // TODO: Research on Amazon
+                        amazonASIN: 'B0DG61JQDT', // TODO: Research on Amazon
                         category: 'HVAC',
                         description: 'Compatible filters for most mini split systems',
                         priority: 'HIGH',
                         estCommission: '$2-4'
                     },
                     {
-                        name: 'Mini Split Cleaning Spray Kit',
-                        price: '$19.99', // TODO: Update with real Amazon price
-                        rating: '4.3/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_MINI_SPLIT_CLEANER', // TODO: Research on Amazon
+                        name: 'Mitsubishi Electric U01 A01 100 Nano Platinum Mini Split Filter 2-Pack',
+                        price: '$46.99', // TODO: Update with real Amazon price
+                        rating: '4.5/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B08LMKWGBZ', // TODO: Research on Amazon
                         category: 'HVAC',
-                        description: 'Professional cleaning solution for mini splits',
-                        priority: 'MEDIUM',
-                        estCommission: '$1-3'
-                    }
+                        description: 'Compatible filters for most mini split systems',
+                        priority: 'HIGH',
+                        estCommission: '$2-4'
+                    },
                 ]
             },
             'wall ac': {
                 products: [
                     {
-                        name: 'Universal Wall AC Filter Pack',
-                        price: '$18.99', // TODO: Update with real Amazon price
-                        rating: '4.2/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_WALL_AC_FILTER', // TODO: Research on Amazon
+                        name: 'Filtrete 16x25x1 AC Furnace Air Filter, MERV 11 4 pack',
+                        price: '$39.58', // TODO: Update with real Amazon price
+                        rating: '4.8/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B005GZ89WU', // TODO: Research on Amazon
                         category: 'HVAC',
                         description: 'Multiple sizes for wall AC units',
                         priority: 'HIGH',
@@ -272,9 +282,9 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Baseboard Heater Cleaning Kit',
-                        price: '$16.99', // TODO: Update with real Amazon price
-                        rating: '4.1/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_BASEBOARD_CLEANER', // TODO: Research on Amazon
+                        price: '$19.99', // TODO: Update with real Amazon price
+                        rating: '4.2/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B0C89V894L', // TODO: Research on Amazon
                         category: 'HVAC',
                         description: 'Specialized tools for baseboard heater maintenance',
                         priority: 'MEDIUM',
@@ -282,28 +292,14 @@ class MarketplaceManager {
                     }
                 ]
             },
-            'boiler': {
-                products: [
-                    {
-                        name: 'Boiler Treatment Chemical Kit',
-                        price: '$34.99', // TODO: Update with real Amazon price
-                        rating: '4.5/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_BOILER_TREATMENT', // TODO: Research on Amazon
-                        category: 'HVAC',
-                        description: 'Annual boiler system maintenance chemicals',
-                        priority: 'HIGH',
-                        estCommission: '$2-5'
-                    }
-                ]
-            },
             // Water System Feature Products
             'well water': {
                 products: [
                     {
-                        name: 'Well Water Test Kit',
-                        price: '$24.99', // TODO: Update with real Amazon price
-                        rating: '4.4/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_WELL_TEST_KIT', // TODO: Research on Amazon
+                        name: 'Drinking Water Test Strips',
+                        price: '$14.98', // TODO: Update with real Amazon price
+                        rating: '4.3/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B0D2RJ1LTM', // TODO: Research on Amazon
                         category: 'Water Systems',
                         description: 'Comprehensive water quality testing',
                         priority: 'HIGH',
@@ -314,12 +310,12 @@ class MarketplaceManager {
             'sediment filter': {
                 products: [
                     {
-                        name: 'Sediment Filter Cartridge 3-Pack',
-                        price: '$29.99', // TODO: Update with real Amazon price
+                        name: 'Aquaboon 5 Micron 10 x 4.5 Well Water Sediment Filter Replacement 4 pack',
+                        price: '$38.07', // TODO: Update with real Amazon price
                         rating: '4.6/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_SEDIMENT_FILTER', // TODO: Research on Amazon
+                        amazonASIN: 'B01LZZA5S7', // TODO: Research on Amazon
                         category: 'Water Systems',
-                        description: 'Standard 10-inch sediment filters',
+                        description: 'Standard 10 x 4.5 sediment filters',
                         priority: 'HIGH',
                         estCommission: '$2-4'
                     }
@@ -329,9 +325,9 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'UV Sterilizer Replacement Lamp',
-                        price: '$39.99', // TODO: Update with real Amazon price
-                        rating: '4.5/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_UV_LAMP', // TODO: Research on Amazon
+                        price: '$104.79', // TODO: Update with real Amazon price
+                        rating: '4.7/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B0050OMXHO', // TODO: Research on Amazon
                         category: 'Water Systems',
                         description: 'Annual replacement UV lamp for water sterilization',
                         priority: 'HIGH',
@@ -342,10 +338,10 @@ class MarketplaceManager {
             'water softener': {
                 products: [
                     {
-                        name: 'Water Softener Salt (40 lb bag)',
-                        price: '$8.99', // TODO: Update with real Amazon price
+                        name: 'Water Softener Salt (3 40lb bag)',
+                        price: '$52.75', // TODO: Update with real Amazon price
                         rating: '4.7/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_WATER_SOFTENER_SALT', // TODO: Research on Amazon
+                        amazonASIN: 'B0DZQJNWZX', // TODO: Research on Amazon
                         category: 'Water Systems',
                         description: 'High purity salt for water softener systems',
                         priority: 'HIGH',
@@ -353,9 +349,9 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Water Softener Cleaner & Sanitizer',
-                        price: '$12.99', // TODO: Update with real Amazon price
-                        rating: '4.4/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_SOFTENER_CLEANER', // TODO: Research on Amazon
+                        price: '$14.97', // TODO: Update with real Amazon price
+                        rating: '4.6/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B00HVX4PSM', // TODO: Research on Amazon
                         category: 'Water Systems',
                         description: 'Annual cleaning and sanitizing solution',
                         priority: 'MEDIUM',
@@ -367,9 +363,9 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Septic Tank Treatment (12 months)',
-                        price: '$24.99', // TODO: Update with real Amazon price
+                        price: '$20.37', // TODO: Update with real Amazon price
                         rating: '4.3/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_SEPTIC_TREATMENT', // TODO: Research on Amazon
+                        amazonASIN: 'B071WMZCFC', // TODO: Research on Amazon
                         category: 'Water Systems',
                         description: 'Biological septic system treatment',
                         priority: 'HIGH',
