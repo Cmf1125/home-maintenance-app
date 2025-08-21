@@ -223,6 +223,26 @@ class MarketplaceManager {
                         priority: 'MEDIUM',
                         estCommission: '$2-4'
                     }
+                    {
+                        name: 'Lysol All Purpose Cleaner Spray',
+                        price: '$3.97', // TODO: Update with real Amazon price
+                        rating: '4.8/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B00QIT9NDW', // TODO: Research on Amazon
+                        category: 'General',
+                        description: 'All purpose for cleaning',
+                        priority: 'MEDIUM',
+                        estCommission: '$2-4'
+                    }
+                    {
+                        name: 'Microfiber cleaning cloths (50 pk)',
+                        price: '$15.99', // TODO: Update with real Amazon price
+                        rating: '4.4/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B07ZF9GTCJ', // TODO: Research on Amazon
+                        category: 'General',
+                        description: 'All purpose for cleaning',
+                        priority: 'MEDIUM',
+                        estCommission: '$2-4'
+                    }
                 ]
             },
             'pipe': {
@@ -377,10 +397,10 @@ class MarketplaceManager {
             'fireplace': {
                 products: [
                     {
-                        name: 'Chimney Cleaning Log',
-                        price: '$16.99', // TODO: Update with real Amazon price
-                        rating: '4.2/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_CHIMNEY_LOG', // TODO: Research on Amazon
+                        name: 'Chimney Cleaning Log 2 pk',
+                        price: '$24.99', // TODO: Update with real Amazon price
+                        rating: '4.5/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B0CHN5JBV3', // TODO: Research on Amazon
                         category: 'Safety',
                         description: 'Reduces creosote buildup in chimneys',
                         priority: 'MEDIUM',
@@ -388,27 +408,13 @@ class MarketplaceManager {
                     }
                 ]
             },
-            'chimney': {
-                products: [
-                    {
-                        name: 'Chimney Cap and Screen Kit',
-                        price: '$49.99', // TODO: Update with real Amazon price
-                        rating: '4.4/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_CHIMNEY_CAP', // TODO: Research on Amazon
-                        category: 'Safety',
-                        description: 'Prevent animals and debris from entering',
-                        priority: 'HIGH',
-                        estCommission: '$4-8'
-                    }
-                ]
-            },
             'pool': {
                 products: [
                     {
-                        name: 'Pool Chemical Test Kit',
-                        price: '$19.99', // TODO: Update with real Amazon price
+                        name: 'Pool and Hot Tub Test Strips',
+                        price: '$9.99', // TODO: Update with real Amazon price
                         rating: '4.5/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_POOL_TEST_KIT', // TODO: Research on Amazon
+                        amazonASIN: 'B0C4L9D87N', // TODO: Research on Amazon
                         category: 'Pool & Spa',
                         description: 'Complete water testing solution',
                         priority: 'HIGH',
@@ -416,9 +422,9 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Pool Shock Treatment (6-Pack)',
-                        price: '$34.99', // TODO: Update with real Amazon price
-                        rating: '4.6/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_POOL_SHOCK', // TODO: Research on Amazon
+                        price: '$25.42', // TODO: Update with real Amazon price
+                        rating: '4.7/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B09R839DJ1', // TODO: Research on Amazon
                         category: 'Pool & Spa',
                         description: 'Essential pool sanitizer',
                         priority: 'HIGH',
@@ -430,21 +436,31 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Deck Stain and Sealer (1 gallon)',
-                        price: '$39.99', // TODO: Update with real Amazon price
-                        rating: '4.4/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_DECK_STAIN', // TODO: Research on Amazon
+                        price: '$34.99', // TODO: Update with real Amazon price
+                        rating: '4.6/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B06XG8Z6SJ', // TODO: Research on Amazon
                         category: 'Exterior',
                         description: 'Weather protection for wood decks',
                         priority: 'HIGH',
                         estCommission: '$3-6'
                     },
                     {
-                        name: 'Deck Cleaning Solution',
-                        price: '$22.99', // TODO: Update with real Amazon price
+                        name: 'Algae Stain Remover Multi-Surface Outdoor Cleaner',
+                        price: '$40.54', // TODO: Update with real Amazon price
                         rating: '4.3/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_DECK_CLEANER', // TODO: Research on Amazon
+                        amazonASIN: 'B0DNGFBN8F', // TODO: Research on Amazon
                         category: 'Exterior',
                         description: 'Removes dirt, mildew, and old stain',
+                        priority: 'MEDIUM',
+                        estCommission: '$2-3'
+                    }
+                    {
+                        name: 'Westinghouse ePX3100v Electric Pressure Washer',
+                        price: '$129.00', // TODO: Update with real Amazon price
+                        rating: '4.7/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B0BX4KL2C8', // TODO: Research on Amazon
+                        category: 'Exterior',
+                        description: 'High powered washer for exterior surfaces',
                         priority: 'MEDIUM',
                         estCommission: '$2-3'
                     }
@@ -453,12 +469,12 @@ class MarketplaceManager {
             'garage': {
                 products: [
                     {
-                        name: 'Garage Door Lubricant Kit',
-                        price: '$18.99', // TODO: Update with real Amazon price
-                        rating: '4.5/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_GARAGE_LUBE', // TODO: Research on Amazon
+                        name: '3-IN-ONE Garage Door Lubricant',
+                        price: '$7.98', // TODO: Update with real Amazon price
+                        rating: '4.7/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B001E5DLVO', // TODO: Research on Amazon
                         category: 'General',
-                        description: 'Complete garage door maintenance kit',
+                        description: 'Keep Garage Door Functioning Smoothly',
                         priority: 'MEDIUM',
                         estCommission: '$1-3'
                     }
@@ -469,8 +485,8 @@ class MarketplaceManager {
                     {
                         name: 'Basement Dehumidifier',
                         price: '$149.99', // TODO: Update with real Amazon price
-                        rating: '4.4/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'RESEARCH_NEEDED_DEHUMIDIFIER', // TODO: Research on Amazon
+                        rating: '4.5/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B0BVZ62Y3M', // TODO: Research on Amazon
                         category: 'General',
                         description: 'Prevent moisture and mold in basements',
                         priority: 'HIGH',
