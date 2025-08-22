@@ -567,21 +567,32 @@ class MarketplaceManager {
 
         // Search through keywords in priority order
         for (const keyword of keywordPriority) {
-            if (this.productDatabase[keyword] && searchText.includes(keyword)) {
-                let products = this.productDatabase[keyword].products;
-                
-                // Filter by appliance-specific details if available
-                if (applianceDetails && keyword === 'hvac filter') {
-                    products = this.getApplianceSpecificProducts(keyword, applianceDetails);
+            if (this.productDatabase[keyword]) {
+                // Handle flexible matching for hyphenated terms
+                let isMatch = false;
+                if (keyword === 'mini split') {
+                    // Match both "mini split" and "mini-split"
+                    isMatch = searchText.includes('mini split') || searchText.includes('mini-split');
+                } else {
+                    isMatch = searchText.includes(keyword);
                 }
                 
-                recommendations.push({
-                    keyword: keyword,
-                    products: products
-                });
-                
-                // Stop after first match to avoid showing multiple categories
-                break;
+                if (isMatch) {
+                    let products = this.productDatabase[keyword].products;
+                    
+                    // Filter by appliance-specific details if available
+                    if (applianceDetails && keyword === 'hvac filter') {
+                        products = this.getApplianceSpecificProducts(keyword, applianceDetails);
+                    }
+                    
+                    recommendations.push({
+                        keyword: keyword,
+                        products: products
+                    });
+                    
+                    // Stop after first match to avoid showing multiple categories
+                    break;
+                }
             }
         }
 
