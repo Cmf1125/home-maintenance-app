@@ -71,7 +71,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'First Alert Carbon Monoxide Detector',
-                        price: '$19.99',
+                        price: '~$19.99',
                         rating: '4.6/5',
                         amazonASIN: 'B000N8OYXI',
                         category: 'Safety',
@@ -83,7 +83,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Gutter Cleaning Tool Kit',
-                        price: '$29.99',
+                        price: '~$29.99',
                         rating: '4.3/5',
                         amazonASIN: 'B07XQZQZQZ',
                         category: 'Exterior',
@@ -91,7 +91,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Gutter Guards (200ft)',
-                        price: '$89.99',
+                        price: '~$89.99',
                         rating: '4.2/5',
                         amazonASIN: 'B08XQZQZQZ',
                         category: 'Exterior',
@@ -103,7 +103,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Viqua CMB-510-HF Sediment Filter 5 Micron 4.5" x 10"',
-                        price: '$25.99',
+                        price: '~$25.99',
                         rating: '4.7/5',
                         amazonASIN: 'B00ZD30POA',
                         category: 'Water',
@@ -111,7 +111,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Viqua S200RL-HO Replacement UV Lamp for VH200 System',
-                        price: '$93.67',
+                        price: '~$93.67',
                         rating: '4.6/5',
                         amazonASIN: 'B002WDMHPO',
                         category: 'Water',
@@ -123,7 +123,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Green Gobbler Drain Cleaner (2-Pack)',
-                        price: '$16.99',
+                        price: '~$16.99',
                         rating: '4.3/5',
                         amazonASIN: 'B0154IFRWY',
                         category: 'Plumbing',
@@ -131,7 +131,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Drain Snake Tool 25ft',
-                        price: '$12.99',
+                        price: '~$12.99',
                         rating: '4.1/5',
                         amazonASIN: 'B07DRAINXX',
                         category: 'Plumbing',
@@ -143,7 +143,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'DAP Silicone Sealant (Clear, 6-Pack)',
-                        price: '$18.99',
+                        price: '~$18.99',
                         rating: '4.4/5',
                         amazonASIN: 'B000BQOXKY',
                         category: 'General',
@@ -151,7 +151,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Caulk Gun + Removal Tool Kit',
-                        price: '$14.99',
+                        price: '~$14.99',
                         rating: '4.2/5',
                         amazonASIN: 'B07CAULKXX',
                         category: 'Tools',
@@ -163,7 +163,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Sealegend 37-Piece 33-Feet Dryer Vent Cleaner Kit',
-                        price: '$27.95',
+                        price: '~$27.95',
                         rating: '4.5/5',
                         amazonASIN: 'B09HH2CVG5',
                         category: 'Safety',
@@ -542,25 +542,57 @@ class MarketplaceManager {
         const searchText = `${taskTitle} ${taskDescription}`.toLowerCase();
         const recommendations = [];
 
-        // Search through product database
-        for (const [keyword, data] of Object.entries(this.productDatabase)) {
-            if (searchText.includes(keyword)) {
-                let products = data.products;
+        // Define priority matching - more specific keywords first
+        const keywordPriority = [
+            'dryer vent', 'mini split', 'wall ac', 'hvac filter', 'smoke detector', 
+            'water filter', 'sediment filter', 'uv filter', 'water softener',
+            'well water', 'septic', 'fireplace', 'pool', 'deck', 'garage', 
+            'basement', 'baseboard', 'pipe', 'gutter', 'caulk', 'drain',
+            'battery', 'filter', 'clean'  // 'clean' goes last to avoid conflicts
+        ];
+
+        // Search through keywords in priority order
+        for (const keyword of keywordPriority) {
+            if (this.productDatabase[keyword]) {
+                // Use more specific matching for certain keywords
+                let isMatch = false;
                 
-                // Filter by appliance-specific details if available
-                if (applianceDetails && keyword === 'hvac filter') {
-                    products = this.getApplianceSpecificProducts(keyword, applianceDetails);
+                if (keyword === 'clean') {
+                    // Only match 'clean' if it's NOT part of a more specific task
+                    const hasSpecificMatch = keywordPriority.slice(0, -1).some(specificKeyword => 
+                        searchText.includes(specificKeyword)
+                    );
+                    // Match 'clean' only if no specific match AND contains cleaning-related words
+                    isMatch = !hasSpecificMatch && (
+                        searchText.includes('clean ') || 
+                        searchText.includes(' clean') ||
+                        searchText.includes('wash') ||
+                        searchText.includes('scrub') ||
+                        searchText.includes('disinfect')
+                    );
+                } else {
+                    // Standard keyword matching for other products
+                    isMatch = searchText.includes(keyword);
                 }
                 
-                recommendations.push({
-                    keyword: keyword,
-                    products: products
-                });
+                if (isMatch) {
+                    let products = this.productDatabase[keyword].products;
+                    
+                    // Filter by appliance-specific details if available
+                    if (applianceDetails && keyword === 'hvac filter') {
+                        products = this.getApplianceSpecificProducts(keyword, applianceDetails);
+                    }
+                    
+                    recommendations.push({
+                        keyword: keyword,
+                        products: products
+                    });
+                    
+                    // Stop after first match to avoid showing multiple categories
+                    break;
+                }
             }
         }
-
-        // Don't show generic recommendations for tasks without specific matches
-        // This prevents every task from showing the same generic kit
 
         return recommendations;
     }
@@ -610,7 +642,7 @@ class MarketplaceManager {
         return [
             {
                 name: 'Home Maintenance Tool Kit (130-Piece)',
-                price: '$49.99',
+                price: '~$49.99',
                 rating: '4.5/5',
                 amazonASIN: 'B07TOOLSXX',
                 category: 'Tools',
@@ -618,7 +650,7 @@ class MarketplaceManager {
             },
             {
                 name: 'WD-40 Multi-Use Product (3-Pack)',
-                price: '$12.99',
+                price: '~$12.99',
                 rating: '4.7/5',
                 amazonASIN: 'B00009WD40',
                 category: 'General',
@@ -626,7 +658,7 @@ class MarketplaceManager {
             },
             {
                 name: 'BLACK+DECKER 12V MAX Drill & Home Tool Kit, 60-Piece',
-                price: '$59.99',
+                price: '~$59.99',
                 rating: '4.7/5',
                 amazonASIN: 'B014QUP0FE',
                 category: 'General',
@@ -634,7 +666,7 @@ class MarketplaceManager {
             },
              {
                 name: 'WORKPRO 32-Piece SAE & Metric Combination Wrenches Set',
-                price: '$37.59',
+                price: '~$37.59',
                 rating: '4.6/5',
                 amazonASIN: 'B0BN39LYJ5',
                 category: 'General',
@@ -642,7 +674,7 @@ class MarketplaceManager {
             },
             {
                 name: 'Spackle for DryWall',
-                price: '$8.97',
+                price: '~$8.97',
                 rating: '4.7/5',
                 amazonASIN: 'B000BQPYJ0',
                 category: 'General',
@@ -814,57 +846,59 @@ class MarketplaceManager {
         container.innerHTML = html;
     }
     
-    // Populate seasonal products
+    // Populate seasonal products using real products from database
     populateSeasonalProducts() {
         const container = document.getElementById('seasonal-products');
         if (!container) return;
         
         const currentMonth = new Date().getMonth();
-        let seasonalItems = [];
+        let seasonalProducts = [];
         
-        // Spring (Mar-May)
+        // Spring (Mar-May) - Gutter cleaning, HVAC prep, deck care
         if (currentMonth >= 2 && currentMonth <= 4) {
-            seasonalItems = [
-                { name: 'Spring Gutter Cleaning Kit', price: '$29.99', description: 'Clean out winter debris' },
-                { name: 'HVAC Tune-up Kit', price: '$45.99', description: 'Prep for summer cooling' },
-                { name: 'Deck Cleaning Supplies', price: '$24.99', description: 'Spring deck maintenance' }
+            seasonalProducts = [
+                ...this.productDatabase['gutter']?.products.slice(0, 1) || [],
+                ...this.productDatabase['hvac filter']?.products.slice(0, 1) || [],
+                ...this.productDatabase['deck']?.products.slice(0, 1) || []
             ];
         }
-        // Summer (Jun-Aug)  
+        // Summer (Jun-Aug) - AC filters, pool maintenance
         else if (currentMonth >= 5 && currentMonth <= 7) {
-            seasonalItems = [
-                { name: 'AC Filter Multi-Pack', price: '$34.99', description: 'Keep AC running efficiently' },
-                { name: 'Pool Maintenance Kit', price: '$89.99', description: 'Summer pool care essentials' },
-                { name: 'Sprinkler System Check Kit', price: '$19.99', description: 'Maintain your irrigation' }
+            seasonalProducts = [
+                ...this.productDatabase['hvac filter']?.products.slice(0, 1) || [],
+                ...this.productDatabase['pool']?.products.slice(0, 2) || []
             ];
         }
-        // Fall (Sep-Nov)
+        // Fall (Sep-Nov) - Heating prep, weatherproofing, chimney
         else if (currentMonth >= 8 && currentMonth <= 10) {
-            seasonalItems = [
-                { name: 'Heating System Prep Kit', price: '$39.99', description: 'Ready for winter heating' },
-                { name: 'Weatherproofing Bundle', price: '$54.99', description: 'Seal gaps before winter' },
-                { name: 'Chimney Cleaning Kit', price: '$32.99', description: 'Safe fireplace season' }
+            seasonalProducts = [
+                ...this.productDatabase['filter']?.products.slice(0, 1) || [],
+                ...this.productDatabase['caulk']?.products.slice(0, 1) || [],
+                ...this.productDatabase['fireplace']?.products.slice(0, 1) || []
             ];
         }
-        // Winter (Dec-Feb)
+        // Winter (Dec-Feb) - Pipe protection, indoor air
         else {
-            seasonalItems = [
-                { name: 'Pipe Freeze Prevention Kit', price: '$28.99', description: 'Protect against frozen pipes' },
-                { name: 'Winter Safety Bundle', price: '$41.99', description: 'Ice melt, emergency supplies' },
-                { name: 'Indoor Air Quality Kit', price: '$67.99', description: 'Combat dry winter air' }
+            seasonalProducts = [
+                ...this.productDatabase['pipe']?.products.slice(0, 1) || [],
+                ...this.productDatabase['battery']?.products.slice(0, 1) || [],
+                ...this.productDatabase['hvac filter']?.products.slice(0, 1) || []
             ];
         }
         
         let html = '';
-        seasonalItems.forEach(item => {
+        seasonalProducts.forEach(product => {
             html += `
                 <div class="bg-white p-3 rounded-lg border border-green-200">
-                    <h5 class="font-medium text-gray-900 mb-1">${item.name}</h5>
-                    <p class="text-xs text-gray-600 mb-2">${item.description}</p>
+                    <h5 class="font-medium text-gray-900 mb-1">${product.name}</h5>
+                    <p class="text-xs text-gray-600 mb-2">${product.description}</p>
                     <div class="flex items-center justify-between">
-                        <span class="text-green-600 font-semibold text-sm">${item.price}</span>
-                        <button class="bg-green-500 hover:bg-green-600 text-white text-xs px-2 py-1 rounded">
-                            Shop
+                        <span class="text-green-600 font-semibold text-sm">${product.price}</span>
+                        <button 
+                            onclick="window.open('${this.generateAmazonLink(product.amazonASIN, product.name)}', '_blank')"
+                            class="bg-green-500 hover:bg-green-600 text-white text-xs px-2 py-1 rounded transition-colors"
+                        >
+                            Buy on Amazon
                         </button>
                     </div>
                 </div>
