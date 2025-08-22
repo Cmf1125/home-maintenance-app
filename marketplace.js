@@ -212,7 +212,7 @@ class MarketplaceManager {
                         description: 'All purpose for cleaning with vinegar',
                         priority: 'MEDIUM',
                         estCommission: '$2-4'
-                    }
+                    },
                      {
                         name: '30% Vinegar – Pure Concentrated Active-Force Vinegar for Cleaning 128 oz (2)',
                         price: '$39.48', // TODO: Update with real Amazon price
@@ -222,7 +222,7 @@ class MarketplaceManager {
                         description: 'All purpose for cleaning',
                         priority: 'MEDIUM',
                         estCommission: '$2-4'
-                    }
+                    },
                     {
                         name: 'Lysol All Purpose Cleaner Spray',
                         price: '$3.97', // TODO: Update with real Amazon price
@@ -232,12 +232,52 @@ class MarketplaceManager {
                         description: 'All purpose for cleaning',
                         priority: 'MEDIUM',
                         estCommission: '$2-4'
-                    }
+                    },
                     {
                         name: 'Microfiber cleaning cloths (50 pk)',
                         price: '$15.99', // TODO: Update with real Amazon price
                         rating: '4.4/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B07ZF9GTCJ', // TODO: Research on Amazon
+                        category: 'General',
+                        description: 'All purpose for cleaning',
+                        priority: 'MEDIUM',
+                        estCommission: '$2-4'
+                    },
+                    {
+                        name: 'Clorox Disinfecting Wipes (3pk)',
+                        price: '$10.86', // TODO: Update with real Amazon price
+                        rating: '4.8/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B00HSC9F2C', // TODO: Research on Amazon
+                        category: 'General',
+                        description: 'All purpose for cleaning',
+                        priority: 'MEDIUM',
+                        estCommission: '$2-4'
+                    },
+                    {
+                        name: 'Mr. Clean Magic Eraser 6pk',
+                        price: '$8.94', // TODO: Update with real Amazon price
+                        rating: '4.6/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B0CP4GXQVY', // TODO: Research on Amazon
+                        category: 'General',
+                        description: 'All purpose for cleaning',
+                        priority: 'MEDIUM',
+                        estCommission: '$2-4'
+                    },
+                    {
+                        name: 'Swiffer Sweep & Mop Deluxe',
+                        price: '$22.24', // TODO: Update with real Amazon price
+                        rating: '4.6/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B0DWNDSNKD', // TODO: Research on Amazon
+                        category: 'General',
+                        description: 'All purpose for cleaning',
+                        priority: 'MEDIUM',
+                        estCommission: '$2-4'
+                    },
+                    {
+                        name: 'Lysol Toilet Bowl Cleaner- Bleach Free',
+                        price: '$2.27', // TODO: Update with real Amazon price
+                        rating: '4.7/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B0080DTSP2', // TODO: Research on Amazon
                         category: 'General',
                         description: 'All purpose for cleaning',
                         priority: 'MEDIUM',
@@ -281,7 +321,7 @@ class MarketplaceManager {
                         description: 'Compatible filters for most mini split systems',
                         priority: 'HIGH',
                         estCommission: '$2-4'
-                    },
+                    }
                 ]
             },
             'wall ac': {
@@ -453,7 +493,7 @@ class MarketplaceManager {
                         description: 'Removes dirt, mildew, and old stain',
                         priority: 'MEDIUM',
                         estCommission: '$2-3'
-                    }
+                    },
                     {
                         name: 'Westinghouse ePX3100v Electric Pressure Washer',
                         price: '$129.00', // TODO: Update with real Amazon price
@@ -583,7 +623,40 @@ class MarketplaceManager {
                 amazonASIN: 'B00009WD40',
                 category: 'General',
                 description: 'Lubricates, displaces moisture, prevents rust'
+            },
+            {
+                name: 'BLACK+DECKER 12V MAX Drill & Home Tool Kit, 60-Piece',
+                price: '$59.99',
+                rating: '4.7/5',
+                amazonASIN: 'B014QUP0FE',
+                category: 'General',
+                description: 'Basic Home Tool Kit'
+            },
+             {
+                name: 'WORKPRO 32-Piece SAE & Metric Combination Wrenches Set',
+                price: '$37.59',
+                rating: '4.6/5',
+                amazonASIN: 'B0BN39LYJ5',
+                category: 'General',
+                description: 'Wrench Kit'
+            },
+            {
+                name: 'Spackle for DryWall',
+                price: '$8.97',
+                rating: '4.7/5',
+                amazonASIN: 'B000BQPYJ0',
+                category: 'General',
+                description: 'Wall Repair'
+            },
+            {
+                name: 'Spackle for DryWall',
+                price: '$8.97',
+                rating: '4.7/5',
+                amazonASIN: 'B000BQPYJ0',
+                category: 'General',
+                description: 'Wall Repair'
             }
+            
         ];
     }
 
