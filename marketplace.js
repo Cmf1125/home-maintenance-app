@@ -448,6 +448,20 @@ class MarketplaceManager {
                     }
                 ]
             },
+            'chimney': {
+                products: [
+                    {
+                        name: 'Chimney Cleaning Log 2 pk',
+                        price: '~$24.99', // Approximate - prices change daily
+                        rating: '4.5/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B0CHN5JBV3', // TODO: Research on Amazon
+                        category: 'Safety',
+                        description: 'Reduces creosote buildup in chimneys',
+                        priority: 'MEDIUM',
+                        estCommission: '$1-2'
+                    }
+                ]
+            },
             'pool': {
                 products: [
                     {
@@ -546,51 +560,28 @@ class MarketplaceManager {
         const keywordPriority = [
             'dryer vent', 'mini split', 'wall ac', 'hvac filter', 'smoke detector', 
             'water filter', 'sediment filter', 'uv filter', 'water softener',
-            'well water', 'septic', 'fireplace', 'pool', 'deck', 'garage', 
+            'well water', 'septic', 'fireplace', 'chimney', 'pool', 'deck', 'garage', 
             'basement', 'baseboard', 'pipe', 'gutter', 'caulk', 'drain',
-            'battery', 'filter', 'clean'  // 'clean' goes last to avoid conflicts
+            'battery', 'filter'  // 'clean' removed - now only available in Shop tab
         ];
 
         // Search through keywords in priority order
         for (const keyword of keywordPriority) {
-            if (this.productDatabase[keyword]) {
-                // Use more specific matching for certain keywords
-                let isMatch = false;
+            if (this.productDatabase[keyword] && searchText.includes(keyword)) {
+                let products = this.productDatabase[keyword].products;
                 
-                if (keyword === 'clean') {
-                    // Only match 'clean' if it's NOT part of a more specific task
-                    const hasSpecificMatch = keywordPriority.slice(0, -1).some(specificKeyword => 
-                        searchText.includes(specificKeyword)
-                    );
-                    // Match 'clean' only if no specific match AND contains cleaning-related words
-                    isMatch = !hasSpecificMatch && (
-                        searchText.includes('clean ') || 
-                        searchText.includes(' clean') ||
-                        searchText.includes('wash') ||
-                        searchText.includes('scrub') ||
-                        searchText.includes('disinfect')
-                    );
-                } else {
-                    // Standard keyword matching for other products
-                    isMatch = searchText.includes(keyword);
+                // Filter by appliance-specific details if available
+                if (applianceDetails && keyword === 'hvac filter') {
+                    products = this.getApplianceSpecificProducts(keyword, applianceDetails);
                 }
                 
-                if (isMatch) {
-                    let products = this.productDatabase[keyword].products;
-                    
-                    // Filter by appliance-specific details if available
-                    if (applianceDetails && keyword === 'hvac filter') {
-                        products = this.getApplianceSpecificProducts(keyword, applianceDetails);
-                    }
-                    
-                    recommendations.push({
-                        keyword: keyword,
-                        products: products
-                    });
-                    
-                    // Stop after first match to avoid showing multiple categories
-                    break;
-                }
+                recommendations.push({
+                    keyword: keyword,
+                    products: products
+                });
+                
+                // Stop after first match to avoid showing multiple categories
+                break;
             }
         }
 
@@ -766,6 +757,9 @@ class MarketplaceManager {
         
         // Populate Safety products
         this.populateCategory('safety-products', ['smoke detector']);
+        
+        // Populate Cleaning products
+        this.populateCategory('cleaning-products', ['clean']);
         
         // Populate Tool kits
         this.populateToolkits();
