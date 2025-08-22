@@ -37,7 +37,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Filtrete 16x25x1 Air Filter (4-Pack)',
-                        price: '$39.58', // TODO: Update with real Amazon price
+                        price: '~$39.58', // Approximate - prices change daily
                         rating: '4.8/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B005GZ89WU', // TODO: Research on Amazon
                         category: 'HVAC',
@@ -48,7 +48,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Simply 20x20x1 Air Filter, Merv 8 (6-Pack)',
-                        price: '$35.07', // TODO: Update with real Amazon price
+                        price: '~$35.07', // Approximate - prices change daily
                         rating: '4.7/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B07G2KT7FN', // TODO: Research on Amazon
                         category: 'HVAC',
@@ -63,7 +63,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'SITERWELL Smoke Detector(2-Pack)',
-                        price: '$26.39', 
+                        price: '~$26.39', 
                         rating: '4.5/5',
                         amazonASIN: 'B0DJNGHB58', // Go to Amazon, find product, copy ASIN from URL
                         category: 'Safety',
@@ -177,7 +177,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Energizer AA/AAA Battery Variety Pack',
-                        price: '$19.63', // TODO: Update with real Amazon price
+                        price: '~$19.63', // Approximate - prices change daily
                         rating: '4.8/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B087GMJXMC', // TODO: Research on Amazon
                         category: 'General',
@@ -191,7 +191,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Aerostar 20x25x1 MERV 13 - 6 Count',
-                        price: '$64.95', // TODO: Update with real Amazon price
+                        price: '~$64.95', // Approximate - prices change daily
                         rating: '4.6/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B01CR9JLDI', // TODO: Research on Amazon
                         category: 'HVAC',
@@ -205,7 +205,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'ARM & HAMMER Baking Soda 2.7lb',
-                        price: '$6.79', // TODO: Update with real Amazon price
+                        price: '~$6.79', // Approximate - prices change daily
                         rating: '4.8/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0CJCXLDSP', // TODO: Research on Amazon
                         category: 'General',
@@ -215,7 +215,7 @@ class MarketplaceManager {
                     },
                      {
                         name: '30% Vinegar – Pure Concentrated Active-Force Vinegar for Cleaning 128 oz (2)',
-                        price: '$39.48', // TODO: Update with real Amazon price
+                        price: '~$39.48', // Approximate - prices change daily
                         rating: '4.8/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0DNV967D8', // TODO: Research on Amazon
                         category: 'General',
@@ -225,7 +225,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Lysol All Purpose Cleaner Spray',
-                        price: '$3.97', // TODO: Update with real Amazon price
+                        price: '~$3.97', // Approximate - prices change daily
                         rating: '4.8/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B00QIT9NDW', // TODO: Research on Amazon
                         category: 'General',
@@ -235,7 +235,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Microfiber cleaning cloths (50 pk)',
-                        price: '$15.99', // TODO: Update with real Amazon price
+                        price: '~$15.99', // Approximate - prices change daily
                         rating: '4.4/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B07ZF9GTCJ', // TODO: Research on Amazon
                         category: 'General',
@@ -245,7 +245,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Clorox Disinfecting Wipes (3pk)',
-                        price: '$10.86', // TODO: Update with real Amazon price
+                        price: '~$10.86', // Approximate - prices change daily
                         rating: '4.8/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B00HSC9F2C', // TODO: Research on Amazon
                         category: 'General',
@@ -255,7 +255,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Mr. Clean Magic Eraser 6pk',
-                        price: '$8.94', // TODO: Update with real Amazon price
+                        price: '~$8.94', // Approximate - prices change daily
                         rating: '4.6/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0CP4GXQVY', // TODO: Research on Amazon
                         category: 'General',
@@ -265,7 +265,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Swiffer Sweep & Mop Deluxe',
-                        price: '$22.24', // TODO: Update with real Amazon price
+                        price: '~$22.24', // Approximate - prices change daily
                         rating: '4.6/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0DWNDSNKD', // TODO: Research on Amazon
                         category: 'General',
@@ -275,7 +275,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Lysol Toilet Bowl Cleaner- Bleach Free',
-                        price: '$2.27', // TODO: Update with real Amazon price
+                        price: '~$2.27', // Approximate - prices change daily
                         rating: '4.7/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0080DTSP2', // TODO: Research on Amazon
                         category: 'General',
@@ -289,7 +289,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Frost King HC3A Automatic Electric Heat Kit Heating Cables, 3 Feet, Black',
-                        price: '$21.16', // TODO: Update with real Amazon price
+                        price: '~$21.16', // Approximate - prices change daily
                         rating: '4.6/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B000IKSQ8U', // TODO: Research on Amazon
                         category: 'Water Systems',
@@ -304,7 +304,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Mini Split Filter Bundle Compatible with Mitsubishi Electric MAC-2330FT-E and MAC-3000FT-E',
-                        price: '$36.99', // TODO: Update with real Amazon price
+                        price: '~$36.99', // Approximate - prices change daily
                         rating: '4.4/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0DG61JQDT', // TODO: Research on Amazon
                         category: 'HVAC',
@@ -314,7 +314,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Mitsubishi Electric U01 A01 100 Nano Platinum Mini Split Filter 2-Pack',
-                        price: '$46.99', // TODO: Update with real Amazon price
+                        price: '~$46.99', // Approximate - prices change daily
                         rating: '4.5/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B08LMKWGBZ', // TODO: Research on Amazon
                         category: 'HVAC',
@@ -328,7 +328,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Filtrete 16x25x1 AC Furnace Air Filter, MERV 11 4 pack',
-                        price: '$39.58', // TODO: Update with real Amazon price
+                        price: '~$39.58', // Approximate - prices change daily
                         rating: '4.8/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B005GZ89WU', // TODO: Research on Amazon
                         category: 'HVAC',
@@ -342,7 +342,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Baseboard Heater Cleaning Kit',
-                        price: '$19.99', // TODO: Update with real Amazon price
+                        price: '~$19.99', // Approximate - prices change daily
                         rating: '4.2/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0C89V894L', // TODO: Research on Amazon
                         category: 'HVAC',
@@ -357,7 +357,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Drinking Water Test Strips',
-                        price: '$14.98', // TODO: Update with real Amazon price
+                        price: '~$14.98', // Approximate - prices change daily
                         rating: '4.3/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0D2RJ1LTM', // TODO: Research on Amazon
                         category: 'Water Systems',
@@ -371,7 +371,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Aquaboon 5 Micron 10 x 4.5 Well Water Sediment Filter Replacement 4 pack',
-                        price: '$38.07', // TODO: Update with real Amazon price
+                        price: '~$38.07', // Approximate - prices change daily
                         rating: '4.6/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B01LZZA5S7', // TODO: Research on Amazon
                         category: 'Water Systems',
@@ -385,7 +385,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'UV Sterilizer Replacement Lamp',
-                        price: '$104.79', // TODO: Update with real Amazon price
+                        price: '~$104.79', // Approximate - prices change daily
                         rating: '4.7/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0050OMXHO', // TODO: Research on Amazon
                         category: 'Water Systems',
@@ -399,7 +399,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Water Softener Salt (3 40lb bag)',
-                        price: '$52.75', // TODO: Update with real Amazon price
+                        price: '~$52.75', // Approximate - prices change daily
                         rating: '4.7/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0DZQJNWZX', // TODO: Research on Amazon
                         category: 'Water Systems',
@@ -409,7 +409,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Water Softener Cleaner & Sanitizer',
-                        price: '$14.97', // TODO: Update with real Amazon price
+                        price: '~$14.97', // Approximate - prices change daily
                         rating: '4.6/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B00HVX4PSM', // TODO: Research on Amazon
                         category: 'Water Systems',
@@ -423,7 +423,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Septic Tank Treatment (12 months)',
-                        price: '$20.37', // TODO: Update with real Amazon price
+                        price: '~$20.37', // Approximate - prices change daily
                         rating: '4.3/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B071WMZCFC', // TODO: Research on Amazon
                         category: 'Water Systems',
@@ -438,7 +438,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Chimney Cleaning Log 2 pk',
-                        price: '$24.99', // TODO: Update with real Amazon price
+                        price: '~$24.99', // Approximate - prices change daily
                         rating: '4.5/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0CHN5JBV3', // TODO: Research on Amazon
                         category: 'Safety',
@@ -452,7 +452,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Pool and Hot Tub Test Strips',
-                        price: '$9.99', // TODO: Update with real Amazon price
+                        price: '~$9.99', // Approximate - prices change daily
                         rating: '4.5/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0C4L9D87N', // TODO: Research on Amazon
                         category: 'Pool & Spa',
@@ -462,7 +462,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Pool Shock Treatment (6-Pack)',
-                        price: '$25.42', // TODO: Update with real Amazon price
+                        price: '~$25.42', // Approximate - prices change daily
                         rating: '4.7/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B09R839DJ1', // TODO: Research on Amazon
                         category: 'Pool & Spa',
@@ -476,7 +476,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Deck Stain and Sealer (1 gallon)',
-                        price: '$34.99', // TODO: Update with real Amazon price
+                        price: '~$34.99', // Approximate - prices change daily
                         rating: '4.6/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B06XG8Z6SJ', // TODO: Research on Amazon
                         category: 'Exterior',
@@ -486,7 +486,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Algae Stain Remover Multi-Surface Outdoor Cleaner',
-                        price: '$40.54', // TODO: Update with real Amazon price
+                        price: '~$40.54', // Approximate - prices change daily
                         rating: '4.3/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0DNGFBN8F', // TODO: Research on Amazon
                         category: 'Exterior',
@@ -496,7 +496,7 @@ class MarketplaceManager {
                     },
                     {
                         name: 'Westinghouse ePX3100v Electric Pressure Washer',
-                        price: '$129.00', // TODO: Update with real Amazon price
+                        price: '~$129.00', // Approximate - prices change daily
                         rating: '4.7/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0BX4KL2C8', // TODO: Research on Amazon
                         category: 'Exterior',
@@ -510,7 +510,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: '3-IN-ONE Garage Door Lubricant',
-                        price: '$7.98', // TODO: Update with real Amazon price
+                        price: '~$7.98', // Approximate - prices change daily
                         rating: '4.7/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B001E5DLVO', // TODO: Research on Amazon
                         category: 'General',
@@ -524,7 +524,7 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Basement Dehumidifier',
-                        price: '$149.99', // TODO: Update with real Amazon price
+                        price: '~$149.99', // Approximate - prices change daily
                         rating: '4.5/5', // TODO: Update with real Amazon rating
                         amazonASIN: 'B0BVZ62Y3M', // TODO: Research on Amazon
                         category: 'General',
@@ -639,14 +639,6 @@ class MarketplaceManager {
                 amazonASIN: 'B0BN39LYJ5',
                 category: 'General',
                 description: 'Wrench Kit'
-            },
-            {
-                name: 'Spackle for DryWall',
-                price: '$8.97',
-                rating: '4.7/5',
-                amazonASIN: 'B000BQPYJ0',
-                category: 'General',
-                description: 'Wall Repair'
             },
             {
                 name: 'Spackle for DryWall',
