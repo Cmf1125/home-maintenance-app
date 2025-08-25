@@ -1649,10 +1649,10 @@ function showTab(tabName) {
     if (marketplaceView) marketplaceView.classList.add('hidden');
     if (allTasksView) allTasksView.classList.add('hidden');
     
-    // Update tab buttons
+    // Update tab buttons - all buttons are white text on blue background
     document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-blue-100', 'text-blue-700');
-        btn.classList.add('text-gray-600');
+        btn.classList.remove('opacity-100');
+        btn.classList.add('opacity-70');
     });
     
     if (tabName === 'dashboard') {
@@ -1661,11 +1661,11 @@ function showTab(tabName) {
             dashboardView.classList.remove('hidden');
         }
         
-        // Update tab styling
+        // Update tab styling - active tab is fully opaque
         const dashboardTab = document.getElementById('tab-dashboard');
         if (dashboardTab) {
-            dashboardTab.classList.add('bg-blue-100', 'text-blue-700');
-            dashboardTab.classList.remove('text-gray-600');
+            dashboardTab.classList.add('opacity-100');
+            dashboardTab.classList.remove('opacity-70');
         }
         
         console.log('🏠 Initializing enhanced dashboard...');
@@ -1699,8 +1699,8 @@ function showTab(tabName) {
         // Update tab styling
         const calendarTab = document.getElementById('tab-calendar');
         if (calendarTab) {
-            calendarTab.classList.add('bg-blue-100', 'text-blue-700');
-            calendarTab.classList.remove('text-gray-600');
+            calendarTab.classList.add('opacity-100');
+            calendarTab.classList.remove('opacity-70');
         }
         
         console.log('📅 Initializing calendar...');
@@ -1753,8 +1753,8 @@ function showTab(tabName) {
         // Update tab styling  
         const appliancesTab = document.getElementById('tab-appliances');
         if (appliancesTab) {
-            appliancesTab.classList.add('bg-blue-100', 'text-blue-700');
-            appliancesTab.classList.remove('text-gray-600');
+            appliancesTab.classList.add('opacity-100');
+            appliancesTab.classList.remove('opacity-70');
         }
         
         console.log('⚙️ Switching to appliances tab...');
@@ -1793,8 +1793,8 @@ function showTab(tabName) {
         // Update tab styling  
         const marketplaceTab = document.getElementById('tab-marketplace');
         if (marketplaceTab) {
-            marketplaceTab.classList.add('bg-blue-100', 'text-blue-700');
-            marketplaceTab.classList.remove('text-gray-600');
+            marketplaceTab.classList.add('opacity-100');
+            marketplaceTab.classList.remove('opacity-70');
         }
         
         console.log('🛍️ Switching to marketplace tab...');
