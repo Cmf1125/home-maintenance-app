@@ -806,7 +806,7 @@ class MarketplaceManager {
         this.populateCategory('hvac-products', ['hvac filter', 'filter', 'mini split', 'wall ac', 'baseboard']);
         
         // Populate Water products - show all water system items
-        this.populateCategory('water-products', ['water filter', 'sediment filter', 'uv filter', 'water softener', 'well water', 'septic']);
+        this.populateCategory('water-products', ['water filter', 'sediment filter', 'uv filter', 'water softener', 'well water', 'septic', 'pipe']);
         
         // Populate Safety products - show all safety items
         this.populateCategory('safety-products', ['smoke detector', 'dryer vent', 'fireplace', 'chimney']);
