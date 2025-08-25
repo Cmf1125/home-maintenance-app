@@ -53,21 +53,41 @@
     <div id="app" class="overflow-auto">
 
 <!-- Login Screen (shows first) -->
-<div id="login-screen" class="fixed inset-0 z-50 bg-gradient-to-br from-blue-50 to-indigo-100 pt-8 px-4">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-auto">
-       <div class="text-center mb-8">
-    <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mb-4 mx-auto shadow-lg">
-        TH
-    </div>
-    <h1 class="text-3xl font-bold text-gray-900 mb-2">The Home Keeper</h1>
-    <p class="text-gray-600 mb-3 font-medium">Professional home maintenance management</p>
+<div id="login-screen" class="fixed inset-0 z-50 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 pt-8 px-4">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="7" cy="7" r="1"/%3E%3Ccircle cx="53" cy="7" r="1"/%3E%3Ccircle cx="7" cy="53" r="1"/%3E%3Ccircle cx="53" cy="53" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
     
-    <!-- NEW: Rotating Benefits -->
-    <div class="rotating-benefits h-6 overflow-hidden">
-        <div class="benefit-item text-sm font-semibold text-blue-600">• Never miss critical maintenance</div>
-        <div class="benefit-item text-sm font-semibold text-blue-600">• Prevent costly repairs</div>
-        <div class="benefit-item text-sm font-semibold text-blue-600">• Smart automated reminders</div>
-        <div class="benefit-item text-sm font-semibold text-blue-600">• Increase your home value</div>
+    <div class="relative z-10 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8 w-full max-w-md mx-auto">
+       <div class="text-center mb-8">
+    <!-- Enhanced Logo Design -->
+    <div class="relative w-20 h-20 mx-auto mb-6">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-orange-600 rounded-3xl shadow-2xl"></div>
+        <div class="absolute inset-1 bg-white rounded-2xl flex items-center justify-center">
+            <span class="text-2xl font-black bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent">TH</span>
+        </div>
+    </div>
+    
+    <h1 class="text-4xl font-black text-gray-900 mb-2 tracking-tight">The Home Keeper</h1>
+    <p class="text-gray-600 mb-6 font-medium text-lg">Professional property maintenance platform</p>
+    
+    <!-- Professional Benefits Grid -->
+    <div class="grid grid-cols-2 gap-3 text-xs text-left mb-6">
+        <div class="flex items-center gap-2 text-gray-700">
+            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span class="font-medium">Smart Scheduling</span>
+        </div>
+        <div class="flex items-center gap-2 text-gray-700">
+            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+            <span class="font-medium">Cost Tracking</span>
+        </div>
+        <div class="flex items-center gap-2 text-gray-700">
+            <div class="w-2 h-2 bg-orange-500 rounded-full"></div>
+            <span class="font-medium">Vendor Network</span>
+        </div>
+        <div class="flex items-center gap-2 text-gray-700">
+            <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
+            <span class="font-medium">Asset Reports</span>
+        </div>
     </div>
 </div>
 
@@ -87,18 +107,31 @@
                            placeholder="••••••••">
                 </div>
 
-<!-- ADD THIS above the "Sign In" button: -->
+<!-- Enhanced Demo Button -->
 <button onclick="startDemo()" 
-        class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-medium mb-3">
-    🚀 Try Demo (No Signup Required)
+        class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-xl hover:from-green-700 hover:to-emerald-700 font-semibold mb-4 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
+    <div class="flex items-center justify-center gap-2">
+        <span class="text-lg">⚡</span>
+        <span>Try Demo (No Signup Required)</span>
+    </div>
 </button>
 
-<div class="text-center text-xs text-gray-500 mb-4">
-    or sign in to save your data
+<div class="relative my-6">
+    <div class="absolute inset-0 flex items-center">
+        <div class="w-full border-t border-gray-200"></div>
+    </div>
+    <div class="relative flex justify-center text-xs uppercase">
+        <span class="bg-white px-3 text-gray-500 font-medium tracking-wider">or sign in to save data</span>
+    </div>
 </div>
+
+                <!-- Enhanced Sign In Button -->
                 <button onclick="signInUser()" 
-                        class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium">
-                    Sign In
+                        class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl hover:from-blue-700 hover:to-blue-800 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
+                    <div class="flex items-center justify-center gap-2">
+                        <span>Sign In to Account</span>
+                        <span class="text-lg">→</span>
+                    </div>
                 </button>
                 <button onclick="signInWithGoogle()" 
                         class="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 font-medium">

@@ -2047,30 +2047,77 @@ if (isOverdue) {
 }
     
     return `
-    <div class="flex flex-col py-3 px-4 ${statusClass} rounded-lg hover:bg-gray-100 transition-colors">
-        <!-- Row 1: Dot + Task Name + Cost -->
-        <div class="flex items-center justify-between gap-2 mb-2">
-            <div class="flex items-center gap-2 flex-1 min-w-0">
-                <span class="text-sm">${urgencyDot}</span>
-                <span class="font-medium text-gray-900 text-sm truncate">${task.title}</span>
+    <div class="group relative bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-all duration-200 hover:-translate-y-1 ${statusClass}">
+        <!-- Professional Status Indicator -->
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getStatusGradient(urgencyDot)} rounded-t-xl"></div>
+        
+        <!-- Enhanced Header Row -->
+        <div class="flex items-start justify-between gap-3 mb-3">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+                <!-- Modern Status Badge -->
+                <div class="flex-shrink-0 w-3 h-3 rounded-full ${getStatusBadgeColor(urgencyDot)} ring-2 ring-white shadow-sm"></div>
+                <div class="min-w-0 flex-1">
+                    <h4 class="font-semibold text-gray-900 text-base truncate group-hover:text-blue-900 transition-colors">
+                        ${task.title}
+                    </h4>
+                    <p class="text-sm text-gray-500 mt-1">${task.category}</p>
+                </div>
             </div>
-            ${task.cost > 0 ? `<span class="text-green-600 font-medium text-sm">$${task.cost}</span>` : ''}
+            ${task.cost > 0 ? `
+                <div class="flex-shrink-0 text-right">
+                    <span class="bg-green-100 text-green-800 text-sm font-semibold px-2.5 py-1 rounded-full">
+                        $${task.cost}
+                    </span>
+                </div>
+            ` : ''}
         </div>
         
-        <!-- Row 2: Due Date + Frequency + Edit Button -->
-        <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-4 text-xs text-gray-500">
-                <span>${dueDateDisplay}</span>
-                <span>Every ${task.frequency} days</span>
+        <!-- Enhanced Bottom Row -->
+        <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-4 text-sm">
+                <div class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    ${dueDateDisplay}
+                </div>
+                <div class="flex items-center gap-1.5 text-gray-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <span>Every ${task.frequency}d</span>
+                </div>
             </div>
-         <button onclick="editTaskFromAllTasks(${task.id})" 
-            class="bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs px-3 py-1 rounded transition-colors font-medium" 
-            title="Edit task">
-        Edit
-    </button>
+            <button onclick="editTaskFromAllTasks(${task.id})" 
+                class="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm px-3 py-1.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md transform hover:-translate-y-0.5" 
+                title="Edit task">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                Edit
+            </button>
         </div>
     </div>
 `;
+}
+
+// Helper functions for enhanced task card styling
+function getStatusGradient(urgencyDot) {
+    switch(urgencyDot) {
+        case '🔴': return 'from-red-500 to-red-600';
+        case '🟠': return 'from-orange-500 to-orange-600';
+        case '🟡': return 'from-yellow-500 to-yellow-600';
+        default: return 'from-gray-300 to-gray-400';
+    }
+}
+
+function getStatusBadgeColor(urgencyDot) {
+    switch(urgencyDot) {
+        case '🔴': return 'bg-red-500';
+        case '🟠': return 'bg-orange-500';
+        case '🟡': return 'bg-yellow-500';
+        default: return 'bg-gray-400';
+    }
 }
 
 // NEW FUNCTION: Edit task specifically from All Tasks view
