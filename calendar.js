@@ -387,7 +387,7 @@ showDayPanel(date, dayTasks) {
         </div>
         <div class="task-actions">
             <button onclick="completeTask(${task.id})" class="complete-task-btn text-base font-medium">✅ Complete</button>
-            <button onclick="rescheduleTask(${task.id})" class="reschedule-task-btn text-base font-medium">📅 Reschedule</button>
+            <button onclick="window.masterRescheduleTask(${task.id}, event)" class="reschedule-task-btn text-base font-medium">📅 Reschedule</button>
         </div>
     </div>
 `;

@@ -5,7 +5,9 @@ console.log('🔄 Loading Master Reschedule module...');
 
 // THE ONE AND ONLY RESCHEDULE FUNCTION
 window.masterRescheduleTask = function(taskId, event) {
+    console.log('🚀🚀🚀 MASTER RESCHEDULE FUNCTION CALLED! 🚀🚀🚀');
     console.log('🚀 MASTER RESCHEDULE called for task:', taskId);
+    alert('🚀 MASTER RESCHEDULE FUNCTION CALLED!');
     
     // Stop event bubbling
     if (event) {
