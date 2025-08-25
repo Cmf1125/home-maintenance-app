@@ -280,9 +280,12 @@
             
 <div class="bg-white rounded-xl p-6 shadow-lg max-w-md mx-auto">
     <div class="text-center mb-6">
-         <div class="text-4xl mb-4">🏠</div>
+         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4 mx-auto">
+             <span class="text-blue-600 font-bold text-lg">H</span>
+         </div>
             <h2 class="text-xl font-bold text-gray-900 mb-2">Tell us about your home</h2>
-            <p class="text-gray-600 text-sm">We'll create a personalized maintenance plan</p>
+            <p class="text-gray-600 text-sm">We'll create a simple maintenance plan just for you</p>
+            <p class="text-xs text-blue-600 mt-2">💡 Don't worry - you can change these details anytime later!</p>
          </div>
                 
 <div class="space-y-6">
@@ -430,11 +433,17 @@
                             <div id="well-water-options" class="ml-8 space-y-2 hidden">
                                 <label class="flex items-center space-x-3 touch-btn">
                                     <input type="checkbox" id="sediment-filter" class="w-4 h-4">
-                                    <span class="text-sm">Sediment Filtration</span>
+                                    <div>
+                                        <span class="text-sm">Sediment Filter</span>
+                                        <div class="text-xs text-gray-500">Removes dirt and rust from water</div>
+                                    </div>
                                 </label>
                                 <label class="flex items-center space-x-3 touch-btn">
                                     <input type="checkbox" id="uv-filter" class="w-4 h-4">
-                                    <span class="text-sm">UV Filtration</span>
+                                    <div>
+                                        <span class="text-sm">UV Water Filter</span>
+                                        <div class="text-xs text-gray-500">Kills bacteria with UV light</div>
+                                    </div>
                                 </label>
                                 <label class="flex items-center space-x-3 touch-btn">
                                     <input type="checkbox" id="water-softener" class="w-4 h-4">
