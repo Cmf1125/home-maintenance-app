@@ -2137,17 +2137,33 @@ window.rescheduleTaskFromDashboard = function(taskId, event) {
     };
     
     window.confirmTaskReschedule = function(taskId) {
+        console.log('🚀 confirmTaskReschedule called for task:', taskId);
+        
         const newDateStr = document.getElementById('new-task-date').value;
-        if (!newDateStr) return;
+        console.log('📅 New date selected:', newDateStr);
+        
+        if (!newDateStr) {
+            console.log('⚠️ No date selected, returning');
+            return;
+        }
         
         const newDate = new Date(newDateStr + 'T12:00:00');
         const task = window.tasks.find(t => t.id === taskId);
+        
+        console.log('📋 Task found:', !!task, task?.title);
+        console.log('📅 New date object:', newDate);
         
         if (task) {
             task.dueDate = newDate;
             task.nextDue = newDate;
             
             // Sync reschedule to Google Calendar if connected
+            console.log('🔍 Google Calendar sync check:', {
+                googleCalendarSyncExists: !!window.googleCalendarSync,
+                isConnected: window.googleCalendarSync?.isConnected?.(),
+                taskHasGoogleEventId: !!task.googleEventId
+            });
+            
             if (window.googleCalendarSync && window.googleCalendarSync.isConnected()) {
                 if (task.googleEventId) {
                     // Task already has calendar event - update it
