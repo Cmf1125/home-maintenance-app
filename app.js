@@ -2292,7 +2292,7 @@ function addTaskFromSetup() {
 function completeTask(taskId) {
     console.log(`✅ Completing task ${taskId}...`);
     
-    const task = tasks.find(t => t.id === taskId);
+    const task = window.tasks.find(t => t.id === taskId);
     if (!task) {
         console.error('❌ Task not found:', taskId);
         alert('❌ Task not found');
