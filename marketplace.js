@@ -849,20 +849,82 @@ class MarketplaceManager {
         // Clean up price - remove ~ symbol
         const cleanPrice = product.price.replace(/~/g, '');
         
+        // Get category-specific styling
+        const categoryStyles = {
+            'HVAC': {
+                bg: 'bg-gradient-to-r from-blue-50 to-indigo-50',
+                border: 'border-blue-200',
+                hoverBg: 'hover:from-blue-100 hover:to-indigo-100',
+                icon: '🌡️',
+                iconBg: 'bg-blue-100',
+                iconColor: 'text-blue-600',
+                textHover: 'group-hover:text-blue-800'
+            },
+            'Safety': {
+                bg: 'bg-gradient-to-r from-red-50 to-pink-50',
+                border: 'border-red-200',
+                hoverBg: 'hover:from-red-100 hover:to-pink-100',
+                icon: '⚠️',
+                iconBg: 'bg-red-100',
+                iconColor: 'text-red-600',
+                textHover: 'group-hover:text-red-800'
+            },
+            'Water Systems': {
+                bg: 'bg-gradient-to-r from-cyan-50 to-blue-50',
+                border: 'border-cyan-200',
+                hoverBg: 'hover:from-cyan-100 hover:to-blue-100',
+                icon: '💧',
+                iconBg: 'bg-cyan-100',
+                iconColor: 'text-cyan-600',
+                textHover: 'group-hover:text-cyan-800'
+            },
+            'Exterior': {
+                bg: 'bg-gradient-to-r from-green-50 to-emerald-50',
+                border: 'border-green-200',
+                hoverBg: 'hover:from-green-100 hover:to-emerald-100',
+                icon: '🏠',
+                iconBg: 'bg-green-100',
+                iconColor: 'text-green-600',
+                textHover: 'group-hover:text-green-800'
+            },
+            'General': {
+                bg: 'bg-gradient-to-r from-gray-50 to-slate-50',
+                border: 'border-gray-200',
+                hoverBg: 'hover:from-gray-100 hover:to-slate-100',
+                icon: '🔧',
+                iconBg: 'bg-gray-100',
+                iconColor: 'text-gray-600',
+                textHover: 'group-hover:text-gray-800'
+            }
+        };
+        
+        const style = categoryStyles[product.category] || categoryStyles['General'];
+        
         return `
             <div 
                 onclick="window.open('${this.generateAmazonLink(product.amazonASIN, product.name)}', '_blank')"
-                class="flex items-center justify-between p-3 bg-gray-50 hover:bg-blue-50 rounded border cursor-pointer transition-colors group"
+                class="flex items-center gap-3 p-4 ${style.bg} ${style.hoverBg} ${style.border} rounded-lg border cursor-pointer transition-all duration-200 group shadow-sm hover:shadow-md"
             >
-                <div class="flex-1 min-w-0">
-                    <div class="text-sm font-medium text-gray-900 truncate group-hover:text-blue-800">${product.name}</div>
-                    <div class="flex items-center mt-1 space-x-2">
-                        <span class="text-green-600 font-semibold text-xs">${cleanPrice}</span>
-                        <span class="text-yellow-600 text-xs">⭐ ${product.rating}</span>
+                <!-- Category Icon -->
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 ${style.iconBg} rounded-lg flex items-center justify-center">
+                        <span class="text-lg">${style.icon}</span>
                     </div>
                 </div>
-                <div class="ml-2 text-blue-600 group-hover:text-blue-800">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                
+                <!-- Product Info -->
+                <div class="flex-1 min-w-0">
+                    <div class="font-medium text-gray-900 truncate ${style.textHover} text-sm leading-tight">${product.name}</div>
+                    <div class="flex items-center mt-1 space-x-3">
+                        <span class="text-green-700 font-bold text-sm">${cleanPrice}</span>
+                        <span class="text-amber-600 text-sm font-medium">⭐ ${product.rating}</span>
+                        <span class="text-xs ${style.iconColor} font-medium px-2 py-1 ${style.iconBg} rounded-full">${product.category}</span>
+                    </div>
+                </div>
+                
+                <!-- Arrow -->
+                <div class="flex-shrink-0 ${style.iconColor} ${style.textHover}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
                 </div>
