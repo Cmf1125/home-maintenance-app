@@ -49,13 +49,26 @@ class GoogleCalendarSync {
         try {
             console.log('🔄 Initializing Google Calendar API...');
             
+            if (!window.gapi) {
+                throw new Error('Google API library (gapi) not loaded');
+            }
+            
             this.gapi = window.gapi;
 
             // Initialize the API client
-            await new Promise((resolve) => {
-                this.gapi.load('client', resolve);
+            await new Promise((resolve, reject) => {
+                this.gapi.load('client', {
+                    callback: resolve,
+                    onerror: reject
+                });
             });
 
+            // Verify client loaded
+            if (!this.gapi.client) {
+                throw new Error('Google API client failed to load');
+            }
+
+            // Initialize with discovery document
             await this.gapi.client.init({
                 discoveryDocs: [this.DISCOVERY_DOC]
             });
@@ -71,8 +84,12 @@ class GoogleCalendarSync {
     // Sign in to Google Calendar using modern OAuth
     async signInToGoogle() {
         try {
-            if (!this.gapi) {
-                throw new Error('Google API not initialized');
+            if (!this.gapi || !this.gapi.client) {
+                console.log('🔄 Google API not ready, re-initializing...');
+                const initSuccess = await this.initializeGoogleAPI();
+                if (!initSuccess) {
+                    throw new Error('Failed to initialize Google API');
+                }
             }
 
             console.log('🔐 Signing in to Google Calendar...');
@@ -93,6 +110,13 @@ class GoogleCalendarSync {
                         console.log('✅ OAuth token received');
                         this.accessToken = response.access_token;
                         this.isSignedIn = true;
+
+                        // Ensure gapi.client is available before setting token
+                        if (!this.gapi || !this.gapi.client) {
+                            console.error('❌ Google API client not properly initialized');
+                            reject(new Error('Google API client not initialized'));
+                            return;
+                        }
 
                         // Set the access token for API calls
                         this.gapi.client.setToken({ access_token: this.accessToken });
