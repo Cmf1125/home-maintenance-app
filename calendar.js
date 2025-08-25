@@ -262,33 +262,53 @@ class CasaCareCalendar {
             return [];
         }
 
-        const tasksForDate = window.tasks.filter(task => {
-            if (!task.nextDue) return false;
+        const tasksForDate = [];
+        const searchDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        
+        window.tasks.forEach(task => {
+            if (!task.nextDue || !task.frequency) return;
             
-            // Handle both Date objects and string dates
-            let taskDate;
+            // Get the task's base due date
+            let baseTaskDate;
             if (task.nextDue instanceof Date) {
-                taskDate = task.nextDue;
+                baseTaskDate = task.nextDue;
             } else {
-                taskDate = new Date(task.nextDue);
+                baseTaskDate = new Date(task.nextDue);
             }
             
-            // Normalize both dates to avoid timezone issues
-            const normalizedTaskDate = new Date(taskDate.getFullYear(), taskDate.getMonth(), taskDate.getDate());
-            const normalizedSearchDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            // Normalize the base task date
+            const normalizedBaseDate = new Date(baseTaskDate.getFullYear(), baseTaskDate.getMonth(), baseTaskDate.getDate());
             
-            const matches = normalizedTaskDate.getTime() === normalizedSearchDate.getTime();
-            
-            // Debug log for the first few checks
-            if (date.getDate() <= 3) {
-                console.log(`🔍 Comparing task "${task.title}": ${normalizedTaskDate.toDateString()} vs ${normalizedSearchDate.toDateString()} = ${matches}`);
+            // Check if this date matches the task's next due date
+            if (normalizedBaseDate.getTime() === searchDate.getTime()) {
+                tasksForDate.push(task);
+                return;
             }
             
-            return matches;
+            // For recurring tasks, check if this date is a future occurrence
+            if (task.frequency > 0) {
+                // Calculate how many days difference between search date and base date
+                const daysDiff = Math.floor((searchDate.getTime() - normalizedBaseDate.getTime()) / (24 * 60 * 60 * 1000));
+                
+                // Only look ahead (positive days) and within reasonable range (2 years)
+                if (daysDiff > 0 && daysDiff <= 730) {
+                    // Check if this date falls on a recurring interval
+                    if (daysDiff % task.frequency === 0) {
+                        // Create a virtual instance for this recurring date
+                        const recurringTask = {
+                            ...task,
+                            nextDue: new Date(searchDate),
+                            isRecurringInstance: true,
+                            originalDueDate: normalizedBaseDate
+                        };
+                        tasksForDate.push(recurringTask);
+                    }
+                }
+            }
         });
 
         if (tasksForDate.length > 0) {
-            console.log(`📅 Found ${tasksForDate.length} tasks for ${date.toDateString()}`);
+            console.log(`📅 Found ${tasksForDate.length} tasks for ${date.toDateString()} (including recurring)`);
         }
         
         return tasksForDate;
@@ -381,13 +401,17 @@ showDayPanel(date, dayTasks) {
             </div>
             <div class="task-meta mb-3">
                 <span class="task-category">${task.category}</span>
+                ${task.isRecurringInstance ? '<span class="recurring-badge bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">🔄 Recurring</span>' : ''}
                 ${isOverdue ? '<span class="overdue-badge">OVERDUE</span>' : ''}
             </div>
             <p class="task-description text-base text-gray-700 leading-snug mb-1">${task.description}</p>
         </div>
         <div class="task-actions">
-            <button onclick="completeTask(${task.id})" class="complete-task-btn text-base font-medium">✅ Complete</button>
-            <button onclick="window.masterRescheduleTask(${task.id}, event)" class="reschedule-task-btn text-base font-medium">📅 Reschedule</button>
+            ${task.isRecurringInstance ? 
+                '<p class="text-sm text-gray-500 italic">This is a future recurring instance</p>' :
+                `<button onclick="completeTask(${task.id})" class="complete-task-btn text-base font-medium">✅ Complete</button>
+                <button onclick="rescheduleTask(${task.id})" class="reschedule-task-btn text-base font-medium">📅 Reschedule</button>`
+            }
         </div>
     </div>
 `;

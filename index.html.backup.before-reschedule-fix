@@ -1616,147 +1616,9 @@
         document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
     
-    // Main reschedule function using new modal
-    window.rescheduleTaskFromDashboard = function(taskId, event) {
-        // CRITICAL: Stop any event bubbling immediately
-        if (event) {
-            event.stopPropagation();
-            event.preventDefault();
-        }
-        
-        console.log('📅 Opening WORKING reschedule modal for task:', taskId);
-        
-        const task = window.tasks.find(t => t.id === taskId);
-        if (!task) {
-            console.error('❌ Task not found:', taskId);
-            return;
-        }
-        
-        // Store current task
-        window.currentRescheduleTask = task;
-        
-        // Ensure modal exists
-        createWorkingRescheduleModal();
-        
-        // Get modal and elements
-        const modal = document.getElementById('working-reschedule-modal');
-        const taskNameEl = document.getElementById('working-task-name');
-        const currentDateEl = document.getElementById('working-current-date');
-        const newDateEl = document.getElementById('working-new-date');
-        
-        // Set content
-        taskNameEl.textContent = `"${task.title}"`;
-        
-        const currentDate = task.dueDate instanceof Date ? task.dueDate : new Date(task.dueDate);
-        currentDateEl.textContent = currentDate.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-        
-        newDateEl.value = currentDate.toISOString().split('T')[0];
-        
-        // SHOW the modal
-        modal.style.display = 'flex';
-        
-        // Focus on date input
-        setTimeout(() => {
-            newDateEl.focus();
-            console.log('✅ Working modal should now be visible!');
-        }, 100);
-    };
+    // REMOVED: Old reschedule function - now using master-reschedule.js
     
-    // Quick date setter for new modal
-    window.setWorkingQuickDate = function(daysFromNow) {
-        const newDateEl = document.getElementById('working-new-date');
-        if (!newDateEl) return;
-        
-        const newDate = new Date();
-        newDate.setDate(newDate.getDate() + daysFromNow);
-        newDateEl.value = newDate.toISOString().split('T')[0];
-        
-        // Visual feedback
-        newDateEl.style.background = '#dbeafe';
-        setTimeout(() => newDateEl.style.background = '', 300);
-    };
-    
-    // Close working modal
-    window.closeWorkingModal = function() {
-        const modal = document.getElementById('working-reschedule-modal');
-        if (modal) {
-            modal.style.display = 'none';
-        }
-        window.currentRescheduleTask = null;
-    };
-    
-    // Confirm reschedule with new modal
-    window.confirmWorkingReschedule = function() {
-        if (!window.currentRescheduleTask) {
-            alert('❌ No task selected');
-            return;
-        }
-        
-        const newDateEl = document.getElementById('working-new-date');
-        if (!newDateEl?.value) {
-            alert('❌ Please select a new due date');
-            return;
-        }
-        
-        const newDate = new Date(newDateEl.value + 'T12:00:00');
-        if (isNaN(newDate.getTime())) {
-            alert('❌ Invalid date');
-            return;
-        }
-        
-        const taskTitle = window.currentRescheduleTask.title;
-        
-        // Update task
-        window.currentRescheduleTask.dueDate = newDate;
-        window.currentRescheduleTask.nextDue = newDate; // Calendar sync
-        
-        console.log('✅ Task updated:', taskTitle, 'to', newDate.toLocaleDateString());
-        
-        // Save and refresh
-        if (typeof saveData === 'function') {
-            saveData();
-            console.log('💾 Data saved');
-        }
-        
-        if (window.enhancedDashboard?.render) {
-            window.enhancedDashboard.render();
-            console.log('🔄 Dashboard refreshed');
-        }
-        
-        if (window.casaCareCalendar?.refresh) {
-            window.casaCareCalendar.refresh();
-            console.log('📅 Calendar refreshed');
-        }
-        
-        // Close modal and show success
-        window.closeWorkingModal();
-        alert(`✅ "${taskTitle}" rescheduled to ${newDate.toLocaleDateString()}`);
-    };
-    
-    console.log('✅ NEW working reschedule modal created and ready!');
-
-    // DEBUG: Test reschedule system
-    window.testReschedule = function() {
-        console.log('🧪 TESTING RESCHEDULE SYSTEM:');
-        console.log('  rescheduleTaskFromDashboard:', typeof window.rescheduleTaskFromDashboard);
-        console.log('  tasks available:', !!window.tasks);
-        console.log('  tasks count:', window.tasks?.length || 0);
-        
-        if (window.tasks && window.tasks.length > 0) {
-            console.log('  Testing with first task:', window.tasks[0].title);
-            try {
-                window.rescheduleTaskFromDashboard(window.tasks[0].id);
-            } catch (error) {
-                console.error('  ERROR:', error);
-            }
-        }
-    };
-    
+    // REMOVED: Old reschedule helper functions - now using master-reschedule.js
 </script>
             
 <script>
@@ -1870,6 +1732,7 @@
     <script src="date-utils.js"></script>
     <script src="marketplace.js"></script>
     <script src="google-calendar-sync.js"></script>
+    <script src="master-reschedule.js"></script>
     <script src="app.js"></script>
     <script src="calendar.js"></script>
     <script src="enhanced-dashboard.js"></script>
@@ -2082,13 +1945,7 @@ window.editTaskFromDashboard = function(taskId) {
 };
 
 // 4. WORKING RESCHEDULE MODAL (COMPLETELY REWRITTEN)
-window.rescheduleTaskFromDashboard = function(taskId, event) {
-    if (event) {
-        event.stopPropagation();
-        event.preventDefault();
-    }
-    
-    console.log('📅 Rescheduling task:', taskId);
+// REMOVED: Second old reschedule function - now using master-reschedule.js
     
     const task = window.tasks?.find(t => t.id === taskId);
     if (!task) {

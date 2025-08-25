@@ -3975,3 +3975,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial update
     setTimeout(updateTaskPreview, 500);
 });
+
+// DEBUG: Test reschedule system
+window.testReschedule = function() {
+    console.log('🧪 TESTING RESCHEDULE SYSTEM:');
+    console.log('  rescheduleTaskFromDashboard:', typeof window.rescheduleTaskFromDashboard);
+    console.log('  tasks available:', !!window.tasks);
+    console.log('  tasks count:', window.tasks?.length || 0);
+    
+    if (window.tasks && window.tasks.length > 0) {
+        console.log('  Testing with first task:', window.tasks[0].title);
+        try {
+            window.rescheduleTaskFromDashboard(window.tasks[0].id);
+        } catch (error) {
+            console.error('  ERROR:', error);
+        }
+    }
+};

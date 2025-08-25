@@ -275,7 +275,7 @@ renderEnhancedTaskCard(task) {
                         class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-base font-medium transition-colors">
                     Complete
                 </button>
-                <button onclick="event.stopPropagation(); window.masterRescheduleTask(${task.id}, event)"
+                <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
                         class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-base font-medium transition-colors">
                     Reschedule
                 </button>
@@ -343,23 +343,7 @@ renderEnhancedTaskCard(task) {
 }
 }
 
-// FIXED: Enhanced reschedule function with proper event handling
-function rescheduleTaskFromDashboard(taskId, event) {
-    // CRITICAL: Stop any event bubbling immediately
-    if (event) {
-        event.stopPropagation();
-        event.preventDefault();
-    }
-    
-    console.log('📅 Dashboard reschedule clicked for task:', taskId);
-    
-    // Use the fixed reschedule function from index.html
-    if (typeof window.rescheduleTaskFromDashboard === 'function') {
-        window.rescheduleTaskFromDashboard(taskId);
-    } else {
-        console.error('❌ Fixed reschedule function not found');
-    }
-}
+// REMOVED: Using the original reschedule function from HTML instead
 
 // UPDATED: Function to add task (replaces show all tasks)
 function addTaskFromDashboard() {
