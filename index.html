@@ -2148,13 +2148,27 @@ window.rescheduleTaskFromDashboard = function(taskId, event) {
             task.nextDue = newDate;
             
             // Sync reschedule to Google Calendar if connected
-            if (window.googleCalendarSync && window.googleCalendarSync.isConnected() && task.googleEventId) {
-                console.log('📅 Syncing reschedule to Google Calendar...');
-                window.googleCalendarSync.updateCalendarEvent(task).then(() => {
-                    console.log('✅ Google Calendar event updated for reschedule');
-                }).catch(error => {
-                    console.error('❌ Failed to update Google Calendar event:', error);
-                });
+            if (window.googleCalendarSync && window.googleCalendarSync.isConnected()) {
+                if (task.googleEventId) {
+                    // Task already has calendar event - update it
+                    console.log('📅 Updating existing Google Calendar event for reschedule...');
+                    window.googleCalendarSync.updateCalendarEvent(task).then(() => {
+                        console.log('✅ Google Calendar event updated for reschedule');
+                    }).catch(error => {
+                        console.error('❌ Failed to update Google Calendar event:', error);
+                    });
+                } else {
+                    // Task doesn't have calendar event yet - create one
+                    console.log('📅 Creating new Google Calendar event for reschedule...');
+                    window.googleCalendarSync.syncTaskToCalendar(task).then((eventId) => {
+                        if (eventId) {
+                            task.googleEventId = eventId;
+                            console.log('✅ New Google Calendar event created for reschedule');
+                        }
+                    }).catch(error => {
+                        console.error('❌ Failed to create Google Calendar event:', error);
+                    });
+                }
             }
             
             if (typeof saveData === 'function') saveData();
