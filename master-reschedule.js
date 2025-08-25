@@ -136,6 +136,15 @@ window.confirmMasterReschedule = function() {
     task.dueDate = newDate;
     task.nextDue = newDate; // For calendar compatibility
     
+    // Debug: Log the exact dates being set
+    console.log('🔍 Task date update debug:', {
+        taskTitle: task.title,
+        oldDueDate: oldDate.toDateString(),
+        newDueDate: newDate.toDateString(),
+        newNextDue: task.nextDue.toDateString(),
+        newDateISO: newDate.toISOString()
+    });
+    
     // Google Calendar Sync
     if (window.googleCalendarSync && window.googleCalendarSync.isConnected()) {
         console.log('🔍 Google Calendar sync check:', {
@@ -222,3 +231,17 @@ window.confirmReschedule = window.masterRescheduleTask;
 window.confirmTaskReschedule = window.masterRescheduleTask;
 
 console.log('✅ Master Reschedule module loaded - all reschedule functions unified');
+
+// Debug function to check all task dates
+window.debugTaskDates = function() {
+    console.log('📊 All task dates debug:');
+    if (window.tasks) {
+        window.tasks.forEach((task, index) => {
+            console.log(`${index + 1}. "${task.title}":`, {
+                dueDate: task.dueDate instanceof Date ? task.dueDate.toDateString() : task.dueDate,
+                nextDue: task.nextDue instanceof Date ? task.nextDue.toDateString() : task.nextDue,
+                isCompleted: task.isCompleted
+            });
+        });
+    }
+};
