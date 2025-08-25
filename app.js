@@ -2328,8 +2328,7 @@ function completeTask(taskId) {
         return;
     }
     
-    // Update global references
-    window.tasks = tasks;
+    // Global tasks array is already updated (task variable is a reference)
     
     // Refresh enhanced dashboard
     if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
