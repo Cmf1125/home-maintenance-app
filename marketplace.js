@@ -82,18 +82,18 @@ class MarketplaceManager {
             'gutter': {
                 products: [
                     {
-                        name: 'Gutter Cleaning Tool Kit',
-                        price: '~$29.99',
-                        rating: '4.3/5',
-                        amazonASIN: 'B07XQZQZQZ',
+                        name: 'Telescoping Gutter Cleaning Wand',
+                        price: '~$22.99',
+                        rating: '4.0/5',
+                        amazonASIN: 'B00CLOG5MK',
                         category: 'Exterior',
                         description: 'Telescoping wand and curved attachment'
                     },
                     {
-                        name: 'Gutter Guards (200ft)',
-                        price: '~$89.99',
-                        rating: '4.2/5',
-                        amazonASIN: 'B08XQZQZQZ',
+                        name: 'Gutter Guards (208ft)',
+                        price: '~$120.99',
+                        rating: '4.7/5',
+                        amazonASIN: 'B0CFV3FGH5',
                         category: 'Exterior',
                         description: 'Reduce future cleaning needs'
                     }
@@ -123,17 +123,17 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Green Gobbler Drain Cleaner (2-Pack)',
-                        price: '~$16.99',
+                        price: '~$19.98',
                         rating: '4.3/5',
-                        amazonASIN: 'B0154IFRWY',
+                        amazonASIN: 'B085FS4JTD',
                         category: 'Plumbing',
                         description: 'Eco-friendly drain treatment'
                     },
                     {
-                        name: 'Drain Snake Tool 25ft',
-                        price: '~$12.99',
-                        rating: '4.1/5',
-                        amazonASIN: 'B07DRAINXX',
+                        name: 'Drain Snake Tool 25ft (3pk)',
+                        price: '~$14.95',
+                        rating: '4.3/5',
+                        amazonASIN: 'B08FGH2V5Q',
                         category: 'Plumbing',
                         description: 'Clear tough clogs safely'
                     }
@@ -142,18 +142,18 @@ class MarketplaceManager {
             'caulk': {
                 products: [
                     {
-                        name: 'DAP Silicone Sealant (Clear, 6-Pack)',
-                        price: '~$18.99',
-                        rating: '4.4/5',
-                        amazonASIN: 'B000BQOXKY',
+                        name: 'All Purpose Silicone Caulk, Clear, 10 fl oz',
+                        price: '~$8.87',
+                        rating: '4.7/5',
+                        amazonASIN: 'B0B8QPH3RW',
                         category: 'General',
                         description: 'Waterproof bathroom and kitchen sealing'
                     },
                     {
                         name: 'Caulk Gun + Removal Tool Kit',
-                        price: '~$14.99',
-                        rating: '4.2/5',
-                        amazonASIN: 'B07CAULKXX',
+                        price: '~$15.99',
+                        rating: '4.5/5',
+                        amazonASIN: 'B09Q8JMQXY',
                         category: 'Tools',
                         description: 'Professional caulking kit'
                     }
@@ -434,20 +434,6 @@ class MarketplaceManager {
                 ]
             },
             // Home Feature Products
-            'fireplace': {
-                products: [
-                    {
-                        name: 'Chimney Cleaning Log 2 pk',
-                        price: '~$24.99', // Approximate - prices change daily
-                        rating: '4.5/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'B0CHN5JBV3', // TODO: Research on Amazon
-                        category: 'Safety',
-                        description: 'Reduces creosote buildup in chimneys',
-                        priority: 'MEDIUM',
-                        estCommission: '$1-2'
-                    }
-                ]
-            },
             'chimney': {
                 products: [
                     {
