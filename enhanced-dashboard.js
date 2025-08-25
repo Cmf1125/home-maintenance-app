@@ -693,6 +693,44 @@ function confirmReschedule() {
         window.casaCareCalendar.refresh();
     }
     
+    // ADDED: Google Calendar sync for reschedules
+    if (window.googleCalendarSync && window.googleCalendarSync.isConnected()) {
+        const task = window.currentRescheduleTask;
+        console.log('🔍 Google Calendar sync check for reschedule:', {
+            googleCalendarSyncExists: !!window.googleCalendarSync,
+            isConnected: window.googleCalendarSync.isConnected(),
+            taskHasGoogleEventId: !!task.googleEventId,
+            taskTitle: task.title
+        });
+        
+        if (task.googleEventId) {
+            // Task already has calendar event - update it
+            console.log('📅 Updating existing Google Calendar event for reschedule...');
+            window.googleCalendarSync.updateCalendarEvent(task).then(() => {
+                console.log('✅ Google Calendar event updated for reschedule');
+            }).catch(error => {
+                console.error('❌ Failed to update Google Calendar event:', error);
+            });
+        } else {
+            // Task doesn't have calendar event yet - create one
+            console.log('📅 Creating new Google Calendar event for reschedule...');
+            window.googleCalendarSync.syncTaskToCalendar(task).then((eventId) => {
+                if (eventId) {
+                    task.googleEventId = eventId;
+                    console.log('✅ New Google Calendar event created for reschedule');
+                    // Save again to persist the googleEventId
+                    if (typeof window.saveData === 'function') {
+                        window.saveData();
+                    }
+                }
+            }).catch(error => {
+                console.error('❌ Failed to create Google Calendar event:', error);
+            });
+        }
+    } else {
+        console.log('⚠️ Google Calendar sync not available or not connected');
+    }
+    
     // Close modal
     closeDatePickerModal();
     
