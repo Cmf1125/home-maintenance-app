@@ -937,20 +937,20 @@ class MarketplaceManager {
         return `
             <div 
                 onclick="window.open('${this.generateAmazonLink(product.amazonASIN, product.name)}', '_blank')"
-                class="flex items-center justify-between p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 cursor-pointer transition-all duration-200 group shadow-sm hover:shadow-md"
+                class="bg-white p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-md cursor-pointer transition-all group"
             >
-                <div class="flex-1 min-w-0">
-                    <div class="font-medium text-gray-900 truncate group-hover:text-blue-800 text-sm leading-tight">${product.name}</div>
-                    <div class="flex items-center mt-1 space-x-3">
-                        <span class="text-green-700 font-bold text-sm">${cleanPrice}</span>
-                        <span class="text-amber-600 text-sm font-medium">⭐ ${product.rating}</span>
+                <h4 class="font-semibold text-gray-900 mb-2 group-hover:text-blue-700">${product.name}</h4>
+                <p class="text-sm text-gray-600 mb-3">${product.description}</p>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-green-600 font-bold">${cleanPrice}</span>
+                        <span class="text-yellow-600 text-sm">⭐ ${product.rating}</span>
                     </div>
-                </div>
-                
-                <div class="flex-shrink-0 text-blue-600 group-hover:text-blue-800 ml-4">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
+                    <div class="text-blue-600 group-hover:text-blue-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
                 </div>
             </div>
         `;
