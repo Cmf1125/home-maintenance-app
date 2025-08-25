@@ -789,7 +789,9 @@ class MarketplaceManager {
         let html = '';
         keywords.forEach(keyword => {
             if (this.productDatabase[keyword]) {
-                this.productDatabase[keyword].products.slice(0, 2).forEach(product => {
+                // Show more products for cleaning supplies, limit others to avoid clutter
+                const limit = (containerId === 'cleaning-products') ? 8 : 2;
+                this.productDatabase[keyword].products.slice(0, limit).forEach(product => {
                     html += this.createProductCardHTML(product);
                 });
             }
