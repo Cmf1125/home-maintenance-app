@@ -252,13 +252,6 @@ renderEnhancedTaskCard(task) {
     // Get category info
     const categoryInfo = this.categoryConfig[task.category] || { icon: '📋', color: 'gray' };
 
-    // Generate marketplace recommendations
-    const marketplaceHTML = window.marketplaceManager ? 
-        window.marketplaceManager.createProductHTML(
-            window.marketplaceManager.getProductRecommendations(task.title, task.description), 
-            task.id
-        ) : '';
-
     return `
    <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200 hover:bg-gray-50" onclick="window.TaskManager.openModal(window.tasks.find(t => t.id === ${task.id}), false)">
         <!-- Row 1: Dot + Task Name + Category -->
@@ -281,9 +274,6 @@ renderEnhancedTaskCard(task) {
                 </button>
             </div>
         </div>
-        
-        <!-- Marketplace Integration -->
-        ${marketplaceHTML}
     </div>
 `;
 }

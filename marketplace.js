@@ -737,6 +737,25 @@ class MarketplaceManager {
         return html;
     }
 
+    // Simplified version for dashboard - just "View on Amazon" link
+    createDashboardProductHTML(recommendations, taskId) {
+        if (!recommendations || recommendations.length === 0) return '';
+
+        const firstProduct = recommendations[0]?.products[0];
+        if (!firstProduct) return '';
+
+        return `
+            <div class="marketplace-section mt-2">
+                <button 
+                    onclick="window.open('${window.marketplaceManager.generateAmazonLink(firstProduct.amazonASIN, firstProduct.name)}', '_blank')"
+                    class="text-xs text-blue-600 hover:text-blue-800 underline"
+                >
+                    🛍️ View supplies on Amazon
+                </button>
+            </div>
+        `;
+    }
+
     // Add marketplace integration to existing task card
     enhanceTaskWithMarketplace(taskElement, task) {
         const recommendations = this.getProductRecommendations(task.title, task.description);
@@ -802,23 +821,28 @@ class MarketplaceManager {
         container.innerHTML = html;
     }
     
-    // Create compact product card for marketplace categories
+    // Create compact product card for marketplace categories - clickable with clean pricing
     createProductCardHTML(product) {
+        // Clean up price - remove ~ symbol
+        const cleanPrice = product.price.replace(/~/g, '');
+        
         return `
-            <div class="flex items-center justify-between p-2 bg-gray-50 rounded border">
+            <div 
+                onclick="window.open('${this.generateAmazonLink(product.amazonASIN, product.name)}', '_blank')"
+                class="flex items-center justify-between p-3 bg-gray-50 hover:bg-blue-50 rounded border cursor-pointer transition-colors group"
+            >
                 <div class="flex-1 min-w-0">
-                    <div class="text-sm font-medium text-gray-900 truncate">${product.name}</div>
+                    <div class="text-sm font-medium text-gray-900 truncate group-hover:text-blue-800">${product.name}</div>
                     <div class="flex items-center mt-1 space-x-2">
-                        <span class="text-green-600 font-semibold text-xs">${product.price}</span>
+                        <span class="text-green-600 font-semibold text-xs">${cleanPrice}</span>
                         <span class="text-yellow-600 text-xs">⭐ ${product.rating}</span>
                     </div>
                 </div>
-                <button 
-                    onclick="window.open('${this.generateAmazonLink(product.amazonASIN, product.name)}', '_blank')"
-                    class="ml-2 bg-orange-500 hover:bg-orange-600 text-white text-xs px-2 py-1 rounded transition-colors"
-                >
-                    Buy
-                </button>
+                <div class="ml-2 text-blue-600 group-hover:text-blue-800">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </div>
             </div>
         `;
     }
@@ -832,21 +856,26 @@ class MarketplaceManager {
         let html = '';
         
         toolkits.forEach(product => {
+            // Clean up price - remove ~ symbol
+            const cleanPrice = product.price.replace(/~/g, '');
+            
             html += `
-                <div class="bg-white p-4 rounded-lg border border-orange-200">
-                    <h4 class="font-semibold text-gray-900 mb-2">${product.name}</h4>
+                <div 
+                    onclick="window.open('${this.generateAmazonLink(product.amazonASIN, product.name)}', '_blank')"
+                    class="bg-white p-4 rounded-lg border border-orange-200 hover:border-orange-300 hover:shadow-md cursor-pointer transition-all group"
+                >
+                    <h4 class="font-semibold text-gray-900 mb-2 group-hover:text-orange-700">${product.name}</h4>
                     <p class="text-sm text-gray-600 mb-3">${product.description}</p>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
-                            <span class="text-green-600 font-bold">${product.price}</span>
+                            <span class="text-green-600 font-bold">${cleanPrice}</span>
                             <span class="text-yellow-600 text-sm">⭐ ${product.rating}</span>
                         </div>
-                        <button 
-                            onclick="window.open('${this.generateAmazonLink(product.amazonASIN, product.name)}', '_blank')"
-                            class="bg-orange-500 hover:bg-orange-600 text-white text-sm px-3 py-2 rounded transition-colors"
-                        >
-                            View Details
-                        </button>
+                        <div class="text-orange-600 group-hover:text-orange-700">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
                     </div>
                 </div>
             `;
@@ -897,18 +926,23 @@ class MarketplaceManager {
         
         let html = '';
         seasonalProducts.forEach(product => {
+            // Clean up price - remove ~ symbol
+            const cleanPrice = product.price.replace(/~/g, '');
+            
             html += `
-                <div class="bg-white p-3 rounded-lg border border-green-200">
-                    <h5 class="font-medium text-gray-900 mb-1">${product.name}</h5>
+                <div 
+                    onclick="window.open('${this.generateAmazonLink(product.amazonASIN, product.name)}', '_blank')"
+                    class="bg-white p-3 rounded-lg border border-green-200 hover:border-green-300 hover:shadow-md cursor-pointer transition-all group"
+                >
+                    <h5 class="font-medium text-gray-900 mb-1 group-hover:text-green-700">${product.name}</h5>
                     <p class="text-xs text-gray-600 mb-2">${product.description}</p>
                     <div class="flex items-center justify-between">
-                        <span class="text-green-600 font-semibold text-sm">${product.price}</span>
-                        <button 
-                            onclick="window.open('${this.generateAmazonLink(product.amazonASIN, product.name)}', '_blank')"
-                            class="bg-green-500 hover:bg-green-600 text-white text-xs px-2 py-1 rounded transition-colors"
-                        >
-                            Buy on Amazon
-                        </button>
+                        <span class="text-green-600 font-semibold text-sm">${cleanPrice}</span>
+                        <div class="text-green-600 group-hover:text-green-700">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
                     </div>
                 </div>
             `;
@@ -916,9 +950,46 @@ class MarketplaceManager {
         
         container.innerHTML = html;
     }
+
+    // Filter shop categories based on dropdown selection
+    filterByCategory(selectedCategory) {
+        console.log('🔍 Filtering shop by category:', selectedCategory);
+        
+        // Get all category sections
+        const categories = [
+            { id: 'hvac-category', value: 'hvac' },
+            { id: 'water-category', value: 'water' },
+            { id: 'safety-category', value: 'safety' },
+            { id: 'cleaning-category', value: 'cleaning' },
+            { id: 'general-category', value: 'general' },
+            { id: 'toolkits-category', value: 'toolkits' },
+            { id: 'seasonal-category', value: 'seasonal' }
+        ];
+
+        categories.forEach(category => {
+            const element = document.getElementById(category.id);
+            if (element) {
+                if (selectedCategory === 'all' || selectedCategory === category.value) {
+                    element.style.display = 'block';
+                } else {
+                    element.style.display = 'none';
+                }
+            }
+        });
+
+        console.log(`✅ Shop filtered to show: ${selectedCategory === 'all' ? 'all categories' : selectedCategory}`);
+    }
 }
 
 // Initialize marketplace manager
 window.marketplaceManager = new MarketplaceManager();
+
+// Global function for shop category filtering
+function filterShopCategory() {
+    const select = document.getElementById('shop-category-filter');
+    if (select && window.marketplaceManager) {
+        window.marketplaceManager.filterByCategory(select.value);
+    }
+}
 
 console.log('✅ Marketplace module loaded successfully');
