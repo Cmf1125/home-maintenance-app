@@ -303,10 +303,10 @@ class MarketplaceManager {
             'power wash': {
                 products: [
                     {
-                        name: 'Electric Pressure Washer 3000 PSI 2.4 GPM',
-                        price: '~$149.99',
-                        rating: '4.3/5',
-                        amazonASIN: 'B08KGKQZW3',
+                        name: 'Electric Pressure Washer, 3000 Max PSI and 1.76 Max GPM',
+                        price: '~$264.99',
+                        rating: '4.7/5',
+                        amazonASIN: 'B0CQMZ4BG5',
                         category: 'Exterior',
                         description: 'Clean decks, driveways, and siding',
                         priority: 'SEASONAL',
@@ -317,10 +317,10 @@ class MarketplaceManager {
             'dehumidifier': {
                 products: [
                     {
-                        name: 'TOSOT 4500 Sq Ft Dehumidifier with Internal Pump',
-                        price: '~$199.99',
-                        rating: '4.4/5',
-                        amazonASIN: 'B0BF8QYL4G',
+                        name: '4500 Sq Ft Dehumidifier with Internal Pump',
+                        price: '~$169.99',
+                        rating: '4.3/5',
+                        amazonASIN: 'B0DSVLFLTM',
                         category: 'HVAC',
                         description: 'Remove excess humidity in summer',
                         priority: 'SEASONAL',
@@ -332,9 +332,9 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Lasko Ceramic Space Heater with Remote Control',
-                        price: '~$79.99',
-                        rating: '4.5/5',
-                        amazonASIN: 'B07KRHQD5C',
+                        price: '~$74.99',
+                        rating: '4.6/5',
+                        amazonASIN: '7300019196',
                         category: 'HVAC',
                         description: 'Efficient supplemental heating',
                         priority: 'SEASONAL',
@@ -346,9 +346,9 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Duck Brand Heavy-Duty Weatherstrip Seal',
-                        price: '~$19.99',
-                        rating: '4.2/5',
-                        amazonASIN: 'B000BQ1NTA',
+                        price: '~$9.99',
+                        rating: '4.4/5',
+                        amazonASIN: 'B0025KUSX2',
                         category: 'Exterior',
                         description: 'Seal gaps around doors and windows',
                         priority: 'SEASONAL',
@@ -360,9 +360,9 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'LEVOIT Top Fill Cool Mist Humidifier 6L',
-                        price: '~$79.99',
+                        price: '~$69.99',
                         rating: '4.4/5',
-                        amazonASIN: 'B08L3H9P7L',
+                        amazonASIN: 'B08HS45N13',
                         category: 'HVAC',
                         description: 'Add moisture to dry winter air',
                         priority: 'SEASONAL',
@@ -374,9 +374,9 @@ class MarketplaceManager {
                 products: [
                     {
                         name: 'Safe Paw Non-Toxic Ice Melter Pet Safe 35 lbs',
-                        price: '~$39.99',
-                        rating: '4.3/5',
-                        amazonASIN: 'B000BNXZM4',
+                        price: '~$24.95',
+                        rating: '4.5/5',
+                        amazonASIN: 'B07H9L1RW9',
                         category: 'Exterior',
                         description: 'Safe ice melt for walkways and driveways',
                         priority: 'SEASONAL',
