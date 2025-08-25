@@ -299,6 +299,91 @@ class MarketplaceManager {
                     }
                 ]
             },
+            // Seasonal Products - Spring/Summer
+            'power wash': {
+                products: [
+                    {
+                        name: 'Electric Pressure Washer 3000 PSI 2.4 GPM',
+                        price: '~$149.99',
+                        rating: '4.3/5',
+                        amazonASIN: 'B08KGKQZW3',
+                        category: 'Exterior',
+                        description: 'Clean decks, driveways, and siding',
+                        priority: 'SEASONAL',
+                        estCommission: '$10-15'
+                    }
+                ]
+            },
+            'dehumidifier': {
+                products: [
+                    {
+                        name: 'TOSOT 4500 Sq Ft Dehumidifier with Internal Pump',
+                        price: '~$199.99',
+                        rating: '4.4/5',
+                        amazonASIN: 'B0BF8QYL4G',
+                        category: 'HVAC',
+                        description: 'Remove excess humidity in summer',
+                        priority: 'SEASONAL',
+                        estCommission: '$15-20'
+                    }
+                ]
+            },
+            'space heater': {
+                products: [
+                    {
+                        name: 'Lasko Ceramic Space Heater with Remote Control',
+                        price: '~$79.99',
+                        rating: '4.5/5',
+                        amazonASIN: 'B07KRHQD5C',
+                        category: 'HVAC',
+                        description: 'Efficient supplemental heating',
+                        priority: 'SEASONAL',
+                        estCommission: '$8-12'
+                    }
+                ]
+            },
+            'weatherstrip': {
+                products: [
+                    {
+                        name: 'Duck Brand Heavy-Duty Weatherstrip Seal',
+                        price: '~$19.99',
+                        rating: '4.2/5',
+                        amazonASIN: 'B000BQ1NTA',
+                        category: 'Exterior',
+                        description: 'Seal gaps around doors and windows',
+                        priority: 'SEASONAL',
+                        estCommission: '$2-4'
+                    }
+                ]
+            },
+            'humidifier': {
+                products: [
+                    {
+                        name: 'LEVOIT Top Fill Cool Mist Humidifier 6L',
+                        price: '~$79.99',
+                        rating: '4.4/5',
+                        amazonASIN: 'B08L3H9P7L',
+                        category: 'HVAC',
+                        description: 'Add moisture to dry winter air',
+                        priority: 'SEASONAL',
+                        estCommission: '$8-12'
+                    }
+                ]
+            },
+            'ice melt': {
+                products: [
+                    {
+                        name: 'Safe Paw Non-Toxic Ice Melter Pet Safe 35 lbs',
+                        price: '~$39.99',
+                        rating: '4.3/5',
+                        amazonASIN: 'B000BNXZM4',
+                        category: 'Exterior',
+                        description: 'Safe ice melt for walkways and driveways',
+                        priority: 'SEASONAL',
+                        estCommission: '$4-8'
+                    }
+                ]
+            },
             // HVAC Feature Products
             'mini split': {
                 products: [
@@ -914,59 +999,103 @@ class MarketplaceManager {
         if (!container) return;
         
         const currentMonth = new Date().getMonth();
-        let seasonalProducts = [];
         
-        // Spring (Mar-May) - Gutter cleaning, HVAC prep, deck care
-        if (currentMonth >= 2 && currentMonth <= 4) {
-            seasonalProducts = [
-                ...this.productDatabase['gutter']?.products.slice(0, 1) || [],
-                ...this.productDatabase['hvac filter']?.products.slice(0, 1) || [],
-                ...this.productDatabase['deck']?.products.slice(0, 1) || []
-            ];
-        }
-        // Summer (Jun-Aug) - AC filters, pool maintenance
-        else if (currentMonth >= 5 && currentMonth <= 7) {
-            seasonalProducts = [
-                ...this.productDatabase['hvac filter']?.products.slice(0, 1) || [],
-                ...this.productDatabase['pool']?.products.slice(0, 2) || []
-            ];
-        }
-        // Fall (Sep-Nov) - Heating prep, weatherproofing, chimney
-        else if (currentMonth >= 8 && currentMonth <= 10) {
-            seasonalProducts = [
-                ...this.productDatabase['filter']?.products.slice(0, 1) || [],
-                ...this.productDatabase['caulk']?.products.slice(0, 1) || [],
-                ...this.productDatabase['fireplace']?.products.slice(0, 1) || []
-            ];
-        }
-        // Winter (Dec-Feb) - Pipe protection, indoor air
-        else {
-            seasonalProducts = [
-                ...this.productDatabase['pipe']?.products.slice(0, 1) || [],
-                ...this.productDatabase['battery']?.products.slice(0, 1) || [],
-                ...this.productDatabase['hvac filter']?.products.slice(0, 1) || []
-            ];
-        }
+        // Define all seasonal products with season tags - visible year-round
+        const seasonalProductGroups = [
+            {
+                season: 'Spring',
+                months: 'Mar-May',
+                icon: '🌱',
+                isCurrent: currentMonth >= 2 && currentMonth <= 4,
+                products: [
+                    ...this.productDatabase['gutter']?.products.slice(0, 1) || [],
+                    ...this.productDatabase['hvac filter']?.products.slice(0, 1) || [],
+                    ...this.productDatabase['deck']?.products.slice(0, 1) || [],
+                    ...this.productDatabase['power wash']?.products.slice(0, 1) || []
+                ]
+            },
+            {
+                season: 'Summer', 
+                months: 'Jun-Aug',
+                icon: '☀️',
+                isCurrent: currentMonth >= 5 && currentMonth <= 7,
+                products: [
+                    ...this.productDatabase['hvac filter']?.products.slice(0, 1) || [],
+                    ...this.productDatabase['pool']?.products.slice(0, 1) || [],
+                    ...this.productDatabase['dehumidifier']?.products.slice(0, 1) || [],
+                    ...this.productDatabase['wall ac']?.products.slice(0, 1) || []
+                ]
+            },
+            {
+                season: 'Fall',
+                months: 'Sep-Nov', 
+                icon: '🍂',
+                isCurrent: currentMonth >= 8 && currentMonth <= 10,
+                products: [
+                    ...this.productDatabase['filter']?.products.slice(0, 1) || [],
+                    ...this.productDatabase['caulk']?.products.slice(0, 1) || [],
+                    ...this.productDatabase['fireplace']?.products.slice(0, 1) || [],
+                    ...this.productDatabase['pipe']?.products.slice(0, 1) || [], // Heat tape for fall prep
+                    ...this.productDatabase['weatherstrip']?.products.slice(0, 1) || []
+                ]
+            },
+            {
+                season: 'Winter',
+                months: 'Dec-Feb',
+                icon: '❄️',
+                isCurrent: currentMonth >= 11 || currentMonth <= 1,
+                products: [
+                    ...this.productDatabase['pipe']?.products.slice(0, 1) || [],
+                    ...this.productDatabase['battery']?.products.slice(0, 1) || [],
+                    ...this.productDatabase['hvac filter']?.products.slice(0, 1) || [],
+                    ...this.productDatabase['space heater']?.products.slice(0, 1) || [],
+                    ...this.productDatabase['humidifier']?.products.slice(0, 1) || [],
+                    ...this.productDatabase['ice melt']?.products.slice(0, 1) || []
+                ]
+            }
+        ];
         
         let html = '';
-        seasonalProducts.forEach(product => {
-            // Clean up price - remove ~ symbol
-            const cleanPrice = product.price.replace(/~/g, '');
+        
+        seasonalProductGroups.forEach(group => {
+            if (group.products.length === 0) return;
+            
+            const currentBadge = group.isCurrent ? '<span class="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Current Season</span>' : '';
             
             html += `
-                <div 
-                    onclick="window.open('${this.generateAmazonLink(product.amazonASIN, product.name)}', '_blank')"
-                    class="bg-white p-3 rounded-lg border border-green-200 hover:border-green-300 hover:shadow-md cursor-pointer transition-all group"
-                >
-                    <h5 class="font-medium text-gray-900 mb-1 group-hover:text-green-700">${product.name}</h5>
-                    <p class="text-xs text-gray-600 mb-2">${product.description}</p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-green-600 font-semibold text-sm">${cleanPrice}</span>
-                        <div class="text-green-600 group-hover:text-green-700">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
+                <div class="mb-6">
+                    <div class="flex items-center mb-3">
+                        <span class="text-2xl mr-2">${group.icon}</span>
+                        <h3 class="text-lg font-bold text-gray-900">${group.season}</h3>
+                        <span class="ml-2 text-sm text-gray-600">(${group.months})</span>
+                        ${currentBadge}
+                    </div>
+                    <div class="space-y-2">
+            `;
+            
+            group.products.forEach(product => {
+                const cleanPrice = product.price.replace(/~/g, '');
+                
+                html += `
+                    <div 
+                        onclick="window.open('${this.generateAmazonLink(product.amazonASIN, product.name)}', '_blank')"
+                        class="bg-white p-3 rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-md cursor-pointer transition-all group"
+                    >
+                        <h5 class="font-medium text-gray-900 mb-1 group-hover:text-blue-700">${product.name}</h5>
+                        <p class="text-xs text-gray-600 mb-2">${product.description}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-green-600 font-semibold text-sm">${cleanPrice}</span>
+                            <div class="text-blue-600 group-hover:text-blue-700">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
                         </div>
+                    </div>
+                `;
+            });
+            
+            html += `
                     </div>
                 </div>
             `;
