@@ -559,6 +559,40 @@ class MarketplaceManager {
                         estCommission: '$8-15'
                     }
                 ]
+            },
+            'driveway': {
+                products: [
+                    {
+                        name: 'Driveway Crack Filler',
+                        price: '$12.99',
+                        rating: '4.3/5',
+                        amazonASIN: 'B000BD0L2S',
+                        category: 'Exterior',
+                        description: 'Seals and repairs asphalt driveway cracks',
+                        priority: 'MEDIUM',
+                        estCommission: '$1-3'
+                    },
+                    {
+                        name: 'Concrete Driveway Cleaner',
+                        price: '$19.99',
+                        rating: '4.5/5',
+                        amazonASIN: 'B07K7Z4M4D',
+                        category: 'Exterior',
+                        description: 'Removes oil stains and dirt from driveways',
+                        priority: 'MEDIUM',
+                        estCommission: '$2-4'
+                    },
+                    {
+                        name: 'Driveway Sealer (5 Gallon)',
+                        price: '$89.99',
+                        rating: '4.4/5',
+                        amazonASIN: 'B08J7QRQVD',
+                        category: 'Exterior',
+                        description: 'Protects and extends driveway life',
+                        priority: 'HIGH',
+                        estCommission: '$5-12'
+                    }
+                ]
             }
         };
     }
@@ -804,7 +838,7 @@ class MarketplaceManager {
         this.populateCategory('cleaning-products', ['clean']);
         
         // Populate General Maintenance & Exterior products
-        this.populateCategory('general-products', ['gutter', 'drain', 'caulk', 'battery', 'pipe', 'deck', 'garage', 'basement', 'pool']);
+        this.populateCategory('general-products', ['gutter', 'drain', 'caulk', 'battery', 'pipe', 'deck', 'garage', 'basement', 'pool', 'driveway']);
         
         // Populate Tool kits
         this.populateToolkits();
