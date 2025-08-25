@@ -1576,6 +1576,11 @@ document.body.classList.add('main-app-active');
         console.log('🏠 Initializing dashboard...');
         showTab('dashboard');
         console.log('✅ Dashboard initialized successfully');
+        
+        // Initialize Google Calendar sync UI
+        if (typeof updateCalendarSyncUI === 'function') {
+            updateCalendarSyncUI();
+        }
     } catch (error) {
         console.error('❌ Error initializing dashboard:', error);
         // Try basic fallback
@@ -2973,6 +2978,11 @@ async function initializeApp() {
         
         // Show dashboard
         showTab('dashboard');
+        
+        // Initialize Google Calendar sync UI
+        if (typeof updateCalendarSyncUI === 'function') {
+            updateCalendarSyncUI();
+        }
         
         console.log(`👋 Welcome back! Loaded ${tasks.length} tasks for ${homeData.fullAddress}`);
     } else {
