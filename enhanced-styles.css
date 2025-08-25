@@ -10,7 +10,10 @@
     --primary-600: #0f172a;
     --primary-500: #1e293b;
     --accent-600: #2563eb;
-    --accent-500: #2563eb;
+    --accent-500: #3b82f6;
+    --accent-400: #60a5fa;
+    --brand-orange: #ea580c;
+    --brand-orange-light: #fed7aa;
     --success-600: #059669;
     --success-500: #10b981;
     --warning-600: #d97706;
@@ -20,6 +23,8 @@
     --surface-50: #f8fafc;
     --surface-100: #f1f5f9;
     --surface-200: #e2e8f0;
+    --surface-800: #1e293b;
+    --surface-900: #0f172a;
 }
 
 /* 🍼 STEP 3: Professional Buttons */
@@ -96,6 +101,77 @@ textarea:focus {
 body {
     background: linear-gradient(135deg, var(--surface-50) 0%, var(--surface-200) 100%) !important;
     min-height: 100vh !important;
+}
+
+/* 🎨 STEP 7: Enhanced Typography Hierarchy */
+h1 {
+    font-weight: 800 !important;
+    color: var(--surface-900) !important;
+    letter-spacing: -0.025em !important;
+}
+
+h2 {
+    font-weight: 700 !important;
+    color: var(--surface-800) !important;
+    letter-spacing: -0.015em !important;
+}
+
+h3 {
+    font-weight: 600 !important;
+    color: var(--surface-800) !important;
+}
+
+/* 🎨 STEP 8: Brand Accent Colors */
+.text-blue-600 {
+    color: var(--accent-600) !important;
+}
+
+.text-blue-700 {
+    color: var(--accent-600) !important;
+}
+
+.bg-blue-600 {
+    background-color: var(--accent-600) !important;
+}
+
+.bg-blue-700 {
+    background-color: var(--accent-500) !important;
+}
+
+/* 🎨 STEP 9: Professional Stats Cards */
+.stat-card {
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.stat-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 3px !important;
+    background: linear-gradient(90deg, var(--accent-600), var(--brand-orange)) !important;
+    border-radius: 16px 16px 0 0 !important;
+}
+
+/* 🎨 STEP 10: Professional Navigation */
+.tab-btn {
+    position: relative !important;
+    transition: all 0.2s ease !important;
+    font-weight: 500 !important;
+}
+
+.tab-btn.bg-blue-100 {
+    background: linear-gradient(135deg, var(--accent-600), var(--accent-500)) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+}
+
+.tab-btn:not(.bg-blue-100):hover {
+    background-color: var(--surface-100) !important;
+    transform: translateY(-1px) !important;
 }
 
 /* 🍼 STEP 7: Professional Task Cards (No Colored Borders) */

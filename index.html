@@ -56,16 +56,18 @@
 <div id="login-screen" class="fixed inset-0 z-50 bg-gradient-to-br from-blue-50 to-indigo-100 pt-8 px-4">
     <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-auto">
        <div class="text-center mb-8">
-    <div class="house-animated text-5xl mb-4">🏠</div>
-    <h1 class="text-2xl font-bold text-gray-900 mb-2">The Home Keeper</h1>
-    <p class="text-gray-600 mb-3">Smart home maintenance made simple</p>
+    <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mb-4 mx-auto shadow-lg">
+        TH
+    </div>
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">The Home Keeper</h1>
+    <p class="text-gray-600 mb-3 font-medium">Professional home maintenance management</p>
     
     <!-- NEW: Rotating Benefits -->
     <div class="rotating-benefits h-6 overflow-hidden">
-        <div class="benefit-item text-sm font-medium text-blue-600">🔧 Never miss critical maintenance</div>
-        <div class="benefit-item text-sm font-medium text-blue-600">💰 Prevent costly repairs</div>
-        <div class="benefit-item text-sm font-medium text-blue-600">📱 Smart automated reminders</div>
-        <div class="benefit-item text-sm font-medium text-blue-600">🏠 Increase your home value</div>
+        <div class="benefit-item text-sm font-semibold text-blue-600">• Never miss critical maintenance</div>
+        <div class="benefit-item text-sm font-semibold text-blue-600">• Prevent costly repairs</div>
+        <div class="benefit-item text-sm font-semibold text-blue-600">• Smart automated reminders</div>
+        <div class="benefit-item text-sm font-semibold text-blue-600">• Increase your home value</div>
     </div>
 </div>
 
@@ -825,7 +827,7 @@
             <div class="max-w-4xl mx-auto">
                 <!-- Header -->
                 <div class="text-center mb-6">
-                    <h1 class="text-2xl font-bold text-gray-900 mb-2">🛍️ Home Maintenance Shop</h1>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Maintenance Supply Store</h1>
                     <p class="text-gray-600">Essential tools and supplies for your home maintenance tasks</p>
                 </div>
 
@@ -834,8 +836,10 @@
                     <!-- HVAC Category -->
                     <div class="bg-white rounded-xl p-6 shadow-lg border border-blue-100">
                         <div class="text-center mb-4">
-                            <div class="text-4xl mb-2">🌡️</div>
-                            <h3 class="text-lg font-semibold text-gray-900">HVAC & Air Quality</h3>
+                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-3 mx-auto">
+                                <span class="text-blue-600 font-bold text-sm">HVAC</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900">HVAC & Air Quality</h3>
                             <p class="text-sm text-gray-600">Filters, thermostats, maintenance tools</p>
                         </div>
                         <div class="space-y-3" id="hvac-products">
@@ -846,8 +850,10 @@
                     <!-- Water Systems Category -->
                     <div class="bg-white rounded-xl p-6 shadow-lg border border-cyan-100">
                         <div class="text-center mb-4">
-                            <div class="text-4xl mb-2">💧</div>
-                            <h3 class="text-lg font-semibold text-gray-900">Water Systems</h3>
+                            <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center mb-3 mx-auto">
+                                <span class="text-cyan-600 font-bold text-xs">WATER</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900">Water Systems</h3>
                             <p class="text-sm text-gray-600">Filters, testing kits, treatments</p>
                         </div>
                         <div class="space-y-3" id="water-products">
@@ -858,8 +864,10 @@
                     <!-- Safety & Security Category -->
                     <div class="bg-white rounded-xl p-6 shadow-lg border border-red-100">
                         <div class="text-center mb-4">
-                            <div class="text-4xl mb-2">⚠️</div>
-                            <h3 class="text-lg font-semibold text-gray-900">Safety & Security</h3>
+                            <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-3 mx-auto">
+                                <span class="text-red-600 font-bold text-xs">SAFETY</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900">Safety & Security</h3>
                             <p class="text-sm text-gray-600">Detectors, alarms, emergency supplies</p>
                         </div>
                         <div class="space-y-3" id="safety-products">
@@ -870,8 +878,10 @@
                     <!-- Cleaning Supplies Category -->
                     <div class="bg-white rounded-xl p-6 shadow-lg border border-green-100">
                         <div class="text-center mb-4">
-                            <div class="text-4xl mb-2">🧽</div>
-                            <h3 class="text-lg font-semibold text-gray-900">Cleaning Supplies</h3>
+                            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-3 mx-auto">
+                                <span class="text-green-600 font-bold text-xs">CLEAN</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900">Cleaning Supplies</h3>
                             <p class="text-sm text-gray-600">General purpose cleaners, tools, supplies</p>
                         </div>
                         <div class="space-y-3" id="cleaning-products">
@@ -925,20 +935,16 @@
 <div class="bottom-nav fixed bottom-0 left-0 right-0 bg-white border-t z-50">
     <div class="grid grid-cols-4 gap-1 p-2 sm:gap-2 text-base">
         <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn flex flex-col items-center p-3 rounded-lg bg-blue-100 text-blue-700 touch-btn">
-            <div class="text-lg mb-1">🏠</div>
-            <div class="text-xs">Home</div>
+            <div class="text-sm font-semibold mb-1">Dashboard</div>
         </button>
         <button onclick="showTab('calendar')" id="tab-calendar" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-            <div class="text-lg mb-1">📅</div>
-            <div class="text-xs">Calendar</div>
+            <div class="text-sm font-semibold mb-1">Calendar</div>
         </button>
         <button onclick="showTab('appliances')" id="tab-appliances" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-            <div class="text-lg mb-1">⚙️</div>
-            <div class="text-xs">Appliances</div>
+            <div class="text-sm font-semibold mb-1">Systems</div>
         </button>
         <button onclick="showTab('marketplace')" id="tab-marketplace" class="tab-btn flex flex-col items-center p-3 rounded-lg text-gray-600 hover:text-gray-900 touch-btn">
-            <div class="text-lg mb-1">🛍️</div>
-            <div class="text-xs">Shop</div>
+            <div class="text-sm font-semibold mb-1">Shop</div>
         </button>
     </div>
 </div>
