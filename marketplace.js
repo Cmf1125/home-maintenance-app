@@ -507,30 +507,7 @@ class MarketplaceManager {
                 ]
             },
         
-             'driveway': {
-                products: [
-                    {
-                        name: 'Concrete Crack Filler',
-                        price: '~$23.93', // Approximate - prices change daily
-                        rating: '4.8/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'B0DYDH19QJ', // TODO: Research on Amazon
-                        category: 'Exterior',
-                        description: 'Repair cracks in concrete',
-                        priority: 'HIGH',
-                        estCommission: '$3-6'
-                    },
-                    {
-                        name: 'Driveway Elastomeric Emulsion Crack Filler',
-                        price: '~$29.60', // Approximate - prices change daily
-                        rating: '4.2/5', // TODO: Update with real Amazon rating
-                        amazonASIN: 'B000DZBGDC', // TODO: Research on Amazon
-                        category: 'Exterior',
-                        description: 'Repair cracks in driveway',
-                        priority: 'HIGH',
-                        estCommission: '$3-6'
-                        }
-                ]
-            },
+             
             
             'garage': {
                 products: [
@@ -563,32 +540,32 @@ class MarketplaceManager {
             'driveway': {
                 products: [
                     {
-                        name: 'Driveway Crack Filler',
-                        price: '$12.99',
-                        rating: '4.3/5',
-                        amazonASIN: 'B000BD0L2S',
+                        name: 'Concrete Crack Filler',
+                        price: '$23.93',
+                        rating: '4.8/5',
+                        amazonASIN: 'B0DYDH19QJ',
                         category: 'Exterior',
-                        description: 'Seals and repairs asphalt driveway cracks',
+                        description: 'Repair cracks in concrete',
                         priority: 'MEDIUM',
                         estCommission: '$1-3'
                     },
                     {
-                        name: 'Concrete Driveway Cleaner',
-                        price: '$19.99',
-                        rating: '4.5/5',
-                        amazonASIN: 'B07K7Z4M4D',
+                        name: 'Industrial Cleaner and Degreaser for Driveway',
+                        price: '$10.98',
+                        rating: '4.7/5',
+                        amazonASIN: 'B0000AXNO5',
                         category: 'Exterior',
                         description: 'Removes oil stains and dirt from driveways',
                         priority: 'MEDIUM',
                         estCommission: '$2-4'
                     },
                     {
-                        name: 'Driveway Sealer (5 Gallon)',
-                        price: '$89.99',
-                        rating: '4.4/5',
-                        amazonASIN: 'B08J7QRQVD',
+                        name: 'Driveway Elastomeric Emulsion Crack Filler',
+                        price: '$29.60',
+                        rating: '4.2/5',
+                        amazonASIN: 'B000DZBGDC',
                         category: 'Exterior',
-                        description: 'Protects and extends driveway life',
+                        description: 'Repair cracks in driveway',
                         priority: 'HIGH',
                         estCommission: '$5-12'
                     }
