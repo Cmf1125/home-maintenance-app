@@ -387,21 +387,43 @@ class GoogleCalendarSync {
     async syncAllTasks() {
         if (!window.tasks || !this.isSignedIn) {
             console.log('⚠️ No tasks to sync or not signed in');
+            console.log('📊 Debug info:', {
+                tasksExist: !!window.tasks,
+                tasksCount: window.tasks?.length,
+                isSignedIn: this.isSignedIn
+            });
             return;
         }
 
         console.log('🔄 Syncing all tasks to Google Calendar...');
+        console.log('📊 Total tasks available:', window.tasks.length);
         
         let syncCount = 0;
+        let skipCount = 0;
         for (const task of window.tasks) {
+            console.log('📋 Checking task:', task.title, {
+                isCompleted: task.isCompleted,
+                hasGoogleEventId: !!task.googleEventId,
+                dueDate: task.dueDate
+            });
+            
             // Only sync incomplete tasks without existing Google event
-            if (!task.completed && !task.googleEventId) {
+            if (!task.isCompleted && !task.googleEventId) {
+                console.log('✅ Task eligible for sync:', task.title);
                 const eventId = await this.syncTaskToCalendar(task);
                 if (eventId) {
                     syncCount++;
+                    console.log('🎉 Task synced successfully:', task.title, 'Event ID:', eventId);
+                } else {
+                    console.log('❌ Task sync failed:', task.title);
                 }
                 // Small delay to avoid rate limiting
                 await this.delay(100);
+            } else {
+                skipCount++;
+                console.log('⏭️ Skipping task:', task.title, {
+                    reason: task.isCompleted ? 'completed' : 'already has google event'
+                });
             }
         }
 
