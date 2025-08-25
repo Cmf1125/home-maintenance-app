@@ -506,6 +506,32 @@ class MarketplaceManager {
                     }
                 ]
             },
+        
+             'driveway': {
+                products: [
+                    {
+                        name: 'Concrete Crack Filler',
+                        price: '~$23.93', // Approximate - prices change daily
+                        rating: '4.8/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B0DYDH19QJ', // TODO: Research on Amazon
+                        category: 'Exterior',
+                        description: 'Repair cracks in concrete',
+                        priority: 'HIGH',
+                        estCommission: '$3-6'
+                    },
+                    {
+                        name: 'Driveway Elastomeric Emulsion Crack Filler',
+                        price: '~$29.60', // Approximate - prices change daily
+                        rating: '4.2/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B000DZBGDC', // TODO: Research on Amazon
+                        category: 'Exterior',
+                        description: 'Repair cracks in driveway',
+                        priority: 'HIGH',
+                        estCommission: '$3-6'
+                        }
+                ]
+            },
+            
             'garage': {
                 products: [
                     {
