@@ -815,7 +815,7 @@ class MarketplaceManager {
         this.populateCategory('cleaning-products', ['clean']);
         
         // Populate General Maintenance & Exterior products
-        this.populateCategory('general-products', ['gutter', 'drain', 'caulk', 'battery', 'pipe', 'deck', 'garage', 'basement', 'pool', 'driveway']);
+        this.populateCategory('general-products', ['gutter', 'drain', 'caulk', 'battery', 'deck', 'garage', 'basement', 'pool', 'driveway']);
         
         // Populate Tool kits
         this.populateToolkits();
