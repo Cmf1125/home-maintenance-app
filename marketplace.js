@@ -760,17 +760,20 @@ class MarketplaceManager {
     renderMarketplace() {
         console.log('🛍️ Rendering marketplace...');
         
-        // Populate HVAC products
-        this.populateCategory('hvac-products', ['hvac filter']);
+        // Populate HVAC products - show all HVAC related items
+        this.populateCategory('hvac-products', ['hvac filter', 'filter', 'mini split', 'wall ac', 'baseboard']);
         
-        // Populate Water products  
-        this.populateCategory('water-products', ['water filter']);
+        // Populate Water products - show all water system items
+        this.populateCategory('water-products', ['water filter', 'sediment filter', 'uv filter', 'water softener', 'well water', 'septic']);
         
-        // Populate Safety products
-        this.populateCategory('safety-products', ['smoke detector']);
+        // Populate Safety products - show all safety items
+        this.populateCategory('safety-products', ['smoke detector', 'dryer vent', 'fireplace', 'chimney']);
         
-        // Populate Cleaning products
+        // Populate Cleaning products - show all cleaning items
         this.populateCategory('cleaning-products', ['clean']);
+        
+        // Populate General Maintenance & Exterior products
+        this.populateCategory('general-products', ['gutter', 'drain', 'caulk', 'battery', 'pipe', 'deck', 'garage', 'basement', 'pool']);
         
         // Populate Tool kits
         this.populateToolkits();
@@ -789,9 +792,8 @@ class MarketplaceManager {
         let html = '';
         keywords.forEach(keyword => {
             if (this.productDatabase[keyword]) {
-                // Show more products for cleaning supplies, limit others to avoid clutter
-                const limit = (containerId === 'cleaning-products') ? 8 : 2;
-                this.productDatabase[keyword].products.slice(0, limit).forEach(product => {
+                // Show ALL products for every category in the Shop tab
+                this.productDatabase[keyword].products.forEach(product => {
                     html += this.createProductCardHTML(product);
                 });
             }
