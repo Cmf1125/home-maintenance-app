@@ -2093,14 +2093,21 @@ if (isOverdue) {
                     <span>Every ${task.frequency}d</span>
                 </div>
             </div>
-            <button onclick="editTaskFromAllTasks(${task.id})" 
-                class="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm px-3 py-1.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md transform hover:-translate-y-0.5" 
-                title="Edit task">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                </svg>
-                Edit
-            </button>
+            <div class="flex gap-2">
+                <button onclick="showTaskHistory(${task.id})" 
+                    class="flex items-center gap-1.5 bg-gray-100 text-gray-700 text-sm px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-200 font-medium" 
+                    title="View task history">
+                    📋 History
+                </button>
+                <button onclick="editTaskFromAllTasks(${task.id})" 
+                    class="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm px-3 py-1.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md transform hover:-translate-y-0.5" 
+                    title="Edit task">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    Edit
+                </button>
+            </div>
         </div>
     </div>
 `;
@@ -2309,52 +2316,88 @@ function completeTask(taskId) {
     window.currentCompletingTask = task;
     console.log('🎯 Task stored for completion:', task.title);
     
-    // Check if modal elements exist
-    const modal = document.getElementById('task-completion-modal');
-    const taskName = document.getElementById('completion-task-name');
-    const taskDetails = document.getElementById('completion-task-details');
-    
-    console.log('🔍 Modal elements check:', {
-        modal: !!modal,
-        taskName: !!taskName,
-        taskDetails: !!taskDetails
-    });
-    
-    if (!modal) {
-        console.error('❌ Completion modal not found in DOM!');
-        alert('❌ Completion modal not found - check HTML');
-        return;
+    // Always create a fresh modal (remove any existing one first)
+    const existingModal = document.getElementById('task-completion-modal');
+    if (existingModal && existingModal.parentNode) {
+        existingModal.parentNode.removeChild(existingModal);
+        console.log('🗑️ Removed existing modal');
     }
-    
-    // Populate modal with task info
-    if (taskName) {
-        taskName.textContent = task.title;
-        console.log('✅ Set task name:', task.title);
-    }
-    
-    if (taskDetails) {
-        const detailText = `Due: ${new Date(task.dueDate).toLocaleDateString()} • ${task.category} • Every ${task.frequency} days`;
-        taskDetails.textContent = detailText;
-        console.log('✅ Set task details:', detailText);
-    }
-    
-    // Clear previous inputs
-    const costInput = document.getElementById('completion-actual-cost');
-    const notesInput = document.getElementById('completion-notes');
-    const photoPreview = document.getElementById('photo-preview');
-    
-    if (costInput) costInput.value = '';
-    if (notesInput) notesInput.value = '';
-    if (photoPreview) photoPreview.innerHTML = '';
+    // Initialize photos array
     window.completionPhotos = [];
+    console.log('🧹 Initialized completion photos array');
     
-    console.log('🧹 Cleared inputs');
+    // Create new modal directly in body
+    const newModal = document.createElement('div');
+    newModal.id = 'task-completion-modal';
+    newModal.innerHTML = `
+        <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto m-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold">✅ Complete Task</h3>
+                <button onclick="closeCompletionModal()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+            </div>
+            
+            <div class="space-y-4">
+                <!-- Task Name Display -->
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <div class="font-medium text-blue-900">${task.title}</div>
+                    <div class="text-sm text-blue-700 mt-1">Due: ${new Date(task.dueDate).toLocaleDateString()} • ${task.category} • Every ${task.frequency} days</div>
+                </div>
+                
+                <!-- Photo Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">📷 Completion Photos (Optional)</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 cursor-pointer" onclick="document.getElementById('completion-photo-input').click()">
+                        <div class="text-gray-600">
+                            <span class="text-2xl block mb-2">📸</span>
+                            <span class="text-sm">Click to add before/after photos</span>
+                        </div>
+                        <input type="file" id="completion-photo-input" multiple accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+                    </div>
+                    <div id="photo-preview" class="mt-2 space-y-2"></div>
+                </div>
+                
+                <!-- Actual Cost -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">💰 Actual Cost Spent</label>
+                    <div class="flex items-center">
+                        <span class="text-gray-500 mr-2">$</span>
+                        <input type="number" id="completion-actual-cost" step="0.01" min="0" placeholder="0.00"
+                               class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base">
+                    </div>
+                </div>
+                
+                <!-- Notes -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">📝 Completion Notes (Optional)</label>
+                    <textarea id="completion-notes" rows="3" placeholder="Add any notes about the task completion..."
+                              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base"></textarea>
+                </div>
+                
+                <!-- Completion button -->
+                <button onclick="enhancedTaskCompletion()" class="w-full bg-green-500 text-white px-4 py-3 rounded-lg hover:bg-green-600 font-medium">
+                    ✅ Complete Task
+                </button>
+            </div>
+        </div>
+    `;
     
-    // Show the modal
-    console.log('👁️ About to show modal...');
-    modal.classList.remove('hidden');
-    console.log('✅ Modal classList after remove hidden:', modal.classList.toString());
-    console.log('✅ Modal style.display:', modal.style.display);
+    // Set styles directly
+    newModal.style.position = 'fixed';
+    newModal.style.top = '0';
+    newModal.style.left = '0';
+    newModal.style.width = '100vw';
+    newModal.style.height = '100vh';
+    newModal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    newModal.style.zIndex = '999999';
+    newModal.style.display = 'flex';
+    newModal.style.alignItems = 'center';
+    newModal.style.justifyContent = 'center';
+    newModal.style.padding = '16px';
+    
+    // Add to body
+    document.body.appendChild(newModal);
+    console.log('✅ New modal created and added to body');
+    console.log('✅ Modal should now be visible!');
     
     // Double-check visibility
     setTimeout(() => {
@@ -4076,9 +4119,67 @@ window.completionPhotos = [];
 
 // Close completion modal
 function closeCompletionModal() {
-    document.getElementById('task-completion-modal').classList.add('hidden');
+    const modal = document.getElementById('task-completion-modal');
+    if (modal && modal.parentNode) {
+        modal.parentNode.removeChild(modal);
+    }
     window.currentCompletingTask = null;
     window.completionPhotos = [];
+}
+
+function simpleTaskCompletion() {
+    console.log('✅ Simple task completion triggered');
+    if (!window.currentCompletingTask) {
+        console.error('❌ No task selected for completion');
+        return;
+    }
+    
+    // Use the existing processTaskCompletion function
+    const success = processTaskCompletion(window.currentCompletingTask.id, {});
+    
+    if (success !== false) {
+        closeCompletionModal();
+        console.log(`✅ "${window.currentCompletingTask.title}" completed successfully!`);
+        alert(`✅ "${window.currentCompletingTask.title}" completed successfully!`);
+    }
+}
+
+function enhancedTaskCompletion() {
+    console.log('✅ Enhanced task completion triggered');
+    if (!window.currentCompletingTask) {
+        console.error('❌ No task selected for completion');
+        return;
+    }
+    
+    // Collect completion data
+    const costInput = document.getElementById('completion-actual-cost');
+    const notesInput = document.getElementById('completion-notes');
+    
+    const completionData = {
+        actualCost: costInput ? parseFloat(costInput.value) || 0 : 0,
+        notes: notesInput ? notesInput.value.trim() : '',
+        photos: [...(window.completionPhotos || [])] // Clone the array
+    };
+    
+    console.log('📝 Enhanced completion data:', completionData);
+    
+    // Process the completion using existing logic
+    const success = processTaskCompletion(window.currentCompletingTask.id, completionData);
+    
+    if (success !== false) {
+        closeCompletionModal();
+        console.log(`✅ "${window.currentCompletingTask.title}" completed successfully!`);
+        
+        // Show success message with details
+        let message = `✅ "${window.currentCompletingTask.title}" completed successfully!`;
+        if (completionData.actualCost > 0) {
+            message += `\n💰 Cost: $${completionData.actualCost.toFixed(2)}`;
+        }
+        if (completionData.photos.length > 0) {
+            message += `\n📷 ${completionData.photos.length} photo(s) saved`;
+        }
+        alert(message);
+    }
 }
 
 // Handle photo upload
@@ -4193,6 +4294,281 @@ window.closeCompletionModal = closeCompletionModal;
 window.handlePhotoUpload = handlePhotoUpload;
 window.removeCompletionPhoto = removeCompletionPhoto;
 window.confirmTaskCompletion = confirmTaskCompletion;
+window.simpleTaskCompletion = simpleTaskCompletion;
+window.enhancedTaskCompletion = enhancedTaskCompletion;
+
+// Show task completion history
+function showTaskHistory(taskId) {
+    console.log(`📋 Opening history for task ${taskId}...`);
+    
+    const task = window.tasks.find(t => t.id === taskId);
+    if (!task) {
+        console.error('❌ Task not found:', taskId);
+        alert('❌ Task not found');
+        return;
+    }
+    
+    const completionHistory = task.completionHistory || [];
+    console.log(`📋 Found ${completionHistory.length} completion records for "${task.title}"`);
+    
+    // Remove any existing history modal
+    const existingModal = document.getElementById('task-history-modal');
+    if (existingModal && existingModal.parentNode) {
+        existingModal.parentNode.removeChild(existingModal);
+    }
+    
+    // Create history modal
+    const historyModal = document.createElement('div');
+    historyModal.id = 'task-history-modal';
+    
+    let historyHTML = '';
+    if (completionHistory.length === 0) {
+        historyHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <div class="text-4xl mb-2">📋</div>
+                <div class="text-lg font-medium">No History Yet</div>
+                <div class="text-sm">Complete this task to start building maintenance history</div>
+            </div>
+        `;
+    } else {
+        historyHTML = completionHistory
+            .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
+            .map((record, index) => {
+                const date = new Date(record.completedAt);
+                const photosHtml = record.photos && record.photos.length > 0 ? 
+                    `<div class="mt-2">
+                        <div class="text-sm font-medium text-gray-700 mb-1">📷 Photos (${record.photos.length})</div>
+                        <div class="flex gap-2 flex-wrap">
+                            ${record.photos.map((photo, photoIndex) => 
+                                `<img src="${photo.data}" class="w-16 h-16 object-cover rounded border cursor-pointer" 
+                                      onclick="showPhotoModal('${photo.data}', '${photo.name}')"
+                                      title="${photo.name}">`
+                            ).join('')}
+                        </div>
+                    </div>` : '';
+                
+                return `
+                    <div class="border border-gray-200 rounded-lg p-4 ${index === 0 ? 'bg-green-50' : 'bg-gray-50'}">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="font-medium text-gray-900">
+                                ${index === 0 ? '✅ Most Recent' : `📋 Completion #${completionHistory.length - index}`}
+                            </div>
+                            <div class="text-sm text-gray-500">${date.toLocaleDateString()}</div>
+                        </div>
+                        ${record.actualCost > 0 ? `<div class="text-sm text-green-700 font-medium">💰 Cost: $${record.actualCost.toFixed(2)}</div>` : ''}
+                        ${record.notes ? `<div class="text-sm text-gray-700 mt-1"><span class="font-medium">📝 Notes:</span> ${record.notes}</div>` : ''}
+                        ${photosHtml}
+                    </div>
+                `;
+            }).join('');
+    }
+    
+    historyModal.innerHTML = `
+        <div class="bg-white rounded-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto m-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold">📋 Maintenance History</h3>
+                <button onclick="closeHistoryModal()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+            </div>
+            
+            <!-- Task Info -->
+            <div class="bg-blue-50 p-3 rounded-lg mb-4">
+                <div class="font-medium text-blue-900">${task.title}</div>
+                <div class="text-sm text-blue-700 mt-1">${task.category} • Every ${task.frequency} days</div>
+            </div>
+            
+            <!-- History Records -->
+            <div class="space-y-3">
+                ${historyHTML}
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <button onclick="closeHistoryModal()" class="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 font-medium">
+                    Close
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Set modal styles
+    historyModal.style.position = 'fixed';
+    historyModal.style.top = '0';
+    historyModal.style.left = '0';
+    historyModal.style.width = '100vw';
+    historyModal.style.height = '100vh';
+    historyModal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    historyModal.style.zIndex = '999999';
+    historyModal.style.display = 'flex';
+    historyModal.style.alignItems = 'center';
+    historyModal.style.justifyContent = 'center';
+    historyModal.style.padding = '16px';
+    
+    document.body.appendChild(historyModal);
+    console.log('✅ History modal created and displayed');
+}
+
+function closeHistoryModal() {
+    const modal = document.getElementById('task-history-modal');
+    if (modal && modal.parentNode) {
+        modal.parentNode.removeChild(modal);
+    }
+}
+
+function showPhotoModal(photoData, photoName) {
+    // Remove any existing photo modal
+    const existingModal = document.getElementById('photo-view-modal');
+    if (existingModal && existingModal.parentNode) {
+        existingModal.parentNode.removeChild(existingModal);
+    }
+    
+    const photoModal = document.createElement('div');
+    photoModal.id = 'photo-view-modal';
+    photoModal.innerHTML = `
+        <div class="bg-white rounded-xl max-w-4xl max-h-[90vh] p-4 m-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold">${photoName}</h3>
+                <button onclick="closePhotoModal()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+            </div>
+            <div class="flex justify-center">
+                <img src="${photoData}" class="max-w-full max-h-[70vh] object-contain rounded">
+            </div>
+        </div>
+    `;
+    
+    photoModal.style.position = 'fixed';
+    photoModal.style.top = '0';
+    photoModal.style.left = '0';
+    photoModal.style.width = '100vw';
+    photoModal.style.height = '100vh';
+    photoModal.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+    photoModal.style.zIndex = '9999999';
+    photoModal.style.display = 'flex';
+    photoModal.style.alignItems = 'center';
+    photoModal.style.justifyContent = 'center';
+    photoModal.style.padding = '16px';
+    
+    document.body.appendChild(photoModal);
+}
+
+function closePhotoModal() {
+    const modal = document.getElementById('photo-view-modal');
+    if (modal && modal.parentNode) {
+        modal.parentNode.removeChild(modal);
+    }
+}
+
+window.showTaskHistory = showTaskHistory;
+window.closeHistoryModal = closeHistoryModal;
+window.showPhotoModal = showPhotoModal;
+window.closePhotoModal = closePhotoModal;
+
+// DEBUG: Clear all modals and fix scrolling
+window.clearAllModals = function() {
+    console.log('🧹 Clearing all modals and fixing scrolling...');
+    
+    // Remove all possible modal elements
+    const modalIds = [
+        'task-completion-modal',
+        'task-history-modal', 
+        'photo-view-modal',
+        'task-edit-modal',
+        'date-picker-modal'
+    ];
+    
+    modalIds.forEach(id => {
+        const modal = document.getElementById(id);
+        if (modal && modal.parentNode) {
+            modal.parentNode.removeChild(modal);
+            console.log(`✅ Removed ${id}`);
+        }
+    });
+    
+    // Remove ALL fixed/absolute positioned elements with high z-index
+    const allElements = document.querySelectorAll('*');
+    let removedCount = 0;
+    allElements.forEach(el => {
+        const computed = window.getComputedStyle(el);
+        const zIndex = parseInt(computed.zIndex);
+        const position = computed.position;
+        
+        if (zIndex > 1000 && (position === 'fixed' || position === 'absolute')) {
+            console.log(`🔍 Found high z-index element:`, {
+                tag: el.tagName,
+                id: el.id,
+                class: el.className,
+                zIndex: zIndex,
+                position: position,
+                display: computed.display
+            });
+            
+            // Remove it completely
+            if (el.parentNode) {
+                el.parentNode.removeChild(el);
+                removedCount++;
+                console.log(`🗑️ Removed blocking element`);
+            }
+        }
+    });
+    
+    // Aggressive CSS reset for scrolling
+    document.body.style.cssText = '';
+    document.documentElement.style.cssText = '';
+    document.body.style.overflow = 'auto !important';
+    document.documentElement.style.overflow = 'auto !important';
+    document.body.style.position = 'static';
+    document.documentElement.style.position = 'static';
+    document.body.style.height = 'auto';
+    document.documentElement.style.height = 'auto';
+    
+    // Clear any event listeners that might be preventing scroll
+    window.onscroll = null;
+    window.ontouchmove = null;
+    document.onscroll = null;
+    document.ontouchmove = null;
+    
+    console.log(`✅ Removed ${removedCount} blocking elements, scrolling should work now`);
+    console.log('🔄 Try scrolling now, or refresh page if still stuck');
+};
+
+// DEBUG: Test modal manually
+window.testModal = function() {
+    console.log('🧪 Testing modal manually...');
+    const modal = document.getElementById('task-completion-modal');
+    if (!modal) {
+        console.error('❌ Modal not found!');
+        return;
+    }
+    console.log('✅ Modal found, showing...');
+    modal.style.display = 'flex';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.backgroundColor = 'rgba(255, 0, 0, 0.8)'; // Bright red background
+    modal.style.zIndex = '999999'; // Much higher z-index
+    modal.classList.remove('hidden');
+    
+    // Debug info
+    const rect = modal.getBoundingClientRect();
+    const computed = window.getComputedStyle(modal);
+    console.log('🔍 Modal bounding rect:', rect);
+    console.log('🔍 Modal parent:', modal.parentElement);
+    console.log('🔍 Modal computed z-index:', computed.zIndex);
+    console.log('🔍 Modal computed position:', computed.position);
+    
+    // Check if there are other elements with high z-index
+    const allElements = document.querySelectorAll('*');
+    const highZIndexElements = [];
+    allElements.forEach(el => {
+        const zIndex = parseInt(window.getComputedStyle(el).zIndex);
+        if (zIndex > 1000) {
+            highZIndexElements.push({element: el, zIndex: zIndex});
+        }
+    });
+    console.log('🔍 Elements with high z-index:', highZIndexElements);
+    
+    console.log('🧪 Modal should now be visible with red background');
+};
 
 // DEBUG: Test reschedule system
 window.testReschedule = function() {

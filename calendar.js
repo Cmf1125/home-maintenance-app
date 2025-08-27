@@ -409,7 +409,8 @@ showDayPanel(date, dayTasks) {
         <div class="task-actions">
             ${task.isRecurringInstance ? 
                 '<p class="text-sm text-gray-500 italic">This is a future recurring instance</p>' :
-                `<button onclick="completeTask(${task.id})" class="complete-task-btn text-base font-medium">✅ Complete</button>
+                `<button onclick="showTaskHistory(${task.id})" class="history-task-btn text-sm font-medium">📋 History</button>
+                <button onclick="completeTask(${task.id})" class="complete-task-btn text-base font-medium">✅ Complete</button>
                 <button onclick="rescheduleTask(${task.id})" class="reschedule-task-btn text-base font-medium">📅 Reschedule</button>`
             }
         </div>

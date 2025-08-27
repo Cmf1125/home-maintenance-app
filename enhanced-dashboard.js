@@ -264,6 +264,10 @@ renderEnhancedTaskCard(task) {
         <div class="flex items-center justify-start gap-4">
             <span class="text-xs ${dueDateColor} flex-shrink-0">${dueDateDisplay}</span>
             <div class="flex gap-2 ml-auto">
+                <button onclick="event.stopPropagation(); showTaskHistory(${task.id})" 
+                        class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-2 py-1 rounded text-sm font-medium transition-colors">
+                    📋 History
+                </button>
                 <button onclick="event.stopPropagation(); completeTask(${task.id})" 
                         class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-base font-medium transition-colors">
                     Complete
