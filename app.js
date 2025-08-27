@@ -229,7 +229,8 @@ function createMaintenancePlan() {
             zipcode: document.getElementById('zipcode')?.value || '12345',
             propertyType: document.getElementById('property-type')?.value || 'single-family',
             yearBuilt: parseInt(document.getElementById('year-built')?.value) || 2000,
-            sqft: parseInt(document.getElementById('sqft')?.value) || 2000
+            sqft: parseInt(document.getElementById('sqft')?.value) || 2000,
+            ownerName: window.currentUser?.displayName || 'Homeowner'
         };
         homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
 
@@ -3160,7 +3161,8 @@ function showPropertyConfirmation() {
         zipcode: document.getElementById('zipcode')?.value || '12345',
         propertyType: document.getElementById('property-type')?.value || 'single-family',
         yearBuilt: parseInt(document.getElementById('year-built')?.value) || 2000,
-        sqft: parseInt(document.getElementById('sqft')?.value) || 2000
+        sqft: parseInt(document.getElementById('sqft')?.value) || 2000,
+        ownerName: window.currentUser?.displayName || 'Homeowner'
     };
     homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
 
