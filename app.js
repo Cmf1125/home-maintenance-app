@@ -1575,6 +1575,14 @@ document.body.classList.add('main-app-active');
     // Initialize dashboard with error handling
     try {
         console.log('🏠 Initializing dashboard...');
+        
+        // CRITICAL FIX: Ensure main-app is visible
+        const mainApp = document.getElementById('main-app');
+        if (mainApp) {
+            mainApp.classList.remove('hidden');
+            mainApp.style.display = 'block';
+        }
+        
         showTab('dashboard');
         console.log('✅ Dashboard initialized successfully');
         
