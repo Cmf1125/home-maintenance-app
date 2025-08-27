@@ -2307,19 +2307,62 @@ function completeTask(taskId) {
 
     // Store the task ID for the modal
     window.currentCompletingTask = task;
+    console.log('🎯 Task stored for completion:', task.title);
+    
+    // Check if modal elements exist
+    const modal = document.getElementById('task-completion-modal');
+    const taskName = document.getElementById('completion-task-name');
+    const taskDetails = document.getElementById('completion-task-details');
+    
+    console.log('🔍 Modal elements check:', {
+        modal: !!modal,
+        taskName: !!taskName,
+        taskDetails: !!taskDetails
+    });
+    
+    if (!modal) {
+        console.error('❌ Completion modal not found in DOM!');
+        alert('❌ Completion modal not found - check HTML');
+        return;
+    }
     
     // Populate modal with task info
-    document.getElementById('completion-task-name').textContent = task.title;
-    document.getElementById('completion-task-details').textContent = `Due: ${new Date(task.dueDate).toLocaleDateString()} • ${task.category} • Every ${task.frequency} days`;
+    if (taskName) {
+        taskName.textContent = task.title;
+        console.log('✅ Set task name:', task.title);
+    }
+    
+    if (taskDetails) {
+        const detailText = `Due: ${new Date(task.dueDate).toLocaleDateString()} • ${task.category} • Every ${task.frequency} days`;
+        taskDetails.textContent = detailText;
+        console.log('✅ Set task details:', detailText);
+    }
     
     // Clear previous inputs
-    document.getElementById('completion-actual-cost').value = '';
-    document.getElementById('completion-notes').value = '';
-    document.getElementById('photo-preview').innerHTML = '';
+    const costInput = document.getElementById('completion-actual-cost');
+    const notesInput = document.getElementById('completion-notes');
+    const photoPreview = document.getElementById('photo-preview');
+    
+    if (costInput) costInput.value = '';
+    if (notesInput) notesInput.value = '';
+    if (photoPreview) photoPreview.innerHTML = '';
     window.completionPhotos = [];
     
+    console.log('🧹 Cleared inputs');
+    
     // Show the modal
-    document.getElementById('task-completion-modal').classList.remove('hidden');
+    console.log('👁️ About to show modal...');
+    modal.classList.remove('hidden');
+    console.log('✅ Modal classList after remove hidden:', modal.classList.toString());
+    console.log('✅ Modal style.display:', modal.style.display);
+    
+    // Double-check visibility
+    setTimeout(() => {
+        const computedStyle = window.getComputedStyle(modal);
+        console.log('🔍 Modal computed display:', computedStyle.display);
+        console.log('🔍 Modal computed visibility:', computedStyle.visibility);
+        console.log('🔍 Modal computed opacity:', computedStyle.opacity);
+    }, 100);
 }
 
 // Original task completion logic - now called from modal
