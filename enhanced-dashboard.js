@@ -260,20 +260,20 @@ renderEnhancedTaskCard(task) {
             <span class="text-xs text-gray-500 flex-shrink-0">${categoryInfo.icon} ${task.category}</span>
         </div>
         
-        <!-- Row 2: Due Date + Buttons (left aligned) -->
-        <div class="flex items-center justify-start gap-4">
+        <!-- Row 2: Due Date + Action Buttons -->
+        <div class="flex items-center justify-between gap-2">
             <span class="text-xs ${dueDateColor} flex-shrink-0">${dueDateDisplay}</span>
-            <div class="flex gap-2 ml-auto">
+            <div class="flex gap-1">
                 <button onclick="event.stopPropagation(); showTaskHistory(${task.id})" 
-                        class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-2 py-1 rounded text-sm font-medium transition-colors">
-                    📋 History
+                        class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-1.5 py-1 rounded text-xs font-medium transition-colors">
+                    History
                 </button>
                 <button onclick="event.stopPropagation(); completeTask(${task.id})" 
-                        class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-base font-medium transition-colors">
+                        class="bg-green-100 text-green-700 hover:bg-green-200 px-1.5 py-1 rounded text-xs font-medium transition-colors">
                     Complete
                 </button>
                 <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
-                        class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-base font-medium transition-colors">
+                        class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-1.5 py-1 rounded text-xs font-medium transition-colors">
                     Reschedule
                 </button>
             </div>
