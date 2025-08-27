@@ -3,7 +3,7 @@
   "short_name": "HomeKeeper",
   "description": "Smart home maintenance tracker for your property",
   "start_url": "./",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#2563eb",
   "theme_color": "#2563eb",
   "orientation": "portrait-primary",
