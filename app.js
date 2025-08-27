@@ -2294,8 +2294,9 @@ function addTaskFromSetup() {
 }
 
 // FIXED: Enhanced task completion with better calendar sync
+// Enhanced task completion - now opens modal instead of direct completion
 function completeTask(taskId) {
-    console.log(`✅ Completing task ${taskId}...`);
+    console.log(`✅ Opening completion modal for task ${taskId}...`);
     
     const task = window.tasks.find(t => t.id === taskId);
     if (!task) {
@@ -2304,24 +2305,71 @@ function completeTask(taskId) {
         return;
     }
 
+    // Store the task ID for the modal
+    window.currentCompletingTask = task;
+    
+    // Populate modal with task info
+    document.getElementById('completion-task-name').textContent = task.title;
+    document.getElementById('completion-task-details').textContent = `Due: ${new Date(task.dueDate).toLocaleDateString()} • ${task.category} • Every ${task.frequency} days`;
+    
+    // Clear previous inputs
+    document.getElementById('completion-actual-cost').value = '';
+    document.getElementById('completion-notes').value = '';
+    document.getElementById('photo-preview').innerHTML = '';
+    window.completionPhotos = [];
+    
+    // Show the modal
+    document.getElementById('task-completion-modal').classList.remove('hidden');
+}
+
+// Original task completion logic - now called from modal
+function processTaskCompletion(taskId, completionData = {}) {
+    console.log(`✅ Processing completion for task ${taskId}...`);
+    
+    const task = window.tasks.find(t => t.id === taskId);
+    if (!task) {
+        console.error('❌ Task not found:', taskId);
+        return false;
+    }
+
     const oldDueDate = task.dueDate ? new Date(task.dueDate) : new Date();
+    const completionDate = new Date();
+    
+    // Create completion record
+    const completionRecord = {
+        id: Date.now(), // Simple ID
+        completedAt: completionDate,
+        actualCost: completionData.actualCost || 0,
+        notes: completionData.notes || '',
+        photos: completionData.photos || [],
+        previousDueDate: oldDueDate,
+        nextDueDate: null // Will be set below
+    };
+    
+    // Initialize completionHistory if it doesn't exist
+    if (!task.completionHistory) {
+        task.completionHistory = [];
+    }
     
     // Mark as completed with timestamp
-    task.lastCompleted = new Date();
+    task.lastCompleted = completionDate;
     task.isCompleted = false; // Will be due again in the future
     
     // Calculate next due date from current due date + frequency
     const nextDueDate = new Date(oldDueDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
+    completionRecord.nextDueDate = nextDueDate;
+    
+    // Add completion record to history
+    task.completionHistory.push(completionRecord);
     
     // CRITICAL: Set both dueDate and nextDue for full compatibility
     task.dueDate = nextDueDate;
     task.nextDue = nextDueDate;
     
-    console.log(`📅 Task "${task.title}" completed!`);
+    console.log(`📅 Task "${task.title}" completed with enhanced data!`);
     console.log(`  Old due date: ${oldDueDate.toLocaleDateString()}`);
     console.log(`  Next due date: ${nextDueDate.toLocaleDateString()}`);
-    console.log(`  Frequency: ${task.frequency} days`);
-    console.log(`  Both dueDate and nextDue set: ${task.dueDate} | ${task.nextDue}`);
+    console.log(`  Completion record:`, completionRecord);
     
     // Save data immediately
     try {
@@ -3975,6 +4023,133 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial update
     setTimeout(updateTaskPreview, 500);
 });
+
+// ========================================
+// ENHANCED TASK COMPLETION MODAL FUNCTIONS
+// ========================================
+
+// Storage for completion photos (as base64 strings for localStorage compatibility)
+window.completionPhotos = [];
+
+// Close completion modal
+function closeCompletionModal() {
+    document.getElementById('task-completion-modal').classList.add('hidden');
+    window.currentCompletingTask = null;
+    window.completionPhotos = [];
+}
+
+// Handle photo upload
+function handlePhotoUpload(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    
+    const previewContainer = document.getElementById('photo-preview');
+    
+    Array.from(files).forEach((file, index) => {
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            alert(`Photo "${file.name}" is too large. Please use photos under 5MB.`);
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const photoData = {
+                name: file.name,
+                data: e.target.result, // base64 string
+                size: file.size,
+                uploadedAt: new Date().toISOString()
+            };
+            
+            window.completionPhotos.push(photoData);
+            
+            // Create preview element
+            const previewDiv = document.createElement('div');
+            previewDiv.className = 'flex items-center justify-between bg-gray-50 p-2 rounded border';
+            previewDiv.innerHTML = `
+                <div class="flex items-center">
+                    <img src="${e.target.result}" class="w-12 h-12 object-cover rounded mr-3">
+                    <div>
+                        <div class="text-sm font-medium">${file.name}</div>
+                        <div class="text-xs text-gray-500">${(file.size / 1024).toFixed(1)}KB</div>
+                    </div>
+                </div>
+                <button onclick="removeCompletionPhoto(${window.completionPhotos.length - 1})" 
+                        class="text-red-500 hover:text-red-700 ml-2">×</button>
+            `;
+            previewContainer.appendChild(previewDiv);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// Remove a completion photo
+function removeCompletionPhoto(index) {
+    if (index >= 0 && index < window.completionPhotos.length) {
+        window.completionPhotos.splice(index, 1);
+        
+        // Rebuild preview
+        const previewContainer = document.getElementById('photo-preview');
+        previewContainer.innerHTML = '';
+        
+        window.completionPhotos.forEach((photo, i) => {
+            const previewDiv = document.createElement('div');
+            previewDiv.className = 'flex items-center justify-between bg-gray-50 p-2 rounded border';
+            previewDiv.innerHTML = `
+                <div class="flex items-center">
+                    <img src="${photo.data}" class="w-12 h-12 object-cover rounded mr-3">
+                    <div>
+                        <div class="text-sm font-medium">${photo.name}</div>
+                        <div class="text-xs text-gray-500">${(photo.size / 1024).toFixed(1)}KB</div>
+                    </div>
+                </div>
+                <button onclick="removeCompletionPhoto(${i})" 
+                        class="text-red-500 hover:text-red-700 ml-2">×</button>
+            `;
+            previewContainer.appendChild(previewDiv);
+        });
+    }
+}
+
+// Confirm and process task completion
+function confirmTaskCompletion() {
+    if (!window.currentCompletingTask) {
+        console.error('❌ No task selected for completion');
+        return;
+    }
+    
+    // Get form data
+    const actualCost = parseFloat(document.getElementById('completion-actual-cost').value) || 0;
+    const notes = document.getElementById('completion-notes').value.trim();
+    
+    const completionData = {
+        actualCost: actualCost,
+        notes: notes,
+        photos: [...window.completionPhotos] // Clone the array
+    };
+    
+    console.log('📝 Completion data:', completionData);
+    
+    // Process the completion using existing logic
+    const success = processTaskCompletion(window.currentCompletingTask.id, completionData);
+    
+    if (success !== false) {
+        // Close the modal
+        closeCompletionModal();
+        
+        // Show success message
+        const message = `✅ "${window.currentCompletingTask.title}" completed successfully!`;
+        console.log(message);
+        
+        // You could add a toast notification here
+        alert(message);
+    }
+}
+
+// Make modal functions available globally
+window.closeCompletionModal = closeCompletionModal;
+window.handlePhotoUpload = handlePhotoUpload;
+window.removeCompletionPhoto = removeCompletionPhoto;
+window.confirmTaskCompletion = confirmTaskCompletion;
 
 // DEBUG: Test reschedule system
 window.testReschedule = function() {
