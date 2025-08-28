@@ -414,9 +414,9 @@ showDayPanel(date, dayTasks) {
             ${task.isRecurringInstance ? 
                 '<p class="text-sm text-gray-500 italic">This is a future recurring instance</p>' :
                 `<div class="flex gap-2 mt-3">
-                    <button onclick="showTaskHistory(${task.id})" class="flex-1 text-xs font-medium px-2 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">History</button>
-                    <button onclick="completeTask(${task.id})" class="flex-1 text-xs font-medium px-2 py-1 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors">Complete</button>
-                    <button onclick="rescheduleTask(${task.id})" class="flex-1 text-xs font-medium px-2 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors">Reschedule</button>
+                    <button onclick="showTaskHistory(${task.id})" class="flex-1 text-sm font-medium px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">History</button>
+                    <button onclick="completeTask(${task.id})" class="flex-1 text-sm font-medium px-3 py-1.5 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors">Complete</button>
+                    <button onclick="rescheduleTask(${task.id})" class="flex-1 text-sm font-medium px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors">Reschedule</button>
                 </div>`
             }
         </div>
