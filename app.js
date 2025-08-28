@@ -1907,30 +1907,31 @@ window.tasks.forEach(task => {
     
     const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
     
-    // Enhanced All Tasks interface with annual cost
+    // Native mobile All Tasks interface 
     allTasksView.innerHTML = `
-        <div class="p-4">
-            <div class="bg-white rounded-xl p-6 shadow-lg max-w-4xl mx-auto">
-<div class="text-center mb-4">
-    <h2 class="text-lg font-bold text-gray-900 mb-3">📋 Manage All Tasks</h2>
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+            <div class="px-4 py-6">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Manage All Tasks</h2>
+                </div>
 
-<!-- Compact Overview with Add Button -->
-<div class="bg-gray-50 p-3 rounded-lg mb-4">
-    <div class="flex justify-center items-center gap-6 text-sm">
-        <div class="text-center">
-            <div class="text-lg font-bold text-blue-600">${totalTasks}</div>
-            <div class="text-xs text-gray-600">Tasks</div>
-        </div>
-        <div class="text-center">
-            <div class="text-lg font-bold text-green-600">$${Math.round(totalCost)}</div>
-            <div class="text-xs text-gray-600">Annual Cost</div>
-        </div>
-        <button onclick="event.stopPropagation(); window.closeDatePickerModal(); addTaskFromDashboard()" 
-                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm touch-btn">
-        Add Task
-        </button>
-    </div>
-</div>
+                <!-- Compact Overview with Native Styling -->
+                <div class="bg-white/90 backdrop-blur-sm rounded-xl p-4 mb-6 border border-white/20 shadow-sm">
+                    <div class="flex justify-center items-center gap-8 text-sm mb-4">
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-blue-600">${totalTasks}</div>
+                            <div class="text-xs text-gray-600">Tasks</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-green-600">$${Math.round(totalCost)}</div>
+                            <div class="text-xs text-gray-600">Annual Cost</div>
+                        </div>
+                    </div>
+                    <button onclick="event.stopPropagation(); window.closeDatePickerModal(); addTaskFromDashboard()" 
+                            class="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 font-semibold shadow-lg transition-all duration-200">
+                        Add Task
+                    </button>
+                </div>
                 
                
                 
@@ -1939,7 +1940,7 @@ window.tasks.forEach(task => {
                     ${renderAllTaskCategories()}
                 </div>
 
-               <!-- Tasks managed through Settings dropdown -->
+                <!-- Tasks managed through Settings dropdown -->
             </div>
         </div>
     `;
@@ -2101,37 +2102,34 @@ if (isOverdue) {
             ` : ''}
         </div>
         
-        <!-- Enhanced Bottom Row -->
-        <div class="flex items-center justify-between gap-3">
-            <div class="flex items-center gap-4 text-sm">
-                <div class="flex items-center gap-1.5">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                    ${dueDateDisplay}
-                </div>
-                <div class="flex items-center gap-1.5 text-gray-500">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                    </svg>
-                    <span>Every ${task.frequency}d</span>
-                </div>
+        <!-- Mobile-Optimized Info Section -->
+        <div class="flex items-center gap-4 text-sm mb-3">
+            <div class="flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                ${dueDateDisplay}
             </div>
-            <div class="flex gap-2">
-                <button onclick="showTaskHistory(${task.id})" 
-                    class="flex items-center gap-1.5 bg-gray-100 text-gray-700 text-sm px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-200 font-medium" 
-                    title="View task history">
-                    📋 History
-                </button>
-                <button onclick="editTaskFromAllTasks(${task.id})" 
-                    class="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm px-3 py-1.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-sm hover:shadow-md transform hover:-translate-y-0.5" 
-                    title="Edit task">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                    </svg>
-                    Edit
-                </button>
+            <div class="flex items-center gap-1.5 text-gray-500">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                <span>Every ${task.frequency}d</span>
             </div>
+        </div>
+        
+        <!-- Mobile-Optimized Button Row -->
+        <div class="flex gap-2">
+            <button onclick="showTaskHistory(${task.id})" 
+                class="flex-1 bg-gray-100 text-gray-700 text-sm py-2 px-3 rounded-lg hover:bg-gray-200 transition-all duration-200 font-medium" 
+                title="View task history">
+                History
+            </button>
+            <button onclick="editTaskFromAllTasks(${task.id})" 
+                class="flex-1 bg-blue-600 text-white text-sm py-2 px-3 rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium" 
+                title="Edit task">
+                Edit
+            </button>
         </div>
     </div>
 `;
