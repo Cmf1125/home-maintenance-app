@@ -2962,6 +2962,232 @@ function clearData() {
     }
 }
 
+// ===== PROPERTY FEATURES EDITING =====
+
+/**
+ * Open the property features edit modal
+ */
+function openPropertyFeaturesModal() {
+    console.log('🏠 Opening property features edit modal');
+    
+    const modal = document.getElementById('property-features-modal');
+    if (!modal) {
+        console.error('❌ Property features modal not found');
+        alert('❌ Cannot open property features editor: Modal not available.');
+        return;
+    }
+    
+    // Populate the form with current features
+    populatePropertyFeaturesForm();
+    
+    // Show modal
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    
+    console.log('✅ Property features modal opened');
+}
+
+/**
+ * Populate the property features form with current data
+ */
+function populatePropertyFeaturesForm() {
+    if (!homeData.features) return;
+    
+    // Map of feature IDs to their current values
+    const featureMap = {
+        'edit-central-ac': homeData.features.centralAC,
+        'edit-mini-splits': homeData.features.miniSplits,
+        'edit-wall-ac': homeData.features.wallAC,
+        'edit-electric-baseboard': homeData.features.electricBaseboard,
+        'edit-boiler': homeData.features.boiler,
+        'edit-municipal-water': homeData.features.municipalWater,
+        'edit-well-water': homeData.features.wellWater,
+        'edit-sediment-filter': homeData.features.sedimentFilter,
+        'edit-uv-filter': homeData.features.uvFilter,
+        'edit-water-softener': homeData.features.waterSoftener,
+        'edit-whole-house-filter': homeData.features.wholeHouseFilter,
+        'edit-municipal-sewer': homeData.features.municipalSewer,
+        'edit-septic': homeData.features.septic,
+        'edit-fireplace': homeData.features.fireplace,
+        'edit-pool': homeData.features.pool,
+        'edit-deck': homeData.features.deck,
+        'edit-garage': homeData.features.garage,
+        'edit-basement': homeData.features.basement
+    };
+    
+    // Set checkbox values
+    Object.entries(featureMap).forEach(([id, value]) => {
+        const checkbox = document.getElementById(id);
+        if (checkbox) {
+            checkbox.checked = value || false;
+        } else {
+            console.warn(`⚠️ Checkbox not found: ${id}`);
+        }
+    });
+    
+    console.log('📝 Property features form populated with current data');
+}
+
+/**
+ * Close the property features modal
+ */
+function closePropertyFeaturesModal() {
+    const modal = document.getElementById('property-features-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    }
+    console.log('✅ Property features modal closed');
+}
+
+/**
+ * Save property features changes
+ */
+function savePropertyFeatures() {
+    console.log('💾 Saving property features changes...');
+    
+    if (!homeData.features) {
+        homeData.features = {};
+    }
+    
+    // Store old features to compare what changed
+    const oldFeatures = { ...homeData.features };
+    
+    // Get new feature values from form
+    const newFeatures = {
+        centralAC: document.getElementById('edit-central-ac')?.checked || false,
+        miniSplits: document.getElementById('edit-mini-splits')?.checked || false,
+        wallAC: document.getElementById('edit-wall-ac')?.checked || false,
+        electricBaseboard: document.getElementById('edit-electric-baseboard')?.checked || false,
+        boiler: document.getElementById('edit-boiler')?.checked || false,
+        municipalWater: document.getElementById('edit-municipal-water')?.checked || false,
+        wellWater: document.getElementById('edit-well-water')?.checked || false,
+        sedimentFilter: document.getElementById('edit-sediment-filter')?.checked || false,
+        uvFilter: document.getElementById('edit-uv-filter')?.checked || false,
+        waterSoftener: document.getElementById('edit-water-softener')?.checked || false,
+        wholeHouseFilter: document.getElementById('edit-whole-house-filter')?.checked || false,
+        municipalSewer: document.getElementById('edit-municipal-sewer')?.checked || false,
+        septic: document.getElementById('edit-septic')?.checked || false,
+        fireplace: document.getElementById('edit-fireplace')?.checked || false,
+        pool: document.getElementById('edit-pool')?.checked || false,
+        deck: document.getElementById('edit-deck')?.checked || false,
+        garage: document.getElementById('edit-garage')?.checked || false,
+        basement: document.getElementById('edit-basement')?.checked || false
+    };
+    
+    // Update home data
+    homeData.features = newFeatures;
+    
+    // Generate new tasks for newly added features
+    generateTasksForNewFeatures(oldFeatures, newFeatures);
+    
+    // Save to Firebase
+    try {
+        if (window.currentUser) {
+            saveUserDataToFirebaseEnhanced(window.currentUser.uid, homeData, window.tasks || [])
+                .then(() => {
+                    console.log('✅ Property features saved to Firebase');
+                })
+                .catch((error) => {
+                    console.error('❌ Error saving to Firebase:', error);
+                });
+        }
+    } catch (error) {
+        console.error('❌ Error saving property features:', error);
+    }
+    
+    // Refresh UI
+    refreshAfterFeatureUpdate();
+    
+    // Close modal
+    closePropertyFeaturesModal();
+    
+    alert('✅ Property features updated successfully!\n\nNew maintenance tasks have been added for any new features you selected.');
+    
+    console.log('✅ Property features updated:', newFeatures);
+}
+
+/**
+ * Generate new tasks for newly added features
+ */
+function generateTasksForNewFeatures(oldFeatures, newFeatures) {
+    console.log('🔄 Checking for new features to generate tasks...');
+    
+    const newlyAddedFeatures = [];
+    
+    // Check which features were added (changed from false/undefined to true)
+    Object.entries(newFeatures).forEach(([feature, isEnabled]) => {
+        const wasEnabled = oldFeatures[feature];
+        if (isEnabled && !wasEnabled) {
+            newlyAddedFeatures.push(feature);
+        }
+    });
+    
+    if (newlyAddedFeatures.length === 0) {
+        console.log('📋 No new features added, no new tasks to generate');
+        return;
+    }
+    
+    console.log('🆕 New features detected:', newlyAddedFeatures);
+    
+    // Use the task generator to create tasks for new features
+    if (window.taskGenerator && homeData) {
+        const newTasks = window.taskGenerator.generateTaskTemplates(homeData);
+        const currentTaskIds = (window.tasks || []).map(t => t.title);
+        
+        // Add only tasks that don't already exist
+        newTasks.forEach(newTask => {
+            if (!currentTaskIds.includes(newTask.title)) {
+                // Set initial due date
+                if (!newTask.dueDate) {
+                    const dueDate = new Date();
+                    dueDate.setDate(dueDate.getDate() + 7); // Default to 1 week from now
+                    newTask.dueDate = dueDate;
+                    newTask.nextDue = dueDate;
+                }
+                
+                // Ensure we have tasks array
+                if (!window.tasks) window.tasks = [];
+                
+                // Add the new task
+                window.tasks.push(newTask);
+                console.log(`✅ Added new task: ${newTask.title}`);
+            }
+        });
+    }
+}
+
+/**
+ * Refresh UI after feature update
+ */
+function refreshAfterFeatureUpdate() {
+    // Refresh dashboard if visible
+    if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
+        window.enhancedDashboard.render();
+    }
+    
+    // Refresh All Tasks view if visible
+    const allTasksView = document.getElementById('all-tasks-view');
+    if (allTasksView && !allTasksView.classList.contains('hidden')) {
+        if (typeof renderAllTasksView === 'function') {
+            renderAllTasksView();
+        }
+    }
+    
+    // Refresh calendar if visible
+    const calendarView = document.getElementById('calendar-view');
+    if (calendarView && !calendarView.classList.contains('hidden')) {
+        if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
+            window.casaCareCalendar.refresh();
+        }
+    }
+}
+
+// Make functions globally available
+window.openPropertyFeaturesModal = openPropertyFeaturesModal;
+window.closePropertyFeaturesModal = closePropertyFeaturesModal;
+window.savePropertyFeatures = savePropertyFeatures;
+
 function exportData() {
     const data = {
         homeData: homeData,
