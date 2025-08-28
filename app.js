@@ -2969,13 +2969,16 @@ function clearData() {
  */
 function openPropertyFeaturesModal() {
     console.log('🏠 Opening property features edit modal');
+    alert('DEBUG: Function called!');
     
     const modal = document.getElementById('property-features-modal');
     if (!modal) {
         console.error('❌ Property features modal not found');
-        alert('❌ Cannot open property features editor: Modal not available.');
+        alert('❌ DEBUG: Modal element not found in DOM!');
         return;
     }
+    
+    alert('DEBUG: Modal found, about to show it');
     
     // Populate the form with current features
     populatePropertyFeaturesForm();
