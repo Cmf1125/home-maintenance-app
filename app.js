@@ -1673,6 +1673,10 @@ function showTab(tabName) {
     if (marketplaceView) marketplaceView.classList.add('hidden');
     if (allTasksView) allTasksView.classList.add('hidden');
     
+    // Hide property features view
+    const propertyFeaturesView = document.getElementById('property-features-view');
+    if (propertyFeaturesView) propertyFeaturesView.classList.add('hidden');
+    
     // Update tab buttons - all buttons are white text on blue background
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('opacity-100');
@@ -1766,6 +1770,23 @@ function showTab(tabName) {
             }
         } catch (error) {
             console.error('❌ Error initializing documents:', error);
+        }
+        
+    } else if (tabName === 'property-features') {
+        // Show property features
+        const propertyFeaturesView = document.getElementById('property-features-view');
+        if (propertyFeaturesView) {
+            propertyFeaturesView.classList.remove('hidden');
+        }
+        
+        console.log('🏠 Initializing property features...');
+        
+        // Populate with current data
+        try {
+            populatePropertyFeaturesTab();
+            console.log('✅ Property features populated');
+        } catch (error) {
+            console.error('❌ Error populating property features:', error);
         }
         
     } else if (tabName === 'appliances') {
@@ -2965,54 +2986,31 @@ function clearData() {
 // ===== PROPERTY FEATURES EDITING =====
 
 /**
- * Open the property features edit modal
+ * Populate the property features form with current data (for the tab)
  */
-function openPropertyFeaturesModal() {
-    console.log('🏠 Opening property features edit modal');
-    
-    const modal = document.getElementById('property-features-modal');
-    if (!modal) {
-        console.error('❌ Property features modal not found');
-        alert('❌ Cannot open property features editor: Modal not available.');
-        return;
-    }
-    
-    // Populate the form with current features
-    populatePropertyFeaturesForm();
-    
-    // Force show with custom CSS class
-    modal.classList.remove('hidden');
-    modal.classList.add('show-modal');
-    
-    console.log('✅ Property features modal opened');
-}
-
-/**
- * Populate the property features form with current data
- */
-function populatePropertyFeaturesForm() {
+function populatePropertyFeaturesTab() {
     if (!homeData.features) return;
     
-    // Map of feature IDs to their current values
+    // Map of feature IDs to their current values (updated for tab IDs)
     const featureMap = {
-        'edit-central-ac': homeData.features.centralAC,
-        'edit-mini-splits': homeData.features.miniSplits,
-        'edit-wall-ac': homeData.features.wallAC,
-        'edit-electric-baseboard': homeData.features.electricBaseboard,
-        'edit-boiler': homeData.features.boiler,
-        'edit-municipal-water': homeData.features.municipalWater,
-        'edit-well-water': homeData.features.wellWater,
-        'edit-sediment-filter': homeData.features.sedimentFilter,
-        'edit-uv-filter': homeData.features.uvFilter,
-        'edit-water-softener': homeData.features.waterSoftener,
-        'edit-whole-house-filter': homeData.features.wholeHouseFilter,
-        'edit-municipal-sewer': homeData.features.municipalSewer,
-        'edit-septic': homeData.features.septic,
-        'edit-fireplace': homeData.features.fireplace,
-        'edit-pool': homeData.features.pool,
-        'edit-deck': homeData.features.deck,
-        'edit-garage': homeData.features.garage,
-        'edit-basement': homeData.features.basement
+        'features-central-ac': homeData.features.centralAC,
+        'features-mini-splits': homeData.features.miniSplits,
+        'features-wall-ac': homeData.features.wallAC,
+        'features-electric-baseboard': homeData.features.electricBaseboard,
+        'features-boiler': homeData.features.boiler,
+        'features-municipal-water': homeData.features.municipalWater,
+        'features-well-water': homeData.features.wellWater,
+        'features-sediment-filter': homeData.features.sedimentFilter,
+        'features-uv-filter': homeData.features.uvFilter,
+        'features-water-softener': homeData.features.waterSoftener,
+        'features-whole-house-filter': homeData.features.wholeHouseFilter,
+        'features-municipal-sewer': homeData.features.municipalSewer,
+        'features-septic': homeData.features.septic,
+        'features-fireplace': homeData.features.fireplace,
+        'features-pool': homeData.features.pool,
+        'features-deck': homeData.features.deck,
+        'features-garage': homeData.features.garage,
+        'features-basement': homeData.features.basement
     };
     
     // Set checkbox values
@@ -3025,26 +3023,13 @@ function populatePropertyFeaturesForm() {
         }
     });
     
-    console.log('📝 Property features form populated with current data');
+    console.log('📝 Property features tab populated with current data');
 }
 
 /**
- * Close the property features modal
+ * Save property features changes from the tab
  */
-function closePropertyFeaturesModal() {
-    const modal = document.getElementById('property-features-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('show-modal');
-    }
-    
-    console.log('✅ Property features modal closed');
-}
-
-/**
- * Save property features changes
- */
-function savePropertyFeatures() {
+function savePropertyFeaturesFromTab() {
     console.log('💾 Saving property features changes...');
     
     if (!homeData.features) {
@@ -3054,26 +3039,26 @@ function savePropertyFeatures() {
     // Store old features to compare what changed
     const oldFeatures = { ...homeData.features };
     
-    // Get new feature values from form
+    // Get new feature values from tab form
     const newFeatures = {
-        centralAC: document.getElementById('edit-central-ac')?.checked || false,
-        miniSplits: document.getElementById('edit-mini-splits')?.checked || false,
-        wallAC: document.getElementById('edit-wall-ac')?.checked || false,
-        electricBaseboard: document.getElementById('edit-electric-baseboard')?.checked || false,
-        boiler: document.getElementById('edit-boiler')?.checked || false,
-        municipalWater: document.getElementById('edit-municipal-water')?.checked || false,
-        wellWater: document.getElementById('edit-well-water')?.checked || false,
-        sedimentFilter: document.getElementById('edit-sediment-filter')?.checked || false,
-        uvFilter: document.getElementById('edit-uv-filter')?.checked || false,
-        waterSoftener: document.getElementById('edit-water-softener')?.checked || false,
-        wholeHouseFilter: document.getElementById('edit-whole-house-filter')?.checked || false,
-        municipalSewer: document.getElementById('edit-municipal-sewer')?.checked || false,
-        septic: document.getElementById('edit-septic')?.checked || false,
-        fireplace: document.getElementById('edit-fireplace')?.checked || false,
-        pool: document.getElementById('edit-pool')?.checked || false,
-        deck: document.getElementById('edit-deck')?.checked || false,
-        garage: document.getElementById('edit-garage')?.checked || false,
-        basement: document.getElementById('edit-basement')?.checked || false
+        centralAC: document.getElementById('features-central-ac')?.checked || false,
+        miniSplits: document.getElementById('features-mini-splits')?.checked || false,
+        wallAC: document.getElementById('features-wall-ac')?.checked || false,
+        electricBaseboard: document.getElementById('features-electric-baseboard')?.checked || false,
+        boiler: document.getElementById('features-boiler')?.checked || false,
+        municipalWater: document.getElementById('features-municipal-water')?.checked || false,
+        wellWater: document.getElementById('features-well-water')?.checked || false,
+        sedimentFilter: document.getElementById('features-sediment-filter')?.checked || false,
+        uvFilter: document.getElementById('features-uv-filter')?.checked || false,
+        waterSoftener: document.getElementById('features-water-softener')?.checked || false,
+        wholeHouseFilter: document.getElementById('features-whole-house-filter')?.checked || false,
+        municipalSewer: document.getElementById('features-municipal-sewer')?.checked || false,
+        septic: document.getElementById('features-septic')?.checked || false,
+        fireplace: document.getElementById('features-fireplace')?.checked || false,
+        pool: document.getElementById('features-pool')?.checked || false,
+        deck: document.getElementById('features-deck')?.checked || false,
+        garage: document.getElementById('features-garage')?.checked || false,
+        basement: document.getElementById('features-basement')?.checked || false
     };
     
     // Update home data
@@ -3100,10 +3085,11 @@ function savePropertyFeatures() {
     // Refresh UI
     refreshAfterFeatureUpdate();
     
-    // Close modal
-    closePropertyFeaturesModal();
-    
+    // Show success message and navigate back to dashboard
     alert('✅ Property features updated successfully!\n\nNew maintenance tasks have been added for any new features you selected.');
+    
+    // Navigate back to dashboard
+    showTab('dashboard');
     
     console.log('✅ Property features updated:', newFeatures);
 }
@@ -3185,9 +3171,8 @@ function refreshAfterFeatureUpdate() {
 }
 
 // Make functions globally available
-window.openPropertyFeaturesModal = openPropertyFeaturesModal;
-window.closePropertyFeaturesModal = closePropertyFeaturesModal;
-window.savePropertyFeatures = savePropertyFeatures;
+window.populatePropertyFeaturesTab = populatePropertyFeaturesTab;
+window.savePropertyFeaturesFromTab = savePropertyFeaturesFromTab;
 
 function exportData() {
     const data = {

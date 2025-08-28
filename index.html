@@ -41,13 +41,6 @@
 <!-- App Icon -->
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='180' height='180' fill='%232563eb'/%3E%3Ctext x='90' y='110' font-family='Arial' font-size='50' fill='white' text-anchor='middle'%3E🏠%3C/text%3E%3C/svg%3E">
 
-<style>
-    .property-modal.show-modal {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-</style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Smart Installation Banner -->
@@ -272,7 +265,7 @@ function showMainApp() {
   
   <div class="border-t border-gray-100 my-1"></div>
   
-  <button onclick="openPropertyFeaturesModal(); closeSettingsDropdown()"
+  <button onclick="showTab('property-features'); closeSettingsDropdown()"
           class="w-full text-left px-4 py-2 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-3">
     <span>🏠</span>
     <div class="flex-1">
@@ -993,6 +986,144 @@ function showMainApp() {
             <!-- Documents content will be rendered here by documents.js -->
         </div>
         
+        <!-- Property Features View -->
+        <div id="property-features-view" class="hidden">
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+                <div class="px-4 py-6">
+                    <!-- Header -->
+                    <div class="bg-white/90 backdrop-blur-sm rounded-xl p-4 mb-6 border border-white/20 shadow-sm">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900">Property Features</h2>
+                                <p class="text-gray-600">Add or remove home features and their maintenance tasks</p>
+                            </div>
+                            <button onclick="showTab('dashboard')" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg font-medium transition-colors">
+                                ← Back
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Features Form -->
+                    <div class="space-y-6">
+                        <!-- HVAC Systems -->
+                        <div class="bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-sm">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                🌡️ HVAC Systems
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-central-ac" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Central Air Conditioning</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-mini-splits" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Mini-Split Systems</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-wall-ac" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Wall AC Units</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-electric-baseboard" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Electric Baseboard Heating</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-boiler" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Boiler System</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Water Systems -->
+                        <div class="bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-sm">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                💧 Water Systems
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-municipal-water" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Municipal Water</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-well-water" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Well Water</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-sediment-filter" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Sediment Filter</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-uv-filter" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">UV Filter</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-water-softener" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Water Softener</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-whole-house-filter" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Whole House Filter</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-municipal-sewer" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Municipal Sewer</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-septic" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Septic System</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Other Features -->
+                        <div class="bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-sm">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                🏠 Other Features
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-fireplace" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Fireplace/Chimney</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-pool" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Swimming Pool</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-deck" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Deck/Patio</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-garage" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Garage</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-basement" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Basement</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="mt-8">
+                        <div class="bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-sm">
+                            <button onclick="savePropertyFeaturesFromTab()" 
+                                    class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                                💾 Save Property Features
+                            </button>
+                            <div class="mt-4 p-3 bg-blue-50/80 border border-blue-200 rounded-lg">
+                                <p class="text-xs text-blue-800">
+                                    <strong>💡 Note:</strong> Adding new features will automatically create related maintenance tasks. 
+                                    Removing features will not delete existing tasks - you can manage those separately.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- NEW: All Tasks View -->
         <div id="all-tasks-view" class="hidden">
             <!-- All tasks management content will go here -->
@@ -1139,131 +1270,6 @@ function showMainApp() {
                     <p class="text-xs text-blue-800">
                         <strong>💡 Tip:</strong> Frequency determines how often this task repeats after completion. 
                         For example, 90 days means the task will be due again 90 days after you mark it complete.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Property Features Edit Modal -->
-        <div id="property-features-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 property-modal" style="z-index: 9999;">
-            <div class="bg-white rounded-xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold">Edit Property Features</h3>
-                    <button onclick="closePropertyFeaturesModal()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
-                </div>
-                
-                <div class="space-y-6">
-                    <!-- HVAC Systems -->
-                    <div class="feature-group">
-                        <h4 class="text-lg font-semibold text-gray-800 mb-3">🌡️ HVAC Systems</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-central-ac" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Central Air Conditioning</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-mini-splits" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Mini-Split Systems</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-wall-ac" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Wall AC Units</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-electric-baseboard" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Electric Baseboard Heating</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-boiler" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Boiler System</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Water Systems -->
-                    <div class="feature-group">
-                        <h4 class="text-lg font-semibold text-gray-800 mb-3">💧 Water Systems</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-municipal-water" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Municipal Water</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-well-water" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Well Water</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-sediment-filter" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Sediment Filter</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-uv-filter" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">UV Filter</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-water-softener" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Water Softener</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-whole-house-filter" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Whole House Filter</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-municipal-sewer" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Municipal Sewer</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-septic" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Septic System</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Other Features -->
-                    <div class="feature-group">
-                        <h4 class="text-lg font-semibold text-gray-800 mb-3">🏠 Other Features</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-fireplace" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Fireplace/Chimney</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-pool" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Swimming Pool</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-deck" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Deck/Patio</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-garage" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Garage</span>
-                            </label>
-                            <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" id="edit-basement" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm">Basement</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex gap-3 mt-6">
-                    <button onclick="closePropertyFeaturesModal()" 
-                            class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition-colors touch-btn">
-                        Cancel
-                    </button>
-                    <button onclick="savePropertyFeatures()" 
-                            class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors touch-btn">
-                        💾 Save Changes
-                    </button>
-                </div>
-
-                <!-- Helper Text -->
-                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p class="text-xs text-blue-800">
-                        <strong>💡 Note:</strong> Adding new features will automatically create related maintenance tasks. 
-                        Removing features will not delete existing tasks - you can manage those separately.
                     </p>
                 </div>
             </div>
