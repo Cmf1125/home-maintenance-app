@@ -2969,23 +2969,25 @@ function clearData() {
  */
 function openPropertyFeaturesModal() {
     console.log('🏠 Opening property features edit modal');
-    alert('DEBUG: Function called!');
     
     const modal = document.getElementById('property-features-modal');
     if (!modal) {
         console.error('❌ Property features modal not found');
-        alert('❌ DEBUG: Modal element not found in DOM!');
+        alert('❌ Cannot open property features editor: Modal not available.');
         return;
     }
-    
-    alert('DEBUG: Modal found, about to show it');
     
     // Populate the form with current features
     populatePropertyFeaturesForm();
     
-    // Show modal
+    // Prevent background scrolling
+    document.body.style.overflow = 'hidden';
+    
+    // Show modal with proper display and visibility
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
+    modal.style.visibility = 'visible';
+    modal.style.opacity = '1';
     
     console.log('✅ Property features modal opened');
 }
@@ -3039,7 +3041,13 @@ function closePropertyFeaturesModal() {
     if (modal) {
         modal.classList.add('hidden');
         modal.style.display = 'none';
+        modal.style.visibility = 'hidden';
+        modal.style.opacity = '0';
     }
+    
+    // Restore background scrolling
+    document.body.style.overflow = '';
+    
     console.log('✅ Property features modal closed');
 }
 
