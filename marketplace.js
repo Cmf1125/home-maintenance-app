@@ -515,6 +515,30 @@ class MarketplaceManager {
                         description: 'Biological septic system treatment',
                         priority: 'HIGH',
                         estCommission: '$2-4'
+                    },
+                    {
+                        name: 'Monthly Septic Treatment Pods (12 count)',
+                        price: '~$16.99', // Approximate - prices change daily
+                        rating: '4.4/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B07QQBF9YJ', // TODO: Research specific pod product
+                        category: 'Water Systems',
+                        description: 'Easy monthly septic treatment pods for healthy bacterial balance',
+                        priority: 'HIGH',
+                        estCommission: '$1-3'
+                    }
+                ]
+            },
+            'septic pod': {
+                products: [
+                    {
+                        name: 'Monthly Septic Treatment Pods (12 count)',
+                        price: '~$16.99', // Approximate - prices change daily
+                        rating: '4.4/5', // TODO: Update with real Amazon rating
+                        amazonASIN: 'B07QQBF9YJ', // TODO: Research specific pod product
+                        category: 'Water Systems',
+                        description: 'Easy monthly septic treatment pods for healthy bacterial balance',
+                        priority: 'HIGH',
+                        estCommission: '$1-3'
                     }
                 ]
             },
@@ -668,7 +692,7 @@ class MarketplaceManager {
         const keywordPriority = [
             'dryer vent', 'mini split', 'wall ac', 'hvac filter', 'smoke detector', 
             'water filter', 'sediment filter', 'uv filter', 'water softener',
-            'well water', 'septic', 'fireplace', 'chimney', 'pool', 'deck', 'garage', 
+            'well water', 'septic pod', 'septic', 'fireplace', 'chimney', 'pool', 'deck', 'garage', 
             'basement', 'baseboard', 'pipe', 'gutter', 'caulk', 'drain',
             'battery', 'filter'  // 'clean' removed - now only available in Shop tab
         ];
