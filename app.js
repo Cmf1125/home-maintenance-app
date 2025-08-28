@@ -583,6 +583,21 @@ function generateTaskTemplates() {
             isCompleted: false,
             isTemplate: true
         });
+        
+        // Monthly septic pod flush for system health
+        tasks.push({
+            id: id++,
+            title: 'Monthly Septic Pod Flush',
+            category: 'Water Systems',
+            frequency: 30, // Monthly
+            cost: 15,
+            priority: 'medium',
+            description: 'Add septic treatment pods to maintain healthy bacterial balance and prevent system issues',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
     }
 
     // Other Feature Tasks
