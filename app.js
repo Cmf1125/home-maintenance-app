@@ -2986,8 +2986,15 @@ function openPropertyFeaturesModal() {
     // Show modal with proper display and visibility
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
-    modal.style.visibility = 'visible';
-    modal.style.opacity = '1';
+    
+    // Force a reflow and then set visibility
+    modal.offsetHeight; // Trigger reflow
+    
+    setTimeout(() => {
+        modal.style.visibility = 'visible';
+        modal.style.opacity = '1';
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.75)'; // More prominent background
+    }, 10);
     
     console.log('✅ Property features modal opened');
 }
