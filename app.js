@@ -2980,23 +2980,9 @@ function openPropertyFeaturesModal() {
     // Populate the form with current features
     populatePropertyFeaturesForm();
     
-    // Prevent background scrolling
-    document.body.style.overflow = 'hidden';
-    
-    // Force show modal by overriding all possible hiding styles
-    modal.style.display = 'flex !important';
-    modal.style.visibility = 'visible !important';
-    modal.style.opacity = '1 !important';
-    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.right = '0';
-    modal.style.bottom = '0';
-    modal.style.zIndex = '9999';
-    
-    // Remove hidden class after setting styles
+    // Force show with custom CSS class
     modal.classList.remove('hidden');
+    modal.classList.add('show-modal');
     
     console.log('✅ Property features modal opened');
 }
@@ -3049,13 +3035,8 @@ function closePropertyFeaturesModal() {
     const modal = document.getElementById('property-features-modal');
     if (modal) {
         modal.classList.add('hidden');
-        modal.style.display = 'none !important';
-        modal.style.visibility = 'hidden !important';
-        modal.style.opacity = '0 !important';
+        modal.classList.remove('show-modal');
     }
-    
-    // Restore background scrolling
-    document.body.style.overflow = '';
     
     console.log('✅ Property features modal closed');
 }
