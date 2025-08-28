@@ -45,27 +45,31 @@ class CasaCareCalendar {
         }
 
         calendarContainer.innerHTML = `
-            <div class="calendar-container">
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-4">
                 <!-- Calendar Header -->
-                <div class="calendar-header">
-                    <button id="prev-month" class="calendar-nav-btn">‹</button>
-                    <h2 id="calendar-month-year" class="calendar-title"></h2>
-                    <button id="next-month" class="calendar-nav-btn">›</button>
+                <div class="bg-white/90 backdrop-blur-sm rounded-xl p-4 mb-6 border border-white/20 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <button id="prev-month" class="bg-blue-100 hover:bg-blue-200 text-blue-700 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl transition-colors">‹</button>
+                        <h2 id="calendar-month-year" class="text-2xl font-bold text-gray-900"></h2>
+                        <button id="next-month" class="bg-blue-100 hover:bg-blue-200 text-blue-700 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl transition-colors">›</button>
+                    </div>
                 </div>
 
                 <!-- Calendar Grid -->
-                <div class="calendar-grid">
-                    <!-- Day headers -->
-                    <div class="calendar-day-header">Sun</div>
-                    <div class="calendar-day-header">Mon</div>
-                    <div class="calendar-day-header">Tue</div>
-                    <div class="calendar-day-header">Wed</div>
-                    <div class="calendar-day-header">Thu</div>
-                    <div class="calendar-day-header">Fri</div>
-                    <div class="calendar-day-header">Sat</div>
+                <div class="bg-white/90 backdrop-blur-sm rounded-xl border border-white/20 shadow-sm overflow-hidden">
+                    <div class="grid grid-cols-7">
+                        <!-- Day headers -->
+                        <div class="bg-gray-50/90 p-3 text-center font-semibold text-gray-700 text-sm border-b border-gray-200">Sun</div>
+                        <div class="bg-gray-50/90 p-3 text-center font-semibold text-gray-700 text-sm border-b border-gray-200">Mon</div>
+                        <div class="bg-gray-50/90 p-3 text-center font-semibold text-gray-700 text-sm border-b border-gray-200">Tue</div>
+                        <div class="bg-gray-50/90 p-3 text-center font-semibold text-gray-700 text-sm border-b border-gray-200">Wed</div>
+                        <div class="bg-gray-50/90 p-3 text-center font-semibold text-gray-700 text-sm border-b border-gray-200">Thu</div>
+                        <div class="bg-gray-50/90 p-3 text-center font-semibold text-gray-700 text-sm border-b border-gray-200">Fri</div>
+                        <div class="bg-gray-50/90 p-3 text-center font-semibold text-gray-700 text-sm border-b border-gray-200">Sat</div>
+                    </div>
                     
                     <!-- Calendar days will be inserted here -->
-                    <div id="calendar-days" class="calendar-days-container"></div>
+                    <div id="calendar-days" class="grid grid-cols-7"></div>
                 </div>
 
                 <!-- Selected Day Modal -->
@@ -401,7 +405,7 @@ showDayPanel(date, dayTasks) {
             </div>
             <div class="task-meta mb-3">
                 <span class="task-category">${task.category}</span>
-                ${task.isRecurringInstance ? '<span class="recurring-badge bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">🔄 Recurring</span>' : ''}
+                ${task.isRecurringInstance ? '<span class="recurring-badge bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Recurring</span>' : ''}
                 ${isOverdue ? '<span class="overdue-badge">OVERDUE</span>' : ''}
             </div>
             <p class="task-description text-base text-gray-700 leading-snug mb-1">${task.description}</p>
@@ -409,9 +413,11 @@ showDayPanel(date, dayTasks) {
         <div class="task-actions">
             ${task.isRecurringInstance ? 
                 '<p class="text-sm text-gray-500 italic">This is a future recurring instance</p>' :
-                `<button onclick="showTaskHistory(${task.id})" class="history-task-btn text-sm font-medium">📋 History</button>
-                <button onclick="completeTask(${task.id})" class="complete-task-btn text-base font-medium">✅ Complete</button>
-                <button onclick="rescheduleTask(${task.id})" class="reschedule-task-btn text-base font-medium">📅 Reschedule</button>`
+                `<div class="flex gap-2 mt-3">
+                    <button onclick="showTaskHistory(${task.id})" class="flex-1 text-xs font-medium px-2 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">History</button>
+                    <button onclick="completeTask(${task.id})" class="flex-1 text-xs font-medium px-2 py-1 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors">Complete</button>
+                    <button onclick="rescheduleTask(${task.id})" class="flex-1 text-xs font-medium px-2 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors">Reschedule</button>
+                </div>`
             }
         </div>
     </div>
