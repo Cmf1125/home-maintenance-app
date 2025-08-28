@@ -139,8 +139,9 @@ function showMainApp() {
                     </div>
                 </div>
                 
-                <!-- Email/Password Form -->
-                <div class="space-y-4">
+                <!-- Email/Password Forms -->
+                <!-- Sign In Form -->
+                <div id="login-form" class="space-y-4">
                     <input type="email" id="login-email" 
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                            placeholder="Email address">
@@ -153,11 +154,44 @@ function showMainApp() {
                     </button>
                 </div>
                 
+                <!-- Sign Up Form -->
+                <div id="signup-form" class="space-y-4 hidden">
+                    <input type="text" id="signup-name" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="Full name">
+                    <input type="email" id="signup-email" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="Email address">
+                    <input type="password" id="signup-password" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="Password (minimum 6 characters)">
+                    <button onclick="createUser()" 
+                            class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold">
+                        Create Account
+                    </button>
+                </div>
+                
+                <!-- Toggle between Sign In and Sign Up -->
                 <div class="text-center pt-4 border-t border-gray-100">
-                    <p class="text-sm text-gray-600 mb-3">
-                        New users will be prompted to set up their account after signing in
-                    </p>
-                    <a href="/privacy-policy.html" class="text-sm text-gray-500 hover:text-gray-700">Privacy Policy</a>
+                    <div id="login-toggle" class="space-y-2">
+                        <p class="text-sm text-gray-600">
+                            Don't have an account? 
+                            <button onclick="showSignupForm()" class="text-blue-600 hover:text-blue-700 font-medium">
+                                Create one here
+                            </button>
+                        </p>
+                    </div>
+                    <div id="signup-toggle" class="space-y-2 hidden">
+                        <p class="text-sm text-gray-600">
+                            Already have an account? 
+                            <button onclick="showLoginForm()" class="text-blue-600 hover:text-blue-700 font-medium">
+                                Sign in here
+                            </button>
+                        </p>
+                    </div>
+                    <div class="mt-3">
+                        <a href="/privacy-policy.html" class="text-sm text-gray-500 hover:text-gray-700">Privacy Policy</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2599,11 +2633,15 @@ console.log('✅ Step 1: Enhanced backup functions loaded');
 function showLoginForm() {
     document.getElementById('login-form').classList.remove('hidden');
     document.getElementById('signup-form').classList.add('hidden');
+    document.getElementById('login-toggle').classList.remove('hidden');
+    document.getElementById('signup-toggle').classList.add('hidden');
 }
 
 function showSignupForm() {
     document.getElementById('login-form').classList.add('hidden');
     document.getElementById('signup-form').classList.remove('hidden');
+    document.getElementById('login-toggle').classList.add('hidden');
+    document.getElementById('signup-toggle').classList.remove('hidden');
 }
 
 function signInUser() {
