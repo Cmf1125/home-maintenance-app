@@ -2126,7 +2126,7 @@ if (isOverdue) {
                 History
             </button>
             <button onclick="editTaskFromAllTasks(${task.id})" 
-                class="flex-1 bg-blue-600 text-white text-sm py-2 px-3 rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium" 
+                class="flex-1 bg-blue-100 text-blue-700 text-sm py-2 px-3 rounded-lg hover:bg-blue-200 transition-all duration-200 font-medium" 
                 title="Edit task">
                 Edit
             </button>
