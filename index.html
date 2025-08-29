@@ -3011,16 +3011,17 @@ function handleNewUserSignup(user) {
     
     // Hide ALL other screens first
     console.log('👁️ Hiding all login screens and main app...');
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('get-started-screen').classList.add('hidden');
-    document.getElementById('sign-in-screen').classList.add('hidden');
-    document.getElementById('main-app').classList.add('hidden');
+    const loginScreen = document.getElementById('login-screen');
+    const mainApp = document.getElementById('main-app');
     
-    // Also force hide with display style
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('get-started-screen').style.display = 'none';
-    document.getElementById('sign-in-screen').style.display = 'none';
-    document.getElementById('main-app').style.display = 'none';
+    if (loginScreen) {
+        loginScreen.classList.add('hidden');
+        loginScreen.style.display = 'none';
+    }
+    if (mainApp) {
+        mainApp.classList.add('hidden');
+        mainApp.style.display = 'none';
+    }
     
     document.body.classList.remove('main-app-active');
     
