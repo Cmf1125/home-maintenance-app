@@ -931,9 +931,10 @@ function showMainApp() {
         <!-- Proper Header for Dashboard -->
         <div class="bg-white shadow-sm border-b border-gray-200 rounded-lg mb-4 p-4">
             <div class="flex items-center justify-between">
-                <div>
+                <div class="cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors" onclick="togglePropertySummary()">
                     <h1 class="text-xl font-bold text-gray-900">The Home Keeper</h1>
                     <p class="text-sm text-gray-600" id="dashboard-subtitle">Smart home maintenance</p>
+                    <p class="text-xs text-blue-600 mt-1">Click to view property details</p>
                 </div>
                 
                 <!-- Settings Dropdown -->
@@ -993,6 +994,20 @@ function showMainApp() {
                 </div>
             </div>
         </div>
+
+        <!-- Property Summary Modal -->
+        <div id="property-summary-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl w-full max-w-md max-h-[80vh] overflow-hidden shadow-2xl">
+                <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-gray-900">Property Summary</h3>
+                    <button onclick="closePropertySummary()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
+                </div>
+                <div id="property-summary-content" class="p-4 overflow-y-auto" style="max-height: 60vh;">
+                    <!-- Summary content will be inserted here -->
+                </div>
+            </div>
+        </div>
+        
         <!-- Interactive Stats Grid - Now Sticky and Mobile Optimized -->
         <div class="sticky top-16 z-30 bg-gray-50 pb-4 mb-6">
             <div class="grid grid-cols-3 gap-2 sm:gap-4">
@@ -2255,6 +2270,109 @@ function showMainApp() {
 
   window.toggleDashboardSettings = toggleDashboardSettings;
   window.closeDashboardSettings = closeDashboardSettings;
+
+  // Property summary modal functions
+  function togglePropertySummary() {
+    const modal = document.getElementById('property-summary-modal');
+    const content = document.getElementById('property-summary-content');
+    
+    if (!modal || !content) return;
+    
+    // Generate summary content
+    if (window.homeData) {
+      content.innerHTML = generatePropertySummaryHTML();
+    }
+    
+    modal.classList.remove('hidden');
+  }
+
+  function closePropertySummary() {
+    const modal = document.getElementById('property-summary-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+    }
+  }
+
+  function generatePropertySummaryHTML() {
+    const data = window.homeData;
+    if (!data) return '<p class="text-gray-500">No property data available</p>';
+    
+    // Build feature lists
+    const heatingCooling = [];
+    if (data.features?.centralAC) heatingCooling.push('Central AC');
+    if (data.features?.miniSplits) heatingCooling.push('Mini-Splits');
+    if (data.features?.wallAC) heatingCooling.push('Wall AC');
+    if (data.features?.electricBaseboard) heatingCooling.push('Electric Baseboard');
+    if (data.features?.boiler) heatingCooling.push('Boiler');
+    
+    const waterSewer = [];
+    if (data.features?.municipalWater) waterSewer.push('Municipal Water');
+    if (data.features?.wellWater) waterSewer.push('Well Water');
+    if (data.features?.municipalSewer) waterSewer.push('Municipal Sewer');
+    if (data.features?.septic) waterSewer.push('Septic System');
+    
+    const otherFeatures = [];
+    if (data.features?.fireplace) otherFeatures.push('Fireplace');
+    if (data.features?.pool) otherFeatures.push('Pool');
+    if (data.features?.deck) otherFeatures.push('Deck');
+    if (data.features?.garage) otherFeatures.push('Garage');
+    if (data.features?.basement) otherFeatures.push('Basement');
+    
+    const advancedFeatures = [];
+    if (data.features?.solarPanels) advancedFeatures.push('Solar Panels');
+    if (data.features?.batteryBackup) advancedFeatures.push('Battery Backup');
+    if (data.features?.generator) advancedFeatures.push('Generator');
+    if (data.features?.irrigation) advancedFeatures.push('Irrigation System');
+    if (data.features?.securitySystem) advancedFeatures.push('Security System');
+    if (data.features?.outdoorKitchen) advancedFeatures.push('Outdoor Kitchen');
+
+    return `
+      <div class="space-y-4">
+        <div>
+          <h4 class="font-semibold text-gray-900 mb-2">🏠 Property Info</h4>
+          <div class="text-sm text-gray-700 space-y-1">
+            <p><strong>Address:</strong> ${data.fullAddress || 'Not set'}</p>
+            <p><strong>Type:</strong> ${data.propertyType || 'Not set'} • <strong>Size:</strong> ${data.sqft?.toLocaleString() || 'Not set'} sq ft</p>
+            <p><strong>Built:</strong> ${data.yearBuilt || 'Not set'}</p>
+          </div>
+        </div>
+        
+        ${heatingCooling.length > 0 ? `
+        <div>
+          <h4 class="font-semibold text-gray-900 mb-2">🌡️ Heating/Cooling</h4>
+          <p class="text-sm text-gray-700">${heatingCooling.join(', ')}</p>
+        </div>` : ''}
+        
+        ${waterSewer.length > 0 ? `
+        <div>
+          <h4 class="font-semibold text-gray-900 mb-2">💧 Water/Sewer</h4>
+          <p class="text-sm text-gray-700">${waterSewer.join(', ')}</p>
+        </div>` : ''}
+        
+        ${otherFeatures.length > 0 ? `
+        <div>
+          <h4 class="font-semibold text-gray-900 mb-2">🏠 Other Features</h4>
+          <p class="text-sm text-gray-700">${otherFeatures.join(', ')}</p>
+        </div>` : ''}
+        
+        ${advancedFeatures.length > 0 ? `
+        <div>
+          <h4 class="font-semibold text-gray-900 mb-2">🔧 Advanced Features</h4>
+          <p class="text-sm text-gray-700">${advancedFeatures.join(', ')}</p>
+        </div>` : ''}
+        
+        <div class="pt-4 border-t border-gray-100">
+          <button onclick="showTab('property-features'); closePropertySummary()" 
+                  class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            🏠 Edit Property Features
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  window.togglePropertySummary = togglePropertySummary;
+  window.closePropertySummary = closePropertySummary;
 
 // Clean Navigation Functions for New Landing Flow
 function showLanding() {
