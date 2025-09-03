@@ -2276,77 +2276,71 @@ function showMainApp() {
   }
 
   function generatePropertySummaryHTML() {
-    const data = window.homeData;
-    if (!data) return '<p class="text-gray-500">No property data available</p>';
+    const homeData = window.homeData;
+    if (!homeData) return '<p class="text-gray-500">No property data available</p>';
     
-    // Build feature lists
+    // Use the same logic as onboarding summary
+    const propertyTypeDisplay = {
+        'single-family': 'Single-Family Home',
+        'townhouse': 'Townhouse',
+        'condo': 'Condominium', 
+        'apartment': 'Apartment',
+        'mobile-home': 'Mobile Home',
+        'duplex': 'Duplex'
+    };
+
+    // Build feature lists (same as original)
     const heatingCooling = [];
-    if (data.features?.centralAC) heatingCooling.push('Central AC');
-    if (data.features?.miniSplits) heatingCooling.push('Mini-Splits');
-    if (data.features?.wallAC) heatingCooling.push('Wall AC');
-    if (data.features?.electricBaseboard) heatingCooling.push('Electric Baseboard');
-    if (data.features?.boiler) heatingCooling.push('Boiler');
-    
+    if (homeData.features?.centralAC) heatingCooling.push('Central AC');
+    if (homeData.features?.miniSplits) heatingCooling.push('Mini-Split Systems');
+    if (homeData.features?.wallAC) heatingCooling.push('Wall AC Units');
+    if (homeData.features?.electricBaseboard) heatingCooling.push('Electric Baseboard');
+    if (homeData.features?.boiler) heatingCooling.push('Boiler');
+
     const waterSewer = [];
-    if (data.features?.municipalWater) waterSewer.push('Municipal Water');
-    if (data.features?.wellWater) waterSewer.push('Well Water');
-    if (data.features?.municipalSewer) waterSewer.push('Municipal Sewer');
-    if (data.features?.septic) waterSewer.push('Septic System');
-    
+    if (homeData.features?.municipalWater) waterSewer.push('Municipal Water');
+    if (homeData.features?.wellWater) waterSewer.push('Well Water');
+    if (homeData.features?.sedimentFilter) waterSewer.push('Sediment Filter');
+    if (homeData.features?.uvFilter) waterSewer.push('UV Filter');
+    if (homeData.features?.waterSoftener) waterSewer.push('Water Softener');
+    if (homeData.features?.wholeHouseFilter) waterSewer.push('Whole House Filter');
+    if (homeData.features?.municipalSewer) waterSewer.push('Municipal Sewer');
+    if (homeData.features?.septic) waterSewer.push('Septic System');
+
     const otherFeatures = [];
-    if (data.features?.fireplace) otherFeatures.push('Fireplace');
-    if (data.features?.pool) otherFeatures.push('Pool');
-    if (data.features?.deck) otherFeatures.push('Deck');
-    if (data.features?.garage) otherFeatures.push('Garage');
-    if (data.features?.basement) otherFeatures.push('Basement');
-    
-    const advancedFeatures = [];
-    if (data.features?.solarPanels) advancedFeatures.push('Solar Panels');
-    if (data.features?.batteryBackup) advancedFeatures.push('Battery Backup');
-    if (data.features?.generator) advancedFeatures.push('Generator');
-    if (data.features?.irrigation) advancedFeatures.push('Irrigation System');
-    if (data.features?.securitySystem) advancedFeatures.push('Security System');
-    if (data.features?.outdoorKitchen) advancedFeatures.push('Outdoor Kitchen');
+    if (homeData.features?.fireplace) otherFeatures.push('Fireplace/Chimney');
+    if (homeData.features?.pool) otherFeatures.push('Swimming Pool');
+    if (homeData.features?.deck) otherFeatures.push('Deck/Patio');
+    if (homeData.features?.garage) otherFeatures.push('Garage');
+    if (homeData.features?.basement) otherFeatures.push('Basement');
+    if (homeData.features?.solarPanels) otherFeatures.push('Solar Panels');
+    if (homeData.features?.batteryBackup) otherFeatures.push('Battery Backup');
+    if (homeData.features?.generator) otherFeatures.push('Generator');
+    if (homeData.features?.irrigation) otherFeatures.push('Irrigation System');
+    if (homeData.features?.securitySystem) otherFeatures.push('Security System');
+    if (homeData.features?.outdoorKitchen) otherFeatures.push('Outdoor Kitchen');
+
+    const climateRegion = window.getClimateRegion ? window.getClimateRegion(homeData.state) : 'GENERAL';
+    const regionDisplayNames = {
+        'NORTHEAST_COLD': 'Northeast (Cold)',
+        'SOUTHEAST_HUMID': 'Southeast (Humid)',
+        'MIDWEST_CONTINENTAL': 'Midwest (Continental)',
+        'SOUTHWEST_ARID': 'Southwest (Arid)',
+        'WEST_COAST': 'West Coast',
+        'MOUNTAIN_WEST': 'Mountain West',
+        'ALASKA_HAWAII': 'Alaska/Hawaii',
+        'GENERAL': 'General'
+    };
 
     return `
-      <div class="space-y-4">
-        <div>
-          <h4 class="font-semibold text-gray-900 mb-2">🏠 Property Info</h4>
-          <div class="text-sm text-gray-700 space-y-1">
-            <p><strong>Address:</strong> ${data.fullAddress || 'Not set'}</p>
-            <p><strong>Type:</strong> ${data.propertyType || 'Not set'} • <strong>Size:</strong> ${data.sqft?.toLocaleString() || 'Not set'} sq ft</p>
-            <p><strong>Built:</strong> ${data.yearBuilt || 'Not set'}</p>
-          </div>
+        <div class="space-y-1 text-sm">
+            <div><strong>🏠 Address:</strong> ${homeData.fullAddress || 'Not set'}</div>
+            <div><strong>🏢 Type:</strong> ${propertyTypeDisplay[homeData.propertyType] || 'Not set'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Not set'} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Not set'}</div>
+            ${heatingCooling.length > 0 ? `<div><strong>🌡️ Heating/Cooling:</strong> ${heatingCooling.join(', ')}</div>` : ''}
+            ${waterSewer.length > 0 ? `<div><strong>💧 Water/Sewer:</strong> ${waterSewer.join(', ')}</div>` : ''}
+            ${otherFeatures.length > 0 ? `<div><strong>⚙️ Other Features:</strong> ${otherFeatures.join(', ')}</div>` : ''}
+            <div><strong>🌍 Climate Region:</strong> ${regionDisplayNames[climateRegion]} (includes regional seasonal tasks)</div>
         </div>
-        
-        ${heatingCooling.length > 0 ? `
-        <div>
-          <h4 class="font-semibold text-gray-900 mb-2">🌡️ Heating/Cooling</h4>
-          <p class="text-sm text-gray-700">${heatingCooling.join(', ')}</p>
-        </div>` : ''}
-        
-        ${waterSewer.length > 0 ? `
-        <div>
-          <h4 class="font-semibold text-gray-900 mb-2">💧 Water/Sewer</h4>
-          <p class="text-sm text-gray-700">${waterSewer.join(', ')}</p>
-        </div>` : ''}
-        
-        ${otherFeatures.length > 0 ? `
-        <div>
-          <h4 class="font-semibold text-gray-900 mb-2">🏠 Other Features</h4>
-          <p class="text-sm text-gray-700">${otherFeatures.join(', ')}</p>
-        </div>` : ''}
-        
-        ${advancedFeatures.length > 0 ? `
-        <div>
-          <h4 class="font-semibold text-gray-900 mb-2">🔧 Advanced Features</h4>
-          <p class="text-sm text-gray-700">${advancedFeatures.join(', ')}</p>
-        </div>` : ''}
-        
-        <div class="pt-4 border-t border-gray-100 text-center">
-          <p class="text-xs text-gray-500">💡 Edit your features using the form below</p>
-        </div>
-      </div>
     `;
   }
 
