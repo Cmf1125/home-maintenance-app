@@ -928,14 +928,69 @@ function showMainApp() {
         <!-- Enhanced Dashboard View -->
         <div id="dashboard-view" class="p-4">
         
-        <!-- TEMPORARY: Critical Settings Access -->
-        <div class="bg-red-100 border border-red-300 rounded-lg p-3 mb-4 text-center">
-            <p class="text-red-800 text-sm mb-2"><strong>⚠️ Header Issue - Temporary Settings Access</strong></p>
-            <div class="flex flex-wrap justify-center gap-2">
-                <button onclick="toggleGoogleCalendarSync()" class="bg-blue-600 text-white px-3 py-1 rounded text-sm">📅 Google Calendar</button>
-                <button onclick="showTab('documents')" class="bg-green-600 text-white px-3 py-1 rounded text-sm">📄 Documents</button>
-                <button onclick="showTab('property-features')" class="bg-purple-600 text-white px-3 py-1 rounded text-sm">🏠 Edit Property</button>
-                <button onclick="signOutUser()" class="bg-gray-600 text-white px-3 py-1 rounded text-sm">🚪 Sign Out</button>
+        <!-- Proper Header for Dashboard -->
+        <div class="bg-white shadow-sm border-b border-gray-200 rounded-lg mb-4 p-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">The Home Keeper</h1>
+                    <p class="text-sm text-gray-600" id="dashboard-subtitle">Smart home maintenance</p>
+                </div>
+                
+                <!-- Settings Dropdown -->
+                <div class="relative">
+                    <button id="dashboard-settings-btn" onclick="toggleDashboardSettings()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg">⚙️</button>
+                    
+                    <!-- Dropdown menu -->
+                    <div id="dashboard-settings-dropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                        <div class="py-2">
+                            <button onclick="showTab('documents'); closeDashboardSettings()" class="w-full text-left px-4 py-2 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-3">
+                                <span>📄</span>
+                                <div class="flex-1">
+                                    <div class="font-medium">Documents</div>
+                                    <div class="text-xs text-gray-500">Manuals, warranties, receipts</div>
+                                </div>
+                            </button>
+                            
+                            <div class="border-t border-gray-100 my-1"></div>
+                            
+                            <button onclick="toggleGoogleCalendarSync(); closeDashboardSettings()" class="w-full text-left px-4 py-2 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-3">
+                                <span>📅</span>
+                                <div class="flex-1">
+                                    <div class="font-medium" id="dashboard-calendar-sync-text">Connect Google Calendar</div>
+                                    <div class="text-xs text-gray-500">Sync tasks to your calendar</div>
+                                </div>
+                            </button>
+                            
+                            <div class="border-t border-gray-100 my-1"></div>
+                            
+                            <button onclick="showTab('property-features'); closeDashboardSettings()" class="w-full text-left px-4 py-2 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-3">
+                                <span>🏠</span>
+                                <div class="flex-1">
+                                    <div class="font-medium">Edit Property Features</div>
+                                    <div class="text-xs text-gray-500">Add/remove home features</div>
+                                </div>
+                            </button>
+                            
+                            <div class="border-t border-gray-100 my-1"></div>
+                            
+                            <button onclick="exportTaskList(); closeDashboardSettings()" class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
+                                <span>📋</span><span>Export Tasks</span>
+                            </button>
+                            
+                            <div class="border-t border-gray-100 my-1"></div>
+                            
+                            <button onclick="clearData(); closeDashboardSettings()" class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
+                                <span>🗑️</span><span>Reset App</span>
+                            </button>
+                            
+                            <div class="border-t border-gray-100 my-1"></div>
+                            
+                            <button onclick="signOutUser(); closeDashboardSettings()" class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
+                                <span>🚪</span><span>Sign out</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- Interactive Stats Grid - Now Sticky and Mobile Optimized -->
@@ -2150,6 +2205,24 @@ function showMainApp() {
   window.toggleSettingsDropdown = toggleSettingsDropdown;
   window.closeSettingsDropdown  = closeSettingsDropdown;
 
+  // Dashboard settings dropdown functions
+  function toggleDashboardSettings() {
+    const dropdown = document.getElementById('dashboard-settings-dropdown');
+    if (dropdown) {
+      dropdown.classList.toggle('hidden');
+    }
+  }
+
+  function closeDashboardSettings() {
+    const dropdown = document.getElementById('dashboard-settings-dropdown');
+    if (dropdown) {
+      dropdown.classList.add('hidden');
+    }
+  }
+
+  window.toggleDashboardSettings = toggleDashboardSettings;
+  window.closeDashboardSettings = closeDashboardSettings;
+
 // Clean Navigation Functions for New Landing Flow
 function showLanding() {
     document.getElementById('login-screen').classList.remove('hidden');
@@ -3088,7 +3161,14 @@ function handleSuccessfulLogin(user) {
             document.body.classList.add('main-app-active');
             console.log('🔍 Body classes after main-app-active:', document.body.className);
             const userName = user.displayName ? `Welcome, ${user.displayName.split(' ')[0]}` : 'Welcome back';
-            document.getElementById('header-subtitle').textContent = `${userName} • ${window.homeData.fullAddress}`;
+            
+            // Update both header subtitles
+            const headerSubtitle = document.getElementById('header-subtitle');
+            const dashboardSubtitle = document.getElementById('dashboard-subtitle');
+            const subtitleText = `${userName} • ${window.homeData.fullAddress}`;
+            
+            if (headerSubtitle) headerSubtitle.textContent = subtitleText;
+            if (dashboardSubtitle) dashboardSubtitle.textContent = subtitleText;
             showTab('dashboard');
             
             // Force dashboard refresh after data is loaded
