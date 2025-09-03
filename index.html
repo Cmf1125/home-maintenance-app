@@ -289,7 +289,7 @@ function showMainApp() {
 
 
 <!-- Header -->
-<div id="app-header" class="hidden bg-white shadow-sm border-b sticky top-0 z-40">
+<div id="app-header" class="hidden bg-red-500 shadow-sm border-b sticky top-0 z-40" style="height: 80px; background-color: red !important;">
     <div class="px-4 py-4">
         <div class="flex items-center justify-between">
             <!-- Left side: Back arrow (hidden by default) -->
@@ -3054,11 +3054,20 @@ function handleSuccessfulLogin(user) {
         if (hasData) {
             // NOW show the app with data already loaded
             const header = document.getElementById('app-header');
-            header.classList.remove('hidden');
-            header.style.display = 'block';
+            console.log('🔍 Header element found:', !!header);
+            if (header) {
+                console.log('🔍 Header current classes:', header.className);
+                console.log('🔍 Header current style:', header.style.cssText);
+                header.classList.remove('hidden');
+                header.style.display = 'block';
+                header.style.visibility = 'visible';
+                header.style.opacity = '1';
+                console.log('🔍 Header after changes:', header.style.cssText);
+            }
             
             document.getElementById('main-app').classList.remove('hidden');
             document.body.classList.add('main-app-active');
+            console.log('🔍 Body classes after main-app-active:', document.body.className);
             const userName = user.displayName ? `Welcome, ${user.displayName.split(' ')[0]}` : 'Welcome back';
             document.getElementById('header-subtitle').textContent = `${userName} • ${window.homeData.fullAddress}`;
             showTab('dashboard');
