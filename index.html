@@ -931,10 +931,10 @@ function showMainApp() {
         <!-- Proper Header for Dashboard -->
         <div class="bg-white shadow-sm border-b border-gray-200 rounded-lg mb-4 p-4">
             <div class="flex items-center justify-between">
-                <div class="cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors" onclick="togglePropertySummary()">
+                <div class="cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors" onclick="showTab('property-features')">
                     <h1 class="text-xl font-bold text-gray-900">The Home Keeper</h1>
                     <p class="text-sm text-gray-600" id="dashboard-subtitle">Smart home maintenance</p>
-                    <p class="text-xs text-blue-600 mt-1">Click to view property details</p>
+                    <p class="text-xs text-blue-600 mt-1">Click to view & edit property</p>
                 </div>
                 
                 <!-- Settings Dropdown -->
@@ -995,18 +995,6 @@ function showMainApp() {
             </div>
         </div>
 
-        <!-- Property Summary Modal -->
-        <div id="property-summary-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-md max-h-[80vh] overflow-hidden shadow-2xl">
-                <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-                    <h3 class="text-lg font-bold text-gray-900">Property Summary</h3>
-                    <button onclick="closePropertySummary()" class="text-gray-500 hover:text-gray-700 text-xl">×</button>
-                </div>
-                <div id="property-summary-content" class="p-4 overflow-y-auto" style="max-height: 60vh;">
-                    <!-- Summary content will be inserted here -->
-                </div>
-            </div>
-        </div>
         
         <!-- Interactive Stats Grid - Now Sticky and Mobile Optimized -->
         <div class="sticky top-16 z-30 bg-gray-50 pb-4 mb-6">
@@ -1166,13 +1154,18 @@ function showMainApp() {
                     <div class="bg-white/90 backdrop-blur-sm rounded-xl p-4 mb-6 border border-white/20 shadow-sm">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h2 class="text-2xl font-bold text-gray-900">Property Features</h2>
-                                <p class="text-gray-600">Add or remove home features and their maintenance tasks</p>
+                                <h2 class="text-2xl font-bold text-gray-900">Property Details & Features</h2>
+                                <p class="text-gray-600">View your property summary and edit features</p>
                             </div>
                             <button onclick="showTab('dashboard')" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg font-medium transition-colors">
                                 ← Back
                             </button>
                         </div>
+                    </div>
+
+                    <!-- Property Summary Section -->
+                    <div id="property-summary-display" class="bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-sm mb-6">
+                        <!-- Summary content will be populated here -->
                     </div>
 
                     <!-- Features Form -->
@@ -2271,25 +2264,14 @@ function showMainApp() {
   window.toggleDashboardSettings = toggleDashboardSettings;
   window.closeDashboardSettings = closeDashboardSettings;
 
-  // Property summary modal functions
-  function togglePropertySummary() {
-    const modal = document.getElementById('property-summary-modal');
+  // Property summary tab functions
+  function populatePropertySummary() {
     const content = document.getElementById('property-summary-content');
-    
-    if (!modal || !content) return;
+    if (!content) return;
     
     // Generate summary content
     if (window.homeData) {
       content.innerHTML = generatePropertySummaryHTML();
-    }
-    
-    modal.classList.remove('hidden');
-  }
-
-  function closePropertySummary() {
-    const modal = document.getElementById('property-summary-modal');
-    if (modal) {
-      modal.classList.add('hidden');
     }
   }
 
@@ -2361,18 +2343,23 @@ function showMainApp() {
           <p class="text-sm text-gray-700">${advancedFeatures.join(', ')}</p>
         </div>` : ''}
         
-        <div class="pt-4 border-t border-gray-100">
-          <button onclick="showTab('property-features'); closePropertySummary()" 
-                  class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
-            🏠 Edit Property Features
-          </button>
+        <div class="pt-4 border-t border-gray-100 text-center">
+          <p class="text-xs text-gray-500">💡 Edit your features using the form below</p>
         </div>
       </div>
     `;
   }
 
-  window.togglePropertySummary = togglePropertySummary;
-  window.closePropertySummary = closePropertySummary;
+  function populatePropertySummarySection() {
+    const content = document.getElementById('property-summary-display');
+    if (!content) return;
+    
+    if (window.homeData) {
+      content.innerHTML = generatePropertySummaryHTML();
+    }
+  }
+
+  window.populatePropertySummarySection = populatePropertySummarySection;
 
 // Clean Navigation Functions for New Landing Flow
 function showLanding() {

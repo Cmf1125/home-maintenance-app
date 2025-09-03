@@ -1677,6 +1677,7 @@ function showTab(tabName) {
     const propertyFeaturesView = document.getElementById('property-features-view');
     if (propertyFeaturesView) propertyFeaturesView.classList.add('hidden');
     
+    
     // Update tab buttons - all buttons are white text on blue background
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('opacity-100');
@@ -1784,6 +1785,7 @@ function showTab(tabName) {
         // Populate with current data
         try {
             populatePropertyFeaturesTab();
+            populatePropertySummarySection();
             console.log('✅ Property features populated');
         } catch (error) {
             console.error('❌ Error populating property features:', error);
