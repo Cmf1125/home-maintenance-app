@@ -75,6 +75,7 @@ function showLoginScreen() {
     document.getElementById('login-screen').classList.remove('hidden');
     document.getElementById('app-header').classList.add('hidden');
     document.getElementById('main-app').classList.add('hidden');
+    document.body.classList.remove('main-app-active');
     
     // Force hide any other elements that might be showing
     const setupForm = document.getElementById('setup-form');
@@ -93,10 +94,15 @@ function showLoginScreen() {
 }
 
 function showMainApp() {
+    console.log('🚀 showMainApp called');
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('app-header').classList.remove('hidden');
     document.getElementById('main-app').classList.remove('hidden');
     document.body.classList.add('main-app-active');
+    
+    console.log('✅ Header should now be visible, main-app-active class added');
+    console.log('Header element:', document.getElementById('app-header'));
+    console.log('Body classes:', document.body.className);
     
     if (typeof showTab === 'function') {
         showTab('dashboard');
