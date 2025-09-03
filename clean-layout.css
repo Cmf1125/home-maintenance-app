@@ -48,9 +48,15 @@ body:has(#login-screen:not(.hidden)) .main-content {
 /* ========================================
    JOURNEY 1: LOGIN PAGE (Clean - No Header, No Banners)
    ======================================== */
+/* Only hide header when login screen is actually visible (not hidden) */
 body:has(#login-screen:not(.hidden)) .bg-white.shadow-sm.border-b.sticky,
 .login-active .bg-white.shadow-sm.border-b.sticky {
     display: none !important;
+}
+
+/* Force show header when main app is active, regardless of other rules */
+body.main-app-active #app-header {
+    display: block !important;
 }
 
 body:has(#login-screen:not(.hidden)) {
