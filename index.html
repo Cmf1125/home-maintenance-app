@@ -3049,6 +3049,7 @@ function handleSuccessfulLogin(user) {
     loadUserDataEnhanced(user.uid).then(hasData => {
         if (hasData) {
             // NOW show the app with data already loaded
+            document.getElementById('app-header').classList.remove('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             document.body.classList.add('main-app-active');
             const userName = user.displayName ? `Welcome, ${user.displayName.split(' ')[0]}` : 'Welcome back';
