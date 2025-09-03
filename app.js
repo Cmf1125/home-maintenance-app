@@ -3010,7 +3010,13 @@ function populatePropertyFeaturesTab() {
         'features-pool': homeData.features.pool,
         'features-deck': homeData.features.deck,
         'features-garage': homeData.features.garage,
-        'features-basement': homeData.features.basement
+        'features-basement': homeData.features.basement,
+        'features-solar-panels': homeData.features.solarPanels,
+        'features-battery-backup': homeData.features.batteryBackup,
+        'features-generator': homeData.features.generator,
+        'features-irrigation': homeData.features.irrigation,
+        'features-security-system': homeData.features.securitySystem,
+        'features-outdoor-kitchen': homeData.features.outdoorKitchen
     };
     
     // Set checkbox values
@@ -3058,7 +3064,13 @@ function savePropertyFeaturesFromTab() {
         pool: document.getElementById('features-pool')?.checked || false,
         deck: document.getElementById('features-deck')?.checked || false,
         garage: document.getElementById('features-garage')?.checked || false,
-        basement: document.getElementById('features-basement')?.checked || false
+        basement: document.getElementById('features-basement')?.checked || false,
+        solarPanels: document.getElementById('features-solar-panels')?.checked || false,
+        batteryBackup: document.getElementById('features-battery-backup')?.checked || false,
+        generator: document.getElementById('features-generator')?.checked || false,
+        irrigation: document.getElementById('features-irrigation')?.checked || false,
+        securitySystem: document.getElementById('features-security-system')?.checked || false,
+        outdoorKitchen: document.getElementById('features-outdoor-kitchen')?.checked || false
     };
     
     // Update home data
