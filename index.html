@@ -96,12 +96,16 @@ function showLoginScreen() {
 function showMainApp() {
     console.log('🚀 showMainApp called');
     document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('app-header').classList.remove('hidden');
+    
+    const header = document.getElementById('app-header');
+    header.classList.remove('hidden');
+    header.style.display = 'block';
+    
     document.getElementById('main-app').classList.remove('hidden');
     document.body.classList.add('main-app-active');
     
     console.log('✅ Header should now be visible, main-app-active class added');
-    console.log('Header element:', document.getElementById('app-header'));
+    console.log('Header element:', header);
     console.log('Body classes:', document.body.className);
     
     if (typeof showTab === 'function') {
@@ -285,7 +289,7 @@ function showMainApp() {
 
 
 <!-- Header -->
-<div id="app-header" class="hidden bg-white shadow-sm border-b sticky top-0 z-40">
+<div id="app-header" class="hidden bg-white shadow-sm border-b sticky top-0 z-40" style="display: none !important;">
     <div class="px-4 py-4">
         <div class="flex items-center justify-between">
             <!-- Left side: Back arrow (hidden by default) -->
@@ -3049,7 +3053,10 @@ function handleSuccessfulLogin(user) {
     loadUserDataEnhanced(user.uid).then(hasData => {
         if (hasData) {
             // NOW show the app with data already loaded
-            document.getElementById('app-header').classList.remove('hidden');
+            const header = document.getElementById('app-header');
+            header.classList.remove('hidden');
+            header.style.display = 'block';
+            
             document.getElementById('main-app').classList.remove('hidden');
             document.body.classList.add('main-app-active');
             const userName = user.displayName ? `Welcome, ${user.displayName.split(' ')[0]}` : 'Welcome back';
