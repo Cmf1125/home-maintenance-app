@@ -3132,6 +3132,11 @@ function generateTasksForNewFeatures(oldFeatures, newFeatures) {
     // Use the task generator to create tasks for new features
     if (window.taskGenerator && homeData) {
         const newTasks = window.taskGenerator.generateTaskTemplates(homeData);
+        
+        // Also generate advanced feature tasks
+        const expandedTasks = generateExpandedFeatureTasks(Math.max(...(window.tasks || []).map(t => t.id), 0) + 1);
+        newTasks.push(...expandedTasks);
+        
         const currentTaskIds = (window.tasks || []).map(t => t.title);
         
         // Add only tasks that don't already exist
