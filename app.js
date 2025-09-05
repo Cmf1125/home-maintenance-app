@@ -2993,13 +2993,16 @@ function clearData() {
 function populatePropertyFeaturesTab() {
     if (!homeData.features) return;
     
-    // Map of feature IDs to their current values (updated for tab IDs)
+    // Map ALL features to their form checkboxes (all use features- prefix)
     const featureMap = {
+        // HVAC Systems
         'features-central-ac': homeData.features.centralAC,
         'features-mini-splits': homeData.features.miniSplits,
         'features-wall-ac': homeData.features.wallAC,
         'features-electric-baseboard': homeData.features.electricBaseboard,
         'features-boiler': homeData.features.boiler,
+        
+        // Water Systems
         'features-municipal-water': homeData.features.municipalWater,
         'features-well-water': homeData.features.wellWater,
         'features-sediment-filter': homeData.features.sedimentFilter,
@@ -3008,11 +3011,15 @@ function populatePropertyFeaturesTab() {
         'features-whole-house-filter': homeData.features.wholeHouseFilter,
         'features-municipal-sewer': homeData.features.municipalSewer,
         'features-septic': homeData.features.septic,
+        
+        // Property Features
         'features-fireplace': homeData.features.fireplace,
         'features-pool': homeData.features.pool,
         'features-deck': homeData.features.deck,
         'features-garage': homeData.features.garage,
         'features-basement': homeData.features.basement,
+        
+        // Advanced Features
         'features-solar-panels': homeData.features.solarPanels,
         'features-battery-backup': homeData.features.batteryBackup,
         'features-generator': homeData.features.generator,
@@ -3047,13 +3054,16 @@ function savePropertyFeaturesFromTab() {
     // Store old features to compare what changed
     const oldFeatures = { ...homeData.features };
     
-    // Get new feature values from tab form
+    // Read ALL feature checkboxes from the property editing form
     const newFeatures = {
+        // HVAC Systems (with features- prefix)
         centralAC: document.getElementById('features-central-ac')?.checked || false,
         miniSplits: document.getElementById('features-mini-splits')?.checked || false,
         wallAC: document.getElementById('features-wall-ac')?.checked || false,
         electricBaseboard: document.getElementById('features-electric-baseboard')?.checked || false,
         boiler: document.getElementById('features-boiler')?.checked || false,
+        
+        // Water Systems (with features- prefix)
         municipalWater: document.getElementById('features-municipal-water')?.checked || false,
         wellWater: document.getElementById('features-well-water')?.checked || false,
         sedimentFilter: document.getElementById('features-sediment-filter')?.checked || false,
@@ -3062,20 +3072,38 @@ function savePropertyFeaturesFromTab() {
         wholeHouseFilter: document.getElementById('features-whole-house-filter')?.checked || false,
         municipalSewer: document.getElementById('features-municipal-sewer')?.checked || false,
         septic: document.getElementById('features-septic')?.checked || false,
+        
+        // Property Features (with features- prefix)
         fireplace: document.getElementById('features-fireplace')?.checked || false,
         pool: document.getElementById('features-pool')?.checked || false,
         deck: document.getElementById('features-deck')?.checked || false,
         garage: document.getElementById('features-garage')?.checked || false,
         basement: document.getElementById('features-basement')?.checked || false,
+        
+        // Advanced Features (with features- prefix)
         solarPanels: document.getElementById('features-solar-panels')?.checked || false,
         batteryBackup: document.getElementById('features-battery-backup')?.checked || false,
         generator: document.getElementById('features-generator')?.checked || false,
         irrigation: document.getElementById('features-irrigation')?.checked || false,
         securitySystem: document.getElementById('features-security-system')?.checked || false,
-        outdoorKitchen: document.getElementById('features-outdoor-kitchen')?.checked || false
+        outdoorKitchen: document.getElementById('features-outdoor-kitchen')?.checked || false,
+        
+        // Preserve other features that aren't in the form but exist in data
+        smartThermostat: homeData.features.smartThermostat,
+        pavedDriveway: homeData.features.pavedDriveway,
+        fencing: homeData.features.fencing,
+        sidingType: homeData.features.sidingType,
+        roofType: homeData.features.roofType,
+        roofAge: homeData.features.roofAge,
+        foundationType: homeData.features.foundationType,
+        matureLandscaping: homeData.features.matureLandscaping,
+        outdoorLighting: homeData.features.outdoorLighting,
+        sprinklerSystem: homeData.features.sprinklerSystem,
+        batteryStorage: homeData.features.batteryStorage,
+        backupGenerator: homeData.features.backupGenerator,
+        otherFeatures: homeData.features.otherFeatures
     };
     
-    // Update home data
     homeData.features = newFeatures;
     
     // Generate new tasks for newly added features

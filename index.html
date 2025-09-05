@@ -11,6 +11,60 @@
 * {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
+
+/* Beautiful animations for dashboard */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+/* Dashboard animations */
+#dashboard-view {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.stat-card:nth-child(1) {
+    animation: slideInFromLeft 0.5s ease-out 0.1s both;
+}
+
+.stat-card:nth-child(2) {
+    animation: slideInFromLeft 0.5s ease-out 0.2s both;
+}
+
+.stat-card:nth-child(3) {
+    animation: slideInFromLeft 0.5s ease-out 0.3s both;
+}
+
+/* Subtle floating animation for background elements */
+.floating-bg {
+    animation: pulse 4s ease-in-out infinite;
+}
 </style>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
@@ -926,20 +980,33 @@ function showMainApp() {
         <div id="main-app" class="hidden">
             <div class="main-content">
         <!-- Enhanced Dashboard View -->
-        <div id="dashboard-view" class="p-4">
+        <div id="dashboard-view" class="p-4 bg-gradient-to-br from-blue-50 via-white to-indigo-50 min-h-screen">
         
-        <!-- Proper Header for Dashboard -->
-        <div class="bg-white shadow-sm border-b border-gray-200 rounded-lg mb-4 p-4">
-            <div class="flex items-center justify-between">
-                <div class="cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors" onclick="showTab('property-features')">
-                    <h1 class="text-xl font-bold text-gray-900">The Home Keeper</h1>
-                    <p class="text-sm text-gray-600" id="dashboard-subtitle">Smart home maintenance</p>
-                    <p class="text-xs text-blue-600 mt-1">Click to view & edit property</p>
+        <!-- Beautiful Header for Dashboard -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 shadow-xl rounded-2xl mb-6 p-6 text-white relative overflow-hidden">
+            <!-- Background pattern -->
+            <div class="absolute inset-0 bg-white/5 backdrop-blur-3xl"></div>
+            <div class="absolute top-0 right-0 -mr-12 -mt-12 w-32 h-32 rounded-full bg-white/10"></div>
+            <div class="absolute bottom-0 left-0 -ml-8 -mb-8 w-24 h-24 rounded-full bg-white/5"></div>
+            
+            <div class="relative flex items-center justify-between">
+                <div class="cursor-pointer hover:bg-white/10 rounded-xl p-3 -m-3 transition-all duration-300 hover:scale-105" onclick="showTab('property-features')">
+                    <h1 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <span class="text-3xl">🏠</span>
+                        The Home Keeper
+                    </h1>
+                    <p class="text-blue-100" id="dashboard-subtitle">Smart home maintenance made simple</p>
+                    <p class="text-xs text-blue-200 mt-2 flex items-center gap-2">
+                        <span class="w-4 h-4 bg-white/20 rounded-full flex items-center justify-center text-xs">✎</span>
+                        Click to view & edit property details
+                    </p>
                 </div>
                 
                 <!-- Settings Dropdown -->
                 <div class="relative">
-                    <button id="dashboard-settings-btn" onclick="toggleDashboardSettings()" class="text-2xl hover:bg-gray-100 p-2 rounded-lg">⚙️</button>
+                    <button id="dashboard-settings-btn" onclick="toggleDashboardSettings()" class="text-2xl hover:bg-white/10 p-3 rounded-xl transition-all duration-300 hover:scale-110 text-white">
+                        <span class="drop-shadow-sm">⚙️</span>
+                    </button>
                     
                     <!-- Dropdown menu -->
                     <div id="dashboard-settings-dropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50" style="background-color: rgba(255,255,255,0.98) !important; backdrop-filter: blur(12px); box-shadow: 0 10px 25px rgba(0,0,0,0.25) !important;">
@@ -996,54 +1063,78 @@ function showMainApp() {
         </div>
 
         
-        <!-- Interactive Stats Grid - Now Sticky and Mobile Optimized -->
-        <div class="sticky top-16 z-30 bg-gray-50 pb-4 mb-6">
-            <div class="grid grid-cols-3 gap-2 sm:gap-4">
-                <div id="overdue-card" class="stat-card bg-white rounded-xl p-3 sm:p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
-                    <div class="flex flex-col items-center text-center">
-                    <div class="p-1 sm:p-2 bg-red-100 rounded-lg text-base sm:text-lg mb-1 sm:mb-0">⚠️</div>
-                    <div>
-                        <p id="overdue-count" class="text-lg sm:text-xl font-bold text-red-600">0</p>
-                        <p class="text-xs text-gray-600">Overdue</p>
-                </div>
-            </div>
-        </div>
-    
-        <div id="week-card" class="stat-card bg-white rounded-xl p-3 sm:p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
-            <div class="flex flex-col items-center text-center">
-                <div class="p-1 sm:p-2 bg-orange-100 rounded-lg text-base sm:text-lg mb-1 sm:mb-0">📅</div>
-                <div>
-                    <p id="week-count" class="text-lg sm:text-xl font-bold text-orange-600">0</p>
-                    <p class="text-xs text-gray-600">This Week</p>
-                </div>
-            </div>
-        </div>
-        
-        <div id="total-card" class="stat-card bg-white rounded-xl p-3 sm:p-4 shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105">
-            <div class="flex flex-col items-center text-center">
-                <div class="p-1 sm:p-2 bg-blue-100 rounded-lg text-base sm:text-lg mb-1 sm:mb-0">📋</div>
-                <div>
-                    <p id="total-count" class="text-lg sm:text-xl font-bold text-blue-600">0</p>
-                    <p class="text-xs text-gray-600">All Tasks</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+        <!-- Beautiful Interactive Stats Grid -->
+        <div class="mb-8">
+            <div class="grid grid-cols-3 gap-3 sm:gap-6">
+                <!-- Overdue Card -->
+                <div id="overdue-card" class="stat-card group bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-4 sm:p-6 shadow-xl cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5"></div>
+                    <div class="absolute top-0 right-0 -mr-6 -mt-6 w-16 h-16 rounded-full bg-white/10"></div>
                     
-                 <!-- Enhanced Tasks Section -->
-            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-                 <h3 id="tasks-list-title" class="text-lg font-bold text-gray-900">Upcoming Tasks</h3>
-                <div class="flex gap-2">
-        <button onclick="addTaskFromDashboard()" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 text-sm touch-btn">
-            Add Task
-        </button>
-    </div>
-</div>
+                    <div class="relative flex flex-col items-center text-center text-white">
+                        <div class="p-2 sm:p-3 bg-white/20 backdrop-blur-sm rounded-2xl text-2xl sm:text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">⚠️</div>
+                        <div>
+                            <p id="overdue-count" class="text-2xl sm:text-3xl font-bold text-white drop-shadow-sm">0</p>
+                            <p class="text-xs sm:text-sm text-red-100 font-medium">Overdue</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- This Week Card -->
+                <div id="week-card" class="stat-card group bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl p-4 sm:p-6 shadow-xl cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5"></div>
+                    <div class="absolute bottom-0 left-0 -ml-6 -mb-6 w-16 h-16 rounded-full bg-white/10"></div>
+                    
+                    <div class="relative flex flex-col items-center text-center text-white">
+                        <div class="p-2 sm:p-3 bg-white/20 backdrop-blur-sm rounded-2xl text-2xl sm:text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">📅</div>
+                        <div>
+                            <p id="week-count" class="text-2xl sm:text-3xl font-bold text-white drop-shadow-sm">0</p>
+                            <p class="text-xs sm:text-sm text-orange-100 font-medium">This Week</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- All Tasks Card -->
+                <div id="total-card" class="stat-card group bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-4 sm:p-6 shadow-xl cursor-pointer hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5"></div>
+                    <div class="absolute top-0 left-0 -ml-6 -mt-6 w-16 h-16 rounded-full bg-white/10"></div>
+                    
+                    <div class="relative flex flex-col items-center text-center text-white">
+                        <div class="p-2 sm:p-3 bg-white/20 backdrop-blur-sm rounded-2xl text-2xl sm:text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">📋</div>
+                        <div>
+                            <p id="total-count" class="text-2xl sm:text-3xl font-bold text-white drop-shadow-sm">0</p>
+                            <p class="text-xs sm:text-sm text-blue-100 font-medium">All Tasks</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                    
+                 <!-- Beautiful Tasks Section -->
+            <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-white/20 relative">
+                <!-- Header with gradient -->
+                <div class="bg-gradient-to-r from-slate-50 to-gray-100 p-6 border-b border-gray-200/50 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5"></div>
+                    <div class="absolute top-0 right-0 -mr-8 -mt-8 w-20 h-20 rounded-full bg-blue-500/10"></div>
+                    
+                    <div class="relative flex items-center justify-between">
+                        <div>
+                            <h3 id="tasks-list-title" class="text-xl font-bold text-gray-900 flex items-center gap-3">
+                                <span class="p-2 bg-blue-100 rounded-xl text-blue-600">📋</span>
+                                Upcoming Tasks
+                            </h3>
+                            <p class="text-sm text-gray-600 mt-1">Stay on top of your home maintenance</p>
+                        </div>
+                        
+                        <button onclick="addTaskFromDashboard()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-xl hover:from-green-600 hover:to-emerald-700 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+                            <span class="text-lg">+</span>
+                            Add Task
+                        </button>
+                    </div>
+                </div>
                 
                 <!-- Tasks List -->
-                <div id="tasks-list">
+                <div id="tasks-list" class="relative">
                     <!-- Enhanced tasks will be populated here -->
                 </div>
             </div>
