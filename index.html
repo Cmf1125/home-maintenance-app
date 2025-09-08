@@ -778,46 +778,95 @@ function showMainApp() {
         <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
             <h5 class="font-semibold text-purple-900 mb-3 flex items-center gap-2">
                 <span class="text-lg">🏠</span>
-                Structural Details
+                Structural Details <span class="text-sm text-purple-700 font-normal">(Select what applies)</span>
             </h5>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Roof Type</label>
-                    <select id="roof-type" class="w-full p-2 border border-gray-300 rounded text-sm">
-                        <option value="asphalt">Asphalt Shingles</option>
-                        <option value="metal">Metal Roofing</option>
-                        <option value="tile">Tile (Clay/Concrete)</option>
-                        <option value="slate">Slate</option>
-                        <option value="wood">Wood Shakes</option>
-                        <option value="flat">Flat/Membrane</option>
-                    </select>
+            
+            <!-- Roof Types -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Roof Type</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="roof-asphalt" class="w-4 h-4">
+                        <span>Asphalt Shingles</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="roof-metal" class="w-4 h-4">
+                        <span>Metal Roofing</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="roof-tile" class="w-4 h-4">
+                        <span>Tile (Clay/Concrete)</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="roof-slate" class="w-4 h-4">
+                        <span>Slate</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="roof-wood" class="w-4 h-4">
+                        <span>Wood Shakes</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="roof-flat" class="w-4 h-4">
+                        <span>Flat/Membrane</span>
+                    </label>
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Roof Age (years)</label>
-                    <input type="number" id="roof-age" min="0" max="50" 
-                           class="w-full p-2 border border-gray-300 rounded text-sm" 
-                           placeholder="10">
+            </div>
+            
+            <!-- Exterior Siding -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Exterior Siding</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="siding-vinyl" class="w-4 h-4">
+                        <span>Vinyl Siding</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="siding-wood" class="w-4 h-4">
+                        <span>Wood Siding</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="siding-brick" class="w-4 h-4">
+                        <span>Brick</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="siding-stucco" class="w-4 h-4">
+                        <span>Stucco</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="siding-fiber-cement" class="w-4 h-4">
+                        <span>Fiber Cement</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="siding-stone" class="w-4 h-4">
+                        <span>Stone/Masonry</span>
+                    </label>
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Exterior Siding</label>
-                    <select id="siding-type" class="w-full p-2 border border-gray-300 rounded text-sm">
-                        <option value="vinyl">Vinyl Siding</option>
-                        <option value="wood">Wood Siding</option>
-                        <option value="brick">Brick</option>
-                        <option value="stucco">Stucco</option>
-                        <option value="fiber-cement">Fiber Cement</option>
-                        <option value="stone">Stone/Masonry</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Foundation Type</label>
-                    <select id="foundation-type" class="w-full p-2 border border-gray-300 rounded text-sm">
-                        <option value="concrete-slab">Concrete Slab</option>
-                        <option value="crawl-space">Crawl Space</option>
-                        <option value="full-basement">Full Basement</option>
-                        <option value="partial-basement">Partial Basement</option>
-                        <option value="pier-beam">Pier & Beam</option>
-                    </select>
+            </div>
+            
+            <!-- Foundation Types -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Foundation Type</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="foundation-slab" class="w-4 h-4">
+                        <span>Concrete Slab</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="foundation-crawl" class="w-4 h-4">
+                        <span>Crawl Space</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="foundation-full-basement" class="w-4 h-4">
+                        <span>Full Basement</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="foundation-partial-basement" class="w-4 h-4">
+                        <span>Partial Basement</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="foundation-pier" class="w-4 h-4">
+                        <span>Pier & Beam</span>
+                    </label>
                 </div>
             </div>
         </div>
@@ -3553,6 +3602,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('municipal-water').checked = true;
                 document.getElementById('municipal-sewer').checked = true;
                 document.getElementById('garage').checked = true;
+                // Common structural defaults
+                document.getElementById('roof-asphalt').checked = true;
+                document.getElementById('siding-vinyl').checked = true;
+                document.getElementById('foundation-slab').checked = true;
                 break;
                 
             case 'townhouse':
@@ -3560,24 +3613,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('central-ac').checked = true;
                 document.getElementById('municipal-water').checked = true;
                 document.getElementById('municipal-sewer').checked = true;
+                // Structural defaults for townhouses
+                document.getElementById('roof-asphalt').checked = true;
+                document.getElementById('siding-vinyl').checked = true;
                 break;
                 
             case 'condo':
                 // Minimal features for condos (usually handled by HOA)
                 document.getElementById('municipal-water').checked = true;
                 document.getElementById('municipal-sewer').checked = true;
+                // Usually no structural responsibility for condos
                 break;
                 
             case 'apartment':
                 // Very minimal for apartments (most handled by landlord)
                 document.getElementById('municipal-water').checked = true;
                 document.getElementById('municipal-sewer').checked = true;
+                // No structural responsibility for apartments
                 break;
                 
             case 'mobile-home':
                 // Mobile homes often have unique systems
                 document.getElementById('municipal-water').checked = true;
                 document.getElementById('municipal-sewer').checked = true;
+                // Mobile home specific defaults
+                document.getElementById('roof-metal').checked = true;
+                document.getElementById('siding-vinyl').checked = true;
+                document.getElementById('foundation-pier').checked = true;
                 break;
         }
         
@@ -3831,8 +3893,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Listen for changes to structural details
-    const structuralInputs = ['roof-type', 'roof-age', 'siding-type', 'foundation-type'];
+    // Listen for changes to structural details (checkboxes)
+    const structuralInputs = [
+        'roof-asphalt', 'roof-metal', 'roof-tile', 'roof-slate', 'roof-wood', 'roof-flat',
+        'siding-vinyl', 'siding-wood', 'siding-brick', 'siding-stucco', 'siding-fiber-cement', 'siding-stone',
+        'foundation-slab', 'foundation-crawl', 'foundation-full-basement', 'foundation-partial-basement', 'foundation-pier'
+    ];
     structuralInputs.forEach(id => {
         const input = document.getElementById(id);
         if (input && typeof updateTaskPreview === 'function') {
