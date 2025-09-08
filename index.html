@@ -567,7 +567,7 @@ function showMainApp() {
 <div class="mt-4">
     <button type="button" id="next-to-step-2" onclick="celebrateStepCompletion(1, 2)"
             class="w-full px-6 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold text-lg shadow-lg transition-all duration-200">
-        Next: Essential Systems →
+        Next: Home Systems →
     </button>
 </div>
 </div> <!-- ✅ End Step 1 goes HERE -->
@@ -677,7 +677,7 @@ function showMainApp() {
                         </button>
                         <button type="button" id="next-to-step-3" onclick="celebrateStepCompletion(2, 3)"
                                 class="px-6 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold text-lg shadow-lg transition-all duration-200">
-                            Next: Outdoor & Yard →
+                            Next: Additional Features →
                         </button>
                     </div>
                 </div>
@@ -3169,36 +3169,6 @@ window.rescheduleTaskFromDashboard = function(taskId, event) {
 console.log('✅ FIXED modal script loaded - all buttons should work now!');
 </script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const setupForm = document.getElementById('setup-form');
-  if (!setupForm) return;
-
-  // 1) Remove any previously inserted headers (avoid duplicates)
-  document.querySelectorAll('.onboarding-section-header').forEach(h => h.remove());
-
-  // 2) Insert new headers at the top of Step 2 and Step 3
-  const sections = [
-    { step: 2, heading: '⚙️ Home Systems', subheading: 'Tell us about your heating, cooling, and water systems' },
-    { step: 3, heading: '🏠 Additional Features', subheading: 'Any extra features your home has' }
-  ];
-
-  sections.forEach(({ step, heading, subheading }) => {
-    const stepContainer = document.querySelector(`.onboarding-step[data-step="${step}"]`);
-    if (!stepContainer) return;
-
-    const sectionHeader = document.createElement('div');
-    sectionHeader.className = 'onboarding-section-header mb-4';
-    sectionHeader.innerHTML = `
-      <h3 class="text-lg font-semibold text-gray-900 mb-1">${heading}</h3>
-      <p class="text-sm text-gray-600">${subheading}</p>
-    `;
-    stepContainer.insertAdjacentElement('afterbegin', sectionHeader);
-  });
-
-  console.log('✅ Form section headers added at step starts');
-});
-</script>
 
 <!-- Firebase Configuration -->
 <script>
