@@ -71,7 +71,8 @@ class TaskGenerator {
                 zipcode: document.getElementById('zipcode')?.value || '12345',
                 propertyType: document.getElementById('property-type')?.value || 'single-family',
                 yearBuilt: parseInt(document.getElementById('year-built')?.value) || 2000,
-                sqft: parseInt(document.getElementById('sqft')?.value) || 2000
+                sqft: parseInt(document.getElementById('sqft')?.value) || 2000,
+                hoaCost: parseFloat(document.getElementById('hoa-cost')?.value) || 0
             };
             homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
 

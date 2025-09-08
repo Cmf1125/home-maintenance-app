@@ -230,6 +230,7 @@ function createMaintenancePlan() {
             propertyType: document.getElementById('property-type')?.value || 'single-family',
             yearBuilt: parseInt(document.getElementById('year-built')?.value) || 2000,
             sqft: parseInt(document.getElementById('sqft')?.value) || 2000,
+            hoaCost: parseFloat(document.getElementById('hoa-cost')?.value) || 0,
             ownerName: window.currentUser?.displayName || 'Homeowner'
         };
         homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
@@ -1430,6 +1431,7 @@ function goBackToHomeSetup() {
     if (homeData.propertyType) document.getElementById('property-type').value = homeData.propertyType;
     if (homeData.yearBuilt) document.getElementById('year-built').value = homeData.yearBuilt;
     if (homeData.sqft) document.getElementById('sqft').value = homeData.sqft;
+    if (homeData.hoaCost) document.getElementById('hoa-cost').value = homeData.hoaCost;
     
     // Set all checkboxes and options
     if (homeData.features) {
@@ -3419,6 +3421,7 @@ function showPropertyConfirmation() {
         propertyType: document.getElementById('property-type')?.value || 'single-family',
         yearBuilt: parseInt(document.getElementById('year-built')?.value) || 2000,
         sqft: parseInt(document.getElementById('sqft')?.value) || 2000,
+        hoaCost: parseFloat(document.getElementById('hoa-cost')?.value) || 0,
         ownerName: window.currentUser?.displayName || 'Homeowner'
     };
     homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
