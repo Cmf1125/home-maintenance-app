@@ -266,11 +266,27 @@ function createMaintenancePlan() {
             smartThermostat: document.getElementById('smart-thermostat')?.checked || false,
             securitySystem: document.getElementById('security-system')?.checked || false,
 
-            // Structural Details
-            roofType: document.getElementById('roof-type')?.value || 'asphalt',
+            // Structural Details (new checkbox system)
+            roofAsphalt: document.getElementById('roof-asphalt')?.checked || false,
+            roofMetal: document.getElementById('roof-metal')?.checked || false,
+            roofTile: document.getElementById('roof-tile')?.checked || false,
+            roofSlate: document.getElementById('roof-slate')?.checked || false,
+            roofWood: document.getElementById('roof-wood')?.checked || false,
+            roofFlat: document.getElementById('roof-flat')?.checked || false,
             roofAge: parseInt(document.getElementById('roof-age')?.value) || 0,
-            sidingType: document.getElementById('siding-type')?.value || 'vinyl',
-            foundationType: document.getElementById('foundation-type')?.value || 'concrete-slab',
+            
+            sidingVinyl: document.getElementById('siding-vinyl')?.checked || false,
+            sidingWood: document.getElementById('siding-wood')?.checked || false,
+            sidingBrick: document.getElementById('siding-brick')?.checked || false,
+            sidingStucco: document.getElementById('siding-stucco')?.checked || false,
+            sidingFiberCement: document.getElementById('siding-fiber-cement')?.checked || false,
+            sidingStone: document.getElementById('siding-stone')?.checked || false,
+            
+            foundationSlab: document.getElementById('foundation-slab')?.checked || false,
+            foundationCrawl: document.getElementById('foundation-crawl')?.checked || false,
+            foundationFullBasement: document.getElementById('foundation-full-basement')?.checked || false,
+            foundationPartialBasement: document.getElementById('foundation-partial-basement')?.checked || false,
+            foundationPier: document.getElementById('foundation-pier')?.checked || false,
 
             // Outdoor Features
             sprinklerSystem: document.getElementById('sprinkler-system')?.checked || false,
@@ -3456,11 +3472,27 @@ function showPropertyConfirmation() {
             smartThermostat: document.getElementById('smart-thermostat')?.checked || false,
             securitySystem: document.getElementById('security-system')?.checked || false,
 
-            // Structural Details
-            roofType: document.getElementById('roof-type')?.value || 'asphalt',
+            // Structural Details (new checkbox system)
+            roofAsphalt: document.getElementById('roof-asphalt')?.checked || false,
+            roofMetal: document.getElementById('roof-metal')?.checked || false,
+            roofTile: document.getElementById('roof-tile')?.checked || false,
+            roofSlate: document.getElementById('roof-slate')?.checked || false,
+            roofWood: document.getElementById('roof-wood')?.checked || false,
+            roofFlat: document.getElementById('roof-flat')?.checked || false,
             roofAge: parseInt(document.getElementById('roof-age')?.value) || 0,
-            sidingType: document.getElementById('siding-type')?.value || 'vinyl',
-            foundationType: document.getElementById('foundation-type')?.value || 'concrete-slab',
+            
+            sidingVinyl: document.getElementById('siding-vinyl')?.checked || false,
+            sidingWood: document.getElementById('siding-wood')?.checked || false,
+            sidingBrick: document.getElementById('siding-brick')?.checked || false,
+            sidingStucco: document.getElementById('siding-stucco')?.checked || false,
+            sidingFiberCement: document.getElementById('siding-fiber-cement')?.checked || false,
+            sidingStone: document.getElementById('siding-stone')?.checked || false,
+            
+            foundationSlab: document.getElementById('foundation-slab')?.checked || false,
+            foundationCrawl: document.getElementById('foundation-crawl')?.checked || false,
+            foundationFullBasement: document.getElementById('foundation-full-basement')?.checked || false,
+            foundationPartialBasement: document.getElementById('foundation-partial-basement')?.checked || false,
+            foundationPier: document.getElementById('foundation-pier')?.checked || false,
 
             // Outdoor Features
             sprinklerSystem: document.getElementById('sprinkler-system')?.checked || false,
@@ -3528,42 +3560,47 @@ function updateConfirmationSummary() {
 
     // NEW: Build Structural Details section
     const structuralDetails = [];
-    if (homeData.features.roofType && homeData.features.roofType !== 'asphalt') {
-        const roofTypeMap = {
-            'metal': 'Metal Roofing',
-            'tile': 'Tile Roof',
-            'slate': 'Slate Roof',
-            'wood': 'Wood Shakes',
-            'flat': 'Flat/Membrane Roof'
-        };
-        structuralDetails.push(roofTypeMap[homeData.features.roofType] || 'Asphalt Shingles');
-    } else {
-        structuralDetails.push('Asphalt Shingles');
+    
+    // Check roof types (new checkbox system)
+    const roofTypes = [];
+    if (homeData.features.roofAsphalt) roofTypes.push('Asphalt Shingles');
+    if (homeData.features.roofMetal) roofTypes.push('Metal Roofing');
+    if (homeData.features.roofTile) roofTypes.push('Tile Roof');
+    if (homeData.features.roofSlate) roofTypes.push('Slate Roof');
+    if (homeData.features.roofWood) roofTypes.push('Wood Shakes');
+    if (homeData.features.roofFlat) roofTypes.push('Flat/Membrane Roof');
+    
+    if (roofTypes.length > 0) {
+        structuralDetails.push(roofTypes.join(', '));
     }
     
-    if (homeData.features.roofAge > 0) {
+    if (homeData.features.roofAge && homeData.features.roofAge > 0) {
         structuralDetails.push(`${homeData.features.roofAge} year old roof`);
     }
     
-    if (homeData.features.sidingType && homeData.features.sidingType !== 'vinyl') {
-        const sidingTypeMap = {
-            'wood': 'Wood Siding',
-            'brick': 'Brick',
-            'stucco': 'Stucco',
-            'fiber-cement': 'Fiber Cement',
-            'stone': 'Stone/Masonry'
-        };
-        structuralDetails.push(sidingTypeMap[homeData.features.sidingType] || 'Vinyl Siding');
+    // Check siding types (new checkbox system)
+    const sidingTypes = [];
+    if (homeData.features.sidingVinyl) sidingTypes.push('Vinyl Siding');
+    if (homeData.features.sidingWood) sidingTypes.push('Wood Siding');
+    if (homeData.features.sidingBrick) sidingTypes.push('Brick');
+    if (homeData.features.sidingStucco) sidingTypes.push('Stucco');
+    if (homeData.features.sidingFiberCement) sidingTypes.push('Fiber Cement');
+    if (homeData.features.sidingStone) sidingTypes.push('Stone/Masonry');
+    
+    if (sidingTypes.length > 0) {
+        structuralDetails.push(sidingTypes.join(', '));
     }
     
-    if (homeData.features.foundationType && homeData.features.foundationType !== 'concrete-slab') {
-        const foundationTypeMap = {
-            'crawl-space': 'Crawl Space',
-            'full-basement': 'Full Basement',
-            'partial-basement': 'Partial Basement',
-            'pier-beam': 'Pier & Beam'
-        };
-        structuralDetails.push(foundationTypeMap[homeData.features.foundationType] || 'Concrete Slab');
+    // Check foundation types (new checkbox system)
+    const foundationTypes = [];
+    if (homeData.features.foundationSlab) foundationTypes.push('Concrete Slab');
+    if (homeData.features.foundationCrawl) foundationTypes.push('Crawl Space');
+    if (homeData.features.foundationFullBasement) foundationTypes.push('Full Basement');
+    if (homeData.features.foundationPartialBasement) foundationTypes.push('Partial Basement');
+    if (homeData.features.foundationPier) foundationTypes.push('Pier & Beam');
+    
+    if (foundationTypes.length > 0) {
+        structuralDetails.push(foundationTypes.join(', '));
     }
 
     // NEW: Build Outdoor Features section
