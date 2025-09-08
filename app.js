@@ -1601,6 +1601,11 @@ document.body.classList.add('main-app-active');
         showTab('dashboard');
         console.log('✅ Dashboard initialized successfully');
         
+        // Start welcome tour for new users
+        setTimeout(() => {
+            startWelcomeTour();
+        }, 1000); // Small delay to ensure dashboard is fully rendered
+        
         // Initialize Google Calendar sync UI
         if (typeof updateCalendarSyncUI === 'function') {
             updateCalendarSyncUI();
