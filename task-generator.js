@@ -96,18 +96,7 @@ class TaskGenerator {
                 deck: document.getElementById('deck')?.checked || false,
                 garage: document.getElementById('garage')?.checked || false,
                 basement: document.getElementById('basement')?.checked || false,
-                otherFeatures: document.getElementById('other-features')?.value || '',
-                
-                // Major Appliances
-                refrigerator: document.getElementById('refrigerator')?.checked || false,
-                electricOven: document.getElementById('electric-oven')?.checked || false,
-                gasOven: document.getElementById('gas-oven')?.checked || false,
-                inductionCooktop: document.getElementById('induction-cooktop')?.checked || false,
-                dishwasher: document.getElementById('dishwasher')?.checked || false,
-                washer: document.getElementById('washer')?.checked || false,
-                dryer: document.getElementById('dryer')?.checked || false,
-                microwave: document.getElementById('microwave')?.checked || false,
-                garbageDisposal: document.getElementById('garbage-disposal')?.checked || false
+                otherFeatures: document.getElementById('other-features')?.value || ''
             };
 
             // Generate tasks

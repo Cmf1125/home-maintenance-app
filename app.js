@@ -294,18 +294,7 @@ function createMaintenancePlan() {
             fencing: document.getElementById('fencing')?.checked || false,
             pavedDriveway: document.getElementById('paved-driveway')?.checked || false,
             matureLandscaping: document.getElementById('mature-landscaping')?.checked || false,
-            outdoorKitchen: document.getElementById('outdoor-kitchen')?.checked || false,
-
-            // Major Appliances
-            refrigerator: document.getElementById('refrigerator')?.checked || false,
-            electricOven: document.getElementById('electric-oven')?.checked || false,
-            gasOven: document.getElementById('gas-oven')?.checked || false,
-            inductionCooktop: document.getElementById('induction-cooktop')?.checked || false,
-            dishwasher: document.getElementById('dishwasher')?.checked || false,
-            washer: document.getElementById('washer')?.checked || false,
-            dryer: document.getElementById('dryer')?.checked || false,
-            microwave: document.getElementById('microwave')?.checked || false,
-            garbageDisposal: document.getElementById('garbage-disposal')?.checked || false
+            outdoorKitchen: document.getElementById('outdoor-kitchen')?.checked || false
         };
 
         // Continue with existing task generation...
@@ -3511,18 +3500,7 @@ function showPropertyConfirmation() {
             fencing: document.getElementById('fencing')?.checked || false,
             pavedDriveway: document.getElementById('paved-driveway')?.checked || false,
             matureLandscaping: document.getElementById('mature-landscaping')?.checked || false,
-            outdoorKitchen: document.getElementById('outdoor-kitchen')?.checked || false,
-
-            // Major Appliances
-            refrigerator: document.getElementById('refrigerator')?.checked || false,
-            electricOven: document.getElementById('electric-oven')?.checked || false,
-            gasOven: document.getElementById('gas-oven')?.checked || false,
-            inductionCooktop: document.getElementById('induction-cooktop')?.checked || false,
-            dishwasher: document.getElementById('dishwasher')?.checked || false,
-            washer: document.getElementById('washer')?.checked || false,
-            dryer: document.getElementById('dryer')?.checked || false,
-            microwave: document.getElementById('microwave')?.checked || false,
-            garbageDisposal: document.getElementById('garbage-disposal')?.checked || false
+            outdoorKitchen: document.getElementById('outdoor-kitchen')?.checked || false
         
     };
 
