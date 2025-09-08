@@ -682,81 +682,141 @@ function showMainApp() {
                     </div>
                 </div>
                     
-             <!-- Step 3: Final details & preferences -->
+             <!-- Step 3: Outdoor & Yard Features -->
              <div class="onboarding-step hidden" data-step="3">
-    <!-- Basic Features (Always Visible) -->
-    <div>
-        <label class="block text-sm font-medium text-gray-700 mb-3">Basic Home Features</label>
-        <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
-            <label class="flex items-center space-x-3 touch-btn">
-                <input type="checkbox" id="fireplace" class="w-5 h-5">
-                <span>Fireplace</span>
-            </label>
-            <label class="flex items-center space-x-3 touch-btn">
-                <input type="checkbox" id="pool" class="w-5 h-5">
-                <span>Pool/Spa</span>
-            </label>
-            <label class="flex items-center space-x-3 touch-btn">
-                <input type="checkbox" id="deck" class="w-5 h-5">
-                <span>Deck/Patio</span>
-            </label>
-            <label class="flex items-center space-x-3 touch-btn">
-                <input type="checkbox" id="garage" class="w-5 h-5">
-                <span>Garage</span>
-            </label>
-            <label class="flex items-center space-x-3 touch-btn">
-                <input type="checkbox" id="basement" class="w-5 h-5">
-                <span>Basement</span>
-            </label>
-        </div>
-    </div>
-
-<!-- Advanced Features Toggle Section -->
-    <div class="mt-6">
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 cursor-pointer hover:from-blue-100 hover:to-indigo-100 transition-all duration-200" 
-             onclick="toggleAdvancedFeatures()">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-blue-600 rounded-lg text-white text-lg">⚡</div>
-                    <div>
-                        <h4 class="font-semibold text-blue-900">Advanced Features</h4>
-                        <p class="text-sm text-blue-700">Solar, generators, smart systems, outdoor features</p>
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Outdoor & Yard Features</h3>
+                    <p class="text-gray-600">Tell us about your outdoor spaces and special features</p>
+                </div>
+                
+                <!-- Outdoor Features -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Outdoor Features</label>
+                    <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
+                        <label class="flex items-center space-x-3 touch-btn">
+                            <input type="checkbox" id="pool" class="w-5 h-5">
+                            <div>
+                                <span>Pool/Spa</span>
+                                <div class="text-xs text-gray-500">Swimming pool, hot tub, or spa</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center space-x-3 touch-btn">
+                            <input type="checkbox" id="deck" class="w-5 h-5">
+                            <div>
+                                <span>Deck/Patio</span>
+                                <div class="text-xs text-gray-500">Wood deck, concrete patio, or outdoor living space</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center space-x-3 touch-btn">
+                            <input type="checkbox" id="garage" class="w-5 h-5">
+                            <span>Garage</span>
+                        </label>
+                        <label class="flex items-center space-x-3 touch-btn">
+                            <input type="checkbox" id="sprinkler-system" class="w-5 h-5">
+                            <div>
+                                <span>Sprinkler System</span>
+                                <div class="text-xs text-gray-500">Automatic irrigation for lawn/garden</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center space-x-3 touch-btn">
+                            <input type="checkbox" id="outdoor-lighting" class="w-5 h-5">
+                            <span>Outdoor Lighting</span>
+                        </label>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span id="advanced-toggle-text" class="text-sm font-medium text-blue-800">Show Options</span>
-                    <div id="advanced-toggle-arrow" class="text-blue-600 text-xl transition-transform duration-300">▼</div>
+                
+                <!-- Indoor Spaces -->
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Indoor Spaces</label>
+                    <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
+                        <label class="flex items-center space-x-3 touch-btn">
+                            <input type="checkbox" id="fireplace" class="w-5 h-5">
+                            <div>
+                                <span>Fireplace</span>
+                                <div class="text-xs text-gray-500">Wood, gas, or electric fireplace</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center space-x-3 touch-btn">
+                            <input type="checkbox" id="basement" class="w-5 h-5">
+                            <div>
+                                <span>Basement</span>
+                                <div class="text-xs text-gray-500">Finished or unfinished basement space</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Skip Option -->
+                <div class="mt-4 text-center">
+                    <button type="button" class="text-sm text-blue-600 hover:text-blue-800 transition-colors" onclick="skipToStep(4)">
+                        Skip - I'll add features later →
+                    </button>
+                </div>
+                
+                <div class="flex justify-between mt-6">
+                    <button type="button" id="back-to-step-2" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition-colors">
+                        ← Back
+                    </button>
+                    <button type="button" id="next-to-step-4" onclick="celebrateStepCompletion(3, 4)"
+                            class="px-6 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold text-lg shadow-lg transition-all duration-200">
+                        Next: Energy & Tech →
+                    </button>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Advanced Features Content (Hidden by Default) -->
-    <div id="advanced-features-section" class="hidden mt-4 space-y-4 overflow-hidden transition-all duration-500">
-        
-        <!-- Energy & Smart Systems -->
-        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-            <h5 class="font-semibold text-green-900 mb-3 flex items-center gap-2">
-                <span class="text-lg">🔋</span>
-                Energy & Smart Systems
-            </h5>
-            <div class="space-y-3">
-                <label class="flex items-center space-x-3 touch-btn">
-                    <input type="checkbox" id="solar-panels" class="w-5 h-5">
-                    <span>Solar Panels</span>
-                </label>
-                <label class="flex items-center space-x-3 touch-btn">
-                    <input type="checkbox" id="backup-generator" class="w-5 h-5">
-                    <span>Backup Generator</span>
-                </label>
-                <label class="flex items-center space-x-3 touch-btn">
-                    <input type="checkbox" id="battery-storage" class="w-5 h-5">
-                    <span>Battery Storage System</span>
-                </label>
-                <label class="flex items-center space-x-3 touch-btn">
-                    <input type="checkbox" id="smart-thermostat" class="w-5 h-5">
-                    <span>Smart Thermostat</span>
-                </label>
+            
+            <!-- Step 4: Energy & Tech Features -->
+            <div class="onboarding-step hidden" data-step="4">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Energy & Tech Features</h3>
+                    <p class="text-gray-600">Smart systems, solar panels, and modern technology</p>
+                </div>
+                
+                <!-- Energy Systems -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Energy Systems</label>
+                    <div class="space-y-3 bg-green-50 p-4 rounded-lg border border-green-200">
+                        <label class="flex items-center space-x-3 touch-btn">
+                            <input type="checkbox" id="solar-panels" class="w-5 h-5">
+                            <div>
+                                <span>Solar Panels</span>
+                                <div class="text-xs text-gray-500">Rooftop or ground-mounted solar system</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center space-x-3 touch-btn">
+                            <input type="checkbox" id="backup-generator" class="w-5 h-5">
+                            <div>
+                                <span>Backup Generator</span>
+                                <div class="text-xs text-gray-500">Standby or portable generator</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center space-x-3 touch-btn">
+                            <input type="checkbox" id="battery-storage" class="w-5 h-5">
+                            <div>
+                                <span>Battery Storage System</span>
+                                <div class="text-xs text-gray-500">Tesla Powerwall or similar</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Smart Home Systems -->
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Smart Home Systems</label>
+                    <div class="space-y-3 bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <label class="flex items-center space-x-3 touch-btn">
+                            <input type="checkbox" id="smart-thermostat" class="w-5 h-5">
+                            <div>
+                                <span>Smart Thermostat</span>
+                                <div class="text-xs text-gray-500">Nest, Ecobee, or similar</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center space-x-3 touch-btn">
+                            <input type="checkbox" id="security-system" class="w-5 h-5">
+                            <div>
+                                <span>Security System</span>
+                                <div class="text-xs text-gray-500">Alarm system, cameras, smart locks</div>
+                            </div>
                         </label>
                         <label class="flex items-center space-x-3 touch-btn">
                             <input type="checkbox" id="home-automation" class="w-5 h-5">
