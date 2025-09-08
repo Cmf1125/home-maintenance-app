@@ -564,6 +564,15 @@ function showMainApp() {
 
                  <!-- Step 2: Systems & features -->
                 <div class="onboarding-step hidden" data-step="2">
+                    <!-- Smart Defaults Info -->
+                    <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-lg">💡</span>
+                            <h4 class="font-semibold text-blue-900">Smart Defaults Applied</h4>
+                        </div>
+                        <p class="text-sm text-blue-800">We've pre-selected common features for your property type. Feel free to uncheck any that don't apply or add others you have!</p>
+                    </div>
+                    
                     <!-- Heating & Cooling Systems -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3">Heating & Cooling Systems</label>
@@ -3529,9 +3538,57 @@ document.addEventListener('DOMContentLoaded', function() {
     const propertyCards = document.querySelectorAll('.property-card');
     const hiddenInput = document.getElementById('property-type');
     
-    // Set initial selection
+    // Function to set smart defaults based on property type
+    function setPropertyTypeDefaults(propertyType) {
+        // Clear all checkboxes first
+        document.querySelectorAll('#setup-form input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        
+        // Set defaults based on property type
+        switch(propertyType) {
+            case 'single-family':
+                // Most common features for single-family homes
+                document.getElementById('central-ac').checked = true;
+                document.getElementById('municipal-water').checked = true;
+                document.getElementById('municipal-sewer').checked = true;
+                document.getElementById('garage').checked = true;
+                break;
+                
+            case 'townhouse':
+                // Common features for townhouses
+                document.getElementById('central-ac').checked = true;
+                document.getElementById('municipal-water').checked = true;
+                document.getElementById('municipal-sewer').checked = true;
+                break;
+                
+            case 'condo':
+                // Minimal features for condos (usually handled by HOA)
+                document.getElementById('municipal-water').checked = true;
+                document.getElementById('municipal-sewer').checked = true;
+                break;
+                
+            case 'apartment':
+                // Very minimal for apartments (most handled by landlord)
+                document.getElementById('municipal-water').checked = true;
+                document.getElementById('municipal-sewer').checked = true;
+                break;
+                
+            case 'mobile-home':
+                // Mobile homes often have unique systems
+                document.getElementById('municipal-water').checked = true;
+                document.getElementById('municipal-sewer').checked = true;
+                break;
+        }
+        
+        console.log(`✅ Set smart defaults for ${propertyType}`);
+    }
+    
+    // Set initial selection and defaults
     if (propertyCards.length > 0) {
         propertyCards[0].querySelector('.property-card-inner').classList.add('selected');
+        hiddenInput.value = propertyCards[0].dataset.value;
+        setPropertyTypeDefaults(propertyCards[0].dataset.value);
     }
     
     propertyCards.forEach(card => {
@@ -3546,6 +3603,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Update hidden input
             hiddenInput.value = this.dataset.value;
+            
+            // Set smart defaults based on property type
+            setPropertyTypeDefaults(this.dataset.value);
             
             // Add selection animation
             this.querySelector('.property-card-inner').style.transform = 'scale(0.95)';
