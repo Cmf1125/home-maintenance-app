@@ -785,6 +785,52 @@ function showMainApp() {
             </div>
         </div>
 
+        <!-- Appliances -->
+        <div class="bg-cyan-50 border border-cyan-200 rounded-lg p-4">
+            <h5 class="font-semibold text-cyan-900 mb-3 flex items-center gap-2">
+                <span class="text-lg">🏠</span>
+                Major Appliances
+            </h5>
+            <div class="space-y-3">
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="refrigerator" class="w-5 h-5">
+                    <span>Refrigerator</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="electric-oven" class="w-5 h-5">
+                    <span>Electric Oven/Stovetop</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="gas-oven" class="w-5 h-5">
+                    <span>Gas Oven/Stovetop</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="induction-cooktop" class="w-5 h-5">
+                    <span>Induction Cooktop</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="dishwasher" class="w-5 h-5">
+                    <span>Dishwasher</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="washer" class="w-5 h-5">
+                    <span>Washing Machine</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="dryer" class="w-5 h-5">
+                    <span>Dryer</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="microwave" class="w-5 h-5">
+                    <span>Built-in Microwave</span>
+                </label>
+                <label class="flex items-center space-x-3 touch-btn">
+                    <input type="checkbox" id="garbage-disposal" class="w-5 h-5">
+                    <span>Garbage Disposal</span>
+                </label>
+            </div>
+        </div>
+
         <!-- Structural Details -->
         <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
             <h5 class="font-semibold text-purple-900 mb-3 flex items-center gap-2">
@@ -3628,6 +3674,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('roof-asphalt').checked = true;
                 document.getElementById('siding-vinyl').checked = true;
                 document.getElementById('foundation-slab').checked = true;
+                // Common appliances
+                document.getElementById('refrigerator').checked = true;
+                document.getElementById('dishwasher').checked = true;
+                document.getElementById('washer').checked = true;
+                document.getElementById('dryer').checked = true;
                 break;
                 
             case 'townhouse':
@@ -3638,12 +3689,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Structural defaults for townhouses
                 document.getElementById('roof-asphalt').checked = true;
                 document.getElementById('siding-vinyl').checked = true;
+                // Common appliances
+                document.getElementById('refrigerator').checked = true;
+                document.getElementById('dishwasher').checked = true;
+                document.getElementById('washer').checked = true;
+                document.getElementById('dryer').checked = true;
                 break;
                 
             case 'condo':
                 // Minimal features for condos (usually handled by HOA)
                 document.getElementById('municipal-water').checked = true;
                 document.getElementById('municipal-sewer').checked = true;
+                // Common appliances (usually tenant responsibility)
+                document.getElementById('refrigerator').checked = true;
+                document.getElementById('dishwasher').checked = true;
+                document.getElementById('washer').checked = true;
+                document.getElementById('dryer').checked = true;
                 // Usually no structural responsibility for condos
                 break;
                 
@@ -3651,6 +3712,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Very minimal for apartments (most handled by landlord)
                 document.getElementById('municipal-water').checked = true;
                 document.getElementById('municipal-sewer').checked = true;
+                // Basic appliances (tenant may be responsible for maintenance)
+                document.getElementById('refrigerator').checked = true;
                 // No structural responsibility for apartments
                 break;
                 
@@ -3905,7 +3968,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const advancedCheckboxes = [
         'solar-panels', 'backup-generator', 'battery-storage', 'smart-thermostat', 
         'security-system', 'sprinkler-system', 'outdoor-lighting', 'fencing', 
-        'paved-driveway', 'mature-landscaping', 'outdoor-kitchen'
+        'paved-driveway', 'mature-landscaping', 'outdoor-kitchen',
+        'refrigerator', 'electric-oven', 'gas-oven', 'induction-cooktop',
+        'dishwasher', 'washer', 'dryer', 'microwave', 'garbage-disposal'
     ];
     
     advancedCheckboxes.forEach(id => {
