@@ -10,6 +10,7 @@ class EnhancedDashboard {
         'Exterior': { icon: '🏠', color: 'green' },
         'Pest Control': { icon: '🐛', color: 'orange' },
         'Safety': { icon: '⚠️', color: 'red' },
+        'Energy': { icon: '🔋', color: 'yellow' },
         'General': { icon: '🔧', color: 'gray' }
     };
     

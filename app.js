@@ -3699,7 +3699,7 @@ function goBackFromConfirmation() {
     }
 
     // Update progress bar to Step 3
-    const totalSteps = 3;
+    const totalSteps = 6;
     const step = 3;
     const percent = Math.round((step / totalSteps) * 100);
     document.getElementById('progress-label').textContent = `Step ${step} of ${totalSteps}`;
@@ -4184,7 +4184,7 @@ window.closeTaskEditModal = function() {
 // Fixed showStep function in app.js - replace the existing one
 document.addEventListener('DOMContentLoaded', function () {
   let currentStep = 1;
-  const totalSteps = 3;
+  const totalSteps = 6;
 
   function showStep(step) {
     document.querySelectorAll('.onboarding-step').forEach(div => {
@@ -4215,12 +4215,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Button listeners - FIXED: Add null checks
+  // Button listeners - UPDATED for 6 steps
   const stepButtons = [
+    // Forward navigation
     { id: 'next-to-step-2', action: () => { currentStep = 2; showStep(currentStep); } },
     { id: 'next-to-step-3', action: () => { currentStep = 3; showStep(currentStep); } },
+    { id: 'next-to-step-4', action: () => { currentStep = 4; showStep(currentStep); } },
+    { id: 'next-to-step-5', action: () => { currentStep = 5; showStep(currentStep); } },
+    { id: 'next-to-step-6', action: () => { currentStep = 6; showStep(currentStep); } },
+    // Backward navigation
     { id: 'back-to-step-1', action: () => { currentStep = 1; showStep(currentStep); } },
-    { id: 'back-to-step-2', action: () => { currentStep = 2; showStep(currentStep); } }
+    { id: 'back-to-step-2', action: () => { currentStep = 2; showStep(currentStep); } },
+    { id: 'back-to-step-3', action: () => { currentStep = 3; showStep(currentStep); } },
+    { id: 'back-to-step-4', action: () => { currentStep = 4; showStep(currentStep); } },
+    { id: 'back-to-step-5', action: () => { currentStep = 5; showStep(currentStep); } }
   ];
 
   stepButtons.forEach(btn => {
@@ -4258,7 +4266,7 @@ function goBackToHomeSetup() {
     }
 
     // Update progress bar to Step 3
-    const totalSteps = 3;
+    const totalSteps = 6;
     const step = 3;
     const percent = Math.round((step / totalSteps) * 100);
     document.getElementById('progress-label').textContent = `Step ${step} of ${totalSteps}`;

@@ -568,20 +568,25 @@ function showMainApp() {
 <div class="mt-4">
     <button type="button" id="next-to-step-2" onclick="celebrateStepCompletion(1, 2)"
             class="w-full px-6 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold text-lg shadow-lg transition-all duration-200">
-        Complete Step 1 ✨
+        Next: Essential Systems →
     </button>
 </div>
 </div> <!-- ✅ End Step 1 goes HERE -->
 
-                 <!-- Step 2: Systems & features -->
+                 <!-- Step 2: Essential Systems -->
                 <div class="onboarding-step hidden" data-step="2">
+                    <div class="text-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Essential Systems</h3>
+                        <p class="text-gray-600">Let's identify your core heating, cooling, and water systems</p>
+                    </div>
+                    
                     <!-- Smart Defaults Info -->
                     <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                         <div class="flex items-center gap-2 mb-2">
                             <span class="text-lg">💡</span>
                             <h4 class="font-semibold text-blue-900">Smart Defaults Applied</h4>
                         </div>
-                        <p class="text-sm text-blue-800">We've pre-selected common features for your property type. Feel free to uncheck any that don't apply or add others you have!</p>
+                        <p class="text-sm text-blue-800">We've pre-selected common features for your property type. Feel free to uncheck any that don't apply!</p>
                     </div>
                     
                     <!-- Heating & Cooling Systems -->
@@ -612,7 +617,7 @@ function showMainApp() {
                     </div>
 
                    <!-- Water & Sewer Systems -->
-                    <div>
+                    <div class="mt-6">
                         <label class="block text-sm font-medium text-gray-700 mb-3">Water & Sewer Systems</label>
                         <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
                             <label class="flex items-center space-x-3 touch-btn">
@@ -657,17 +662,25 @@ function showMainApp() {
                                 <span>Septic System</span>
                             </label>
                         </div>
-                         <div class="flex justify-between mt-4">
-                          <button type="button" id="back-to-step-1" class="px-4 py-2 bg-gray-300 rounded-lg">
-                            ← Back
-                          </button>
-                     <button type="button" id="next-to-step-3" onclick="celebrateStepCompletion(2, 3)"
-                            class="px-6 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold text-lg shadow-lg transition-all duration-200">
-                        Complete Step 2 ✨
-                    </button>
-                        </div>
                     </div>
-                    </div> <!-- End of Step 2 container -->
+                    
+                    <!-- Skip Option -->
+                    <div class="mt-4 text-center">
+                        <button type="button" class="text-sm text-blue-600 hover:text-blue-800 transition-colors" onclick="skipToStep(3)">
+                            Skip - I'll add systems later →
+                        </button>
+                    </div>
+                    
+                    <div class="flex justify-between mt-6">
+                        <button type="button" id="back-to-step-1" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition-colors">
+                            ← Back
+                        </button>
+                        <button type="button" id="next-to-step-3" onclick="celebrateStepCompletion(2, 3)"
+                                class="px-6 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold text-lg shadow-lg transition-all duration-200">
+                            Next: Outdoor & Yard →
+                        </button>
+                    </div>
+                </div>
                     
              <!-- Step 3: Final details & preferences -->
              <div class="onboarding-step hidden" data-step="3">
@@ -744,83 +757,101 @@ function showMainApp() {
                     <input type="checkbox" id="smart-thermostat" class="w-5 h-5">
                     <span>Smart Thermostat</span>
                 </label>
-                <label class="flex items-center space-x-3 touch-btn">
-                    <input type="checkbox" id="security-system" class="w-5 h-5">
-                    <span>Security System</span>
-                </label>
-            </div>
-        </div>
-
-        <!-- Outdoor Features -->
-        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h5 class="font-semibold text-yellow-900 mb-3 flex items-center gap-2">
-                <span class="text-lg">🌳</span>
-                Outdoor Features
-            </h5>
-            <div class="space-y-3">
-                <label class="flex items-center space-x-3 touch-btn">
-                    <input type="checkbox" id="sprinkler-system" class="w-5 h-5">
-                    <span>Sprinkler/Irrigation System</span>
-                </label>
-                <label class="flex items-center space-x-3 touch-btn">
-                    <input type="checkbox" id="outdoor-lighting" class="w-5 h-5">
-                    <span>Outdoor Lighting System</span>
-                </label>
-                <label class="flex items-center space-x-3 touch-btn">
-                    <input type="checkbox" id="fencing" class="w-5 h-5">
-                    <span>Fencing</span>
-                </label>
-                <label class="flex items-center space-x-3 touch-btn">
-                    <input type="checkbox" id="paved-driveway" class="w-5 h-5">
-                    <span>Paved Driveway</span>
-                </label>
-                <label class="flex items-center space-x-3 touch-btn">
-                    <input type="checkbox" id="mature-landscaping" class="w-5 h-5">
-                    <span>Mature Landscaping</span>
-                </label>
-                <label class="flex items-center space-x-3 touch-btn">
-                    <input type="checkbox" id="outdoor-kitchen" class="w-5 h-5">
-                    <span>Outdoor Kitchen/Grill Area</span>
-                </label>
-            </div>
-        </div>
-
-        <!-- Structural Details -->
-        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-            <h5 class="font-semibold text-purple-900 mb-3 flex items-center gap-2">
-                <span class="text-lg">🏠</span>
-                Structural Details <span class="text-sm text-purple-700 font-normal">(Select what applies)</span>
-            </h5>
-            
-            <!-- Roof Types and Age -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Roof Type</label>
-                <div class="grid grid-cols-2 gap-2 mb-3">
-                    <label class="flex items-center space-x-2 touch-btn text-sm">
-                        <input type="checkbox" id="roof-asphalt" class="w-4 h-4">
-                        <span>Asphalt Shingles</span>
-                    </label>
-                    <label class="flex items-center space-x-2 touch-btn text-sm">
-                        <input type="checkbox" id="roof-metal" class="w-4 h-4">
-                        <span>Metal Roofing</span>
-                    </label>
-                    <label class="flex items-center space-x-2 touch-btn text-sm">
-                        <input type="checkbox" id="roof-tile" class="w-4 h-4">
-                        <span>Tile (Clay/Concrete)</span>
-                    </label>
-                    <label class="flex items-center space-x-2 touch-btn text-sm">
-                        <input type="checkbox" id="roof-slate" class="w-4 h-4">
-                        <span>Slate</span>
-                    </label>
-                    <label class="flex items-center space-x-2 touch-btn text-sm">
-                        <input type="checkbox" id="roof-wood" class="w-4 h-4">
-                        <span>Wood Shakes</span>
-                    </label>
-                    <label class="flex items-center space-x-2 touch-btn text-sm">
-                        <input type="checkbox" id="roof-flat" class="w-4 h-4">
-                        <span>Flat/Membrane</span>
-                    </label>
+                        </label>
+                        <label class="flex items-center space-x-3 touch-btn">
+                            <input type="checkbox" id="home-automation" class="w-5 h-5">
+                            <div>
+                                <span>Home Automation</span>
+                                <div class="text-xs text-gray-500">Smart switches, outlets, or hubs</div>
+                            </div>
+                        </label>
+                    </div>
                 </div>
+                
+                <!-- Skip Option -->
+                <div class="mt-4 text-center">
+                    <button type="button" class="text-sm text-blue-600 hover:text-blue-800 transition-colors" onclick="skipToStep(5)">
+                        Skip - I'll add tech later →
+                    </button>
+                </div>
+                
+                <div class="flex justify-between mt-6">
+                    <button type="button" id="back-to-step-3" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition-colors">
+                        ← Back
+                    </button>
+                    <button type="button" id="next-to-step-5" onclick="celebrateStepCompletion(4, 5)"
+                            class="px-6 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold text-lg shadow-lg transition-all duration-200">
+                        Next: Structural Details →
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 5: Structural Details -->
+            <div class="onboarding-step hidden" data-step="5">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Structural Details</h3>
+                    <p class="text-gray-600">Help us understand your home's structure and materials</p>
+                </div>
+                
+                <!-- Advanced Features Toggle for Step 5 -->
+                <div class="mb-6">
+                    <div class="bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200 rounded-xl p-4 cursor-pointer hover:from-orange-100 hover:to-red-100 transition-all duration-200" 
+                         onclick="toggleStructuralFeatures()">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-orange-600 rounded-lg text-white text-lg">🏠</div>
+                                <div>
+                                    <h4 class="font-semibold text-orange-900">Structural Features</h4>
+                                    <p class="text-sm text-orange-700">Roof, siding, foundation materials - optional but helpful</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="structural-toggle-text" class="text-sm font-medium text-orange-800">Show Options</span>
+                                <div id="structural-toggle-arrow" class="text-orange-600 text-xl transition-transform duration-300">▼</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Structural Features Content (Hidden by Default) -->
+                <div id="structural-features-section" class="hidden space-y-4 overflow-hidden transition-all duration-500">
+
+                    <!-- Roof Details -->
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <h5 class="font-semibold text-purple-900 mb-3 flex items-center gap-2">
+                            <span class="text-lg">🏠</span>
+                            Roof & Structure <span class="text-sm text-purple-700 font-normal">(Optional - helps with maintenance timing)</span>
+                        </h5>
+                        
+                        <!-- Roof Types and Age -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Roof Type</label>
+                            <div class="grid grid-cols-2 gap-2 mb-3">
+                                <label class="flex items-center space-x-2 touch-btn text-sm">
+                                    <input type="checkbox" id="roof-asphalt" class="w-4 h-4">
+                                    <span>Asphalt Shingles</span>
+                                </label>
+                                <label class="flex items-center space-x-2 touch-btn text-sm">
+                                    <input type="checkbox" id="roof-metal" class="w-4 h-4">
+                                    <span>Metal Roofing</span>
+                                </label>
+                                <label class="flex items-center space-x-2 touch-btn text-sm">
+                                    <input type="checkbox" id="roof-tile" class="w-4 h-4">
+                                    <span>Tile (Clay/Concrete)</span>
+                                </label>
+                                <label class="flex items-center space-x-2 touch-btn text-sm">
+                                    <input type="checkbox" id="roof-slate" class="w-4 h-4">
+                                    <span>Slate</span>
+                                </label>
+                                <label class="flex items-center space-x-2 touch-btn text-sm">
+                                    <input type="checkbox" id="roof-wood" class="w-4 h-4">
+                                    <span>Wood Shakes</span>
+                                </label>
+                                <label class="flex items-center space-x-2 touch-btn text-sm">
+                                    <input type="checkbox" id="roof-flat" class="w-4 h-4">
+                                    <span>Flat/Membrane</span>
+                                </label>
+                            </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Roof Age (years)</label>
                     <input type="number" id="roof-age" min="0" max="50" 
@@ -888,34 +919,99 @@ function showMainApp() {
             </div>
         </div>
 
-        <!-- Helpful Note -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p class="text-sm text-blue-800">
-                <strong>💡 Tip:</strong> Don't worry if you're not sure about some details - you can always add or modify features later in the app!
-            </p>
-        </div>
-    </div>
-
-    <!-- Other Features (Always Visible) -->
-    <div class="mt-6">
-        <label class="block text-sm font-medium text-gray-700 mb-2">Other Features</label>
-        <input type="text" id="other-features" placeholder="e.g., Hot tub, Workshop, Wine cellar..." 
-               class="w-full px-4 py-4 bg-white/90 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm text-gray-900 placeholder-gray-500">
-        <p class="text-xs text-gray-500 mt-1">List any other features you'd like to track maintenance for</p>
-    </div>
-
-    <!-- Navigation Buttons -->
-    <div class="mt-6 flex flex-col sm:flex-row gap-3">
-        <button type="button" id="back-to-step-2" 
-                class="w-full sm:flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
-            ← Back
-        </button>
-        <button type="button" onclick="showPropertyConfirmation()" 
-                class="w-full sm:flex-1 px-6 py-4 bg-green-600 text-white rounded-xl hover:bg-green-700 font-semibold text-lg shadow-lg transition-all duration-200">
-            🚀 Create My Plan
-        </button>
-    </div>
-</div>
+                    <!-- Helpful Note -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+                        <p class="text-sm text-blue-800">
+                            <strong>💡 Tip:</strong> Don't worry if you're not sure about some details - you can always add or modify features later in the app!
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Other Features (Always Visible) -->
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Other Features</label>
+                    <input type="text" id="other-features" placeholder="e.g., Hot tub, Workshop, Wine cellar..." 
+                           class="w-full px-4 py-4 bg-white/90 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm text-gray-900 placeholder-gray-500">
+                    <p class="text-xs text-gray-500 mt-1">List any other features you'd like to track maintenance for</p>
+                </div>
+                
+                <!-- Skip Option -->
+                <div class="mt-4 text-center">
+                    <button type="button" class="text-sm text-blue-600 hover:text-blue-800 transition-colors" onclick="skipToStep(6)">
+                        Skip - I'll add details later →
+                    </button>
+                </div>
+                
+                <div class="flex justify-between mt-6">
+                    <button type="button" id="back-to-step-4" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition-colors">
+                        ← Back
+                    </button>
+                    <button type="button" id="next-to-step-6" onclick="celebrateStepCompletion(5, 6)"
+                            class="px-6 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold text-lg shadow-lg transition-all duration-200">
+                        Next: Review & Start →
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 6: Review & Start -->
+            <div class="onboarding-step hidden" data-step="6">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Review & Start</h3>
+                    <p class="text-gray-600">Let's review your home and create your personalized maintenance plan</p>
+                </div>
+                
+                <!-- Live Preview -->
+                <div id="step6-task-preview" class="bg-white/90 backdrop-blur-sm rounded-xl p-6 mb-6 border border-white/20 shadow-sm">
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-900 text-lg">Your Maintenance Plan Preview</h4>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <div id="step6-preview-task-count" class="text-2xl font-bold text-blue-600">0</div>
+                            <div class="text-xs text-gray-600">Tasks</div>
+                        </div>
+                        <div>
+                            <div id="step6-preview-annual-cost" class="text-2xl font-bold text-green-600">$0</div>
+                            <div class="text-xs text-gray-600">Annual Cost</div>
+                        </div>
+                        <div>
+                            <div id="step6-preview-safety-tasks" class="text-2xl font-bold text-red-600">0</div>
+                            <div class="text-xs text-gray-600">Safety Tasks</div>
+                        </div>
+                    </div>
+                    
+                    <!-- HOA Fee Note -->
+                    <div id="step6-hoa-fee-note" class="mt-3 text-center hidden">
+                        <div class="text-xs text-gray-600">+ <span id="step6-preview-hoa-cost" class="font-semibold">$0</span>/year HOA fees</div>
+                    </div>
+                    
+                    <div class="mt-3 text-center">
+                        <div class="text-xs text-gray-500">Updates as you add features ✨</div>
+                    </div>
+                </div>
+                
+                <!-- Completion Incentive -->
+                <div class="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-xl p-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-green-600 rounded-lg text-white text-lg">✨</div>
+                        <div>
+                            <h4 class="font-semibold text-green-900">You're almost done!</h4>
+                            <p class="text-sm text-green-700">Create your maintenance plan and never miss important home care tasks again.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between mt-6">
+                    <button type="button" id="back-to-step-5" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition-colors">
+                        ← Back
+                    </button>
+                    <button type="button" onclick="showPropertyConfirmation()" 
+                            class="px-6 py-4 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl hover:from-green-700 hover:to-blue-700 font-semibold text-lg shadow-lg transition-all duration-200">
+                        🚀 Create My Plan
+                    </button>
+                </div>
+            </div>
                   
 </div> <!-- This closes Step 3 -->
         </div> <!-- This closes the space-y-6 block -->
@@ -3889,6 +3985,74 @@ function toggleAdvancedFeatures() {
     } else {
         // Hide advanced features
         advancedSection.classList.add('hidden');
+        toggleText.textContent = 'Show Options';
+        toggleArrow.style.transform = 'rotate(0deg)';
+        
+        // Update task preview
+        if (typeof updateTaskPreview === 'function') {
+            setTimeout(updateTaskPreview, 200);
+        }
+    }
+}
+
+// Skip to step function
+function skipToStep(stepNumber) {
+    console.log(`⏭️ Skipping to step ${stepNumber}`);
+    
+    // Hide all steps
+    document.querySelectorAll('.onboarding-step').forEach(step => {
+        step.classList.add('hidden');
+    });
+    
+    // Show target step
+    const targetStep = document.querySelector(`.onboarding-step[data-step="${stepNumber}"]`);
+    if (targetStep) {
+        targetStep.classList.remove('hidden');
+        
+        // Scroll to step
+        setTimeout(() => {
+            targetStep.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }, 100);
+    }
+}
+
+// Toggle structural features for Step 5
+function toggleStructuralFeatures() {
+    const structuralSection = document.getElementById('structural-features-section');
+    const toggleText = document.getElementById('structural-toggle-text');
+    const toggleArrow = document.getElementById('structural-toggle-arrow');
+    
+    if (!structuralSection || !toggleText || !toggleArrow) {
+        console.warn('⚠️ Structural toggle elements not found');
+        return;
+    }
+    
+    const isHidden = structuralSection.classList.contains('hidden');
+    
+    if (isHidden) {
+        // Show structural features
+        structuralSection.classList.remove('hidden');
+        toggleText.textContent = 'Hide Options';
+        toggleArrow.style.transform = 'rotate(180deg)';
+        
+        // Smooth scroll to show the new content
+        setTimeout(() => {
+            structuralSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest' 
+            });
+        }, 100);
+        
+        // Update task preview if available
+        if (typeof updateTaskPreview === 'function') {
+            setTimeout(updateTaskPreview, 200);
+        }
+    } else {
+        // Hide structural features
+        structuralSection.classList.add('hidden');
         toggleText.textContent = 'Show Options';
         toggleArrow.style.transform = 'rotate(0deg)';
         

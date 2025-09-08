@@ -55,6 +55,7 @@ class TaskGenerator {
             'Exterior': { icon: '🏠', color: 'green' },
             'Pest Control': { icon: '🐛', color: 'orange' },
             'Safety': { icon: '⚠️', color: 'red' },
+            'Energy': { icon: '🔋', color: 'yellow' },
             'General': { icon: '🔧', color: 'gray' }
         };
     }
@@ -96,6 +97,35 @@ class TaskGenerator {
                 deck: document.getElementById('deck')?.checked || false,
                 garage: document.getElementById('garage')?.checked || false,
                 basement: document.getElementById('basement')?.checked || false,
+                // New outdoor features
+                sprinklerSystem: document.getElementById('sprinkler-system')?.checked || false,
+                outdoorLighting: document.getElementById('outdoor-lighting')?.checked || false,
+                // New tech features
+                solarPanels: document.getElementById('solar-panels')?.checked || false,
+                backupGenerator: document.getElementById('backup-generator')?.checked || false,
+                batteryStorage: document.getElementById('battery-storage')?.checked || false,
+                smartThermostat: document.getElementById('smart-thermostat')?.checked || false,
+                securitySystem: document.getElementById('security-system')?.checked || false,
+                homeAutomation: document.getElementById('home-automation')?.checked || false,
+                // Structural details
+                roofAsphalt: document.getElementById('roof-asphalt')?.checked || false,
+                roofMetal: document.getElementById('roof-metal')?.checked || false,
+                roofTile: document.getElementById('roof-tile')?.checked || false,
+                roofSlate: document.getElementById('roof-slate')?.checked || false,
+                roofWood: document.getElementById('roof-wood')?.checked || false,
+                roofFlat: document.getElementById('roof-flat')?.checked || false,
+                roofAge: parseInt(document.getElementById('roof-age')?.value) || null,
+                sidingVinyl: document.getElementById('siding-vinyl')?.checked || false,
+                sidingWood: document.getElementById('siding-wood')?.checked || false,
+                sidingBrick: document.getElementById('siding-brick')?.checked || false,
+                sidingStucco: document.getElementById('siding-stucco')?.checked || false,
+                sidingFiberCement: document.getElementById('siding-fiber-cement')?.checked || false,
+                sidingStone: document.getElementById('siding-stone')?.checked || false,
+                foundationSlab: document.getElementById('foundation-slab')?.checked || false,
+                foundationCrawl: document.getElementById('foundation-crawl')?.checked || false,
+                foundationFullBasement: document.getElementById('foundation-full-basement')?.checked || false,
+                foundationPartialBasement: document.getElementById('foundation-partial-basement')?.checked || false,
+                foundationPier: document.getElementById('foundation-pier')?.checked || false,
                 otherFeatures: document.getElementById('other-features')?.value || ''
             };
 
@@ -475,6 +505,71 @@ class TaskGenerator {
                 cost: 0,
                 priority: 'medium',
                 description: 'Inspect basement for signs of moisture, leaks, or mold',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        // New feature tasks
+        if (homeData.features.sprinklerSystem) {
+            tasks.push({
+                id: id++,
+                title: 'Sprinkler System Winterization',
+                category: 'Exterior',
+                frequency: 365,
+                cost: 150,
+                priority: 'medium',
+                description: 'Winterize sprinkler system to prevent freezing damage',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+        
+        if (homeData.features.solarPanels) {
+            tasks.push({
+                id: id++,
+                title: 'Solar Panel Cleaning',
+                category: 'Energy',
+                frequency: 180,
+                cost: 200,
+                priority: 'medium',
+                description: 'Clean solar panels for optimal energy production',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+        
+        if (homeData.features.backupGenerator) {
+            tasks.push({
+                id: id++,
+                title: 'Generator Maintenance',
+                category: 'Energy',
+                frequency: 180,
+                cost: 150,
+                priority: 'high',
+                description: 'Test and service backup generator',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+        
+        if (homeData.features.securitySystem) {
+            tasks.push({
+                id: id++,
+                title: 'Security System Battery Check',
+                category: 'Safety',
+                frequency: 180,
+                cost: 25,
+                priority: 'high',
+                description: 'Test security system batteries and sensors',
                 dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
