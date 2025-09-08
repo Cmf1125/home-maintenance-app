@@ -4352,6 +4352,19 @@ function updateTaskPreview() {
     animateNumber('preview-task-count', taskCount);
     animateNumber('preview-annual-cost', annualCost, '$');
     animateNumber('preview-safety-tasks', safetyTasks);
+    
+    // Update HOA fee display
+    const hoaCost = parseFloat(document.getElementById('hoa-cost')?.value) || 0;
+    const hoaNote = document.getElementById('hoa-fee-note');
+    const hoaAmount = document.getElementById('preview-hoa-cost');
+    
+    if (hoaCost > 0) {
+        const annualHoaCost = hoaCost * 12; // Convert monthly to yearly
+        hoaAmount.textContent = '$' + annualHoaCost;
+        hoaNote.classList.remove('hidden');
+    } else {
+        hoaNote.classList.add('hidden');
+    }
 }
 
 function animateNumber(elementId, newValue, prefix = '') {
