@@ -53,9 +53,26 @@
     z-index: 10001;
 }
 
-/* Match body background to setup form during onboarding */
+/* Match body background to setup form during onboarding - exact same gradient */
 body.setup-active {
-    background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+    background: linear-gradient(to bottom right, #eff6ff, #e0e7ff) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Ensure install banner doesn't create space when hidden during setup */
+body.setup-active .install-banner.hidden {
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Force setup form to fill entire viewport */
+body.setup-active #setup-form {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 100vh !important;
 }
 </style>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -998,12 +1015,12 @@ function showMainApp() {
     <div class="flex-1 flex flex-col justify-center px-6 py-12">
         <div class="max-w-2xl mx-auto w-full">
             <!-- Header Section -->
-            <div class="text-center mb-12">
-                <div class="w-20 h-20 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                    <span class="text-4xl">✅</span>
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg">
+                    <span class="text-xl">✅</span>
                 </div>
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Review Property Information</h2>
-                <p class="text-xl text-gray-600">Please review your home details before we generate your maintenance plan</p>
+                <h2 class="text-xl font-bold text-gray-900 mb-2">Review Property Information</h2>
+                <p class="text-sm text-gray-600">Please review your home details before we generate your maintenance plan</p>
             </div>
         
         <!-- Property Details Card -->
