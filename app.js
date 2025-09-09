@@ -3428,6 +3428,9 @@ window.exportTaskList = exportTaskList;
 
 // NEW: Property confirmation functions
 function showPropertyConfirmation() {
+    // Scroll to top for consistent experience
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
     // Collect home data (same as before)
     homeData = {
         address: document.getElementById('address')?.value || '123 Main Street',
@@ -3683,6 +3686,9 @@ function proceedToTaskGeneration() {
 }
 
 function goBackFromConfirmation() {
+    // Scroll to top for consistent experience
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
     // Hide confirmation page
     document.getElementById('property-confirmation').classList.add('hidden');
     
@@ -4206,13 +4212,8 @@ document.addEventListener('DOMContentLoaded', function () {
       progressBarFill.style.width = `${percent}%`;
     }
     
-    // Scroll so the new step sits just below any fixed headers
-    const stepEl = document.querySelector(`.onboarding-step[data-step="${step}"]`);
-    if (stepEl) {
-      const headerOffset = 80; // Account for any fixed headers
-      const y = stepEl.getBoundingClientRect().top + window.pageYOffset - headerOffset;
-      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
-    }
+    // Always scroll to top for consistent experience
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // Button listeners - UPDATED for 6 steps

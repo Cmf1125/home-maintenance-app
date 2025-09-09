@@ -3785,10 +3785,10 @@ function celebrateStepCompletion(currentStep, nextStep) {
         if (nextStepEl) {
             nextStepEl.classList.remove('hidden');
             
-            // Smooth scroll to new step
-            nextStepEl.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start' 
+            // Scroll to top of page for consistent experience
+            window.scrollTo({ 
+                top: 0, 
+                behavior: 'smooth' 
             });
         }
         
