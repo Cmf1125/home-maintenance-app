@@ -1700,6 +1700,19 @@ function showTab(tabName) {
     const propertyFeaturesView = document.getElementById('property-features-view');
     if (propertyFeaturesView) propertyFeaturesView.classList.add('hidden');
     
+    // CRITICAL FIX: Show/hide main-app container based on tab
+    const mainApp = document.getElementById('main-app');
+    if (mainApp) {
+        if (tabName === 'calendar') {
+            // Calendar is full-screen, hide main-app (and its footer)
+            mainApp.classList.add('hidden');
+            console.log('✅ Main app container hidden for full-screen calendar');
+        } else {
+            // All other tabs need main-app visible
+            mainApp.classList.remove('hidden');
+            console.log('✅ Main app container shown for regular tab:', tabName);
+        }
+    }
     
     // Update tab buttons - all buttons are white text on blue background
     document.querySelectorAll('.tab-btn').forEach(btn => {
