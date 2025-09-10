@@ -1,14 +1,18 @@
-/* Simplified Calendar View Styles */
+/* Full Screen Calendar View */
 #calendar-view {
     padding: 0;
     background: #f9fafb;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Calendar Day Styling */
+/* Calendar Day Styling - Full Width */
 .calendar-day {
-    min-height: 80px;
-    border: 1px solid #e5e7eb;
-    padding: 8px;
+    min-height: 100px;
+    border-bottom: 1px solid #e5e7eb;
+    border-right: 1px solid #e5e7eb;
+    padding: 12px 8px;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
@@ -18,32 +22,29 @@
 }
 
 .calendar-day:hover {
-    background: #f3f4f6;
+    background: #f8fafc;
 }
 
 .calendar-day.empty {
-    background: #f9fafb;
+    background: #fafafa;
     cursor: default;
-    border-color: #f3f4f6;
 }
 
 .calendar-day.today {
     background: #dbeafe;
     border: 2px solid #3b82f6;
-    border-radius: 4px;
 }
 
 .calendar-day.selected {
     background: #e0f2fe;
     border: 2px solid #0ea5e9;
-    border-radius: 4px;
 }
 
 .day-number {
     font-weight: 600;
     color: #374151;
-    margin-bottom: 4px;
-    font-size: 14px;
+    margin-bottom: 6px;
+    font-size: 16px;
 }
 
 .calendar-day.today .day-number {
@@ -55,19 +56,25 @@
     flex: 1;
     display: flex;
     flex-wrap: wrap;
-    gap: 2px;
+    gap: 3px;
     align-items: flex-start;
 }
 
-/* Mobile responsive */
+/* Mobile responsive - full width */
 @media (max-width: 768px) {
     .calendar-day {
-        min-height: 60px;
-        padding: 6px;
+        min-height: 80px;
+        padding: 10px 6px;
     }
     
     .day-number {
-        font-size: 12px;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+    
+    /* Remove right border on last column */
+    .calendar-day:nth-child(7n) {
+        border-right: none;
     }
 }
 

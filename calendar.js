@@ -46,30 +46,30 @@ class CasaCareCalendar {
 
         calendarContainer.innerHTML = `
             <div class="bg-gray-50 min-h-screen">
-                <!-- Simple Calendar Header -->
-                <div class="bg-white p-4 border-b border-gray-200 sticky top-0 z-10">
-                    <div class="flex items-center justify-between max-w-md mx-auto">
-                        <button id="prev-month" class="text-gray-600 hover:text-gray-900 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl transition-colors">‹</button>
-                        <h2 id="calendar-month-year" class="text-xl font-bold text-gray-900"></h2>
-                        <button id="next-month" class="text-gray-600 hover:text-gray-900 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl transition-colors">›</button>
+                <!-- Full Width Calendar Header -->
+                <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-4 sticky top-0 z-10">
+                    <div class="flex items-center justify-between">
+                        <button id="prev-month" class="text-white hover:bg-white hover:bg-opacity-20 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl transition-colors">‹</button>
+                        <h2 id="calendar-month-year" class="text-xl font-bold text-white"></h2>
+                        <button id="next-month" class="text-white hover:bg-white hover:bg-opacity-20 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl transition-colors">›</button>
                     </div>
                 </div>
 
-                <!-- Clean Calendar Grid -->
-                <div class="bg-white">
-                    <div class="grid grid-cols-7 max-w-md mx-auto">
+                <!-- Full Width Calendar Grid -->
+                <div class="bg-white flex-1">
+                    <div class="grid grid-cols-7 w-full">
                         <!-- Day headers -->
-                        <div class="bg-gray-100 p-2 text-center font-medium text-gray-600 text-xs">Sun</div>
-                        <div class="bg-gray-100 p-2 text-center font-medium text-gray-600 text-xs">Mon</div>
-                        <div class="bg-gray-100 p-2 text-center font-medium text-gray-600 text-xs">Tue</div>
-                        <div class="bg-gray-100 p-2 text-center font-medium text-gray-600 text-xs">Wed</div>
-                        <div class="bg-gray-100 p-2 text-center font-medium text-gray-600 text-xs">Thu</div>
-                        <div class="bg-gray-100 p-2 text-center font-medium text-gray-600 text-xs">Fri</div>
-                        <div class="bg-gray-100 p-2 text-center font-medium text-gray-600 text-xs">Sat</div>
+                        <div class="bg-blue-50 p-3 text-center font-semibold text-blue-800 text-sm border-r border-blue-100">Sun</div>
+                        <div class="bg-blue-50 p-3 text-center font-semibold text-blue-800 text-sm border-r border-blue-100">Mon</div>
+                        <div class="bg-blue-50 p-3 text-center font-semibold text-blue-800 text-sm border-r border-blue-100">Tue</div>
+                        <div class="bg-blue-50 p-3 text-center font-semibold text-blue-800 text-sm border-r border-blue-100">Wed</div>
+                        <div class="bg-blue-50 p-3 text-center font-semibold text-blue-800 text-sm border-r border-blue-100">Thu</div>
+                        <div class="bg-blue-50 p-3 text-center font-semibold text-blue-800 text-sm border-r border-blue-100">Fri</div>
+                        <div class="bg-blue-50 p-3 text-center font-semibold text-blue-800 text-sm">Sat</div>
                     </div>
                     
                     <!-- Calendar days will be inserted here -->
-                    <div id="calendar-days" class="grid grid-cols-7 max-w-md mx-auto"></div>
+                    <div id="calendar-days" class="grid grid-cols-7 w-full flex-1"></div>
                 </div>
 
                 <!-- Selected Day Modal -->
