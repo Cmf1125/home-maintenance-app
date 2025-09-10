@@ -4,9 +4,9 @@
     border-radius: 1rem;
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
     overflow: hidden;
-    margin: 0;
+    margin: 0 auto;
     width: 100%;
-    max-width: none;
+    max-width: 1200px;
 }
 
 /* Calendar Header */
@@ -14,7 +14,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(135deg, var(--accent-600) 0%, var(--accent-500) 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
     color: white;
     padding: 1.5rem;
 }
@@ -88,12 +88,12 @@
 
 .calendar-day.today {
     background: #dbeafe;
-    border: 2px solid var(--accent-600);
+    border: 2px solid #2563eb;
 }
 
 .calendar-day.selected {
     background: #e0f2fe;
-    border: 2px solid var(--accent-600);
+    border: 2px solid #2563eb;
 }
 
 .day-number {
