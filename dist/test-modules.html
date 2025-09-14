@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Module Test</title>
+</head>
+<body>
+    <h1>Testing Modules</h1>
+    <div id="output"></div>
+
+    <script>
+        console.log('🔄 Starting module test...');
+        
+        // Test if modules load
+        window.addEventListener('load', function() {
+            console.log('📄 Page loaded, checking modules...');
+            
+            const output = document.getElementById('output');
+            const results = [];
+            
+            // Check each module
+            const modules = ['dataManager', 'dateUtils', 'taskGenerator', 'uiController'];
+            
+            modules.forEach(moduleName => {
+                const exists = !!window[moduleName];
+                const result = `${moduleName}: ${exists ? '✅ LOADED' : '❌ MISSING'}`;
+                results.push(result);
+                console.log(result);
+            });
+            
+            output.innerHTML = results.join('<br>');
+        });
+    </script>
+
+    <!-- Load modules -->
+    <script src="data-manager.js"></script>
+    <script src="date-utils.js"></script>
+    <script src="task-generator.js"></script>
+    <script src="ui-controller.js"></script>
+</body>
+</html> 

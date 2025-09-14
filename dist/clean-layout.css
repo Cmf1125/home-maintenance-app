@@ -1,0 +1,463 @@
+/* Clean Layout CSS - Updated to Fix All Issues */
+
+/* ========================================
+   RESET AND BASE LAYOUT
+   ======================================== */
+body {
+    padding-top: 0 !important;
+    margin: 0;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* LOGIN SCREEN: AGGRESSIVE RESET - No spacing at all */
+body:has(#login-screen:not(.hidden)) {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Force override any conflicting styles */
+body:has(#login-screen:not(.hidden)):not(.main-app-active) {
+    padding-top: 0 !important;
+}
+
+#login-screen:not(.hidden) {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 9999 !important;
+    background: #f9fafb !important;
+    padding-top: 2rem !important; /* Override any centering */
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    display: block !important; /* Override flex centering */
+    overflow-y: auto !important; /* Allow scrolling */
+}
+
+/* Only override specific elements that might add top spacing */
+body:has(#login-screen:not(.hidden)) .main-content {
+    padding-top: 0 !important;
+}
+
+.main-content {
+    padding-top: 0 !important;
+    padding-bottom: 20px;
+}
+
+/* ========================================
+   JOURNEY 1: LOGIN PAGE (Clean - No Header, No Banners)
+   ======================================== */
+/* Only hide header when login screen is actually visible (not hidden) */
+body:has(#login-screen:not(.hidden)) .bg-white.shadow-sm.border-b.sticky,
+.login-active .bg-white.shadow-sm.border-b.sticky {
+    display: none !important;
+}
+
+/* Force show header when main app is active, regardless of other rules */
+body.main-app-active #app-header {
+    display: block !important;
+}
+
+body:has(#login-screen:not(.hidden)) {
+    padding-top: 0 !important;
+}
+
+body:has(#login-screen:not(.hidden)) .install-banner,
+body:has(#login-screen:not(.hidden)) #onboarding-progress {
+    display: none !important;
+}
+
+/* ========================================
+   JOURNEY 2: SETUP FLOW (Banners Only - No Header)
+   ======================================== */
+body:not(.main-app-active) .bg-white.shadow-sm.border-b.sticky {
+    display: none !important;
+}
+
+/* Progress banner always shows during setup - FIXED STICKY */
+body:not(.main-app-active) #onboarding-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 60;
+    height: 40px;
+    display: block !important;
+}
+
+/* Demo banner only for demo users - FIXED STICKY (ON TOP) */
+body:not(.main-app-active).demo-mode .demo-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 70; /* Higher z-index to be on top */
+    height: 40px;
+    display: block !important;
+    border: none !important;
+}
+
+/* When both banners are present, progress banner sits below demo banner */
+body:not(.main-app-active).demo-mode #onboarding-progress {
+    position: fixed;
+    top: 40px; /* Sits below 40px demo banner */
+    left: 0;
+    right: 0;
+    z-index: 60;
+}
+
+/* Add padding to body when banners are present */
+body:not(.main-app-active) {
+    padding-top: 40px !important; /* Space for progress banner */
+}
+
+body:not(.main-app-active).demo-mode {
+    padding-top: 80px !important; /* Space for both banners */
+}
+
+
+/* ========================================
+   JOURNEY 3: MAIN APP (Sticky Header Only - No Banners)
+   ======================================== */
+body.main-app-active .bg-white.shadow-sm.border-b.sticky {
+    display: block !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 50 !important;
+}
+
+body.main-app-active {
+    padding-top: 0 !important;
+}
+
+body.main-app-active .main-content {
+    padding-bottom: 100px; /* Space for bottom nav */
+}
+
+/* Hide ALL banners in main app */
+body.main-app-active .demo-banner,
+body.main-app-active #onboarding-progress,
+body.main-app-active .install-banner {
+    display: none !important;
+}
+
+/* ========================================
+   CRITICAL: SETTINGS DROPDOWN FIXES
+   ======================================== */
+/* Ensure header container doesn't have overflow hidden */
+.bg-white.shadow-sm.border-b.sticky {
+    overflow: visible !important;
+}
+
+.bg-white.shadow-sm.border-b.sticky > div {
+    overflow: visible !important;
+}
+
+/* Settings button container */
+.bg-white.shadow-sm.border-b.sticky .relative {
+    overflow: visible !important;
+    position: relative !important;
+}
+
+/* Settings dropdown positioning */
+#settings-dropdown {
+    position: absolute !important;
+    right: 0 !important;
+    top: 100% !important;
+    z-index: 9999 !important;
+    margin-top: 0.5rem !important;
+    transform: none !important;
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    min-width: 12rem !important;
+    max-height: 400px !important;
+    overflow-y: auto !important;
+    width: auto !important;
+}
+
+/* ========================================
+   BOTTOM NAVIGATION
+   ======================================== */
+.bottom-nav {
+    display: none; /* Hidden by default */
+}
+
+body.main-app-active .bottom-nav {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: white !important;
+    border-top: 1px solid #e5e7eb !important;
+}
+
+/* ========================================
+   MODAL Z-INDEX FIXES
+   ======================================== */
+#task-edit-modal,
+#date-picker-modal,
+#home-info-modal {
+    z-index: 99999 !important;
+}
+
+/* ========================================
+   MOBILE ADJUSTMENTS
+   ======================================== */
+@media (max-width: 768px) {
+    /* Mobile banner adjustments - no padding needed with pushdown */
+    body:not(.main-app-active) {
+        padding-top: 0;
+    }
+    
+    body:not(.main-app-active).demo-mode {
+        padding-top: 0;
+    }
+    
+    #onboarding-progress {
+        height: 40px;
+    }
+    
+    .demo-banner {
+        height: 40px; /* Match progress banner height */
+    }
+}
+    
+    /* Mobile settings dropdown */
+    #settings-dropdown {
+        right: -0.5rem !important;
+        width: 12rem !important;
+        max-width: calc(100vw - 2rem) !important;
+    }
+    
+    /* Mobile main content */
+    body.main-app-active .main-content {
+        padding-bottom: 120px;
+    }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+.no-scroll {
+    overflow: hidden !important;
+}
+
+.force-visible {
+    overflow: visible !important;
+}
+
+/* ========================================
+   DEBUG HELPERS (Remove in Production)
+   ======================================== */
+/*
+.debug-banner {
+    border: 2px solid red !important;
+}
+
+.debug-header {
+    border: 2px solid blue !important;
+}
+
+.debug-dropdown {
+    border: 2px solid green !important;
+}
+*/
+/* ========================================
+   AGGRESSIVE FIXES FOR HEADER GAP AND DROPDOWN
+   Add this to the VERY BOTTOM of clean-layout.css
+   ======================================== */
+
+/* NUCLEAR OPTION: Force remove all gaps and fix positioning */
+body.main-app-active #dashboard-view {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Fix the stats grid - remove the 64px gap completely */
+body.main-app-active .sticky[class*="top-16"],
+body.main-app-active .sticky.top-16 {
+    top: 0 !important;
+    position: static !important; /* Remove sticky behavior causing issues */
+    background: transparent !important;
+    padding: 1rem !important;
+    margin: 0 !important;
+    z-index: auto !important;
+}
+
+/* Force header to proper height and remove overflow issues */
+body.main-app-active .bg-white.shadow-sm.border-b {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9998 !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+}
+
+/* Force ALL containers in header to allow overflow */
+body.main-app-active .bg-white.shadow-sm.border-b * {
+    overflow: visible !important;
+}
+
+/* Settings dropdown - MAXIMUM z-index and positioning */
+#settings-dropdown {
+    position: fixed !important;
+    top: 60px !important; /* Fixed position from top */
+    right: 1rem !important;
+    z-index: 99999 !important;
+    background: white !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35) !important;
+    min-width: 200px !important;
+    max-height: 400px !important;
+    overflow-y: auto !important;
+    width: auto !important;
+    transform: none !important;
+}
+
+/* Remove any padding that might cause gaps */
+body.main-app-active .main-content {
+    padding-top: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Force dashboard content to start immediately after header */
+body.main-app-active #dashboard-view > div:first-child {
+    margin-top: 0 !important;
+    padding-top: 1rem !important;
+}
+
+/* Mobile fixes */
+@media (max-width: 768px) {
+    body.main-app-active #dashboard-view {
+        padding: 0.5rem !important;
+    }
+    
+    #settings-dropdown {
+        top: 55px !important;
+        right: 0.5rem !important;
+        min-width: 180px !important;
+    }
+}
+
+/* DEBUG: Uncomment these to see what's happening */
+/*
+body.main-app-active .bg-white.shadow-sm.border-b {
+    background: red !important;
+    opacity: 0.5 !important;
+}
+body.main-app-active .sticky {
+    background: blue !important;
+    opacity: 0.5 !important;
+}
+#dashboard-view {
+    background: green !important;
+    opacity: 0.5 !important;
+}
+*/
+/* COMPLETE BANNER SPACING FIX - Add this to clean-layout.css */
+
+/* ========================================
+   SETUP FORM CONTENT SPACING FIXES
+   ======================================== */
+
+/* CRITICAL FIX 1: Remove conflicting padding from setup-form */
+#setup-form.main-content.pt-20 {
+    padding-top: 1rem !important; /* Override the pt-20 class */
+}
+
+/* CRITICAL FIX 2: Add proper spacing to the white card container */
+#setup-form .bg-white.rounded-xl.p-6.shadow-lg.max-w-md.mx-auto {
+    margin-top: 1.5rem !important; /* Space below banners */
+}
+
+/* CRITICAL FIX 3: Ensure all onboarding steps have proper spacing */
+.onboarding-step {
+    margin-top: 0 !important; /* Reset any inherited margin */
+    padding-top: 0 !important; /* Reset any inherited padding */
+}
+
+/* CRITICAL FIX 4: The step content container gets breathing room */
+#setup-form .space-y-6 {
+    margin-top: 0.5rem !important;
+}
+
+/* MOBILE: Extra space for mobile setup */
+@media (max-width: 768px) {
+    #setup-form .bg-white.rounded-xl.p-6.shadow-lg.max-w-md.mx-auto {
+        margin-top: 2rem !important; /* More space on mobile */
+    }
+    
+    /* Extra mobile spacing for step content */
+    #setup-form .space-y-6 {
+        margin-top: 1rem !important;
+    }
+}
+
+/* ========================================
+   PROPERTY CONFIRMATION & TASK SETUP
+   ======================================== */
+
+/* These were already working, but keeping for completeness */
+#property-confirmation .bg-white.rounded-xl.p-6.shadow-lg,
+#task-setup .bg-white.rounded-xl.p-6.shadow-lg {
+    margin-top: 1.5rem !important;
+}
+
+@media (max-width: 768px) {
+    #property-confirmation .bg-white.rounded-xl.p-6.shadow-lg,
+    #task-setup .bg-white.rounded-xl.p-6.shadow-lg {
+        margin-top: 2rem !important;
+    }
+}
+
+/* ========================================
+   DASHBOARD PROTECTION (NO GAPS)
+   ======================================== */
+
+/* CRITICAL: Ensure dashboard never gets setup spacing */
+body.main-app-active #dashboard-view,
+body.main-app-active .main-content {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* CRITICAL: Stats grid should sit right under header */
+body.main-app-active .sticky.top-16 {
+    top: 0 !important;
+    position: static !important;
+    background: transparent !important;
+    padding: 1rem !important;
+    margin: 0 !important;
+    z-index: auto !important;
+}
+
+/* ========================================
+   REMOVE CELEBRATION ANIMATIONS
+   ======================================== */
+
+.success-message {
+    display: none !important;
+}
+
+.step-completed {
+    /* Remove animation */
+}
+
+.checkmark-animation {
+    /* Remove animation */
+}
+
+.progress-celebration {
+    /* Remove animation */
+}

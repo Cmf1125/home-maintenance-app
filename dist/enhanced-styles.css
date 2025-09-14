@@ -1,0 +1,724 @@
+/* Enhanced Styles for The Home Keeper - CLEANED VERSION */
+
+/* 🍼 STEP 1: Professional Font */
+* {
+    font-family: 'Inter', sans-serif !important;
+}
+
+/* 🍼 STEP 2: Professional Color System */
+:root {
+    --primary-600: #0f172a;
+    --primary-500: #1e293b;
+    --accent-600: #2563eb;
+    --accent-500: #3b82f6;
+    --accent-400: #60a5fa;
+    --brand-orange: #ea580c;
+    --brand-orange-light: #fed7aa;
+    --success-600: #059669;
+    --success-500: #10b981;
+    --warning-600: #d97706;
+    --warning-500: #f59e0b;
+    --danger-600: #dc2626;
+    --danger-500: #ef4444;
+    --surface-50: #f8fafc;
+    --surface-100: #f1f5f9;
+    --surface-200: #e2e8f0;
+    --surface-800: #1e293b;
+    --surface-900: #0f172a;
+}
+
+/* 🍼 STEP 3: Professional Buttons */
+.btn-primary, 
+button[onclick*="createMaintenancePlan"],
+button[onclick*="finishTaskSetup"],
+button[onclick*="addTask"] {
+    background: linear-gradient(135deg, var(--accent-600), var(--accent-500)) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+    border: none !important;
+    padding: 14px 24px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3) !important;
+}
+
+.btn-primary:hover,
+button[onclick*="createMaintenancePlan"]:hover,
+button[onclick*="finishTaskSetup"]:hover,
+button[onclick*="addTask"]:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4) !important;
+}
+
+/* 🍼 STEP 4: Professional Glass Cards */
+.bg-white,
+.stat-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 16px !important;
+    transition: all 0.3s ease !important;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* 🍼 STEP 4B: More Obvious Glass Effect */
+.bg-white,
+.stat-card {
+    border-radius: 20px !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 🍼 STEP 5: Professional Form Inputs */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+    border: 2px solid var(--surface-200) !important;
+    border-radius: 12px !important;
+    padding: 16px 20px !important;
+    font-size: 16px !important;
+    transition: all 0.3s ease !important;
+    background: white !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: var(--accent-500) !important;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* 🍼 STEP 6: Professional Background */
+body {
+    background: linear-gradient(135deg, var(--surface-50) 0%, var(--surface-200) 100%) !important;
+    min-height: 100vh !important;
+}
+
+/* 🎨 STEP 7: Enhanced Typography Hierarchy */
+h1 {
+    font-weight: 800 !important;
+    color: var(--surface-900) !important;
+    letter-spacing: -0.025em !important;
+}
+
+h2 {
+    font-weight: 700 !important;
+    color: var(--surface-800) !important;
+    letter-spacing: -0.015em !important;
+}
+
+h3 {
+    font-weight: 600 !important;
+    color: var(--surface-800) !important;
+}
+
+/* 🎨 STEP 8: Brand Accent Colors */
+.text-blue-600 {
+    color: var(--accent-600) !important;
+}
+
+.text-blue-700 {
+    color: var(--accent-600) !important;
+}
+
+.bg-blue-600 {
+    background-color: var(--accent-600) !important;
+}
+
+.bg-blue-700 {
+    background-color: var(--accent-500) !important;
+}
+
+/* 🎨 STEP 9: Professional Stats Cards */
+.stat-card {
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.stat-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 3px !important;
+    background: linear-gradient(90deg, var(--accent-600), var(--brand-orange)) !important;
+    border-radius: 16px 16px 0 0 !important;
+}
+
+/* 🎨 STEP 10: Professional Navigation */
+.tab-btn {
+    position: relative !important;
+    transition: all 0.2s ease !important;
+    font-weight: 500 !important;
+}
+
+.tab-btn.bg-blue-100 {
+    background: linear-gradient(135deg, var(--accent-600), var(--accent-500)) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+}
+
+.tab-btn:not(.bg-blue-100):hover {
+    background-color: var(--surface-100) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* 🍼 STEP 7: Professional Task Cards (No Colored Borders) */
+.enhanced-task-card,
+.task-card-pro,
+.day-panel-task {
+    background: white !important;
+    border-radius: 16px !important;
+    padding: 20px !important;
+    border: 1px solid var(--surface-100) !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.enhanced-task-card:hover,
+.task-card-pro:hover,
+.day-panel-task:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 🍼 STEP 8: Final Polish */
+/* Better checkboxes */
+input[type="checkbox"] {
+    appearance: none !important;
+    width: 20px !important;
+    height: 20px !important;
+    border: 2px solid var(--surface-200) !important;
+    border-radius: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+}
+
+input[type="checkbox"]:checked {
+    background: var(--accent-500) !important;
+    border-color: var(--accent-500) !important;
+}
+
+input[type="checkbox"]:checked::after {
+    content: '✓' !important;
+    color: white !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+}
+
+/* Better navigation */
+.bottom-nav {
+    background: white !important;
+    border-top: 1px solid var(--surface-100) !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.tab-btn.bg-blue-100 {
+    background: rgba(14, 165, 233, 0.1) !important;
+    color: var(--accent-600) !important;
+}
+
+/* Modal Fixes */
+#task-edit-modal {
+    z-index: 9999 !important;
+    position: fixed !important;
+    inset: 0 !important;
+}
+
+#task-edit-modal:not(.hidden) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+#task-edit-modal.hidden {
+    display: none !important;
+}
+
+#date-picker-modal {
+    z-index: 9999 !important;
+    position: fixed !important;
+    inset: 0 !important;
+}
+
+#date-picker-modal:not(.hidden) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+#date-picker-modal.hidden {
+    display: none !important;
+}
+
+/* CRITICAL: Settings Dropdown Fix */
+#settings-dropdown {
+    position: absolute !important;
+    right: 0 !important;
+    top: 100% !important;
+    z-index: 9999 !important;
+    margin-top: 0.5rem !important;
+    background: white !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    min-width: 12rem !important;
+    max-height: 400px !important;
+    overflow-y: auto !important;
+}
+
+/* Smart Installation Banner Styles */
+.install-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10001;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+.install-banner.show {
+    transform: translateY(0);
+}
+
+.install-banner.hidden {
+    display: none;
+}
+
+.install-banner-content {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    max-width: 100%;
+    gap: 12px;
+}
+
+.install-banner-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.install-banner-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.install-banner-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.install-banner-instructions {
+    font-size: 12px;
+    opacity: 0.9;
+    line-height: 1.3;
+}
+
+.install-banner-actions {
+    flex-shrink: 0;
+}
+
+.install-banner-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.install-banner-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .install-banner-content {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+    
+    .install-banner-icon {
+        font-size: 20px;
+    }
+    
+    .install-banner-title {
+        font-size: 13px;
+    }
+    
+    .install-banner-instructions {
+        font-size: 11px;
+    }
+    
+    .install-banner-close {
+        width: 24px;
+        height: 24px;
+        font-size: 14px;
+    }
+    
+    #settings-dropdown {
+        right: -0.5rem !important;
+        width: 12rem !important;
+    }
+}
+
+/* --- Mobile enhancements --- */
+:root {
+  --safe-inset-bottom: env(safe-area-inset-bottom);
+}
+.bottom-nav { padding-bottom: max(0px, var(--safe-inset-bottom)); }
+
+.touch-btn {
+  min-width: 48px;
+  min-height: 48px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card { border-radius: 0.75rem; }
+.card * { word-wrap: break-word; }
+
+/* Reduce motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+/* --- Compact horizontal task card layout --- */
+.enhanced-task-card.simple-horizontal-task {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.enhanced-task-card .text-sm.truncate {
+  max-width: 60vw; /* keep titles from wrapping too early */
+}
+@media (min-width: 640px) {
+  .enhanced-task-card .text-sm.truncate { max-width: 40vw; }
+}
+
+/* --- Larger Complete/Reschedule buttons for mobile --- */
+.enhanced-task-card.simple-horizontal-task button {
+  min-height: 36px;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+@media (max-width: 640px) {
+  .enhanced-task-card.simple-horizontal-task button {
+    font-size: 0.8rem;
+  }
+}
+
+/* --- Pressed state feedback for Complete/Reschedule buttons --- */
+.enhanced-task-card.simple-horizontal-task button:active {
+  transform: scale(0.96);
+  filter: brightness(0.95);
+  transition: transform 0.05s ease, filter 0.05s ease;
+}
+
+/* --- Tap feedback effect on action buttons --- */
+.enhanced-task-card.simple-horizontal-task button:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+.enhanced-task-card.simple-horizontal-task button {
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+
+/* Appliance filter active state */
+.active-filter {
+    border: 2px solid #0891b2 !important;
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe) !important;
+    box-shadow: 0 8px 25px -5px rgb(8 145 178 / 0.2) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Rotating benefits animation */
+.rotating-benefits {
+    position: relative;
+}
+
+.benefit-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: rotateBenefit 8s infinite;
+    position: absolute;
+    width: 100%;
+    left: 0;
+}
+
+.benefit-item:nth-child(1) { animation-delay: 0s; }
+.benefit-item:nth-child(2) { animation-delay: 2s; }
+.benefit-item:nth-child(3) { animation-delay: 4s; }
+.benefit-item:nth-child(4) { animation-delay: 6s; }
+
+@keyframes rotateBenefit {
+    0%, 20% { opacity: 1; transform: translateY(0); }
+    25%, 100% { opacity: 0; transform: translateY(-20px); }
+}
+
+/* House animation */
+.house-animated {
+    animation: houseFloat 3s ease-in-out infinite;
+}
+
+@keyframes houseFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Property type cards */
+.property-card-inner {
+    transition: all 0.2s ease;
+    text-align: center;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.property-card-inner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+.property-card-inner.selected {
+    border-color: #2563eb !important;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.property-card-inner.selected .text-xs {
+    color: #2563eb !important;
+    font-weight: 600;
+}
+
+/* Step completion celebrations */
+.step-completed {
+    animation: stepComplete 0.6s ease-out;
+}
+
+@keyframes stepComplete {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); background-color: #dcfce7; }
+    100% { transform: scale(1); }
+}
+
+.checkmark-animation {
+    animation: checkmarkBounce 0.5s ease-out;
+}
+
+@keyframes checkmarkBounce {
+    0% { transform: scale(0) rotate(45deg); opacity: 0; }
+    50% { transform: scale(1.2) rotate(45deg); opacity: 1; }
+    100% { transform: scale(1) rotate(45deg); opacity: 1; }
+}
+
+.progress-celebration {
+    animation: progressGlow 0.8s ease-out;
+}
+
+@keyframes progressGlow {
+    0% { box-shadow: 0 0 0 rgba(37, 99, 235, 0); }
+    50% { box-shadow: 0 0 20px rgba(37, 99, 235, 0.5); }
+    100% { box-shadow: 0 0 0 rgba(37, 99, 235, 0); }
+}
+
+.success-message {
+    transition: all 0.3s ease;
+    transform: translate(-50%, -20px);
+    opacity: 0;
+}
+/* ===== Settings dropdown: guaranteed visibility ===== */
+
+/* Ensure the gear button container can host absolute children */
+#settings-wrapper,
+.bg-white.shadow-sm.border-b.sticky .relative {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Do not let any ancestor clip the menu */
+.bg-white.shadow-sm.border-b.sticky,
+.header,
+#app-header {
+  overflow: visible !important;
+}
+
+/* Tailwind's .hidden should still hide it */
+#settings-dropdown.hidden {
+  display: none !important;
+}
+
+/* ===== Settings dropdown: guaranteed visibility ===== */
+
+/* Ensure the gear button container can host absolute children */
+#settings-wrapper,
+.bg-white.shadow-sm.border-b.sticky .relative {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Do not let any ancestor clip the menu */
+.bg-white.shadow-sm.border-b.sticky,
+.header,
+#app-header {
+  overflow: visible !important;
+}
+
+/* Remove clipping from the dashboard card container */
+.bg-white.rounded-2xl.shadow-lg.overflow-hidden {
+  overflow: visible !important;
+}
+
+/* Tailwind's .hidden should still hide it */
+#settings-dropdown.hidden {
+  display: none !important;
+}
+
+/* ===== Settings dropdown: guaranteed visibility ===== */
+
+/* Ensure the gear button container can host absolute children */
+#settings-wrapper,
+.bg-white.shadow-sm.border-b.sticky .relative {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Do not let any ancestor clip the menu */
+.bg-white.shadow-sm.border-b.sticky,
+.header,
+#app-header {
+  overflow: visible !important;
+}
+
+/* Remove clipping from the dashboard card container */
+.bg-white.rounded-2xl.shadow-lg.overflow-hidden {
+  overflow: visible !important;
+}
+
+/* Tailwind's .hidden should still hide it */
+#settings-dropdown.hidden {
+  display: none !important;
+}
+
+/* ===== Settings dropdown: guaranteed visibility ===== */
+
+/* Ensure the gear button container can host absolute children */
+#settings-wrapper,
+.bg-white.shadow-sm.border-b.sticky .relative {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Do not let any ancestor clip the menu */
+.bg-white.shadow-sm.border-b.sticky,
+.header,
+#app-header {
+  overflow: visible !important;
+}
+
+/* Remove clipping from the dashboard card container */
+.bg-white.rounded-2xl.shadow-lg.overflow-hidden {
+  overflow: visible !important;
+}
+
+/* Tailwind's .hidden should still hide it */
+#settings-dropdown.hidden {
+  display: none !important;
+}
+
+/* ===== Settings dropdown: guaranteed visibility ===== */
+
+/* Ensure the gear button container can host absolute children */
+#settings-wrapper,
+.bg-white.shadow-sm.border-b.sticky .relative {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Do not let any ancestor clip the menu */
+.bg-white.shadow-sm.border-b.sticky,
+.header,
+#app-header {
+  overflow: visible !important;
+}
+
+/* Remove clipping from the dashboard card container you highlighted */
+.bg-white.rounded-2xl.shadow-lg.overflow-hidden {
+  overflow: visible !important;
+}
+
+/* Tailwind's .hidden should still hide it */
+#settings-dropdown.hidden {
+  display: none !important;
+}
+
+/* Default: when living inside the header */
+#settings-dropdown {
+  position: absolute;                /* NOTE: no !important so we can override */
+  right: 0;
+  top: 100%;                         /* directly below the gear */
+  margin-top: 0.5rem;
+  z-index: 10001;                    /* above header + content */
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,.15);
+  min-width: 12rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* When we portal to <body>, we force fixed positioning */
+#settings-dropdown.portalized {
+  position: fixed !important;
+}
+
+/* Header visual cleanup */
+#app-header {
+  border-radius: 0 !important;
+  overflow: visible !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  background-color: #ffffff !important;
+}
+/* When the dropdown is portaled to <body>, keep it dropdown-sized */
+#settings-dropdown.portalized {
+  position: fixed !important;
+  width: 12rem !important;      /* same as w-48 */
+  max-width: 90vw !important;   /* guard on tiny screens */
+  left: 0; top: 0;               /* JS will position these */
+}
+
+/* Optional: tighter, cleaner menu look */
+#settings-dropdown { box-shadow: 0 10px 25px rgba(0,0,0,.15); border-radius: 0.5rem; }
+
+/* Prevent any slide/fade animations on the dropdown itself */
+#settings-dropdown { transition: none !important; }

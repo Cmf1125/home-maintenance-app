@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Home Keeper - Smart Home Maintenance Management</title>
+    <meta name="description" content="The Home Keeper helps homeowners track, schedule, and manage essential home maintenance tasks. Never miss important maintenance again with automated scheduling and calendar integration.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Open Graph meta tags for better sharing -->
+    <meta property="og:title" content="The Home Keeper - Smart Home Maintenance Management">
+    <meta property="og:description" content="Track, schedule, and manage essential home maintenance tasks. Automated scheduling with Google Calendar integration.">
+    <meta property="og:type" content="website">
+    
+    <!-- App Icon -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' fill='%232563eb'/%3E%3Ctext x='16' y='22' font-family='Arial' font-size='18' fill='white' text-anchor='middle'%3E🏠%3C/text%3E%3C/svg%3E">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    
+    <!-- Main Content -->
+    <div class="min-h-screen flex flex-col">
+        
+        <!-- Header -->
+        <header class="bg-white/90 backdrop-blur-sm border-b border-white/20 shadow-sm">
+            <div class="max-w-6xl mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white text-xl">🏠</div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">The Home Keeper</h1>
+                            <p class="text-sm text-gray-600">Smart Home Maintenance Management</p>
+                        </div>
+                    </div>
+                    <a href="index.html" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        Launch App
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <main class="flex-1">
+            <div class="max-w-6xl mx-auto px-4 py-12">
+                
+                <!-- Main Hero -->
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                        Never Miss Important <br>
+                        <span class="text-blue-600">Home Maintenance</span> Again
+                    </h2>
+                    <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                        The Home Keeper helps homeowners track, schedule, and manage essential maintenance tasks. 
+                        From HVAC filter changes to septic system care, we make sure your home stays in perfect condition.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="index.html" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg">
+                            Get Started Free
+                        </a>
+                        <a href="#features" class="bg-white/90 backdrop-blur-sm text-blue-600 px-8 py-3 rounded-lg hover:bg-white border border-blue-200 transition-colors font-medium text-lg">
+                            Learn More
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Key Features Grid -->
+                <div id="features" class="grid md:grid-cols-3 gap-8 mb-16">
+                    
+                    <!-- Smart Scheduling -->
+                    <div class="bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-sm">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-2xl mb-4">📅</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Smart Scheduling</h3>
+                        <p class="text-gray-600">
+                            Automatically generate maintenance schedules based on your home's specific features, 
+                            climate, and property type. No guesswork required.
+                        </p>
+                    </div>
+
+                    <!-- Calendar Integration -->
+                    <div class="bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-sm">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-2xl mb-4">📱</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Calendar Integration</h3>
+                        <p class="text-gray-600">
+                            <strong>Sync your maintenance tasks with Google Calendar</strong> to get reminders 
+                            on your phone and never miss critical home maintenance deadlines.
+                        </p>
+                    </div>
+
+                    <!-- Cost Tracking -->
+                    <div class="bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-sm">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-2xl mb-4">💰</div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Cost Tracking</h3>
+                        <p class="text-gray-600">
+                            Track maintenance costs and get budget estimates. Know what to expect 
+                            and plan for seasonal maintenance expenses.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- How It Works -->
+                <div class="mb-16">
+                    <h3 class="text-3xl font-bold text-center text-gray-900 mb-12">How The Home Keeper Works</h3>
+                    <div class="grid md:grid-cols-4 gap-6">
+                        
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl mx-auto mb-4">1</div>
+                            <h4 class="text-lg font-semibold text-gray-900 mb-2">Enter Home Details</h4>
+                            <p class="text-gray-600">Tell us about your property: type, age, features like HVAC, water systems, pool, etc.</p>
+                        </div>
+
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl mx-auto mb-4">2</div>
+                            <h4 class="text-lg font-semibold text-gray-900 mb-2">Auto-Generate Tasks</h4>
+                            <p class="text-gray-600">We create a personalized maintenance schedule based on your home and local climate.</p>
+                        </div>
+
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl mx-auto mb-4">3</div>
+                            <h4 class="text-lg font-semibold text-gray-900 mb-2">Sync to Calendar</h4>
+                            <p class="text-gray-600"><strong>Connect Google Calendar</strong> to get maintenance reminders on your phone and desktop.</p>
+                        </div>
+
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl mx-auto mb-4">4</div>
+                            <h4 class="text-lg font-semibold text-gray-900 mb-2">Stay Maintained</h4>
+                            <p class="text-gray-600">Complete tasks, track costs, and keep your home in perfect condition year-round.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Why Calendar Access -->
+                <div class="bg-white/90 backdrop-blur-sm rounded-xl p-8 border border-white/20 shadow-sm mb-16">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4 text-center">Why We Need Google Calendar Access</h3>
+                    <div class="max-w-4xl mx-auto">
+                        <p class="text-lg text-gray-700 mb-6 text-center">
+                            The Home Keeper integrates with Google Calendar to provide seamless maintenance reminders
+                        </p>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold mt-1">✓</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Automatic Task Sync</h4>
+                                    <p class="text-gray-600">Your maintenance tasks appear in Google Calendar with proper due dates</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold mt-1">✓</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Mobile Notifications</h4>
+                                    <p class="text-gray-600">Get reminders on your phone when maintenance is due</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold mt-1">✓</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Family Coordination</h4>
+                                    <p class="text-gray-600">Share maintenance schedules with family members via shared calendars</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold mt-1">✓</div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900">Schedule Planning</h4>
+                                    <p class="text-gray-600">Plan maintenance around your existing calendar events</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sample Tasks -->
+                <div class="mb-16">
+                    <h3 class="text-3xl font-bold text-center text-gray-900 mb-8">Sample Maintenance Tasks We Track</h3>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white/90 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🌡️</div>
+                                <h4 class="font-semibold text-gray-900">HVAC Filter</h4>
+                                <p class="text-sm text-gray-600">Every 90 days</p>
+                            </div>
+                        </div>
+                        <div class="bg-white/90 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">🏠</div>
+                                <h4 class="font-semibold text-gray-900">Gutter Cleaning</h4>
+                                <p class="text-sm text-gray-600">Every 6 months</p>
+                            </div>
+                        </div>
+                        <div class="bg-white/90 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">⚠️</div>
+                                <h4 class="font-semibold text-gray-900">Smoke Detectors</h4>
+                                <p class="text-sm text-gray-600">Every 6 months</p>
+                            </div>
+                        </div>
+                        <div class="bg-white/90 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                            <div class="text-center">
+                                <div class="text-2xl mb-2">💧</div>
+                                <h4 class="font-semibold text-gray-900">Water Systems</h4>
+                                <p class="text-sm text-gray-600">Various intervals</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Call to Action -->
+                <div class="text-center">
+                    <h3 class="text-3xl font-bold text-gray-900 mb-4">Ready to Protect Your Home Investment?</h3>
+                    <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+                        Join thousands of homeowners who use The Home Keeper to maintain their homes efficiently and never miss critical maintenance tasks.
+                    </p>
+                    <a href="index.html" class="bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg inline-block">
+                        Start Managing Your Home Today
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white/90 backdrop-blur-sm border-t border-white/20 py-8 mt-16">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="text-center md:text-left">
+                        <div class="text-sm text-gray-600">
+                            © 2025 The Home Keeper. All rights reserved.
+                        </div>
+                        <div class="text-sm text-gray-500 mt-1">
+                            Smart home maintenance scheduling and management
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-6 text-sm">
+                        <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors">Privacy Policy</a>
+                        <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors">Terms of Service</a>
+                        <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors">Support</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Schema.org structured data for better SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "The Home Keeper",
+        "description": "Smart home maintenance management application that helps homeowners track, schedule, and manage essential maintenance tasks with Google Calendar integration.",
+        "url": "https://your-domain.com",
+        "applicationCategory": "Productivity",
+        "operatingSystem": "Web Browser",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Automated maintenance scheduling",
+            "Google Calendar integration", 
+            "Property-specific task generation",
+            "Cost tracking and budgeting",
+            "Mobile-friendly interface",
+            "Task completion tracking"
+        ]
+    }
+    </script>
+</body>
+</html>

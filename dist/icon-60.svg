@@ -1,0 +1,49 @@
+<svg width="60" height="60" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with subtle gradient -->
+  <rect width="1024" height="1024" rx="180" fill="url(#gradient)"/>
+  
+  <!-- House icon with modern design -->
+  <g transform="translate(200, 250)">
+    <!-- House base -->
+    <path d="M0 350 L312 200 L624 350 L624 524 L0 524 Z" fill="#ffffff" opacity="0.9"/>
+    
+    <!-- Roof -->
+    <path d="M-50 350 L312 180 L674 350 L624 380 L312 230 L0 380 Z" fill="#f8fafc" opacity="0.95"/>
+    
+    <!-- Door -->
+    <rect x="250" y="400" width="80" height="124" rx="8" fill="#2563eb"/>
+    <circle cx="310" cy="462" r="6" fill="#ffffff"/>
+    
+    <!-- Windows -->
+    <rect x="80" y="380" width="80" height="80" rx="8" fill="#3b82f6" opacity="0.8"/>
+    <rect x="464" y="380" width="80" height="80" rx="8" fill="#3b82f6" opacity="0.8"/>
+    
+    <!-- Window frames -->
+    <rect x="115" y="395" width="10" height="50" fill="#ffffff" opacity="0.6"/>
+    <rect x="95" y="415" width="50" height="10" fill="#ffffff" opacity="0.6"/>
+    <rect x="499" y="395" width="10" height="50" fill="#ffffff" opacity="0.6"/>
+    <rect x="479" y="415" width="50" height="10" fill="#ffffff" opacity="0.6"/>
+    
+    <!-- Chimney -->
+    <rect x="450" y="220" width="40" height="80" fill="#64748b" opacity="0.8"/>
+    
+    <!-- Tools overlay (wrench and screwdriver) -->
+    <g transform="translate(150, 280)" opacity="0.3">
+      <!-- Wrench -->
+      <path d="M20 0 L35 0 Q40 0 40 5 L40 15 Q40 20 35 20 L20 20 Q15 20 15 15 L15 5 Q15 0 20 0 Z" fill="#ffffff"/>
+      <circle cx="27.5" cy="10" r="8" fill="transparent" stroke="#2563eb" stroke-width="2"/>
+      
+      <!-- Screwdriver -->
+      <rect x="50" y="2" width="4" height="16" fill="#fbbf24"/>
+      <rect x="48" y="18" width="8" height="30" fill="#6b7280"/>
+    </g>
+  </g>
+  
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>
