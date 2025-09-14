@@ -72,18 +72,18 @@ class CasaCareCalendar {
                     <div id="calendar-days" class="grid grid-cols-7"></div>
                 </div>
 
-                <!-- Selected Day Modal -->
-                <div id="selected-day-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-                    <div class="bg-white rounded-t-xl sm:rounded-xl w-full max-w-md h-[85vh] sm:max-h-[70vh] overflow-hidden shadow-2xl flex flex-col">
-                        <div class="p-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
-                            <h3 id="selected-day-title" class="text-lg font-bold text-gray-900">Selected Day</h3>
-                            <button id="close-day-modal" class="text-gray-500 hover:text-gray-700 text-xl w-8 h-8 flex items-center justify-center rounded">×</button>
+                <!-- Task Panel Below Calendar -->
+                <div id="task-panel" class="bg-white border-t-2 border-blue-100 hidden">
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 id="selected-date-title" class="text-lg font-bold text-gray-900">Select a date</h3>
+                            <button id="clear-selection" class="text-gray-500 hover:text-gray-700 text-sm">Clear</button>
                         </div>
-                        <div id="selected-day-tasks" class="p-4 flex-1 overflow-y-auto" style="padding-bottom: 6rem;">
-                            <!-- Tasks for selected day will appear here -->
+                        <div id="task-panel-content" class="space-y-2">
+                            <p class="text-gray-500 text-center py-8">Click on a date to see tasks</p>
                         </div>
                     </div>
-               </div>
+                </div>
         `;
     }
 
@@ -97,16 +97,9 @@ class CasaCareCalendar {
             this.nextMonth();
         });
 
-        // Close day modal
-        document.getElementById('close-day-modal')?.addEventListener('click', () => {
-            this.closeDayPanel();
-        });
-
-        // Close modal when clicking outside
-        document.getElementById('selected-day-modal')?.addEventListener('click', (e) => {
-            if (e.target.id === 'selected-day-modal') {
-                this.closeDayPanel();
-            }
+        // Clear task panel selection
+        document.getElementById('clear-selection')?.addEventListener('click', () => {
+            this.clearTaskPanel();
         });
     }
 
@@ -328,118 +321,122 @@ class CasaCareCalendar {
         });
         document.querySelector(`[data-date="${date.toISOString().split('T')[0]}"]`)?.classList.add('selected');
 
-        // Show day panel
-        this.showDayPanel(date, dayTasks);
+        // Show task panel below calendar
+        this.showTaskPanel(date, dayTasks);
     }
 
-showDayPanel(date, dayTasks) {
-    const modal = document.getElementById('selected-day-modal');
-    const title = document.getElementById('selected-day-title');
-    const tasksContainer = document.getElementById('selected-day-tasks');
+showTaskPanel(date, dayTasks) {
+    const taskPanel = document.getElementById('task-panel');
+    const dateTitle = document.getElementById('selected-date-title');
+    const taskContent = document.getElementById('task-panel-content');
 
-    if (!modal || !title || !tasksContainer) return;
+    if (!taskPanel || !dateTitle || !taskContent) return;
 
     // Format date
     const formatOptions = { 
         weekday: 'long', 
-        year: 'numeric', 
         month: 'long', 
         day: 'numeric' 
     };
     const formattedDate = date.toLocaleDateString('en-US', formatOptions);
 
-    title.textContent = formattedDate;
+    dateTitle.textContent = formattedDate;
 
     // Render tasks
     if (dayTasks.length === 0) {
-        tasksContainer.innerHTML = '<div class="text-center text-gray-500 py-8">No tasks scheduled for this day</div>';
+        taskContent.innerHTML = '<div class="text-center text-gray-500 py-8">No tasks scheduled for this day</div>';
     } else {
-        tasksContainer.innerHTML = dayTasks.map(task => this.renderDayPanelTask(task)).join('');
+        taskContent.innerHTML = dayTasks.map(task => this.renderTaskPanelTask(task)).join('');
     }
 
-    // Prevent background scrolling
-    document.body.style.overflow = 'hidden';
-
-    // Show modal
-    modal.classList.remove('hidden');
-    modal.style.display = 'flex';
-}
+    // Show task panel
+    taskPanel.classList.remove('hidden');
     
-    renderDayPanelTask(task) {
-    const taskDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-    const taskDateNormalized = new Date(taskDate);
-    taskDateNormalized.setHours(0, 0, 0, 0);
-    
-    const daysUntilDue = Math.ceil((taskDateNormalized - currentDate) / (24 * 60 * 60 * 1000));
-    const isOverdue = daysUntilDue < 0;
-    
-    // Apply visual priority logic (same as dashboard)
-    let priorityClass = 'priority-normal';
-    let priorityDot = '⚪';
-    let priorityLabel = 'normal';
-    
-    if (isOverdue) {
-        priorityClass = 'priority-overdue';
-        priorityDot = '🔴';
-        priorityLabel = 'overdue';
-    } else if (task.category === 'Safety') {
-        priorityClass = 'priority-safety';
-        priorityDot = '🟠';
-        priorityLabel = 'safety';
-    } else if (daysUntilDue <= 7) {
-        priorityClass = 'priority-due-soon';
-        priorityDot = '🟡';
-        priorityLabel = 'due soon';
-    }
-    
-    const overdueClass = isOverdue ? 'overdue' : '';
-
-   return `
-    <div class="day-panel-task ${priorityClass} ${overdueClass}">
-        <div class="task-info">
-            <div class="flex items-center justify-between mb-3">
-                <h4 class="task-title flex-1">${priorityDot} ${task.title}</h4>
-                ${task.cost > 0 ? `<span class="task-cost-inline text-green-600 font-semibold">$${task.cost}</span>` : ''}
-            </div>
-            <div class="task-meta mb-3">
-                <span class="task-category">${task.category}</span>
-                ${task.isRecurringInstance ? '<span class="recurring-badge bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Recurring</span>' : ''}
-                ${isOverdue ? '<span class="overdue-badge">OVERDUE</span>' : ''}
-            </div>
-            <p class="task-description text-base text-gray-700 leading-snug mb-1">${task.description}</p>
-        </div>
-        <div class="task-actions">
-            ${task.isRecurringInstance ? 
-                '<p class="text-sm text-gray-500 italic">This is a future recurring instance</p>' :
-                `<div class="flex gap-2 mt-3">
-                    <button onclick="showTaskHistory(${task.id})" class="flex-1 text-sm font-medium px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">History</button>
-                    <button onclick="completeTask(${task.id})" class="flex-1 text-sm font-medium px-3 py-1.5 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors">Complete</button>
-                    <button onclick="rescheduleTask(${task.id})" class="flex-[1.2] text-sm font-medium px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors">Reschedule</button>
-                </div>`
-            }
-        </div>
-    </div>
-`;
+    // Smooth scroll to task panel
+    setTimeout(() => {
+        taskPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
 }
 
-closeDayPanel() {
-    const modal = document.getElementById('selected-day-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-        modal.style.display = 'none';
+clearTaskPanel() {
+    const taskPanel = document.getElementById('task-panel');
+    const dateTitle = document.getElementById('selected-date-title');
+    const taskContent = document.getElementById('task-panel-content');
+
+    if (taskPanel) {
+        taskPanel.classList.add('hidden');
     }
-    
-    // Restore background scrolling
-    document.body.style.overflow = '';
-    
-    // Clear selection
-    this.selectedDate = null;
+
+    if (dateTitle) {
+        dateTitle.textContent = 'Select a date';
+    }
+
+    if (taskContent) {
+        taskContent.innerHTML = '<p class="text-gray-500 text-center py-8">Click on a date to see tasks</p>';
+    }
+
+    // Clear visual selection
     document.querySelectorAll('.calendar-day').forEach(day => {
         day.classList.remove('selected');
     });
+
+    this.selectedDate = null;
 }
+    
+    renderTaskPanelTask(task) {
+        const taskDate = task.nextDue instanceof Date ? task.nextDue : new Date(task.nextDue);
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+        taskDate.setHours(0, 0, 0, 0);
+        
+        const isOverdue = taskDate < currentDate;
+        const isToday = taskDate.getTime() === currentDate.getTime();
+        
+        let statusClass = 'border-l-4 border-gray-300';
+        let statusIcon = '⚪';
+        
+        if (isOverdue) {
+            statusClass = 'border-l-4 border-red-400 bg-red-50';
+            statusIcon = '🔴';
+        } else if (task.category === 'Safety' || task.priority === 'high') {
+            statusClass = 'border-l-4 border-orange-400 bg-orange-50';
+            statusIcon = '🟠';
+        } else if (isToday) {
+            statusClass = 'border-l-4 border-blue-400 bg-blue-50';
+            statusIcon = '🔵';
+        }
+        
+        return `
+            <div class="bg-white rounded-lg p-3 shadow-sm ${statusClass} cursor-pointer hover:shadow-md transition-shadow" onclick="window.TaskManager.openModal(window.tasks.find(t => t.id === ${task.id}), false)">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span>${statusIcon}</span>
+                            <span class="font-semibold text-gray-900 text-sm">${task.title}</span>
+                        </div>
+                        <p class="text-gray-600 text-xs mb-2 line-clamp-2">${task.description || ''}</p>
+                        <div class="flex items-center gap-3 text-xs text-gray-500">
+                            <span>📋 ${task.category}</span>
+                            <span>💰 $${task.cost}</span>
+                            <span>🔄 Every ${task.frequency} days</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1 ml-3">
+                        <button onclick="event.stopPropagation(); completeTask(${task.id})" 
+                                class="bg-green-100 text-green-700 hover:bg-green-200 px-2 py-1 rounded text-xs">
+                            Complete
+                        </button>
+                        <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)" 
+                                class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 rounded text-xs">
+                            Reschedule
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+}
+
+// This method is no longer needed - we use clearTaskPanel instead
 
     previousMonth() {
         this.currentMonth--;
@@ -448,7 +445,7 @@ closeDayPanel() {
             this.currentYear--;
         }
         this.renderCalendar();
-        this.closeDayPanel();
+        this.clearTaskPanel();
     }
 
     nextMonth() {
@@ -458,7 +455,7 @@ closeDayPanel() {
             this.currentYear++;
         }
         this.renderCalendar();
-        this.closeDayPanel();
+        this.clearTaskPanel();
     }
 
     // Utility function to check if two dates are the same day
