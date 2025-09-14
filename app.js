@@ -1714,6 +1714,12 @@ function showTab(tabName) {
         }
     }
     
+    // Show footer on all tabs except calendar
+    const footer = document.querySelector('footer');
+    if (footer && tabName !== 'calendar') {
+        footer.style.display = '';
+    }
+    
     // Update tab buttons - all buttons are white text on blue background
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('opacity-100');
@@ -1759,6 +1765,12 @@ function showTab(tabName) {
         // Show calendar
         if (calendarView) {
             calendarView.classList.remove('hidden');
+        }
+        
+        // Hide footer on calendar page
+        const footer = document.querySelector('footer');
+        if (footer) {
+            footer.style.display = 'none';
         }
         
         // Update tab styling
