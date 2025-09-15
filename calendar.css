@@ -1,6 +1,6 @@
 /* Calendar View Styles - Full Screen Layout */
 #calendar-view {
-    padding: 1rem;
+    padding: 0;
 }
 
 .calendar-container {
@@ -15,7 +15,7 @@
 
 @media (max-width: 768px) {
     #calendar-view {
-        padding: 0.5rem;
+        padding: 0;
     }
 }
 
