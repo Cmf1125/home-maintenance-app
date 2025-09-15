@@ -3082,7 +3082,21 @@ function populatePropertyFeaturesTab() {
         'features-generator': homeData.features.generator,
         'features-irrigation': homeData.features.irrigation,
         'features-security-system': homeData.features.securitySystem,
-        'features-outdoor-kitchen': homeData.features.outdoorKitchen
+        'features-outdoor-kitchen': homeData.features.outdoorKitchen,
+        // Structural Features
+        'features-composite-roof': homeData.features.compositeRoof,
+        'features-metal-roof': homeData.features.metalRoof,
+        'features-tile-roof': homeData.features.tileRoof,
+        'features-vinyl-siding': homeData.features.vinylSiding,
+        'features-wood-siding': homeData.features.woodSiding,
+        'features-aluminum-siding': homeData.features.aluminumSiding,
+        'features-brick-exterior': homeData.features.brickExterior,
+        'features-gutters': homeData.features.gutters,
+        'features-windows': homeData.features.windows,
+        'features-exterior-doors': homeData.features.exteriorDoors,
+        'features-driveway': homeData.features.driveway,
+        'features-fence': homeData.features.fence,
+        'features-attic': homeData.features.attic
     };
     
     // Set checkbox values
@@ -3136,16 +3150,140 @@ function savePropertyFeaturesFromTab() {
         generator: document.getElementById('features-generator')?.checked || false,
         irrigation: document.getElementById('features-irrigation')?.checked || false,
         securitySystem: document.getElementById('features-security-system')?.checked || false,
-        outdoorKitchen: document.getElementById('features-outdoor-kitchen')?.checked || false
+        outdoorKitchen: document.getElementById('features-outdoor-kitchen')?.checked || false,
+        // Structural Features
+        compositeRoof: document.getElementById('features-composite-roof')?.checked || false,
+        metalRoof: document.getElementById('features-metal-roof')?.checked || false,
+        tileRoof: document.getElementById('features-tile-roof')?.checked || false,
+        vinylSiding: document.getElementById('features-vinyl-siding')?.checked || false,
+        woodSiding: document.getElementById('features-wood-siding')?.checked || false,
+        aluminumSiding: document.getElementById('features-aluminum-siding')?.checked || false,
+        brickExterior: document.getElementById('features-brick-exterior')?.checked || false,
+        gutters: document.getElementById('features-gutters')?.checked || false,
+        windows: document.getElementById('features-windows')?.checked || false,
+        exteriorDoors: document.getElementById('features-exterior-doors')?.checked || false,
+        driveway: document.getElementById('features-driveway')?.checked || false,
+        fence: document.getElementById('features-fence')?.checked || false,
+        attic: document.getElementById('features-attic')?.checked || false
     };
+    
+    // Detect changes and show summary
+    const changes = detectFeatureChanges(oldFeatures, newFeatures);
     
     // Update home data
     homeData.features = newFeatures;
     
-    // Generate new tasks for newly added features
-    generateTasksForNewFeatures(oldFeatures, newFeatures);
+    // Show change summary and ask about task generation
+    if (changes.added.length > 0 || changes.removed.length > 0) {
+        showChangeDetectionPrompt(changes, oldFeatures, newFeatures);
+    } else {
+        // No changes, just save and go back
+        saveFeatureChanges();
+        showTab('dashboard');
+    }
     
-    // Save to Firebase
+    console.log('✅ Property features updated:', newFeatures);
+}
+
+/**
+ * Detect changes between old and new feature sets
+ */
+function detectFeatureChanges(oldFeatures, newFeatures) {
+    const featureNames = {
+        centralAC: 'Central Air Conditioning',
+        miniSplits: 'Mini-Split Systems',
+        wallAC: 'Wall AC Units',
+        electricBaseboard: 'Electric Baseboard Heating',
+        boiler: 'Boiler',
+        municipalWater: 'Municipal Water',
+        wellWater: 'Well Water',
+        sedimentFilter: 'Sediment Filter',
+        uvFilter: 'UV Filter',
+        waterSoftener: 'Water Softener',
+        wholeHouseFilter: 'Whole House Filter',
+        municipalSewer: 'Municipal Sewer',
+        septic: 'Septic System',
+        fireplace: 'Fireplace/Chimney',
+        pool: 'Swimming Pool',
+        deck: 'Deck/Patio',
+        garage: 'Garage',
+        basement: 'Basement',
+        solarPanels: 'Solar Panels',
+        batteryBackup: 'Battery Backup System',
+        generator: 'Generator',
+        irrigation: 'Irrigation/Sprinkler System',
+        securitySystem: 'Security System',
+        outdoorKitchen: 'Outdoor Kitchen',
+        compositeRoof: 'Composite/Asphalt Roof',
+        metalRoof: 'Metal Roof',
+        tileRoof: 'Tile/Slate Roof',
+        vinylSiding: 'Vinyl Siding',
+        woodSiding: 'Wood Siding',
+        aluminumSiding: 'Aluminum Siding',
+        brickExterior: 'Brick/Stone Exterior',
+        gutters: 'Gutters & Downspouts',
+        windows: 'Windows',
+        exteriorDoors: 'Exterior Doors',
+        driveway: 'Driveway',
+        fence: 'Fence',
+        attic: 'Attic/Insulation'
+    };
+    
+    const added = [];
+    const removed = [];
+    
+    Object.entries(newFeatures).forEach(([feature, isEnabled]) => {
+        const wasEnabled = oldFeatures[feature];
+        if (isEnabled && !wasEnabled) {
+            added.push(featureNames[feature] || feature);
+        } else if (!isEnabled && wasEnabled) {
+            removed.push(featureNames[feature] || feature);
+        }
+    });
+    
+    return { added, removed };
+}
+
+/**
+ * Show change detection prompt to user
+ */
+function showChangeDetectionPrompt(changes, oldFeatures, newFeatures) {
+    let message = '🏠 Property Features Updated\n\n';
+    
+    if (changes.added.length > 0) {
+        message += '✅ ADDED FEATURES:\n';
+        changes.added.forEach(feature => {
+            message += `• ${feature}\n`;
+        });
+        message += '\n';
+    }
+    
+    if (changes.removed.length > 0) {
+        message += '❌ REMOVED FEATURES:\n';
+        changes.removed.forEach(feature => {
+            message += `• ${feature}\n`;
+        });
+        message += '\n';
+    }
+    
+    if (changes.added.length > 0) {
+        message += 'Would you like us to automatically generate maintenance tasks for the new features?';
+        
+        if (confirm(message)) {
+            // Generate tasks for new features
+            generateTasksForNewFeatures(oldFeatures, newFeatures);
+        }
+    }
+    
+    // Save changes and navigate back
+    saveFeatureChanges();
+    showTab('dashboard');
+}
+
+/**
+ * Save feature changes to Firebase
+ */
+function saveFeatureChanges() {
     try {
         if (window.currentUser) {
             saveUserDataToFirebaseEnhanced(window.currentUser.uid, homeData, window.tasks || [])
@@ -3162,14 +3300,6 @@ function savePropertyFeaturesFromTab() {
     
     // Refresh UI
     refreshAfterFeatureUpdate();
-    
-    // Show success message and navigate back to dashboard
-    alert('✅ Property features updated successfully!\n\nNew maintenance tasks have been added for any new features you selected.');
-    
-    // Navigate back to dashboard
-    showTab('dashboard');
-    
-    console.log('✅ Property features updated:', newFeatures);
 }
 
 /**

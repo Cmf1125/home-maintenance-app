@@ -913,6 +913,10 @@ function showMainApp() {
                         <span>Wood Siding</span>
                     </label>
                     <label class="flex items-center space-x-2 touch-btn text-sm">
+                        <input type="checkbox" id="siding-aluminum" class="w-4 h-4">
+                        <span>Aluminum Siding</span>
+                    </label>
+                    <label class="flex items-center space-x-2 touch-btn text-sm">
                         <input type="checkbox" id="siding-brick" class="w-4 h-4">
                         <span>Brick</span>
                     </label>
@@ -1373,18 +1377,6 @@ function showMainApp() {
                         <!-- Summary content will be populated here -->
                     </div>
 
-                    <!-- Edit Property Button -->
-                    <div class="bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-sm mb-6">
-                        <div class="text-center">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Need to make changes?</h3>
-                            <p class="text-gray-600 text-sm mb-4">Edit your address, property details, features, and maintenance preferences</p>
-                            <button onclick="editPropertyDetails()" 
-                                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
-                                🏠 Edit Property Details
-                            </button>
-                        </div>
-                    </div>
-
                     <!-- Features Form -->
                     <div class="space-y-6">
                         <!-- HVAC Systems -->
@@ -1482,6 +1474,67 @@ function showMainApp() {
                                 <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
                                     <input type="checkbox" id="features-basement" class="w-4 h-4 text-blue-600 rounded">
                                     <span class="text-sm">Basement</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Structural Features -->
+                        <div class="bg-white/90 backdrop-blur-sm rounded-xl p-6 border border-white/20 shadow-sm">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                                🏗️ Structural Features
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-composite-roof" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Composite/Asphalt Roof</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-metal-roof" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Metal Roof</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-tile-roof" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Tile/Slate Roof</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-vinyl-siding" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Vinyl Siding</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-wood-siding" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Wood Siding</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-aluminum-siding" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Aluminum Siding</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-brick-exterior" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Brick/Stone Exterior</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-gutters" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Gutters & Downspouts</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-windows" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Windows (Regular Maintenance)</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-exterior-doors" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Exterior Doors</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-driveway" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Driveway</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-fence" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Fence</span>
+                                </label>
+                                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" id="features-attic" class="w-4 h-4 text-blue-600 rounded">
+                                    <span class="text-sm">Attic/Insulation</span>
                                 </label>
                             </div>
                         </div>
@@ -2654,11 +2707,6 @@ function showMainApp() {
     }
   }
 
-  function editPropertyDetails() {
-    console.log('🏠 Opening property features for editing');
-    showTab('property-features');
-  }
-
   function parseAddressString(address) {
     // Simple address parser - assumes format "street, city, state zip"
     const parts = {
@@ -2785,7 +2833,6 @@ function showMainApp() {
 
 
   window.populatePropertySummarySection = populatePropertySummarySection;
-  window.editPropertyDetails = editPropertyDetails;
   window.startAddressEdit = startAddressEdit;
   window.saveAddressInline = saveAddressInline;
   window.cancelAddressEdit = cancelAddressEdit;
@@ -4208,7 +4255,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Listen for changes to structural details (checkboxes and inputs)
     const structuralInputs = [
         'roof-asphalt', 'roof-metal', 'roof-tile', 'roof-slate', 'roof-wood', 'roof-flat', 'roof-age',
-        'siding-vinyl', 'siding-wood', 'siding-brick', 'siding-stucco', 'siding-fiber-cement', 'siding-stone',
+        'siding-vinyl', 'siding-wood', 'siding-aluminum', 'siding-brick', 'siding-stucco', 'siding-fiber-cement', 'siding-stone',
         'foundation-slab', 'foundation-crawl', 'foundation-full-basement', 'foundation-partial-basement', 'foundation-pier'
     ];
     structuralInputs.forEach(id => {
