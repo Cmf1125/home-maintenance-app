@@ -305,7 +305,7 @@ function showMainApp() {
                                         <span class="bg-white px-2 text-gray-500">or continue with</span>
                                     </div>
                                 </div>
-                                <button onclick="signInWithGoogle(event)" 
+                                <button onclick="signInWithGoogle()" 
                                         class="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded-xl hover:bg-gray-50 font-medium shadow-sm transition-all duration-300 flex items-center justify-center gap-2">
                                     <svg class="w-5 h-5" viewBox="0 0 24 24">
                                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -3707,42 +3707,20 @@ function showDebugMessage(message) {
     console.log(message);
 }
 
-function signInWithGoogle(event) {
-    showDebugMessage('🔍 Starting Google sign in...');
+function signInWithGoogle() {
     window.googleSignInInProgress = true; // Flag to prevent auto-login
     const provider = new firebase.auth.GoogleAuthProvider();
     
-    // Detect mobile devices and browsers that have popup issues
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    const hasSmallScreen = window.innerWidth <= 768;
+    // Simple Safari detection - only use redirect for Safari mobile
+    const isSafariMobile = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent);
     
-    // Use redirect for mobile devices, touch devices, or small screens
-    const useRedirect = isMobile || isIOS || isSafari || (isTouch && hasSmallScreen);
-    
-    showDebugMessage(`📱 Device detection: mobile=${isMobile}, iOS=${isIOS}, Safari=${isSafari}, touch=${isTouch}, smallScreen=${hasSmallScreen}, useRedirect=${useRedirect}`);
-    
-    if (useRedirect) {
-        showDebugMessage('📱 Using redirect method for mobile/Safari');
-        // Store a flag and timestamp to handle the redirect result
-        localStorage.setItem('pendingGoogleSignIn', 'true');
-        localStorage.setItem('googleSignInTimestamp', Date.now().toString());
-        
-        // Show loading message for mobile users
-        const button = event.target.closest('button');
-        if (button) {
-            button.innerHTML = '🔄 Redirecting to Google...';
-            button.disabled = true;
-        }
-        
+    if (isSafariMobile) {
+        // Use redirect only for Safari on iOS
         auth.signInWithRedirect(provider);
-        return; // Function ends here for mobile - result handled by getRedirectResult
+        return;
     }
     
-    // Desktop - use popup method
-    showDebugMessage('💻 Using popup method for desktop');
+    // Use popup for everything else (the original working method)
     auth.signInWithPopup(provider)
         .then((result) => {
             console.log('✅ Google sign in success:', result.user.email);
@@ -3940,101 +3918,26 @@ function handleNewUserSignup(user) {
     console.log('✅ New user ready for setup');
 }
     
-// Check for redirect result from Google Sign In (for mobile/Safari)
-showDebugMessage('🔍 Checking for Google redirect result...');
-showDebugMessage('📋 Pending flag: ' + localStorage.getItem('pendingGoogleSignIn'));
-showDebugMessage('🌐 URL: ' + window.location.href);
-showDebugMessage('🔗 Params: ' + window.location.search);
-
+// Check for redirect result from Google Sign In (for Safari iOS only)
 auth.getRedirectResult().then((result) => {
-    showDebugMessage(`📊 Redirect result: user=${!!result.user}, credential=${!!result.credential}`);
-    
     if (result.user) {
-        showDebugMessage('✅ Google redirect sign in success: ' + result.user.email);
-        localStorage.removeItem('pendingGoogleSignIn'); // Clear the flag
-        window.googleSignInInProgress = false; // Clear the flag
+        console.log('✅ Google redirect sign in success:', result.user.email);
         
         // Handle the successful sign in (same logic as popup)
         loadUserDataEnhanced(result.user.uid).then(hasData => {
-            console.log(`🔍 Google Redirect Route Check: hasData = ${hasData}`);
-            
             if (hasData) {
-                console.log('➡️ Routing to main dashboard (existing user)');
                 handleSuccessfulLogin(result.user);
             } else {
-                console.log('➡️ Routing to setup flow (new user)');
                 handleNewUserSignup(result.user);
             }
         }).catch(error => {
             console.error('❌ Error loading user data after redirect:', error);
-            console.log('🔄 Defaulting to setup flow for safety');
             handleNewUserSignup(result.user);
         });
-    } else {
-        // No user in result
-        const wasPending = localStorage.getItem('pendingGoogleSignIn');
-        const timestamp = localStorage.getItem('googleSignInTimestamp');
-        const timeSinceStart = timestamp ? Date.now() - parseInt(timestamp) : 0;
-        
-        showDebugMessage(`❌ No user in redirect result. Was pending: ${wasPending}, time: ${timeSinceStart}ms`);
-        
-        if (wasPending) {
-            // Clean up localStorage
-            localStorage.removeItem('pendingGoogleSignIn');
-            localStorage.removeItem('googleSignInTimestamp');
-            
-            if (timeSinceStart < 2000) {
-                // Very quick return - likely immediate failure
-                console.log('❌ Very quick return suggests immediate failure');
-                alert('Sign in failed immediately. This might be a browser security restriction. Please try again or use a different browser.');
-            } else if (timeSinceStart > 300000) {
-                // Over 5 minutes - likely timeout
-                console.log('❌ Sign in took too long - likely timeout');
-                alert('Sign in timed out. Please try again.');
-            } else {
-                // Normal timing but no result - user likely cancelled
-                console.log('❌ Normal timing but no result - likely cancelled by user');
-                
-                // Offer a fallback option to try popup method
-                if (confirm('Sign in was cancelled. Would you like to try a different sign-in method?')) {
-                    console.log('🔄 User chose to try popup method as fallback');
-                    const provider = new firebase.auth.GoogleAuthProvider();
-                    auth.signInWithPopup(provider)
-                        .then((result) => {
-                            console.log('✅ Fallback popup sign in success:', result.user.email);
-                            loadUserDataEnhanced(result.user.uid).then(hasData => {
-                                if (hasData) {
-                                    handleSuccessfulLogin(result.user);
-                                } else {
-                                    handleNewUserSignup(result.user);
-                                }
-                            });
-                        })
-                        .catch((popupError) => {
-                            console.error('❌ Popup fallback also failed:', popupError);
-                            alert('Both sign-in methods failed. Please try refreshing the page.');
-                        });
-                }
-            }
-        } else {
-            console.log('ℹ️ No pending sign in, this is normal page load');
-        }
     }
 }).catch((error) => {
-    console.error('❌ Error getting redirect result:', error);
-    console.error('❌ Error details:', {
-        code: error.code,
-        message: error.message,
-        stack: error.stack
-    });
-    
-    localStorage.removeItem('pendingGoogleSignIn');
-    
-    if (error.code === 'auth/no-redirect-pending') {
-        console.log('ℹ️ No redirect pending - normal page load');
-    } else {
-        console.error('🚨 Unexpected redirect error:', error);
-        alert('Sign in failed: ' + error.message);
+    if (error.code !== 'auth/no-redirect-pending') {
+        console.error('❌ Redirect error:', error);
     }
 });
 
