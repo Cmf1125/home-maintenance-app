@@ -2599,28 +2599,87 @@ function showMainApp() {
   }
 
   function editAddress() {
+    // Parse current address if it exists
     const currentAddress = window.homeData?.fullAddress || '';
-    const newAddress = prompt('Edit your address:', currentAddress);
+    let street = '', city = '', state = '', zip = '';
     
-    if (newAddress !== null && newAddress.trim() !== currentAddress) {
-      // Update homeData
-      if (!window.homeData) window.homeData = {};
-      window.homeData.fullAddress = newAddress.trim();
-      
-      // Save to Firebase
-      if (typeof saveData === 'function') {
-        saveData();
+    if (currentAddress) {
+      // Try to parse existing address (basic parsing)
+      const parts = currentAddress.split(',').map(p => p.trim());
+      if (parts.length >= 1) street = parts[0];
+      if (parts.length >= 2) {
+        const cityStatePart = parts[1];
+        const stateZipMatch = cityStatePart.match(/^(.+)\s+([A-Z]{2})\s*(\d{5}(-\d{4})?)?\s*$/);
+        if (stateZipMatch) {
+          city = stateZipMatch[1];
+          state = stateZipMatch[2];
+          zip = stateZipMatch[3] || '';
+        } else {
+          city = cityStatePart;
+        }
       }
-      
-      // Refresh the property summary display
-      populatePropertySummarySection();
-      
-      console.log('✅ Address updated:', newAddress.trim());
+      if (parts.length >= 3) state = parts[2];
+      if (parts.length >= 4) zip = parts[3];
     }
+    
+    // Populate modal fields
+    document.getElementById('edit-street').value = street;
+    document.getElementById('edit-city').value = city;
+    document.getElementById('edit-state').value = state;
+    document.getElementById('edit-zip').value = zip;
+    
+    // Show modal
+    document.getElementById('address-edit-modal').classList.remove('hidden');
+  }
+
+  function closeAddressModal() {
+    document.getElementById('address-edit-modal').classList.add('hidden');
+  }
+
+  function saveAddress() {
+    const street = document.getElementById('edit-street').value.trim();
+    const city = document.getElementById('edit-city').value.trim();
+    const state = document.getElementById('edit-state').value.trim().toUpperCase();
+    const zip = document.getElementById('edit-zip').value.trim();
+    
+    if (!street || !city || !state || !zip) {
+      alert('Please fill in all address fields');
+      return;
+    }
+    
+    // Combine into full address
+    const fullAddress = `${street}, ${city}, ${state} ${zip}`;
+    
+    // Update homeData
+    if (!window.homeData) window.homeData = {};
+    window.homeData.fullAddress = fullAddress;
+    
+    // Also store individual components for future use
+    window.homeData.address = {
+      street: street,
+      city: city,
+      state: state,
+      zip: zip
+    };
+    
+    // Save to Firebase
+    if (typeof saveData === 'function') {
+      saveData();
+    }
+    
+    // Refresh the property summary display
+    populatePropertySummarySection();
+    
+    // Close modal
+    closeAddressModal();
+    
+    console.log('✅ Address updated:', fullAddress);
   }
 
   window.populatePropertySummarySection = populatePropertySummarySection;
   window.editAddress = editAddress;
+  window.closeAddressModal = closeAddressModal;
+  window.saveAddress = saveAddress;
 
 // Clean Navigation Functions for New Landing Flow
 function showLanding() {
@@ -2753,6 +2812,56 @@ window.showEmailLogin = showEmailLogin;
                     class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 touch-btn">
                 ✅ Mark Complete
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- Address Edit Modal -->
+<div id="address-edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl w-full max-w-md shadow-2xl">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900">Edit Address</h3>
+                <button onclick="closeAddressModal()" class="text-gray-500 hover:text-gray-700 text-xl w-8 h-8 flex items-center justify-center rounded">×</button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                    <input type="text" id="edit-street" placeholder="123 Main Street" 
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                        <input type="text" id="edit-city" placeholder="Your City" 
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                        <input type="text" id="edit-state" placeholder="State" maxlength="2"
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                    <input type="text" id="edit-zip" placeholder="12345" maxlength="10"
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+            
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeAddressModal()" 
+                        class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300">
+                    Cancel
+                </button>
+                <button onclick="saveAddress()" 
+                        class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
+                    Save Address
+                </button>
+            </div>
         </div>
     </div>
 </div>
