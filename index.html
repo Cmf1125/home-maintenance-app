@@ -3746,6 +3746,18 @@ function signInWithGoogle() {
         })
         .catch((error) => {
             console.error('❌ Google sign in error:', error);
+            
+            // Check if this is a popup blocked error on mobile Safari
+            if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+                const isSafari = /Safari/.test(navigator.userAgent) && /iPhone|iPad|iPod/.test(navigator.userAgent);
+                
+                if (isSafari && confirm('Popup was blocked. Would you like to try a different sign-in method that works better on Safari?')) {
+                    // Try redirect as fallback for Safari
+                    auth.signInWithRedirect(provider);
+                    return;
+                }
+            }
+            
             alert('Google sign in failed: ' + error.message);
             window.googleSignInInProgress = false;
         });
