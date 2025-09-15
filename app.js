@@ -1741,6 +1741,17 @@ function showTab(tabName) {
         
         console.log('🏠 Initializing enhanced dashboard...');
         
+        // Update header subtitles with current address
+        if (window.homeData?.fullAddress) {
+            const headerSubtitle = document.getElementById('header-subtitle');
+            const dashboardSubtitle = document.getElementById('dashboard-subtitle');
+            const subtitleText = window.homeData.fullAddress;
+            
+            if (headerSubtitle) headerSubtitle.textContent = subtitleText;
+            if (dashboardSubtitle) dashboardSubtitle.textContent = subtitleText;
+            console.log('✅ Header address updated:', subtitleText);
+        }
+        
         // Enhanced dashboard initialization with fallback
         try {
             if (typeof EnhancedDashboard !== 'undefined') {
