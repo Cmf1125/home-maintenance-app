@@ -3050,7 +3050,12 @@ function clearData() {
  * Populate the property features form with current data (for the tab)
  */
 function populatePropertyFeaturesTab() {
-    if (!homeData.features) return;
+    if (!window.homeData || !window.homeData.features) {
+        console.warn('⚠️ No homeData.features available for populating property features tab');
+        return;
+    }
+    
+    const homeData = window.homeData;
     
     // Map of feature IDs to their current values (updated for tab IDs)
     const featureMap = {

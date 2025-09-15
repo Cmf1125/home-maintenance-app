@@ -2588,28 +2588,52 @@ function showMainApp() {
 
     return `
         <div class="space-y-1 text-sm">
-            <div class="flex items-center justify-between">
-                <div>
+            <div>
+                <div class="flex items-center justify-between mb-2">
                     <strong>🏠 Address:</strong>
-                    <span id="address-display" class="ml-1">${homeData.fullAddress || 'Not set'}</span>
-                    <input type="text" id="address-input" value="${homeData.fullAddress || ''}" 
-                           class="ml-1 px-2 py-1 border border-gray-300 rounded text-sm hidden"
-                           placeholder="Enter your full address"
-                           onkeydown="handleAddressKeydown(event)">
-                </div>
-                <div>
                     <button id="edit-address-btn" onclick="startAddressEdit()" 
                             class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 border border-blue-200 rounded hover:bg-blue-50">
                         Edit
                     </button>
-                    <button id="save-address-btn" onclick="saveAddressInline()" 
-                            class="text-green-600 hover:text-green-800 text-xs px-2 py-1 border border-green-200 rounded hover:bg-green-50 hidden">
-                        Save
-                    </button>
-                    <button id="cancel-address-btn" onclick="cancelAddressEdit()" 
-                            class="text-gray-600 hover:text-gray-800 text-xs px-2 py-1 border border-gray-200 rounded hover:bg-gray-50 ml-1 hidden">
-                        Cancel
-                    </button>
+                </div>
+                <div id="address-display" class="ml-4 text-gray-700">
+                    ${homeData.fullAddress || 'Not set'}
+                </div>
+                <div id="address-edit-form" class="ml-4 space-y-2 hidden">
+                    <div>
+                        <label class="text-xs text-gray-600">Street Address</label>
+                        <input type="text" id="address-street" placeholder="123 Main Street" 
+                               class="w-full px-2 py-1 border border-gray-300 rounded text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-xs text-gray-600">City</label>
+                            <input type="text" id="address-city" placeholder="City" 
+                                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-600">State</label>
+                            <input type="text" id="address-state" placeholder="CA" maxlength="2"
+                                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-xs text-gray-600">ZIP Code</label>
+                            <input type="text" id="address-zip" placeholder="12345" maxlength="10"
+                                   class="w-full px-2 py-1 border border-gray-300 rounded text-sm">
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button id="save-address-btn" onclick="saveAddressInline()" 
+                                    class="flex-1 text-green-600 hover:text-green-800 text-xs px-2 py-1 border border-green-200 rounded hover:bg-green-50">
+                                Save
+                            </button>
+                            <button id="cancel-address-btn" onclick="cancelAddressEdit()" 
+                                    class="flex-1 text-gray-600 hover:text-gray-800 text-xs px-2 py-1 border border-gray-200 rounded hover:bg-gray-50">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div><strong>🏢 Type:</strong> ${propertyTypeDisplay[homeData.propertyType] || 'Not set'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Not set'} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Not set'}</div>
@@ -2635,40 +2659,89 @@ function showMainApp() {
     showTab('property-features');
   }
 
+  function parseAddressString(address) {
+    // Simple address parser - assumes format "street, city, state zip"
+    const parts = {
+      street: '',
+      city: '',
+      state: '',
+      zip: ''
+    };
+    
+    if (!address) return parts;
+    
+    // Split by commas first
+    const commaParts = address.split(',').map(part => part.trim());
+    
+    if (commaParts.length >= 1) {
+      parts.street = commaParts[0];
+    }
+    
+    if (commaParts.length >= 2) {
+      parts.city = commaParts[1];
+    }
+    
+    if (commaParts.length >= 3) {
+      // Last part should contain "state zip"
+      const stateZipPart = commaParts[2].trim();
+      const stateZipMatch = stateZipPart.match(/^(.+?)\s+(\S+)$/);
+      
+      if (stateZipMatch) {
+        parts.state = stateZipMatch[1];
+        parts.zip = stateZipMatch[2];
+      } else {
+        // Fallback: assume it's all state
+        parts.state = stateZipPart;
+      }
+    }
+    
+    return parts;
+  }
+
   function startAddressEdit() {
     const display = document.getElementById('address-display');
-    const input = document.getElementById('address-input');
+    const editForm = document.getElementById('address-edit-form');
     const editBtn = document.getElementById('edit-address-btn');
-    const saveBtn = document.getElementById('save-address-btn');
-    const cancelBtn = document.getElementById('cancel-address-btn');
     
-    // Hide display and edit button, show input and save/cancel buttons
+    // Parse current address into components
+    const currentAddress = window.homeData?.fullAddress || '';
+    const addressParts = parseAddressString(currentAddress);
+    
+    // Populate form fields
+    document.getElementById('address-street').value = addressParts.street;
+    document.getElementById('address-city').value = addressParts.city;
+    document.getElementById('address-state').value = addressParts.state;
+    document.getElementById('address-zip').value = addressParts.zip;
+    
+    // Hide display and edit button, show form
     display.classList.add('hidden');
     editBtn.classList.add('hidden');
-    input.classList.remove('hidden');
-    saveBtn.classList.remove('hidden');
-    cancelBtn.classList.remove('hidden');
+    editForm.classList.remove('hidden');
     
-    // Focus the input
-    input.focus();
-    input.select();
+    // Focus the first input
+    document.getElementById('address-street').focus();
   }
 
   function saveAddressInline() {
-    const display = document.getElementById('address-display');
-    const input = document.getElementById('address-input');
-    const newAddress = input.value.trim();
+    const street = document.getElementById('address-street').value.trim();
+    const city = document.getElementById('address-city').value.trim();
+    const state = document.getElementById('address-state').value.trim();
+    const zip = document.getElementById('address-zip').value.trim();
     
-    if (!newAddress) {
-      alert('Please enter a valid address');
+    if (!street || !city || !state || !zip) {
+      alert('Please fill in all address fields');
       return;
     }
+    
+    // Build full address string
+    const newAddress = `${street}, ${city}, ${state} ${zip}`;
     
     // Update homeData
     if (!window.homeData) window.homeData = {};
     window.homeData.fullAddress = newAddress;
     
     // Update display
+    const display = document.getElementById('address-display');
     display.textContent = newAddress;
     
     // Save to Firebase
@@ -2684,20 +2757,22 @@ function showMainApp() {
 
   function cancelAddressEdit() {
     const display = document.getElementById('address-display');
-    const input = document.getElementById('address-input');
+    const editForm = document.getElementById('address-edit-form');
     const editBtn = document.getElementById('edit-address-btn');
-    const saveBtn = document.getElementById('save-address-btn');
-    const cancelBtn = document.getElementById('cancel-address-btn');
     
-    // Reset input to original value
-    input.value = window.homeData?.fullAddress || '';
+    // Reset form fields to original values
+    const currentAddress = window.homeData?.fullAddress || '';
+    const addressParts = parseAddressString(currentAddress);
     
-    // Show display and edit button, hide input and save/cancel buttons
+    document.getElementById('address-street').value = addressParts.street;
+    document.getElementById('address-city').value = addressParts.city;
+    document.getElementById('address-state').value = addressParts.state;
+    document.getElementById('address-zip').value = addressParts.zip;
+    
+    // Show display and edit button, hide form
     display.classList.remove('hidden');
     editBtn.classList.remove('hidden');
-    input.classList.add('hidden');
-    saveBtn.classList.add('hidden');
-    cancelBtn.classList.add('hidden');
+    editForm.classList.add('hidden');
   }
 
   function handleAddressKeydown(event) {
