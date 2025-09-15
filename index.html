@@ -2588,7 +2588,30 @@ function showMainApp() {
 
     return `
         <div class="space-y-1 text-sm">
-            <div><strong>🏠 Address:</strong> ${homeData.fullAddress || 'Not set'}</div>
+            <div class="flex items-center justify-between">
+                <div>
+                    <strong>🏠 Address:</strong>
+                    <span id="address-display" class="ml-1">${homeData.fullAddress || 'Not set'}</span>
+                    <input type="text" id="address-input" value="${homeData.fullAddress || ''}" 
+                           class="ml-1 px-2 py-1 border border-gray-300 rounded text-sm hidden"
+                           placeholder="Enter your full address"
+                           onkeydown="handleAddressKeydown(event)">
+                </div>
+                <div>
+                    <button id="edit-address-btn" onclick="startAddressEdit()" 
+                            class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 border border-blue-200 rounded hover:bg-blue-50">
+                        Edit
+                    </button>
+                    <button id="save-address-btn" onclick="saveAddressInline()" 
+                            class="text-green-600 hover:text-green-800 text-xs px-2 py-1 border border-green-200 rounded hover:bg-green-50 hidden">
+                        Save
+                    </button>
+                    <button id="cancel-address-btn" onclick="cancelAddressEdit()" 
+                            class="text-gray-600 hover:text-gray-800 text-xs px-2 py-1 border border-gray-200 rounded hover:bg-gray-50 ml-1 hidden">
+                        Cancel
+                    </button>
+                </div>
+            </div>
             <div><strong>🏢 Type:</strong> ${propertyTypeDisplay[homeData.propertyType] || 'Not set'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Not set'} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Not set'}</div>
             ${heatingCooling.length > 0 ? `<div><strong>🌡️ Heating/Cooling:</strong> ${heatingCooling.join(', ')}</div>` : ''}
             ${waterSewer.length > 0 ? `<div><strong>💧 Water/Sewer:</strong> ${waterSewer.join(', ')}</div>` : ''}
@@ -2608,32 +2631,90 @@ function showMainApp() {
   }
 
   function editPropertyDetails() {
-    console.log('🏠 Redirecting to onboarding flow for property editing');
+    console.log('🏠 Opening property features for editing');
+    showTab('property-features');
+  }
+
+  function startAddressEdit() {
+    const display = document.getElementById('address-display');
+    const input = document.getElementById('address-input');
+    const editBtn = document.getElementById('edit-address-btn');
+    const saveBtn = document.getElementById('save-address-btn');
+    const cancelBtn = document.getElementById('cancel-address-btn');
     
-    // Hide all current views
-    const mainApp = document.getElementById('main-app');
-    const propertyFeaturesView = document.getElementById('property-features-view');
+    // Hide display and edit button, show input and save/cancel buttons
+    display.classList.add('hidden');
+    editBtn.classList.add('hidden');
+    input.classList.remove('hidden');
+    saveBtn.classList.remove('hidden');
+    cancelBtn.classList.remove('hidden');
     
-    if (mainApp) mainApp.classList.add('hidden');
-    if (propertyFeaturesView) propertyFeaturesView.classList.add('hidden');
+    // Focus the input
+    input.focus();
+    input.select();
+  }
+
+  function saveAddressInline() {
+    const display = document.getElementById('address-display');
+    const input = document.getElementById('address-input');
+    const newAddress = input.value.trim();
     
-    // Show setup form (onboarding)
-    const setupForm = document.getElementById('setup-form');
-    if (setupForm) {
-      setupForm.classList.remove('hidden');
-      setupForm.style.display = 'block';
+    if (!newAddress) {
+      alert('Please enter a valid address');
+      return;
     }
     
-    // Reset body classes
-    document.body.classList.remove('main-app-active');
-    document.body.classList.add('setup-active');
+    // Update homeData
+    if (!window.homeData) window.homeData = {};
+    window.homeData.fullAddress = newAddress;
     
-    console.log('✅ Redirected to onboarding flow');
+    // Update display
+    display.textContent = newAddress;
+    
+    // Save to Firebase
+    if (typeof saveData === 'function') {
+      saveData();
+    }
+    
+    // Switch back to display mode
+    cancelAddressEdit();
+    
+    console.log('✅ Address updated:', newAddress);
+  }
+
+  function cancelAddressEdit() {
+    const display = document.getElementById('address-display');
+    const input = document.getElementById('address-input');
+    const editBtn = document.getElementById('edit-address-btn');
+    const saveBtn = document.getElementById('save-address-btn');
+    const cancelBtn = document.getElementById('cancel-address-btn');
+    
+    // Reset input to original value
+    input.value = window.homeData?.fullAddress || '';
+    
+    // Show display and edit button, hide input and save/cancel buttons
+    display.classList.remove('hidden');
+    editBtn.classList.remove('hidden');
+    input.classList.add('hidden');
+    saveBtn.classList.add('hidden');
+    cancelBtn.classList.add('hidden');
+  }
+
+  function handleAddressKeydown(event) {
+    if (event.key === 'Enter') {
+      saveAddressInline();
+    } else if (event.key === 'Escape') {
+      cancelAddressEdit();
+    }
   }
 
 
   window.populatePropertySummarySection = populatePropertySummarySection;
   window.editPropertyDetails = editPropertyDetails;
+  window.startAddressEdit = startAddressEdit;
+  window.saveAddressInline = saveAddressInline;
+  window.cancelAddressEdit = cancelAddressEdit;
+  window.handleAddressKeydown = handleAddressKeydown;
 
 // Clean Navigation Functions for New Landing Flow
 function showLanding() {
