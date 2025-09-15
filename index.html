@@ -3723,70 +3723,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const propertyCards = document.querySelectorAll('.property-card');
     const hiddenInput = document.getElementById('property-type');
     
-    // Function to set smart defaults based on property type
+    // Function removed - no more presumptuous preselections
+    // Let users make their own choices without assumptions
     function setPropertyTypeDefaults(propertyType) {
-        // Clear all checkboxes first
+        // Clear all checkboxes - keep form blank for first-time users
         document.querySelectorAll('#setup-form input[type="checkbox"]').forEach(checkbox => {
             checkbox.checked = false;
         });
         
-        // Set defaults based on property type
-        switch(propertyType) {
-            case 'single-family':
-                // Most common features for single-family homes
-                document.getElementById('central-ac').checked = true;
-                document.getElementById('municipal-water').checked = true;
-                document.getElementById('municipal-sewer').checked = true;
-                document.getElementById('garage').checked = true;
-                // Common structural defaults
-                document.getElementById('roof-asphalt').checked = true;
-                document.getElementById('siding-vinyl').checked = true;
-                document.getElementById('foundation-slab').checked = true;
-                break;
-                
-            case 'townhouse':
-                // Common features for townhouses
-                document.getElementById('central-ac').checked = true;
-                document.getElementById('municipal-water').checked = true;
-                document.getElementById('municipal-sewer').checked = true;
-                // Structural defaults for townhouses
-                document.getElementById('roof-asphalt').checked = true;
-                document.getElementById('siding-vinyl').checked = true;
-                break;
-                
-            case 'condo':
-                // Minimal features for condos (usually handled by HOA)
-                document.getElementById('municipal-water').checked = true;
-                document.getElementById('municipal-sewer').checked = true;
-                // Usually no structural responsibility for condos
-                break;
-                
-            case 'apartment':
-                // Very minimal for apartments (most handled by landlord)
-                document.getElementById('municipal-water').checked = true;
-                document.getElementById('municipal-sewer').checked = true;
-                // No structural responsibility for apartments
-                break;
-                
-            case 'mobile-home':
-                // Mobile homes often have unique systems
-                document.getElementById('municipal-water').checked = true;
-                document.getElementById('municipal-sewer').checked = true;
-                // Mobile home specific defaults
-                document.getElementById('roof-metal').checked = true;
-                document.getElementById('siding-vinyl').checked = true;
-                document.getElementById('foundation-pier').checked = true;
-                break;
-        }
-        
-        console.log(`✅ Set smart defaults for ${propertyType}`);
+        // No more automatic selections based on property type
+        console.log(`Property type selected: ${propertyType} - form remains blank for user choice`);
     }
     
-    // Set initial selection and defaults
+    // Set initial selection (no automatic feature selection)
     if (propertyCards.length > 0) {
         propertyCards[0].querySelector('.property-card-inner').classList.add('selected');
         hiddenInput.value = propertyCards[0].dataset.value;
-        setPropertyTypeDefaults(propertyCards[0].dataset.value);
+        // Removed: setPropertyTypeDefaults call - let users choose their own features
     }
     
     propertyCards.forEach(card => {
@@ -3802,8 +3755,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update hidden input
             hiddenInput.value = this.dataset.value;
             
-            // Set smart defaults based on property type
-            setPropertyTypeDefaults(this.dataset.value);
+            // Removed: automatic feature selection - let users make their own choices
             
             // Add selection animation
             this.querySelector('.property-card-inner').style.transform = 'scale(0.95)';
