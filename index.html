@@ -3668,8 +3668,47 @@ function createUser() {
         });
 }
 
+// Debug display for mobile testing
+function showDebugMessage(message) {
+    // Create or update debug overlay
+    let debugDiv = document.getElementById('mobile-debug');
+    if (!debugDiv) {
+        debugDiv = document.createElement('div');
+        debugDiv.id = 'mobile-debug';
+        debugDiv.style.cssText = `
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 10000;
+            max-height: 200px;
+            overflow-y: auto;
+        `;
+        document.body.appendChild(debugDiv);
+        
+        // Add close button
+        const closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '❌';
+        closeBtn.style.cssText = 'position: absolute; top: 5px; right: 5px; background: none; border: none; color: white; font-size: 16px;';
+        closeBtn.onclick = () => debugDiv.remove();
+        debugDiv.appendChild(closeBtn);
+    }
+    
+    const timestamp = new Date().toLocaleTimeString();
+    debugDiv.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+    debugDiv.scrollTop = debugDiv.scrollHeight;
+    
+    // Also log to console
+    console.log(message);
+}
+
 function signInWithGoogle(event) {
-    console.log('🔍 Starting Google sign in...');
+    showDebugMessage('🔍 Starting Google sign in...');
     window.googleSignInInProgress = true; // Flag to prevent auto-login
     const provider = new firebase.auth.GoogleAuthProvider();
     
@@ -3683,10 +3722,10 @@ function signInWithGoogle(event) {
     // Use redirect for mobile devices, touch devices, or small screens
     const useRedirect = isMobile || isIOS || isSafari || (isTouch && hasSmallScreen);
     
-    console.log(`📱 Device detection: mobile=${isMobile}, iOS=${isIOS}, Safari=${isSafari}, touch=${isTouch}, smallScreen=${hasSmallScreen}, useRedirect=${useRedirect}`);
+    showDebugMessage(`📱 Device detection: mobile=${isMobile}, iOS=${isIOS}, Safari=${isSafari}, touch=${isTouch}, smallScreen=${hasSmallScreen}, useRedirect=${useRedirect}`);
     
     if (useRedirect) {
-        console.log('📱 Using redirect method for mobile/Safari');
+        showDebugMessage('📱 Using redirect method for mobile/Safari');
         // Store a flag and timestamp to handle the redirect result
         localStorage.setItem('pendingGoogleSignIn', 'true');
         localStorage.setItem('googleSignInTimestamp', Date.now().toString());
@@ -3703,7 +3742,7 @@ function signInWithGoogle(event) {
     }
     
     // Desktop - use popup method
-    console.log('💻 Using popup method for desktop');
+    showDebugMessage('💻 Using popup method for desktop');
     auth.signInWithPopup(provider)
         .then((result) => {
             console.log('✅ Google sign in success:', result.user.email);
@@ -3902,20 +3941,16 @@ function handleNewUserSignup(user) {
 }
     
 // Check for redirect result from Google Sign In (for mobile/Safari)
-console.log('🔍 Checking for Google redirect result...');
-console.log('📋 Pending Google sign in flag:', localStorage.getItem('pendingGoogleSignIn'));
-console.log('🌐 Current URL:', window.location.href);
-console.log('🔗 URL search params:', window.location.search);
+showDebugMessage('🔍 Checking for Google redirect result...');
+showDebugMessage('📋 Pending flag: ' + localStorage.getItem('pendingGoogleSignIn'));
+showDebugMessage('🌐 URL: ' + window.location.href);
+showDebugMessage('🔗 Params: ' + window.location.search);
 
 auth.getRedirectResult().then((result) => {
-    console.log('📊 Redirect result received:', {
-        hasUser: !!result.user,
-        hasCredential: !!result.credential,
-        additionalUserInfo: result.additionalUserInfo
-    });
+    showDebugMessage(`📊 Redirect result: user=${!!result.user}, credential=${!!result.credential}`);
     
     if (result.user) {
-        console.log('✅ Google redirect sign in success:', result.user.email);
+        showDebugMessage('✅ Google redirect sign in success: ' + result.user.email);
         localStorage.removeItem('pendingGoogleSignIn'); // Clear the flag
         window.googleSignInInProgress = false; // Clear the flag
         
@@ -3941,7 +3976,7 @@ auth.getRedirectResult().then((result) => {
         const timestamp = localStorage.getItem('googleSignInTimestamp');
         const timeSinceStart = timestamp ? Date.now() - parseInt(timestamp) : 0;
         
-        console.log(`❌ No user in redirect result. Was pending: ${wasPending}, time since start: ${timeSinceStart}ms`);
+        showDebugMessage(`❌ No user in redirect result. Was pending: ${wasPending}, time: ${timeSinceStart}ms`);
         
         if (wasPending) {
             // Clean up localStorage
