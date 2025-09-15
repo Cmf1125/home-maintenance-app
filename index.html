@@ -3711,6 +3711,11 @@ function signInWithGoogle() {
     window.googleSignInInProgress = true; // Flag to prevent auto-login
     const provider = new firebase.auth.GoogleAuthProvider();
     
+    // Force account selection every time
+    provider.setCustomParameters({
+        prompt: 'select_account'
+    });
+    
     // Use popup for all devices (the original working method)
     auth.signInWithPopup(provider)
         .then((result) => {
