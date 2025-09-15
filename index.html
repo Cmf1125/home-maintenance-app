@@ -3711,16 +3711,7 @@ function signInWithGoogle() {
     window.googleSignInInProgress = true; // Flag to prevent auto-login
     const provider = new firebase.auth.GoogleAuthProvider();
     
-    // Simple Safari detection - only use redirect for Safari mobile
-    const isSafariMobile = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent);
-    
-    if (isSafariMobile) {
-        // Use redirect only for Safari on iOS
-        auth.signInWithRedirect(provider);
-        return;
-    }
-    
-    // Use popup for everything else (the original working method)
+    // Use popup for all devices (the original working method)
     auth.signInWithPopup(provider)
         .then((result) => {
             console.log('✅ Google sign in success:', result.user.email);
@@ -3919,12 +3910,16 @@ function handleNewUserSignup(user) {
 }
     
 // Check for redirect result from Google Sign In (for Safari iOS only)
+console.log('🔍 Checking for redirect result...');
 auth.getRedirectResult().then((result) => {
+    console.log('📊 Redirect result:', result);
     if (result.user) {
         console.log('✅ Google redirect sign in success:', result.user.email);
+        alert('✅ Redirect sign in success! Email: ' + result.user.email);
         
         // Handle the successful sign in (same logic as popup)
         loadUserDataEnhanced(result.user.uid).then(hasData => {
+            console.log('📋 Has data:', hasData);
             if (hasData) {
                 handleSuccessfulLogin(result.user);
             } else {
@@ -3934,10 +3929,13 @@ auth.getRedirectResult().then((result) => {
             console.error('❌ Error loading user data after redirect:', error);
             handleNewUserSignup(result.user);
         });
+    } else {
+        console.log('ℹ️ No user in redirect result');
     }
 }).catch((error) => {
+    console.error('❌ Redirect error:', error);
     if (error.code !== 'auth/no-redirect-pending') {
-        console.error('❌ Redirect error:', error);
+        alert('Redirect error: ' + error.message);
     }
 });
 
