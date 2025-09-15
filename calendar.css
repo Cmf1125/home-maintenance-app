@@ -1,6 +1,7 @@
 /* Calendar View Styles - Full Screen Layout */
 #calendar-view {
     padding: 0;
+    margin: 0;
 }
 
 .calendar-container {

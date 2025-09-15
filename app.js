@@ -1720,6 +1720,12 @@ function showTab(tabName) {
         footer.style.display = '';
     }
     
+    // Reset body styles for non-calendar tabs (restore normal spacing)
+    if (tabName !== 'calendar') {
+        document.body.style.margin = '';
+        document.body.style.padding = '';
+    }
+    
     // Update tab buttons - all buttons are white text on blue background
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('opacity-100');
@@ -1783,6 +1789,10 @@ function showTab(tabName) {
         if (footer) {
             footer.style.display = 'none';
         }
+        
+        // Reset body margin/padding to eliminate space above calendar
+        document.body.style.margin = '0';
+        document.body.style.padding = '0';
         
         // Update tab styling
         const calendarTab = document.getElementById('tab-calendar');
