@@ -2576,7 +2576,10 @@ function showMainApp() {
 
     return `
         <div class="space-y-1 text-sm">
-            <div><strong>🏠 Address:</strong> ${homeData.fullAddress || 'Not set'}</div>
+            <div class="flex items-center justify-between">
+                <div><strong>🏠 Address:</strong> ${homeData.fullAddress || 'Not set'}</div>
+                <button onclick="editAddress()" class="text-blue-600 hover:text-blue-800 text-xs ml-2 px-2 py-1 border border-blue-200 rounded hover:bg-blue-50">Edit</button>
+            </div>
             <div><strong>🏢 Type:</strong> ${propertyTypeDisplay[homeData.propertyType] || 'Not set'} • <strong>📐 Size:</strong> ${homeData.sqft?.toLocaleString() || 'Not set'} sq ft • <strong>🏗️ Built:</strong> ${homeData.yearBuilt || 'Not set'}</div>
             ${heatingCooling.length > 0 ? `<div><strong>🌡️ Heating/Cooling:</strong> ${heatingCooling.join(', ')}</div>` : ''}
             ${waterSewer.length > 0 ? `<div><strong>💧 Water/Sewer:</strong> ${waterSewer.join(', ')}</div>` : ''}
@@ -2595,7 +2598,29 @@ function showMainApp() {
     }
   }
 
+  function editAddress() {
+    const currentAddress = window.homeData?.fullAddress || '';
+    const newAddress = prompt('Edit your address:', currentAddress);
+    
+    if (newAddress !== null && newAddress.trim() !== currentAddress) {
+      // Update homeData
+      if (!window.homeData) window.homeData = {};
+      window.homeData.fullAddress = newAddress.trim();
+      
+      // Save to Firebase
+      if (typeof saveData === 'function') {
+        saveData();
+      }
+      
+      // Refresh the property summary display
+      populatePropertySummarySection();
+      
+      console.log('✅ Address updated:', newAddress.trim());
+    }
+  }
+
   window.populatePropertySummarySection = populatePropertySummarySection;
+  window.editAddress = editAddress;
 
 // Clean Navigation Functions for New Landing Flow
 function showLanding() {
