@@ -255,10 +255,13 @@ renderEnhancedTaskCard(task) {
 
     return `
    <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200 hover:bg-gray-50" onclick="window.TaskManager.openModal(window.tasks.find(t => t.id === ${task.id}), false)">
-        <!-- Row 1: Dot + Task Name + Category -->
+        <!-- Row 1: Dot + Task Name + Category + Video Icon -->
         <div class="flex items-center gap-2 mb-2">
             <span class="font-semibold text-gray-900 text-sm flex-1 min-w-0 truncate">${urgencyDot} ${task.title}</span>
-            <span class="text-xs text-gray-500 flex-shrink-0">${categoryInfo.icon} ${task.category}</span>
+            <div class="flex items-center gap-1 flex-shrink-0">
+                ${task.youtubeUrl ? `<span class="text-red-600 text-xs cursor-pointer hover:text-red-800" onclick="event.stopPropagation(); openYouTubeVideo('${task.youtubeUrl}')" title="Watch How-To Video">📺</span>` : ''}
+                <span class="text-xs text-gray-500">${categoryInfo.icon} ${task.category}</span>
+            </div>
         </div>
         
         <!-- Row 2: Due Date + Action Buttons -->

@@ -153,6 +153,7 @@ class TaskGenerator {
                 cost: 0,
                 priority: 'high',
                 description: 'Test all smoke and carbon monoxide detectors',
+                youtubeUrl: null, // To be populated with This Old House video
                 dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
@@ -166,6 +167,7 @@ class TaskGenerator {
                 cost: 100,
                 priority: 'medium',
                 description: 'Remove lint buildup from dryer vent (prevents house fires - super important!)',
+                youtubeUrl: null, // To be populated with This Old House video
                 dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
@@ -186,6 +188,7 @@ class TaskGenerator {
                     cost: 150,
                     priority: 'medium',
                     description: 'Clean gutters and downspouts',
+                    youtubeUrl: null, // To be populated with This Old House video
                     dueDate: null,
                     lastCompleted: null,
                     isCompleted: false,

@@ -1711,6 +1711,15 @@ function showMainApp() {
               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base" 
               rows="3" placeholder="Optional: Describe what needs to be done"></textarea>
 </div>
+
+<!-- YouTube Video -->
+<div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">📺 How-To Video (Optional)</label>
+    <input type="url" id="edit-task-youtube" 
+           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base" 
+           placeholder="https://www.youtube.com/watch?v=abc123">
+    <p class="text-xs text-gray-500 mt-1">YouTube video showing how to complete this task</p>
+</div>
                     
                     <!-- Due Date -->
                     <div>
@@ -1996,6 +2005,7 @@ function showMainApp() {
             const fields = [
                 ['edit-task-name', task.title || ''],
                 ['edit-task-description', task.description || ''],
+                ['edit-task-youtube', task.youtubeUrl || ''],
                 ['edit-task-cost', task.cost || 0],
                 ['edit-task-frequency', task.frequency || 365],
                 ['edit-task-category', task.category || 'General']
@@ -2024,12 +2034,13 @@ function showMainApp() {
             // Get form values
             const nameEl = document.getElementById('edit-task-name');
             const descEl = document.getElementById('edit-task-description');
+            const youtubeEl = document.getElementById('edit-task-youtube');
             const costEl = document.getElementById('edit-task-cost');
             const freqEl = document.getElementById('edit-task-frequency');
             const catEl = document.getElementById('edit-task-category');
             const dateEl = document.getElementById('edit-task-due-date');
             
-            if (!nameEl || !descEl || !costEl || !freqEl || !catEl || !dateEl) {
+            if (!nameEl || !descEl || !youtubeEl || !costEl || !freqEl || !catEl || !dateEl) {
                 alert('❌ Form elements missing');
                 return;
             }
@@ -2176,6 +2187,15 @@ function showMainApp() {
         }
     };
 
+    // Helper function to open YouTube videos
+    window.openYouTubeVideo = function(url) {
+        if (url && url.includes('youtube.com')) {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        } else {
+            alert('No YouTube video available for this task');
+        }
+    };
+    
     console.log('✅ Task system override loaded');
 </script>
 <!-- WORKING MODAL SOLUTION -->
@@ -3036,6 +3056,7 @@ window.openTaskEditModal = function(task, isNew = false) {
     // Fill form
     document.getElementById('edit-task-name').value = task.title || '';
     document.getElementById('edit-task-description').value = task.description || '';
+    document.getElementById('edit-task-youtube').value = task.youtubeUrl || '';
     document.getElementById('edit-task-cost').value = task.cost || 0;
     document.getElementById('edit-task-frequency').value = task.frequency || 365;
     document.getElementById('edit-task-category').value = task.category || 'General';
@@ -3071,6 +3092,7 @@ window.saveTaskFromEdit = function() {
     // Get values
     const title = document.getElementById('edit-task-name').value.trim();
     const description = document.getElementById('edit-task-description').value.trim();
+    const youtubeUrl = document.getElementById('edit-task-youtube').value.trim();
     const cost = parseFloat(document.getElementById('edit-task-cost').value) || 0;
     const frequency = parseInt(document.getElementById('edit-task-frequency').value) || 365;
     const category = document.getElementById('edit-task-category').value;
@@ -3084,6 +3106,7 @@ window.saveTaskFromEdit = function() {
     // Update task
     task.title = title;
     task.description = description;
+    task.youtubeUrl = youtubeUrl;
     task.cost = cost;
     task.frequency = frequency;
     task.category = category;
