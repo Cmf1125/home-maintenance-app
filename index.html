@@ -4546,12 +4546,107 @@ function checkAndStartWelcomeTour() {
     }
 }
 
+// FALLBACK: Simple task renderer with YouTube icons (in case enhanced dashboard fails)
+function ensureTasksHaveYouTubeIcons() {
+    console.log('🎬 Ensuring YouTube icons are visible...');
+    
+    // Check if we have tasks and tasks list element
+    const tasksList = document.getElementById('tasks-list');
+    if (!tasksList || !window.tasks) return;
+    
+    // Only run if enhanced dashboard isn't working or tasks list is empty
+    if (tasksList.innerHTML.trim() === '' || tasksList.innerHTML.includes('<!-- Enhanced tasks will be populated here -->')) {
+        console.log('📋 Rendering basic task list with YouTube icons...');
+        
+        const now = new Date();
+        const upcomingTasks = window.tasks.filter(task => 
+            !task.isCompleted && 
+            task.dueDate
+        ).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)).slice(0, 8);
+        
+        if (upcomingTasks.length === 0) {
+            tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All tasks complete!</div>';
+            return;
+        }
+        
+        tasksList.innerHTML = upcomingTasks.map(task => {
+            const taskDate = new Date(task.dueDate);
+            const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
+            const isOverdue = daysUntilDue < 0;
+            
+            let statusClass = 'bg-white';
+            let urgencyDot = '⚪';
+            let dueDateDisplay = `Due ${taskDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+            let dueDateColor = 'text-gray-600';
+            
+            if (isOverdue) {
+                statusClass = 'bg-red-50 border-l-4 border-red-400';
+                urgencyDot = '🔴';
+                dueDateDisplay = 'Overdue';
+                dueDateColor = 'text-red-600 font-semibold';
+            } else if (daysUntilDue <= 7) {
+                statusClass = 'bg-yellow-50 border-l-4 border-yellow-400';
+                urgencyDot = '🟡';
+                dueDateColor = 'text-orange-600';
+            }
+            
+            if (daysUntilDue === 0) dueDateDisplay = 'Due today';
+            if (daysUntilDue === 1) dueDateDisplay = 'Due tomorrow';
+            
+            return `
+                <div class="p-3 border-b ${statusClass} cursor-pointer hover:bg-gray-50" onclick="window.TaskManager.openModal(window.tasks.find(t => t.id === ${task.id}), false)">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="font-semibold text-gray-900 text-sm flex-1">${urgencyDot} ${task.title}</span>
+                        <div class="flex items-center gap-1">
+                            ${task.youtubeUrl ? `<span class="text-red-600 text-xs cursor-pointer hover:text-red-800" onclick="event.stopPropagation(); openYouTubeVideo('${task.youtubeUrl}')" title="Watch How-To Video">📺</span>` : ''}
+                            <span class="text-xs text-gray-500">${task.category}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs ${dueDateColor}">${dueDateDisplay}</span>
+                        <div class="flex gap-1">
+                            <button onclick="event.stopPropagation(); completeTask(${task.id})" 
+                                    class="bg-green-100 text-green-700 hover:bg-green-200 px-1.5 py-1 rounded text-xs">
+                                Complete
+                            </button>
+                            <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
+                                    class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-1.5 py-1 rounded text-xs">
+                                Reschedule
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        console.log('✅ Basic task list with YouTube icons rendered');
+    }
+}
+
+// Run the fallback after a short delay to ensure everything is loaded
+setTimeout(() => {
+    if (window.tasks && window.tasks.length > 0) {
+        ensureTasksHaveYouTubeIcons();
+    }
+}, 1000);
+
+// Also run when tasks are updated
+const originalSaveData = window.saveData;
+if (originalSaveData) {
+    window.saveData = function(...args) {
+        const result = originalSaveData.apply(this, args);
+        setTimeout(ensureTasksHaveYouTubeIcons, 500);
+        return result;
+    };
+}
+
 // Make functions global
 window.startWelcomeTour = startWelcomeTour;
 window.nextTourStep = nextTourStep;
 window.previousTourStep = previousTourStep;
 window.skipWelcomeTour = skipWelcomeTour;
 window.checkAndStartWelcomeTour = checkAndStartWelcomeTour;
+window.ensureTasksHaveYouTubeIcons = ensureTasksHaveYouTubeIcons;
 
 console.log('✅ Welcome tour loaded');
 </script>
