@@ -2187,10 +2187,10 @@ function showMainApp() {
         }
     };
 
-    // Helper function to open YouTube videos
+    // Helper function to open YouTube videos (supports both direct videos and search)
     window.openYouTubeVideo = function(url) {
         console.log('🎬 Opening YouTube URL:', url);
-        if (url && (url.includes('youtube.com') || url.includes('youtu.be'))) {
+        if (url && url.includes('youtube.com')) {
             window.open(url, '_blank', 'noopener,noreferrer');
         } else {
             alert('No YouTube video available for this task');
@@ -3922,10 +3922,19 @@ function handleSuccessfulLogin(user) {
                         
                         let migrated = 0;
                         window.tasks.forEach(task => {
-                            if (!task.youtubeUrl && videoUrlMap[task.title]) {
-                                task.youtubeUrl = videoUrlMap[task.title];
-                                migrated++;
-                                console.log(`✅ Added video to: ${task.title}`);
+                            if (!task.youtubeUrl) {
+                                if (videoUrlMap[task.title]) {
+                                    // Use specific URL from map
+                                    task.youtubeUrl = videoUrlMap[task.title];
+                                    migrated++;
+                                    console.log(`✅ Added specific video to: ${task.title}`);
+                                } else {
+                                    // Create generic search URL for any task without a video
+                                    const searchQuery = task.title.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '+');
+                                    task.youtubeUrl = `https://www.youtube.com/results?search_query=home+maintenance+${searchQuery}`;
+                                    migrated++;
+                                    console.log(`✅ Added generic video search to: ${task.title}`);
+                                }
                             }
                         });
                         
