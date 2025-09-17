@@ -3878,56 +3878,57 @@ function handleSuccessfulLogin(user) {
                 } else {
                     // Run inline YouTube migration
                     if (window.tasks && window.tasks.length > 0) {
-                        // MIGRATE: Add working YouTube search URLs to existing tasks
+                        // FORCE MIGRATION: Replace ALL YouTube URLs with real working search URLs
                         const videoUrlMap = {
                             'Test Smoke Detectors': 'https://www.youtube.com/results?search_query=how+to+test+smoke+detector+maintenance',
                             'Clean Dryer Vent': 'https://www.youtube.com/results?search_query=how+to+clean+dryer+vent',
                             'Clean Gutters': 'https://www.youtube.com/results?search_query=how+to+clean+gutters',
                             'Inspect Caulking': 'https://www.youtube.com/results?search_query=how+to+caulk+windows+doors',
                             'Inspect Window Seals': 'https://www.youtube.com/results?search_query=how+to+check+window+seals',
-                            'Change Air Filter': 'https://www.youtube.com/results?search_query=how+to+change+HVAC+air+filter',
-                            'AC/Heating Tune-Up': 'https://www.youtube.com/results?search_query=HVAC+maintenance+tune+up',
+                            'Change Air Filter': 'https://www.youtube.com/results?search_query=how+to+change+air+filter+hvac',
+                            'AC/Heating Tune-Up': 'https://www.youtube.com/results?search_query=hvac+tune+up+maintenance',
                             'Clean Mini-Split Filters': 'https://www.youtube.com/results?search_query=how+to+clean+mini+split+filters',
-                            'Clean Wall AC Filters': 'https://www.youtube.com/results?search_query=how+to+clean+wall+AC+unit+filter',
-                            'Clean Electric Baseboard Heaters': 'https://www.youtube.com/results?search_query=how+to+clean+baseboard+heaters',
-                            'Boiler Annual Service': 'https://www.youtube.com/results?search_query=boiler+maintenance+service',
+                            'Clean Wall AC Filters': 'https://www.youtube.com/results?search_query=how+to+clean+wall+ac+filters',
+                            'Clean Electric Baseboard Heaters': 'https://www.youtube.com/results?search_query=how+to+clean+electric+baseboard+heaters',
+                            'Boiler Annual Service': 'https://www.youtube.com/results?search_query=boiler+annual+service+maintenance',
                             'Test Well Water': 'https://www.youtube.com/results?search_query=how+to+test+well+water+quality',
-                            'Replace Sediment Filter': 'https://www.youtube.com/results?search_query=how+to+replace+sediment+water+filter',
-                            'Replace UV Filter': 'https://www.youtube.com/results?search_query=how+to+replace+UV+water+filter',
-                            'Refill Water Softener Salt': 'https://www.youtube.com/results?search_query=how+to+add+salt+water+softener',
+                            'Replace Sediment Filter': 'https://www.youtube.com/results?search_query=how+to+replace+sediment+filter',
+                            'Replace UV Filter': 'https://www.youtube.com/results?search_query=how+to+replace+uv+water+filter',
+                            'Refill Water Softener Salt': 'https://www.youtube.com/results?search_query=how+to+refill+water+softener+salt',
                             'Replace Whole House Filter': 'https://www.youtube.com/results?search_query=how+to+replace+whole+house+water+filter',
-                            'Septic System Maintenance': 'https://www.youtube.com/results?search_query=septic+tank+maintenance',
+                            'Septic System Maintenance': 'https://www.youtube.com/results?search_query=septic+system+pumping+maintenance',
                             'Monthly Septic Pod Flush': 'https://www.youtube.com/results?search_query=septic+tank+treatment+pods',
                             'Chimney Cleaning & Safety Check': 'https://www.youtube.com/results?search_query=chimney+cleaning+inspection',
                             'Deck Staining/Sealing': 'https://www.youtube.com/results?search_query=how+to+stain+seal+deck',
-                            'Pool Opening/Closing': 'https://www.youtube.com/results?search_query=how+to+open+close+pool',
+                            'Pool Opening/Closing': 'https://www.youtube.com/results?search_query=pool+opening+closing+maintenance',
                             'Garage Door Maintenance': 'https://www.youtube.com/results?search_query=garage+door+maintenance+lubrication',
-                            'Check Basement for Moisture': 'https://www.youtube.com/results?search_query=how+to+check+basement+moisture+mold',
-                            'Sprinkler System Winterization': 'https://www.youtube.com/results?search_query=how+to+winterize+sprinkler+system',
+                            'Check Basement for Moisture': 'https://www.youtube.com/results?search_query=basement+moisture+inspection',
+                            'Sprinkler System Winterization': 'https://www.youtube.com/results?search_query=sprinkler+system+winterization',
                             'Solar Panel Cleaning': 'https://www.youtube.com/results?search_query=how+to+clean+solar+panels',
-                            'Generator Maintenance': 'https://www.youtube.com/results?search_query=generator+maintenance+service',
-                            'Security System Battery Check': 'https://www.youtube.com/results?search_query=how+to+test+security+system+batteries',
-                            'Check AC Before Summer': 'https://www.youtube.com/results?search_query=AC+air+conditioning+summer+preparation',
-                            'Winterize Pipes': 'https://www.youtube.com/results?search_query=how+to+winterize+pipes+prevent+freezing',
-                            'Check for Mold': 'https://www.youtube.com/results?search_query=how+to+check+for+mold+in+house',
-                            'Dehumidifier Maintenance': 'https://www.youtube.com/results?search_query=how+to+clean+maintain+dehumidifier',
-                            'Check for Cracks': 'https://www.youtube.com/results?search_query=how+to+inspect+foundation+cracks',
-                            'Seasonal HVAC Check': 'https://www.youtube.com/results?search_query=seasonal+HVAC+maintenance+checklist'
+                            'Generator Maintenance': 'https://www.youtube.com/results?search_query=generator+maintenance+testing',
+                            'Security System Battery Check': 'https://www.youtube.com/results?search_query=security+system+battery+check',
+                            'Check AC Before Summer': 'https://www.youtube.com/results?search_query=air+conditioning+pre+summer+check',
+                            'Winterize Pipes': 'https://www.youtube.com/results?search_query=how+to+winterize+pipes',
+                            'Check for Mold': 'https://www.youtube.com/results?search_query=how+to+check+for+mold+home',
+                            'Dehumidifier Maintenance': 'https://www.youtube.com/results?search_query=dehumidifier+maintenance+cleaning',
+                            'Check for Cracks': 'https://www.youtube.com/results?search_query=foundation+crack+inspection',
+                            'Seasonal HVAC Check': 'https://www.youtube.com/results?search_query=hvac+system+seasonal+check'
                         };
                         
                         let migrated = 0;
                         window.tasks.forEach(task => {
-                            if (!task.youtubeUrl) {
-                                if (videoUrlMap[task.title]) {
-                                    // Use specific URL from map
-                                    task.youtubeUrl = videoUrlMap[task.title];
-                                    migrated++;
-                                } else {
-                                    // Create generic search URL for any task without a video
-                                    const searchQuery = task.title.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '+');
-                                    task.youtubeUrl = `https://www.youtube.com/results?search_query=home+maintenance+${searchQuery}`;
+                            // FORCE UPDATE: Always update YouTube URL if we have a mapping, regardless of current value
+                            if (videoUrlMap[task.title]) {
+                                const oldUrl = task.youtubeUrl;
+                                task.youtubeUrl = videoUrlMap[task.title];
+                                if (oldUrl !== task.youtubeUrl) {
                                     migrated++;
                                 }
+                            } else if (!task.youtubeUrl || task.youtubeUrl.includes('youtube.com/watch?v=')) {
+                                // Only create generic search URL if no specific mapping exists AND URL is missing/broken
+                                const searchQuery = task.title.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '+');
+                                task.youtubeUrl = `https://www.youtube.com/results?search_query=home+maintenance+${searchQuery}`;
+                                migrated++;
                             }
                         });
                         
