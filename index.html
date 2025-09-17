@@ -3882,6 +3882,64 @@ function handleSuccessfulLogin(user) {
                     if (window.tasks && window.tasks.length > 0) {
                         console.log('🎬 Found tasks, adding YouTube integration...');
                         
+                        // MIGRATE: Add YouTube URLs to existing tasks
+                        const videoUrlMap = {
+                            'Test Smoke Detectors': 'https://www.youtube.com/watch?v=QUA5qwKtNRo',
+                            'Clean Dryer Vent': 'https://www.youtube.com/watch?v=7zb2qH9wg5c',
+                            'Clean Gutters': 'https://www.youtube.com/watch?v=eaHHYqJOkVE',
+                            'Inspect Caulking': 'https://www.youtube.com/watch?v=zJ8g6-kLyic',
+                            'Inspect Window Seals': 'https://www.youtube.com/watch?v=B6DcJQkKmWA',
+                            'Change Air Filter': 'https://www.youtube.com/watch?v=WoW4g6gTrNs',
+                            'AC/Heating Tune-Up': 'https://www.youtube.com/watch?v=dGFu9WC5uPs',
+                            'Clean Mini-Split Filters': 'https://www.youtube.com/watch?v=DdGfJXHy1WU',
+                            'Clean Wall AC Filters': 'https://www.youtube.com/watch?v=P6N8iAb0FhU',
+                            'Clean Electric Baseboard Heaters': 'https://www.youtube.com/watch?v=T8BKjg6NaQw',
+                            'Boiler Annual Service': 'https://www.youtube.com/watch?v=8hKZnY2a7_s',
+                            'Test Well Water': 'https://www.youtube.com/watch?v=R9KRFC7s6IM',
+                            'Replace Sediment Filter': 'https://www.youtube.com/watch?v=u8u0P8g4gJY',
+                            'Replace UV Filter': 'https://www.youtube.com/watch?v=O5kF6uHRx1s',
+                            'Refill Water Softener Salt': 'https://www.youtube.com/watch?v=QBfNCWXqbHM',
+                            'Replace Whole House Filter': 'https://www.youtube.com/watch?v=mfXq7YqNVvI',
+                            'Septic System Maintenance': 'https://www.youtube.com/watch?v=S6JLj_lQNio',
+                            'Monthly Septic Pod Flush': 'https://www.youtube.com/watch?v=KQrB4_uqgdU',
+                            'Chimney Cleaning & Safety Check': 'https://www.youtube.com/watch?v=F7vfXGaHD3w',
+                            'Deck Staining/Sealing': 'https://www.youtube.com/watch?v=tRZb9wWOlNk',
+                            'Pool Opening/Closing': 'https://www.youtube.com/watch?v=TGfHIR9wNu0',
+                            'Garage Door Maintenance': 'https://www.youtube.com/watch?v=S-_hLKyZLn8',
+                            'Check Basement for Moisture': 'https://www.youtube.com/watch?v=sEfKHRGKypo',
+                            'Sprinkler System Winterization': 'https://www.youtube.com/watch?v=JQDHczJVmho',
+                            'Solar Panel Cleaning': 'https://www.youtube.com/watch?v=bDa2VzIIukU',
+                            'Generator Maintenance': 'https://www.youtube.com/watch?v=x9rpU0V8Lls',
+                            'Security System Battery Check': 'https://www.youtube.com/watch?v=A3rJ4W7S6j8',
+                            'Check AC Before Summer': 'https://www.youtube.com/watch?v=H5OAnO7TEI0',
+                            'Winterize Pipes': 'https://www.youtube.com/watch?v=6kT4_gshkfE',
+                            'Check for Mold': 'https://www.youtube.com/watch?v=zbQKLu8hGnE',
+                            'Dehumidifier Maintenance': 'https://www.youtube.com/watch?v=eU25bMh5K_8',
+                            'Check for Cracks': 'https://www.youtube.com/watch?v=Hzrj5DQ-nkw',
+                            'Seasonal HVAC Check': 'https://www.youtube.com/watch?v=H5OAnO7TEI0'
+                        };
+                        
+                        let migrated = 0;
+                        window.tasks.forEach(task => {
+                            if (!task.youtubeUrl && videoUrlMap[task.title]) {
+                                task.youtubeUrl = videoUrlMap[task.title];
+                                migrated++;
+                                console.log(`✅ Added video to: ${task.title}`);
+                            }
+                        });
+                        
+                        if (migrated > 0) {
+                            console.log(`🎬 Migration complete: Added videos to ${migrated} tasks`);
+                            // Save the updated tasks
+                            if (typeof saveData === 'function') {
+                                saveData();
+                            }
+                            // Force dashboard refresh to show icons
+                            if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                                window.enhancedDashboard.render();
+                            }
+                        }
+                        
                         // Add test indicators
                         const testDiv = document.createElement('div');
                         testDiv.innerHTML = '🟢 YouTube Integration Active';
