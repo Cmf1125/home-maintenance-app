@@ -4776,11 +4776,20 @@ setTimeout(() => {
     console.log('Dashboard view hidden?', document.getElementById('dashboard-view')?.classList.contains('hidden'));
 }, 2000);
 
+// IMMEDIATE TEST: Basic alert to verify JavaScript is running
+alert('🚀 JavaScript is running! YouTube debug starting...');
+
 // SIMPLE TEST: Add visible indicator that our script is running
-const testDiv = document.createElement('div');
-testDiv.innerHTML = '🟢 YouTube Debug Script Loaded';
-testDiv.style.cssText = 'position:fixed;bottom:10px;right:10px;background:green;color:white;padding:10px;border-radius:5px;z-index:9999;';
-document.body.appendChild(testDiv);
+try {
+    const testDiv = document.createElement('div');
+    testDiv.innerHTML = '🟢 YouTube Debug Script Loaded';
+    testDiv.style.cssText = 'position:fixed;bottom:10px;right:10px;background:green;color:white;padding:10px;border-radius:5px;z-index:9999;';
+    document.body.appendChild(testDiv);
+    console.log('✅ Test div added successfully');
+} catch (error) {
+    console.error('❌ Error adding test div:', error);
+    alert('Error: ' + error.message);
+}
 
 console.log('✅ Welcome tour loaded');
 console.log('🟢 YouTube debug script fully executed');
