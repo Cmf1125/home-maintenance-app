@@ -3871,8 +3871,17 @@ function handleSuccessfulLogin(user) {
             }
             console.log('✅ Data loaded, dashboard ready');
             
-            // Check if user needs the welcome tour
-            checkAndStartWelcomeTour();
+            // Check if user needs the welcome tour (with safety check)
+            if (typeof checkAndStartWelcomeTour === 'function') {
+                checkAndStartWelcomeTour();
+            } else {
+                console.log('⚠️ Welcome tour function not yet available');
+                setTimeout(() => {
+                    if (typeof checkAndStartWelcomeTour === 'function') {
+                        checkAndStartWelcomeTour();
+                    }
+                }, 1000);
+            }
             
             // Update appliance manager with loaded data
             if (window.applianceManager && window.applianceData) {
