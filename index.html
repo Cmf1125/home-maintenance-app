@@ -2189,7 +2189,8 @@ function showMainApp() {
 
     // Helper function to open YouTube videos
     window.openYouTubeVideo = function(url) {
-        if (url && url.includes('youtube.com')) {
+        console.log('🎬 Opening YouTube URL:', url);
+        if (url && (url.includes('youtube.com') || url.includes('youtu.be'))) {
             window.open(url, '_blank', 'noopener,noreferrer');
         } else {
             alert('No YouTube video available for this task');
@@ -3884,7 +3885,7 @@ function handleSuccessfulLogin(user) {
                         
                         // MIGRATE: Add real YouTube URLs to existing tasks (popular/working videos)
                         const videoUrlMap = {
-                            'Test Smoke Detectors': 'https://www.youtube.com/results?search_query=how+to+test+smoke+detector',
+                            'Test Smoke Detectors': 'https://www.youtube.com/watch?v=QUA5qwKtNRo',
                             'Clean Dryer Vent': 'https://www.youtube.com/results?search_query=how+to+clean+dryer+vent',
                             'Clean Gutters': 'https://www.youtube.com/results?search_query=how+to+clean+gutters',
                             'Inspect Caulking': 'https://www.youtube.com/results?search_query=how+to+caulk+windows+doors',
