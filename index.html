@@ -4546,9 +4546,75 @@ function checkAndStartWelcomeTour() {
     }
 }
 
+// MIGRATION: Add YouTube URLs to existing tasks that don't have them
+function migrateTasksWithYouTubeUrls() {
+    if (!window.tasks || !Array.isArray(window.tasks)) return;
+    
+    console.log('🔄 Migrating existing tasks to add YouTube URLs...');
+    
+    const videoUrlMap = {
+        'Test Smoke Detectors': 'https://www.youtube.com/watch?v=QUA5qwKtNRo',
+        'Clean Dryer Vent': 'https://www.youtube.com/watch?v=7zb2qH9wg5c',
+        'Clean Gutters': 'https://www.youtube.com/watch?v=eaHHYqJOkVE',
+        'Inspect Caulking': 'https://www.youtube.com/watch?v=zJ8g6-kLyic',
+        'Inspect Window Seals': 'https://www.youtube.com/watch?v=B6DcJQkKmWA',
+        'Change Air Filter': 'https://www.youtube.com/watch?v=WoW4g6gTrNs',
+        'AC/Heating Tune-Up': 'https://www.youtube.com/watch?v=dGFu9WC5uPs',
+        'Clean Mini-Split Filters': 'https://www.youtube.com/watch?v=DdGfJXHy1WU',
+        'Clean Wall AC Filters': 'https://www.youtube.com/watch?v=P6N8iAb0FhU',
+        'Clean Electric Baseboard Heaters': 'https://www.youtube.com/watch?v=T8BKjg6NaQw',
+        'Boiler Annual Service': 'https://www.youtube.com/watch?v=8hKZnY2a7_s',
+        'Test Well Water': 'https://www.youtube.com/watch?v=R9KRFC7s6IM',
+        'Replace Sediment Filter': 'https://www.youtube.com/watch?v=u8u0P8g4gJY',
+        'Replace UV Filter': 'https://www.youtube.com/watch?v=O5kF6uHRx1s',
+        'Refill Water Softener Salt': 'https://www.youtube.com/watch?v=QBfNCWXqbHM',
+        'Replace Whole House Filter': 'https://www.youtube.com/watch?v=mfXq7YqNVvI',
+        'Septic System Maintenance': 'https://www.youtube.com/watch?v=S6JLj_lQNio',
+        'Monthly Septic Pod Flush': 'https://www.youtube.com/watch?v=KQrB4_uqgdU',
+        'Chimney Cleaning & Safety Check': 'https://www.youtube.com/watch?v=F7vfXGaHD3w',
+        'Deck Staining/Sealing': 'https://www.youtube.com/watch?v=tRZb9wWOlNk',
+        'Pool Opening/Closing': 'https://www.youtube.com/watch?v=TGfHIR9wNu0',
+        'Garage Door Maintenance': 'https://www.youtube.com/watch?v=S-_hLKyZLn8',
+        'Check Basement for Moisture': 'https://www.youtube.com/watch?v=sEfKHRGKypo',
+        'Sprinkler System Winterization': 'https://www.youtube.com/watch?v=JQDHczJVmho',
+        'Solar Panel Cleaning': 'https://www.youtube.com/watch?v=bDa2VzIIukU',
+        'Generator Maintenance': 'https://www.youtube.com/watch?v=x9rpU0V8Lls',
+        'Security System Battery Check': 'https://www.youtube.com/watch?v=A3rJ4W7S6j8',
+        'Check AC Before Summer': 'https://www.youtube.com/watch?v=H5OAnO7TEI0',
+        'Winterize Pipes': 'https://www.youtube.com/watch?v=6kT4_gshkfE',
+        'Check for Mold': 'https://www.youtube.com/watch?v=zbQKLu8hGnE',
+        'Dehumidifier Maintenance': 'https://www.youtube.com/watch?v=eU25bMh5K_8',
+        'Check for Cracks': 'https://www.youtube.com/watch?v=Hzrj5DQ-nkw',
+        'Seasonal HVAC Check': 'https://www.youtube.com/watch?v=H5OAnO7TEI0'
+    };
+    
+    let migrated = 0;
+    window.tasks.forEach(task => {
+        if (!task.youtubeUrl && videoUrlMap[task.title]) {
+            task.youtubeUrl = videoUrlMap[task.title];
+            migrated++;
+            console.log(`✅ Added video to: ${task.title}`);
+        }
+    });
+    
+    if (migrated > 0) {
+        console.log(`🎬 Migration complete: Added videos to ${migrated} tasks`);
+        // Save the updated tasks
+        if (typeof saveData === 'function') {
+            saveData();
+        }
+        return true;
+    }
+    
+    return false;
+}
+
 // FALLBACK: Simple task renderer with YouTube icons (in case enhanced dashboard fails)
 function ensureTasksHaveYouTubeIcons() {
     console.log('🎬 Ensuring YouTube icons are visible...');
+    
+    // First, migrate existing tasks to add YouTube URLs
+    const didMigrate = migrateTasksWithYouTubeUrls();
     
     // Check if we have tasks and tasks list element
     const tasksList = document.getElementById('tasks-list');
@@ -4568,6 +4634,10 @@ function ensureTasksHaveYouTubeIcons() {
             tasksList.innerHTML = '<div class="p-6 text-center text-gray-500">🎉 All tasks complete!</div>';
             return;
         }
+        
+        // Debug: Log tasks with YouTube URLs
+        const tasksWithVideos = upcomingTasks.filter(task => task.youtubeUrl);
+        console.log(`🎬 Found ${tasksWithVideos.length} tasks with YouTube URLs:`, tasksWithVideos.map(t => t.title));
         
         tasksList.innerHTML = upcomingTasks.map(task => {
             const taskDate = new Date(task.dueDate);
@@ -4623,12 +4693,24 @@ function ensureTasksHaveYouTubeIcons() {
     }
 }
 
-// Run the fallback after a short delay to ensure everything is loaded
-setTimeout(() => {
+// IMMEDIATE: Force migration and YouTube icon display
+function forceYouTubeIconsToShow() {
+    console.log('🚀 FORCE: Running immediate YouTube migration and display...');
+    
+    // Force migration first
     if (window.tasks && window.tasks.length > 0) {
+        migrateTasksWithYouTubeUrls();
         ensureTasksHaveYouTubeIcons();
+    } else {
+        console.log('⚠️ No tasks found, retrying in 500ms...');
+        setTimeout(forceYouTubeIconsToShow, 500);
     }
-}, 1000);
+}
+
+// Run immediately and with delays to catch different loading scenarios
+forceYouTubeIconsToShow();
+setTimeout(forceYouTubeIconsToShow, 1000);
+setTimeout(forceYouTubeIconsToShow, 2000);
 
 // Also run when tasks are updated
 const originalSaveData = window.saveData;
@@ -4647,6 +4729,23 @@ window.previousTourStep = previousTourStep;
 window.skipWelcomeTour = skipWelcomeTour;
 window.checkAndStartWelcomeTour = checkAndStartWelcomeTour;
 window.ensureTasksHaveYouTubeIcons = ensureTasksHaveYouTubeIcons;
+window.migrateTasksWithYouTubeUrls = migrateTasksWithYouTubeUrls;
+window.forceYouTubeIconsToShow = forceYouTubeIconsToShow;
+
+// DEBUG: Add a manual button to force YouTube icons (temporary)
+setTimeout(() => {
+    const debugBtn = document.createElement('button');
+    debugBtn.textContent = '🎬 Force YouTube Icons';
+    debugBtn.style.cssText = 'position:fixed;top:10px;right:10px;z-index:9999;background:red;color:white;padding:5px;border:none;border-radius:5px;';
+    debugBtn.onclick = () => {
+        console.log('🔄 Manual force trigger...');
+        forceYouTubeIconsToShow();
+        
+        // Also log current tasks
+        console.log('📋 Current tasks:', window.tasks?.map(t => ({title: t.title, hasVideo: !!t.youtubeUrl})));
+    };
+    document.body.appendChild(debugBtn);
+}, 2000);
 
 console.log('✅ Welcome tour loaded');
 </script>
