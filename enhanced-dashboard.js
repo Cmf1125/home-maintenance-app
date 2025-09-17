@@ -255,16 +255,23 @@ renderEnhancedTaskCard(task) {
 
     return `
    <div class="p-3 border-b ${statusClass} enhanced-task-card mobile-task-card-simple transition-all duration-200 hover:bg-gray-50" onclick="window.TaskManager.openModal(window.tasks.find(t => t.id === ${task.id}), false)">
-        <!-- Row 1: Dot + Task Name + Category + Video Icon -->
+        <!-- Row 1: Dot + Task Name + Category -->
         <div class="flex items-center gap-2 mb-2">
             <span class="font-semibold text-gray-900 text-sm flex-1 min-w-0 truncate">${urgencyDot} ${task.title}</span>
-            <div class="flex items-center gap-1 flex-shrink-0">
-                ${task.youtubeUrl ? `<span class="text-red-600 text-xs cursor-pointer hover:text-red-800" onclick="event.stopPropagation(); openYouTubeVideo('${task.youtubeUrl}')" title="Watch How-To Video">📺</span>` : ''}
-                <span class="text-xs text-gray-500">${categoryInfo.icon} ${task.category}</span>
-            </div>
+            <span class="text-xs text-gray-500">${categoryInfo.icon} ${task.category}</span>
         </div>
         
-        <!-- Row 2: Due Date + Action Buttons -->
+        <!-- Row 2: Video Demo (if available) -->
+        ${task.youtubeUrl ? `
+        <div class="mb-2">
+            <button onclick="event.stopPropagation(); openYouTubeVideo('${task.youtubeUrl}')" 
+                    class="bg-red-50 text-red-700 hover:bg-red-100 px-2 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1">
+                📺 Watch How-To Video
+            </button>
+        </div>
+        ` : ''}
+        
+        <!-- Row 3: Due Date + Action Buttons -->
         <div class="flex items-center justify-between gap-2">
             <span class="text-xs ${dueDateColor} flex-shrink-0">${dueDateDisplay}</span>
             <div class="flex gap-1">
