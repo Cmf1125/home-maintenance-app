@@ -314,6 +314,37 @@ function createMaintenancePlan() {
             console.log('🏠 DEBUG: Using old system fallback');
             // Fallback to old system
             generateTaskTemplates();
+            
+            // Add purchase fields to homeData for old system
+            homeData.purchasePrice = parseFloat(document.getElementById('purchase-price')?.value) || 0;
+            homeData.purchaseYear = parseInt(document.getElementById('purchase-year')?.value) || new Date().getFullYear();
+            console.log('🏠 DEBUG: Added purchase data to old system:', homeData.purchasePrice, homeData.purchaseYear);
+            
+            // Add calculation functions if they don't exist
+            if (!window.calculateEstimatedValue) {
+                window.calculateEstimatedValue = function(purchasePrice, purchaseYear) {
+                    if (!purchasePrice || !purchaseYear) return { low: 0, high: 0, estimate: 0 };
+                    const currentYear = new Date().getFullYear();
+                    const yearsOwned = Math.max(0, currentYear - purchaseYear);
+                    const lowValue = purchasePrice * Math.pow(1.03, yearsOwned); // 3% appreciation
+                    const highValue = purchasePrice * Math.pow(1.05, yearsOwned); // 5% appreciation
+                    return {
+                        low: Math.round(lowValue),
+                        high: Math.round(highValue),
+                        estimate: Math.round((lowValue + highValue) / 2)
+                    };
+                };
+            }
+            
+            if (!window.getMaintenanceBudget) {
+                window.getMaintenanceBudget = function(estimatedValue) {
+                    return {
+                        low: Math.round(estimatedValue * 0.01), // 1% of home value
+                        high: Math.round(estimatedValue * 0.03)  // 3% of home value
+                    };
+                };
+            }
+            
             window.homeData = homeData;
             window.tasks = tasks;
         }
