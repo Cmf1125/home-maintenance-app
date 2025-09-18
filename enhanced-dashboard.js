@@ -362,18 +362,26 @@ renderEnhancedTaskCard(task) {
         console.log('🏠 DEBUG: homeData.purchasePrice:', window.homeData.purchasePrice);
         console.log('🏠 DEBUG: homeData.purchaseYear:', window.homeData.purchaseYear);
         console.log('🏠 DEBUG: calculateEstimatedValue function exists:', !!window.calculateEstimatedValue);
+        console.log('🏠 DEBUG: taskGenerator exists:', !!window.taskGenerator);
         
         if (propertyValueElement && window.homeData.purchasePrice && window.homeData.purchaseYear) {
-            const valueEstimate = window.calculateEstimatedValue 
-                ? window.calculateEstimatedValue(window.homeData.purchasePrice, window.homeData.purchaseYear)
-                : null;
+            // Make sure calculation functions are available
+            let valueEstimate = null;
+            if (window.calculateEstimatedValue) {
+                valueEstimate = window.calculateEstimatedValue(window.homeData.purchasePrice, window.homeData.purchaseYear);
+            } else if (window.taskGenerator && window.taskGenerator.calculateEstimatedValue) {
+                valueEstimate = window.taskGenerator.calculateEstimatedValue(window.homeData.purchasePrice, window.homeData.purchaseYear);
+            }
             
             console.log('🏠 DEBUG: valueEstimate:', valueEstimate);
             
             if (valueEstimate && valueEstimate.estimate > 0) {
-                const budget = window.getMaintenanceBudget 
-                    ? window.getMaintenanceBudget(valueEstimate.estimate)
-                    : { low: 0, high: 0 };
+                let budget = { low: 0, high: 0 };
+                if (window.getMaintenanceBudget) {
+                    budget = window.getMaintenanceBudget(valueEstimate.estimate);
+                } else if (window.taskGenerator && window.taskGenerator.getMaintenanceBudget) {
+                    budget = window.taskGenerator.getMaintenanceBudget(valueEstimate.estimate);
+                }
                 
                 const formatNumber = (num) => new Intl.NumberFormat('en-US').format(num);
                 

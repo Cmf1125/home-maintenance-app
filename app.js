@@ -297,12 +297,17 @@ function createMaintenancePlan() {
             outdoorKitchen: document.getElementById('outdoor-kitchen')?.checked || false
         };
 
-        // Continue with existing task generation...
-        generateTaskTemplates();
-
-        // Rest of your existing function stays the same...
-        window.homeData = homeData;
-        window.tasks = tasks;
+        // Use the new task generator instead of old generateTaskTemplates
+        if (window.taskGenerator && window.taskGenerator.createMaintenancePlan) {
+            const result = window.taskGenerator.createMaintenancePlan();
+            window.homeData = result.homeData;
+            window.tasks = result.tasks;
+        } else {
+            // Fallback to old system
+            generateTaskTemplates();
+            window.homeData = homeData;
+            window.tasks = tasks;
+        }
 
         // Switch to task setup screen
         const setupForm = document.getElementById('setup-form');
