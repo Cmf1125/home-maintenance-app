@@ -3979,40 +3979,38 @@ function handleSuccessfulLogin(user) {
             }
             console.log('✅ Data loaded, dashboard ready');
             
-            // Run YouTube integration 
-            setTimeout(() => {
-                if (typeof window.forceYouTubeIconsToShow === 'function') {
-                    window.forceYouTubeIconsToShow();
-                } else {
-                    // Simple YouTube migration: Add YouTube URLs to tasks that don't have them
-                    if (window.tasks && window.tasks.length > 0) {
-                        let migrated = 0;
-                        window.tasks.forEach(task => {
-                            if (!task.youtubeUrl) {
-                                // Generate YouTube search URL based on task name
-                                const searchQuery = task.title.toLowerCase()
-                                    .replace(/[^a-z0-9\s]/g, '') // Remove special characters
-                                    .replace(/\s+/g, '+') // Replace spaces with +
-                                    .trim();
-                                task.youtubeUrl = `https://www.youtube.com/results?search_query=how+to+${searchQuery}+maintenance`;
-                                migrated++;
-                            }
-                        });
-                        
-                        if (migrated > 0) {
-                            console.log(`📺 Added YouTube URLs to ${migrated} tasks`);
-                            // Save the updated tasks
-                            if (typeof saveData === 'function') {
-                                saveData();
-                            }
-                            // Force dashboard refresh to show video buttons
-                            if (window.enhancedDashboard && window.enhancedDashboard.render) {
-                                window.enhancedDashboard.render();
-                            }
+            // Run YouTube integration immediately (no delay)
+            if (typeof window.forceYouTubeIconsToShow === 'function') {
+                window.forceYouTubeIconsToShow();
+            } else {
+                // Simple YouTube migration: Add YouTube URLs to tasks that don't have them
+                if (window.tasks && window.tasks.length > 0) {
+                    let migrated = 0;
+                    window.tasks.forEach(task => {
+                        if (!task.youtubeUrl) {
+                            // Generate YouTube search URL based on task name
+                            const searchQuery = task.title.toLowerCase()
+                                .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+                                .replace(/\s+/g, '+') // Replace spaces with +
+                                .trim();
+                            task.youtubeUrl = `https://www.youtube.com/results?search_query=how+to+${searchQuery}+maintenance`;
+                            migrated++;
+                        }
+                    });
+                    
+                    if (migrated > 0) {
+                        console.log(`📺 Added YouTube URLs to ${migrated} tasks`);
+                        // Save the updated tasks
+                        if (typeof saveData === 'function') {
+                            saveData();
+                        }
+                        // Force dashboard refresh to show video buttons
+                        if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                            window.enhancedDashboard.render();
                         }
                     }
                 }
-            }, 500);
+            }
             
             // Check if user needs the welcome tour (with safety check)
             if (typeof checkAndStartWelcomeTour === 'function') {

@@ -338,12 +338,17 @@ renderEnhancedTaskCard(task) {
     // const annualCostElement = document.getElementById('annual-cost');
     // if (annualCostElement) annualCostElement.textContent = '$' + Math.round(totalCost);
 
-    // Update home address and property value info
+    // Update welcome message and property value info
     const homeAddressElement = document.getElementById('home-address');
     const propertyValueElement = document.getElementById('property-value-info');
     
+    // Show welcome message with clickable address
     if (homeAddressElement && window.homeData?.fullAddress) {
-        homeAddressElement.innerHTML = `🏠 ${window.homeData.fullAddress} <span class="text-blue-600">(click to search)</span>`;
+        // Get user's first name if available
+        const user = firebase.auth().currentUser;
+        const firstName = user?.displayName ? user.displayName.split(' ')[0] : 'back';
+        
+        homeAddressElement.innerHTML = `👋 Welcome ${firstName}! <span class="text-blue-600 cursor-pointer hover:underline" onclick="window.openPropertySearchMenu && window.openPropertySearchMenu('${window.homeData.fullAddress}')">${window.homeData.fullAddress}</span>`;
         
         // Calculate and display property value if purchase data exists
         if (propertyValueElement && window.homeData.purchasePrice && window.homeData.purchaseYear) {
