@@ -339,16 +339,24 @@ renderEnhancedTaskCard(task) {
     // if (annualCostElement) annualCostElement.textContent = '$' + Math.round(totalCost);
 
     // Update welcome message and property value info
+    const subtitleElement = document.getElementById('dashboard-subtitle');
     const homeAddressElement = document.getElementById('home-address');
     const propertyValueElement = document.getElementById('property-value-info');
     
-    // Show welcome message with clickable address
-    if (homeAddressElement && window.homeData?.fullAddress) {
-        // Get user's first name if available
+    // Update welcome message with user's name
+    if (subtitleElement) {
         const user = firebase.auth().currentUser;
-        const firstName = user?.displayName ? user.displayName.split(' ')[0] : 'back';
-        
-        homeAddressElement.innerHTML = `👋 Welcome ${firstName}! <span class="text-blue-600 cursor-pointer hover:underline" onclick="window.openPropertySearchMenu && window.openPropertySearchMenu('${window.homeData.fullAddress}')">${window.homeData.fullAddress}</span>`;
+        const firstName = user?.displayName ? user.displayName.split(' ')[0] : '';
+        if (firstName) {
+            subtitleElement.textContent = `👋 Welcome ${firstName}!`;
+        } else {
+            subtitleElement.textContent = '👋 Welcome back!';
+        }
+    }
+    
+    // Show clickable address
+    if (homeAddressElement && window.homeData?.fullAddress) {
+        homeAddressElement.innerHTML = `🏠 ${window.homeData.fullAddress} <span class="text-blue-600">(click to search)</span>`;
         
         // Calculate and display property value if purchase data exists
         if (propertyValueElement && window.homeData.purchasePrice && window.homeData.purchaseYear) {
