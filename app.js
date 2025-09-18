@@ -298,11 +298,20 @@ function createMaintenancePlan() {
         };
 
         // Use the new task generator instead of old generateTaskTemplates
+        console.log('🏠 DEBUG: taskGenerator exists:', !!window.taskGenerator);
+        console.log('🏠 DEBUG: createMaintenancePlan exists:', !!(window.taskGenerator && window.taskGenerator.createMaintenancePlan));
+        
         if (window.taskGenerator && window.taskGenerator.createMaintenancePlan) {
+            console.log('🏠 DEBUG: Using new task generator');
             const result = window.taskGenerator.createMaintenancePlan();
+            console.log('🏠 DEBUG: Task generator result:', result);
+            console.log('🏠 DEBUG: homeData from generator:', result.homeData);
+            console.log('🏠 DEBUG: Purchase price:', result.homeData.purchasePrice);
+            console.log('🏠 DEBUG: Purchase year:', result.homeData.purchaseYear);
             window.homeData = result.homeData;
             window.tasks = result.tasks;
         } else {
+            console.log('🏠 DEBUG: Using old system fallback');
             // Fallback to old system
             generateTaskTemplates();
             window.homeData = homeData;

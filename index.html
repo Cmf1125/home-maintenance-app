@@ -3980,9 +3980,15 @@ function handleSuccessfulLogin(user) {
             console.log('✅ Data loaded, dashboard ready');
             
             // Run YouTube integration immediately (no delay)
+            console.log('📺 DEBUG: Running YouTube integration');
+            console.log('📺 DEBUG: window.tasks exists:', !!window.tasks);
+            console.log('📺 DEBUG: tasks length:', window.tasks?.length || 0);
+            
             if (typeof window.forceYouTubeIconsToShow === 'function') {
+                console.log('📺 DEBUG: Using forceYouTubeIconsToShow');
                 window.forceYouTubeIconsToShow();
             } else {
+                console.log('📺 DEBUG: Using inline migration');
                 // Simple YouTube migration: Add YouTube URLs to tasks that don't have them
                 if (window.tasks && window.tasks.length > 0) {
                     let migrated = 0;
