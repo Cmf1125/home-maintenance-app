@@ -1024,36 +1024,6 @@ function showMainApp() {
                 <span class="text-xl">🏠</span>
                 Your Property Details
             </h3>
-        <!-- Real-time task preview -->
-<div id="live-task-preview" class="bg-white/90 backdrop-blur-sm rounded-xl p-6 mb-6 border border-white/20 shadow-sm">
-    <div class="mb-4">
-        <h4 class="font-semibold text-gray-900 text-lg">Your Maintenance Plan Preview</h4>
-    </div>
-    
-    <div class="grid grid-cols-3 gap-4 text-center">
-        <div>
-            <div id="preview-task-count" class="text-2xl font-bold text-blue-600">0</div>
-            <div class="text-xs text-gray-600">Tasks</div>
-        </div>
-        <div>
-            <div id="preview-annual-cost" class="text-2xl font-bold text-green-600">$0</div>
-            <div class="text-xs text-gray-600">Annual Cost</div>
-        </div>
-        <div>
-            <div id="preview-safety-tasks" class="text-2xl font-bold text-red-600">0</div>
-            <div class="text-xs text-gray-600">Safety Tasks</div>
-        </div>
-    </div>
-    
-    <!-- HOA Fee Note -->
-    <div id="hoa-fee-note" class="mt-3 text-center hidden">
-        <div class="text-xs text-gray-600">+ <span id="preview-hoa-cost" class="font-semibold">$0</span>/year HOA fees</div>
-    </div>
-    
-    <div class="mt-3 text-center">
-        <div class="text-xs text-gray-500">Updates as you add features ✨</div>
-    </div>
-</div>
             <div id="confirmation-summary" class="text-sm text-blue-800 space-y-2">
                 <!-- Property summary will be populated here -->
             </div>
@@ -4188,10 +4158,6 @@ function celebrateStepCompletion(currentStep, nextStep) {
     console.log(`✅ Completing step ${currentStep}, moving to step ${nextStep}`);
     
     
-    // Update task preview if available (quietly)
-    if (typeof updateTaskPreview === 'function') {
-        updateTaskPreview();
-    }
     
     // Clean step transition (no celebration animations)
     setTimeout(() => {
@@ -4299,7 +4265,6 @@ function startDemo() {
             firstPropertyCard.click();
         }
         
-        updateTaskPreview();
     }, 500);
 }
 
@@ -4365,20 +4330,12 @@ function toggleAdvancedFeatures() {
             });
         }, 100);
         
-        // Update task preview if available
-        if (typeof updateTaskPreview === 'function') {
-            setTimeout(updateTaskPreview, 200);
-        }
     } else {
         // Hide advanced features
         advancedSection.classList.add('hidden');
         toggleText.textContent = 'Show Options';
         toggleArrow.style.transform = 'rotate(0deg)';
         
-        // Update task preview
-        if (typeof updateTaskPreview === 'function') {
-            setTimeout(updateTaskPreview, 200);
-        }
     }
 }
 
@@ -4433,20 +4390,12 @@ function toggleStructuralFeatures() {
             });
         }, 100);
         
-        // Update task preview if available
-        if (typeof updateTaskPreview === 'function') {
-            setTimeout(updateTaskPreview, 200);
-        }
     } else {
         // Hide structural features
         structuralSection.classList.add('hidden');
         toggleText.textContent = 'Show Options';
         toggleArrow.style.transform = 'rotate(0deg)';
         
-        // Update task preview
-        if (typeof updateTaskPreview === 'function') {
-            setTimeout(updateTaskPreview, 200);
-        }
     }
 }
 
@@ -4461,8 +4410,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     advancedCheckboxes.forEach(id => {
         const checkbox = document.getElementById(id);
-        if (checkbox && typeof updateTaskPreview === 'function') {
-            checkbox.addEventListener('change', updateTaskPreview);
+        if (checkbox) {
+            // Event listener could be added here if needed
         }
     });
     
@@ -4474,8 +4423,8 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
     structuralInputs.forEach(id => {
         const input = document.getElementById(id);
-        if (input && typeof updateTaskPreview === 'function') {
-            input.addEventListener('change', updateTaskPreview);
+        if (input) {
+            // Event listener could be added here if needed
         }
     });
 });
