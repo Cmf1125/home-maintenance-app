@@ -338,10 +338,30 @@ renderEnhancedTaskCard(task) {
     // const annualCostElement = document.getElementById('annual-cost');
     // if (annualCostElement) annualCostElement.textContent = '$' + Math.round(totalCost);
 
-    // Update home address
+    // Update home address and property value info
     const homeAddressElement = document.getElementById('home-address');
+    const propertyValueElement = document.getElementById('property-value-info');
+    
     if (homeAddressElement && window.homeData?.fullAddress) {
-        homeAddressElement.textContent = `Managing maintenance for ${window.homeData.fullAddress}`;
+        homeAddressElement.innerHTML = `🏠 ${window.homeData.fullAddress} <span class="text-blue-600">(click to search)</span>`;
+        
+        // Calculate and display property value if purchase data exists
+        if (propertyValueElement && window.homeData.purchasePrice && window.homeData.purchaseYear) {
+            const valueEstimate = window.calculateEstimatedValue 
+                ? window.calculateEstimatedValue(window.homeData.purchasePrice, window.homeData.purchaseYear)
+                : null;
+            
+            if (valueEstimate && valueEstimate.estimate > 0) {
+                const budget = window.getMaintenanceBudget 
+                    ? window.getMaintenanceBudget(valueEstimate.estimate)
+                    : { low: 0, high: 0 };
+                
+                const formatNumber = (num) => new Intl.NumberFormat('en-US').format(num);
+                
+                propertyValueElement.innerHTML = `💰 Purchased: $${formatNumber(window.homeData.purchasePrice)} (${window.homeData.purchaseYear}) → Est. current: $${formatNumber(valueEstimate.low)} - $${formatNumber(valueEstimate.high)} • Maintenance budget: $${formatNumber(budget.low)} - $${formatNumber(budget.high)}/year`;
+                propertyValueElement.classList.remove('hidden');
+            }
+        }
     }
     
     console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);

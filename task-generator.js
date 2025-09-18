@@ -30,6 +30,40 @@ class TaskGenerator {
         return 'GENERAL';
     }
 
+    // ===== PROPERTY VALUE ESTIMATION =====
+    
+    calculateEstimatedValue(purchasePrice, purchaseYear) {
+        if (!purchasePrice || !purchaseYear) {
+            return { low: 0, high: 0, estimate: 0 };
+        }
+        
+        const currentYear = new Date().getFullYear();
+        const yearsOwned = Math.max(0, currentYear - purchaseYear);
+        
+        // Average home appreciation 3-5% annually
+        const lowAppreciation = 0.03; // 3%
+        const highAppreciation = 0.05; // 5%
+        
+        const lowValue = purchasePrice * Math.pow(1 + lowAppreciation, yearsOwned);
+        const highValue = purchasePrice * Math.pow(1 + highAppreciation, yearsOwned);
+        const estimate = (lowValue + highValue) / 2;
+        
+        return {
+            low: Math.round(lowValue),
+            high: Math.round(highValue), 
+            estimate: Math.round(estimate),
+            yearsOwned: yearsOwned
+        };
+    }
+    
+    getMaintenanceBudget(estimatedValue) {
+        // Recommended 1-3% of home value annually for maintenance
+        const lowBudget = Math.round(estimatedValue * 0.01);
+        const highBudget = Math.round(estimatedValue * 0.03);
+        
+        return { low: lowBudget, high: highBudget };
+    }
+
     // ===== PRIORITY DETECTION =====
     
     getAutoPriority(title, category) {
@@ -73,7 +107,9 @@ class TaskGenerator {
                 propertyType: document.getElementById('property-type')?.value || 'single-family',
                 yearBuilt: parseInt(document.getElementById('year-built')?.value) || 2000,
                 sqft: parseInt(document.getElementById('sqft')?.value) || 2000,
-                hoaCost: parseFloat(document.getElementById('hoa-cost')?.value) || 0
+                hoaCost: parseFloat(document.getElementById('hoa-cost')?.value) || 0,
+                purchasePrice: parseFloat(document.getElementById('purchase-price')?.value) || 0,
+                purchaseYear: parseInt(document.getElementById('purchase-year')?.value) || new Date().getFullYear()
             };
             homeData.fullAddress = `${homeData.address}, ${homeData.city}, ${homeData.state} ${homeData.zipcode}`;
 
@@ -740,6 +776,8 @@ console.log('✅ TaskGenerator global instance created:', !!window.taskGenerator
 // Make functions globally available
 window.getClimateRegion = (state) => window.taskGenerator.getClimateRegion(state);
 window.getAutoPriority = (title, category) => window.taskGenerator.getAutoPriority(title, category);
+window.calculateEstimatedValue = (price, year) => window.taskGenerator.calculateEstimatedValue(price, year);
+window.getMaintenanceBudget = (value) => window.taskGenerator.getMaintenanceBudget(value);
 window.categoryConfig = window.taskGenerator.getCategoryConfig();
 
 // Export for module systems (if needed later)
