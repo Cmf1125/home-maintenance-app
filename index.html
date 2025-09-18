@@ -3927,34 +3927,28 @@ function handleSuccessfulLogin(user) {
                 if (typeof window.forceYouTubeIconsToShow === 'function') {
                     window.forceYouTubeIconsToShow();
                 } else {
-                    // Run inline YouTube migration
+                    // Simple YouTube migration: Add YouTube URLs to tasks that don't have them
                     if (window.tasks && window.tasks.length > 0) {
-                        // Get current YouTube URLs from the task generator (single source of truth)
-                        const videoUrlMap = window.getYouTubeUrlMapping ? window.getYouTubeUrlMapping() : {};
-                        
                         let migrated = 0;
                         window.tasks.forEach(task => {
-                            // FORCE UPDATE: Always update YouTube URL if we have a mapping, regardless of current value
-                            if (videoUrlMap[task.title]) {
-                                const oldUrl = task.youtubeUrl;
-                                task.youtubeUrl = videoUrlMap[task.title];
-                                if (oldUrl !== task.youtubeUrl) {
-                                    migrated++;
-                                }
-                            } else if (!task.youtubeUrl) {
-                                // Only create generic search URL if no specific mapping exists AND URL is completely missing
-                                const searchQuery = task.title.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '+');
-                                task.youtubeUrl = `https://www.youtube.com/results?search_query=home+maintenance+${searchQuery}`;
+                            if (!task.youtubeUrl) {
+                                // Generate YouTube search URL based on task name
+                                const searchQuery = task.title.toLowerCase()
+                                    .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+                                    .replace(/\s+/g, '+') // Replace spaces with +
+                                    .trim();
+                                task.youtubeUrl = `https://www.youtube.com/results?search_query=how+to+${searchQuery}+maintenance`;
                                 migrated++;
                             }
                         });
                         
                         if (migrated > 0) {
+                            console.log(`📺 Added YouTube URLs to ${migrated} tasks`);
                             // Save the updated tasks
                             if (typeof saveData === 'function') {
                                 saveData();
                             }
-                            // Force dashboard refresh to show icons
+                            // Force dashboard refresh to show video buttons
                             if (window.enhancedDashboard && window.enhancedDashboard.render) {
                                 window.enhancedDashboard.render();
                             }
