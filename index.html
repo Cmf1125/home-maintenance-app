@@ -3941,8 +3941,8 @@ function handleSuccessfulLogin(user) {
                                 if (oldUrl !== task.youtubeUrl) {
                                     migrated++;
                                 }
-                            } else if (!task.youtubeUrl || task.youtubeUrl.includes('youtube.com/watch?v=')) {
-                                // Only create generic search URL if no specific mapping exists AND URL is missing/broken
+                            } else if (!task.youtubeUrl) {
+                                // Only create generic search URL if no specific mapping exists AND URL is completely missing
                                 const searchQuery = task.title.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '+');
                                 task.youtubeUrl = `https://www.youtube.com/results?search_query=home+maintenance+${searchQuery}`;
                                 migrated++;
