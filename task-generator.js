@@ -153,7 +153,7 @@ class TaskGenerator {
                 cost: 0,
                 priority: 'high',
                 description: 'Test all smoke and carbon monoxide detectors',
-                youtubeUrl: 'https://www.youtube.com/results?search_query=how+to+test+smoke+detector+maintenance',
+                youtubeUrl: 'https://www.youtube.com/watch?v=LKmhqdq1YnI',
                 dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
