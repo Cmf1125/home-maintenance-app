@@ -60,6 +60,32 @@ class TaskGenerator {
         };
     }
 
+    // ===== YOUTUBE URL MAPPING =====
+    
+    getYouTubeUrlMapping() {
+        // Generate a fresh task list to extract current YouTube URLs
+        const tempTasks = this.generateTaskTemplates({
+            propertyType: 'single-family',
+            features: {
+                centralAC: true, miniSplits: true, wallAC: true, electricBaseboard: true, boiler: true,
+                wellWater: true, sedimentFilter: true, uvFilter: true, waterSoftener: true, wholeHouseFilter: true,
+                septic: true, fireplace: true, deck: true, pool: true, garage: true, basement: true,
+                sprinklerSystem: true, solarPanels: true, backupGenerator: true, securitySystem: true
+            },
+            state: 'NY'
+        });
+        
+        // Build mapping of task title to YouTube URL
+        const mapping = {};
+        tempTasks.forEach(task => {
+            if (task.youtubeUrl) {
+                mapping[task.title] = task.youtubeUrl;
+            }
+        });
+        
+        return mapping;
+    }
+
     // ===== MAIN TASK GENERATION =====
     
     createMaintenancePlan() {
@@ -740,6 +766,7 @@ console.log('✅ TaskGenerator global instance created:', !!window.taskGenerator
 // Make functions globally available
 window.getClimateRegion = (state) => window.taskGenerator.getClimateRegion(state);
 window.getAutoPriority = (title, category) => window.taskGenerator.getAutoPriority(title, category);
+window.getYouTubeUrlMapping = () => window.taskGenerator.getYouTubeUrlMapping();
 window.categoryConfig = window.taskGenerator.getCategoryConfig();
 
 // Export for module systems (if needed later)
