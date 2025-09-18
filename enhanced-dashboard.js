@@ -359,10 +359,16 @@ renderEnhancedTaskCard(task) {
         homeAddressElement.innerHTML = `🏠 ${window.homeData.fullAddress} <span class="text-blue-600">(click to search)</span>`;
         
         // Calculate and display property value if purchase data exists
+        console.log('🏠 DEBUG: homeData.purchasePrice:', window.homeData.purchasePrice);
+        console.log('🏠 DEBUG: homeData.purchaseYear:', window.homeData.purchaseYear);
+        console.log('🏠 DEBUG: calculateEstimatedValue function exists:', !!window.calculateEstimatedValue);
+        
         if (propertyValueElement && window.homeData.purchasePrice && window.homeData.purchaseYear) {
             const valueEstimate = window.calculateEstimatedValue 
                 ? window.calculateEstimatedValue(window.homeData.purchasePrice, window.homeData.purchaseYear)
                 : null;
+            
+            console.log('🏠 DEBUG: valueEstimate:', valueEstimate);
             
             if (valueEstimate && valueEstimate.estimate > 0) {
                 const budget = window.getMaintenanceBudget 
@@ -373,7 +379,12 @@ renderEnhancedTaskCard(task) {
                 
                 propertyValueElement.innerHTML = `💰 Purchased: $${formatNumber(window.homeData.purchasePrice)} (${window.homeData.purchaseYear}) → Est. current: $${formatNumber(valueEstimate.low)} - $${formatNumber(valueEstimate.high)} • Maintenance budget: $${formatNumber(budget.low)} - $${formatNumber(budget.high)}/year`;
                 propertyValueElement.classList.remove('hidden');
+                console.log('✅ Property value info displayed');
+            } else {
+                console.log('❌ Value estimate invalid or zero');
             }
+        } else {
+            console.log('❌ Missing purchase data or element not found');
         }
     }
     
