@@ -338,10 +338,9 @@ renderEnhancedTaskCard(task) {
     // const annualCostElement = document.getElementById('annual-cost');
     // if (annualCostElement) annualCostElement.textContent = '$' + Math.round(totalCost);
 
-    // Update welcome message and property value info
+    // Update welcome message and home address
     const subtitleElement = document.getElementById('dashboard-subtitle');
     const homeAddressElement = document.getElementById('home-address');
-    const propertyValueElement = document.getElementById('property-value-info');
     
     // Update welcome message with user's name
     if (subtitleElement) {
@@ -354,46 +353,9 @@ renderEnhancedTaskCard(task) {
         }
     }
     
-    // Show clickable address
+    // Show address
     if (homeAddressElement && window.homeData?.fullAddress) {
-        homeAddressElement.innerHTML = `🏠 ${window.homeData.fullAddress} <span class="text-blue-600">(click to search)</span>`;
-        
-        // Calculate and display property value if purchase data exists
-        console.log('🏠 DEBUG: homeData.purchasePrice:', window.homeData.purchasePrice);
-        console.log('🏠 DEBUG: homeData.purchaseYear:', window.homeData.purchaseYear);
-        console.log('🏠 DEBUG: calculateEstimatedValue function exists:', !!window.calculateEstimatedValue);
-        console.log('🏠 DEBUG: taskGenerator exists:', !!window.taskGenerator);
-        
-        if (propertyValueElement && window.homeData.purchasePrice && window.homeData.purchaseYear) {
-            // Make sure calculation functions are available
-            let valueEstimate = null;
-            if (window.calculateEstimatedValue) {
-                valueEstimate = window.calculateEstimatedValue(window.homeData.purchasePrice, window.homeData.purchaseYear);
-            } else if (window.taskGenerator && window.taskGenerator.calculateEstimatedValue) {
-                valueEstimate = window.taskGenerator.calculateEstimatedValue(window.homeData.purchasePrice, window.homeData.purchaseYear);
-            }
-            
-            console.log('🏠 DEBUG: valueEstimate:', valueEstimate);
-            
-            if (valueEstimate && valueEstimate.estimate > 0) {
-                let budget = { low: 0, high: 0 };
-                if (window.getMaintenanceBudget) {
-                    budget = window.getMaintenanceBudget(valueEstimate.estimate);
-                } else if (window.taskGenerator && window.taskGenerator.getMaintenanceBudget) {
-                    budget = window.taskGenerator.getMaintenanceBudget(valueEstimate.estimate);
-                }
-                
-                const formatNumber = (num) => new Intl.NumberFormat('en-US').format(num);
-                
-                propertyValueElement.innerHTML = `💰 Purchased: $${formatNumber(window.homeData.purchasePrice)} (${window.homeData.purchaseYear}) → Est. current: $${formatNumber(valueEstimate.low)} - $${formatNumber(valueEstimate.high)} • Maintenance budget: $${formatNumber(budget.low)} - $${formatNumber(budget.high)}/year`;
-                propertyValueElement.classList.remove('hidden');
-                console.log('✅ Property value info displayed');
-            } else {
-                console.log('❌ Value estimate invalid or zero');
-            }
-        } else {
-            console.log('❌ Missing purchase data or element not found');
-        }
+        homeAddressElement.textContent = `🏠 ${window.homeData.fullAddress}`;
     }
     
     console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
