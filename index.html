@@ -3917,31 +3917,27 @@ function handleSuccessfulLogin(user) {
                 console.log('📺 DEBUG: Using forceYouTubeIconsToShow');
                 window.forceYouTubeIconsToShow();
             } else {
-                console.log('📺 DEBUG: Using inline migration');
-                // Simple YouTube migration: Add YouTube URLs to tasks that don't have them
+                // Smart YouTube migration: Add search URLs to user-added tasks that don't have them
                 if (window.tasks && window.tasks.length > 0) {
                     let migrated = 0;
                     window.tasks.forEach(task => {
-                        if (!task.youtubeUrl) {
-                            // Generate YouTube search URL based on task name
+                        // Only add YouTube URLs to tasks that don't have them (user-added tasks)
+                        if (!task.youtubeUrl && task.title) {
                             const searchQuery = task.title.toLowerCase()
                                 .replace(/[^a-z0-9\s]/g, '') // Remove special characters
                                 .replace(/\s+/g, '+') // Replace spaces with +
                                 .trim();
                             task.youtubeUrl = `https://www.youtube.com/results?search_query=how+to+${searchQuery}+maintenance`;
                             migrated++;
+                            console.log(`📺 Added YouTube search URL for user task: "${task.title}"`);
                         }
                     });
                     
                     if (migrated > 0) {
-                        console.log(`📺 Added YouTube URLs to ${migrated} tasks`);
+                        console.log(`📺 Added YouTube search URLs to ${migrated} user-added tasks`);
                         // Save the updated tasks
                         if (typeof saveData === 'function') {
                             saveData();
-                        }
-                        // Force dashboard refresh to show video buttons
-                        if (window.enhancedDashboard && window.enhancedDashboard.render) {
-                            window.enhancedDashboard.render();
                         }
                     }
                 }

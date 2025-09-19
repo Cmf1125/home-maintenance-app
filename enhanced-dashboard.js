@@ -398,6 +398,13 @@ function addTaskFromDashboard() {
     // Find next available ID
     const maxId = Math.max(...window.tasks.map(t => t.id), 0);
     
+    // Generate YouTube search URL based on task title
+    const searchQuery = title.toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+        .replace(/\s+/g, '+') // Replace spaces with +
+        .trim();
+    const youtubeUrl = `https://www.youtube.com/results?search_query=how+to+${searchQuery}+maintenance`;
+    
     const newTask = {
         id: maxId + 1,
         title: title,
@@ -408,7 +415,8 @@ function addTaskFromDashboard() {
         priority: priority,
         dueDate: dueDate,
         lastCompleted: null,
-        isCompleted: false
+        isCompleted: false,
+        youtubeUrl: youtubeUrl
     };
     
     window.tasks.push(newTask);

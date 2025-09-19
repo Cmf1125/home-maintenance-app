@@ -2421,6 +2421,7 @@ function addTaskFromSetup() {
         dueDate: new Date(),
         lastCompleted: null,
         isCompleted: false,
+        youtubeUrl: '', // Will be auto-generated when user saves
         isTemplate: true // Important: mark as template so it gets processed correctly
     };
     
@@ -3861,12 +3862,20 @@ function updateConfirmationSummary() {
 function proceedToTaskGeneration() {
     console.log('🚀 Proceeding to task generation...');
     
-    // Generate tasks (using your existing function)
-    generateTaskTemplates();
-    
-    // Update global references
-    window.homeData = homeData;
-    window.tasks = tasks;
+    // Use the new task generator system to get tasks with proper YouTube URLs
+    if (window.taskGenerator && window.taskGenerator.createMaintenancePlan) {
+        console.log('🚀 Using new task generator with YouTube URLs');
+        const result = window.taskGenerator.createMaintenancePlan();
+        window.homeData = result.homeData;
+        window.tasks = result.tasks;
+        console.log(`🚀 Generated ${result.tasks.length} tasks with YouTube URLs`);
+    } else {
+        console.log('🚀 Fallback to old system');
+        // Fallback to old system
+        generateTaskTemplates();
+        window.homeData = homeData;
+        window.tasks = tasks;
+    }
     
    // Hide confirmation page and setup form
     document.getElementById('property-confirmation').classList.add('hidden');
