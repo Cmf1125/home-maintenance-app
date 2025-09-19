@@ -1119,7 +1119,8 @@ function showMainApp() {
                 <div class="cursor-pointer hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors" onclick="showTab('property-features')">
                     <h1 class="text-xl font-bold text-gray-900">The Home Keeper</h1>
                     <p class="text-sm text-gray-600" id="dashboard-subtitle">👋 Welcome back!</p>
-                    <div id="home-address" class="text-xs text-gray-500 mt-1">
+                    <div id="home-address" class="text-xs text-gray-500 mt-1 cursor-pointer hover:text-blue-600 transition-colors" 
+                         onclick="event.stopPropagation(); window.openPropertySearchMenu && window.openPropertySearchMenu(window.homeData?.fullAddress)">
                         🏠 Property address will appear here
                     </div>
                     <p class="text-xs text-blue-600 mt-1">Click header to edit property details</p>
@@ -2211,6 +2212,37 @@ function showMainApp() {
         console.log('🔍 Generated YouTube search URL:', youtubeSearchUrl);
     };
 
+    
+    // Property search functions
+    window.searchPropertyOnZillow = function(address) {
+        const searchUrl = `https://www.zillow.com/homes/${encodeURIComponent(address)}_rb/`;
+        window.open(searchUrl, '_blank', 'noopener,noreferrer');
+    };
+
+    window.searchPropertyOnRedfin = function(address) {
+        const searchUrl = `https://www.redfin.com/stingray/do/location-search?location=${encodeURIComponent(address)}`;
+        window.open(searchUrl, '_blank', 'noopener,noreferrer');
+    };
+
+    window.searchPropertyOnRealtor = function(address) {
+        const searchUrl = `https://www.realtor.com/search/property?location=${encodeURIComponent(address)}`;
+        window.open(searchUrl, '_blank', 'noopener,noreferrer');
+    };
+
+    window.openPropertySearchMenu = function(address) {
+        const options = [
+            { name: 'Zillow', action: () => window.searchPropertyOnZillow(address) },
+            { name: 'Redfin', action: () => window.searchPropertyOnRedfin(address) },
+            { name: 'Realtor.com', action: () => window.searchPropertyOnRealtor(address) }
+        ];
+        
+        // Simple confirm dialog approach for now
+        const choice = prompt(`Search "${address}" on:\n1. Zillow\n2. Redfin\n3. Realtor.com\n\nEnter number (1-3):`);
+        
+        if (choice === '1') options[0].action();
+        else if (choice === '2') options[1].action();
+        else if (choice === '3') options[2].action();
+    };
     
     console.log('✅ Task system override loaded');
 </script>

@@ -353,9 +353,9 @@ renderEnhancedTaskCard(task) {
         }
     }
     
-    // Show address
+    // Show clickable address
     if (homeAddressElement && window.homeData?.fullAddress) {
-        homeAddressElement.textContent = `🏠 ${window.homeData.fullAddress}`;
+        homeAddressElement.innerHTML = `🏠 ${window.homeData.fullAddress} <span class="text-blue-600">(click to search)</span>`;
     }
     
     console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
