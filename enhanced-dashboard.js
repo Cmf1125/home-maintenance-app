@@ -283,14 +283,14 @@ renderEnhancedTaskCard(task) {
         </div>
         
         <!-- Row 2: Video Demo (if available) -->
-        ${task.youtubeUrl ? `
+        ${task.youtubeUrl && task.youtubeUrl.includes('youtube.com') ? `
         <div class="mb-2">
             <button onclick="event.stopPropagation(); openYouTubeVideo('${task.youtubeUrl}')" 
                     class="bg-red-50 text-red-700 hover:bg-red-100 px-2 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1">
                 📺 Watch How-To Video
             </button>
         </div>
-        ` : `<!-- DEBUG: No YouTube URL for task: ${task.title} -->`}
+        ` : `<!-- DEBUG: No valid YouTube URL for task: ${task.title} (${task.youtubeUrl || 'undefined'}) -->`}
         
         <!-- Row 3: Due Date + Action Buttons -->
         <div class="flex items-center justify-between gap-2">
