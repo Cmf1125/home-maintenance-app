@@ -1783,24 +1783,39 @@ function showTab(tabName) {
             console.log('✅ Header address updated:', subtitleText);
         }
         
-        // Enhanced dashboard initialization with fallback
-        try {
-            if (typeof EnhancedDashboard !== 'undefined') {
-                if (!window.enhancedDashboard) {
-                    console.log('🆕 Creating new enhanced dashboard instance...');
-                    window.enhancedDashboard = new EnhancedDashboard();
+        // Enhanced dashboard initialization with robust retry mechanism
+        const initializeDashboard = () => {
+            try {
+                if (typeof EnhancedDashboard !== 'undefined') {
+                    if (!window.enhancedDashboard) {
+                        console.log('🆕 Creating new enhanced dashboard instance...');
+                        window.enhancedDashboard = new EnhancedDashboard();
+                    } else {
+                        console.log('🔄 Refreshing existing enhanced dashboard...');
+                        window.enhancedDashboard.render();
+                    }
+                    console.log('✅ Enhanced dashboard ready');
+                    return true;
                 } else {
-                    console.log('🔄 Refreshing existing enhanced dashboard...');
-                    window.enhancedDashboard.render();
+                    console.warn('⚠️ EnhancedDashboard class not available yet');
+                    return false;
                 }
-                console.log('✅ Enhanced dashboard ready');
-            } else {
-                console.warn('⚠️ EnhancedDashboard class not available, using basic dashboard');
-                updateDashboard();
+            } catch (error) {
+                console.error('❌ Error with enhanced dashboard:', error);
+                return false;
             }
-        } catch (error) {
-            console.error('❌ Error with enhanced dashboard, falling back to basic:', error);
-            updateDashboard();
+        };
+
+        // Try to initialize immediately
+        if (!initializeDashboard()) {
+            console.log('🔄 Enhanced dashboard not ready, waiting...');
+            // Retry after a short delay to allow scripts to load
+            setTimeout(() => {
+                if (!initializeDashboard()) {
+                    console.warn('⚠️ Enhanced dashboard still not ready, using basic dashboard');
+                    updateDashboard();
+                }
+            }, 100);
         }
         
         // TIMING FIX: Additional refresh to catch any YouTube URL timing issues

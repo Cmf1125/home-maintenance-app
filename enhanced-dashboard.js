@@ -186,6 +186,20 @@ class EnhancedDashboard {
             return;
         }
 
+        // Add safety check for tasks loading
+        if (!window.tasks || !Array.isArray(window.tasks)) {
+            console.log('⚠️ Tasks not yet loaded, showing loading message');
+            tasksList.innerHTML = `<div class="p-6 text-center text-gray-500">Loading tasks...</div>`;
+            // Retry after a short delay
+            setTimeout(() => {
+                if (window.tasks && Array.isArray(window.tasks)) {
+                    console.log('✅ Tasks loaded, re-rendering');
+                    this.renderFilteredTasks();
+                }
+            }, 500);
+            return;
+        }
+
         const filteredTasks = this.getFilteredTasks();
 
         if (filteredTasks.length === 0) {
@@ -201,7 +215,14 @@ class EnhancedDashboard {
             return;
         }
 
+        // Debug logging before rendering
+        console.log('🎬 DEBUG: Task YouTube URL status:');
+        filteredTasks.slice(0, 3).forEach(task => {
+            console.log(`  - "${task.title}": ${task.youtubeUrl ? '✅ HAS URL' : '❌ NO URL'} (${task.youtubeUrl || 'undefined'})`);
+        });
+        
         tasksList.innerHTML = filteredTasks.map(task => this.renderEnhancedTaskCard(task)).join('');
+        console.log(`✅ Rendered ${filteredTasks.length} tasks, ${filteredTasks.filter(t => t.youtubeUrl).length} have video URLs`);
     }
 
 renderEnhancedTaskCard(task) {
@@ -269,7 +290,7 @@ renderEnhancedTaskCard(task) {
                 📺 Watch How-To Video
             </button>
         </div>
-        ` : ''}
+        ` : `<!-- DEBUG: No YouTube URL for task: ${task.title} -->`}
         
         <!-- Row 3: Due Date + Action Buttons -->
         <div class="flex items-center justify-between gap-2">
