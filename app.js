@@ -2330,6 +2330,7 @@ function updateDashboard() {
     // Calculate stats
     let overdueCount = 0;
     let weekCount = 0;
+    let totalCost = 0;
     
     window.tasks.forEach(task => {
         if (!task.isCompleted && task.dueDate) {
@@ -2341,6 +2342,7 @@ function updateDashboard() {
                 weekCount++;
             }
         }
+        totalCost += task.cost * (365 / task.frequency);
     });
     
     const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
@@ -2358,6 +2360,25 @@ function updateDashboard() {
             element.textContent = value;
         }
     });
+
+    // Update annual cost display
+    const annualCostElement = document.getElementById('annual-cost-display');
+    if (annualCostElement) {
+        annualCostElement.textContent = '$' + Math.round(totalCost);
+    }
+
+    // Update HOA fee display
+    const hoaCost = window.homeData?.hoaCost || 0;
+    const hoaDisplayElement = document.getElementById('hoa-fee-display');
+    const hoaAmountElement = document.getElementById('annual-hoa-amount');
+    
+    if (hoaCost > 0 && hoaDisplayElement && hoaAmountElement) {
+        const annualHoaCost = hoaCost * 12; // Convert monthly to yearly
+        hoaAmountElement.textContent = '$' + annualHoaCost;
+        hoaDisplayElement.classList.remove('hidden');
+    } else if (hoaDisplayElement) {
+        hoaDisplayElement.classList.add('hidden');
+    }
     
     // Update home address
     const homeAddressElement = document.getElementById('home-address');
@@ -2368,7 +2389,7 @@ function updateDashboard() {
     // ADD THIS LINE: Set up click handlers for basic dashboard
     setupBasicDashboardClicks();
     
-    console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
+    console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total, annual cost: $${Math.round(totalCost)}, annual HOA: $${hoaCost * 12}`);
 }
 
 // Basic dashboard click handler for Total Tasks card

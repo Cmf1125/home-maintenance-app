@@ -334,9 +334,24 @@ renderEnhancedTaskCard(task) {
     const totalElement = document.getElementById('total-count');
     if (totalElement) totalElement.textContent = totalTasks;
     
-    // REMOVED: annual-cost update since it's no longer on dashboard
-    // const annualCostElement = document.getElementById('annual-cost');
-    // if (annualCostElement) annualCostElement.textContent = '$' + Math.round(totalCost);
+    // Update annual cost display (now back on dashboard in maintenance summary)
+    const annualCostElement = document.getElementById('annual-cost-display');
+    if (annualCostElement) {
+        annualCostElement.textContent = '$' + Math.round(totalCost);
+    }
+
+    // Update HOA fee display
+    const hoaCost = window.homeData?.hoaCost || 0;
+    const hoaDisplayElement = document.getElementById('hoa-fee-display');
+    const hoaAmountElement = document.getElementById('annual-hoa-amount');
+    
+    if (hoaCost > 0 && hoaDisplayElement && hoaAmountElement) {
+        const annualHoaCost = hoaCost * 12; // Convert monthly to yearly
+        hoaAmountElement.textContent = '$' + annualHoaCost;
+        hoaDisplayElement.classList.remove('hidden');
+    } else if (hoaDisplayElement) {
+        hoaDisplayElement.classList.add('hidden');
+    }
 
     // Update welcome message and home address
     const subtitleElement = document.getElementById('dashboard-subtitle');
@@ -358,7 +373,7 @@ renderEnhancedTaskCard(task) {
         homeAddressElement.innerHTML = `🏠 ${window.homeData.fullAddress} <span class="text-blue-600">(click to search on Zillow)</span>`;
     }
     
-    console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total`);
+    console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total, annual cost: $${Math.round(totalCost)}, annual HOA: $${hoaCost * 12}`);
 }
 }
 
