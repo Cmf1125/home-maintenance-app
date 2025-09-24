@@ -1635,6 +1635,14 @@ document.body.classList.add('main-app-active');
         showTab('dashboard');
         console.log('✅ Dashboard initialized successfully');
         
+        // Force enhanced dashboard refresh to show video buttons immediately
+        setTimeout(() => {
+            if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                console.log('🔄 Force refreshing enhanced dashboard to show video buttons');
+                window.enhancedDashboard.render();
+            }
+        }, 100); // Very short delay to ensure DOM is ready
+        
         // Start welcome tour for new users
         setTimeout(() => {
             startWelcomeTour();

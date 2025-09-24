@@ -47,6 +47,18 @@ class TaskGenerator {
         return 'normal';
     }
 
+    // ===== YOUTUBE URL GENERATION =====
+    
+    generateYouTubeSearchUrl(title) {
+        const searchQuery = title.toLowerCase()
+            .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+            .replace(/\s+/g, '+') // Replace spaces with +
+            .trim();
+        const url = `https://www.youtube.com/results?search_query=how+to+${searchQuery}+maintenance`;
+        console.log(`📺 Generated YouTube URL for "${title}": ${url}`);
+        return url;
+    }
+
     // ===== CATEGORY CONFIGURATION =====
     
     getCategoryConfig() {
@@ -154,7 +166,7 @@ class TaskGenerator {
                 cost: 0,
                 priority: 'high',
                 description: 'Test all smoke and carbon monoxide detectors',
-                youtubeUrl: 'https://www.youtube.com/watch?v=LKmhqdq1YnI',
+                youtubeUrl: this.generateYouTubeSearchUrl('Test Smoke Detectors'),
                 dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
@@ -168,7 +180,7 @@ class TaskGenerator {
                 cost: 100,
                 priority: 'medium',
                 description: 'Remove lint buildup from dryer vent (prevents house fires - super important!)',
-                youtubeUrl: 'https://www.youtube.com/results?search_query=how+to+clean+dryer+vent',
+                youtubeUrl: this.generateYouTubeSearchUrl('Clean Dryer Vent'),
                 dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
@@ -189,7 +201,7 @@ class TaskGenerator {
                     cost: 150,
                     priority: 'medium',
                     description: 'Clean gutters and downspouts',
-                    youtubeUrl: 'https://www.youtube.com/results?search_query=how+to+clean+gutters',
+                        youtubeUrl: this.generateYouTubeSearchUrl('Clean Gutters'),
                     dueDate: null,
                     lastCompleted: null,
                     isCompleted: false,
@@ -203,7 +215,7 @@ class TaskGenerator {
                     cost: 50,
                     priority: 'low',
                     description: 'Check and replace caulking around windows and doors',
-                    youtubeUrl: 'https://www.youtube.com/results?search_query=how+to+caulk+windows+doors',
+                        youtubeUrl: this.generateYouTubeSearchUrl('Inspect Caulking'),
                     dueDate: null,
                     lastCompleted: null,
                     isCompleted: false,
@@ -219,7 +231,7 @@ class TaskGenerator {
                 cost: 0,
                 priority: 'low',
                 description: 'Check window and door seals for air leaks',
-                youtubeUrl: 'https://www.youtube.com/results?search_query=how+to+check+window+seals',
+                youtubeUrl: this.generateYouTubeSearchUrl('Inspect Window Seals'),
                 dueDate: null,
                 lastCompleted: null,
                 isCompleted: false,
@@ -240,7 +252,7 @@ class TaskGenerator {
                     cost: 25,
                     priority: 'high',
                     description: 'Replace your air conditioning/heating filter (keeps air clean and system running efficiently)',
-                    youtubeUrl: 'https://www.youtube.com/results?search_query=how+to+change+air+filter+hvac',
+                        youtubeUrl: this.generateYouTubeSearchUrl('Change Air Filter'),
                     dueDate: null,
                     lastCompleted: null,
                     isCompleted: false,
@@ -254,7 +266,7 @@ class TaskGenerator {
                     cost: 150,
                     priority: 'medium',
                     description: 'Annual professional service to keep your heating and cooling system running smoothly',
-                    youtubeUrl: 'https://www.youtube.com/results?search_query=hvac+tune+up+maintenance',
+                        youtubeUrl: this.generateYouTubeSearchUrl('AC Heating Tune-Up'),
                     dueDate: null,
                     lastCompleted: null,
                     isCompleted: false,
