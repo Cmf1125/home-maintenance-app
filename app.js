@@ -1803,6 +1803,22 @@ function showTab(tabName) {
             updateDashboard();
         }
         
+        // TIMING FIX: Additional refresh to catch any YouTube URL timing issues
+        setTimeout(() => {
+            console.log('🎬 Safety refresh for video buttons...');
+            try {
+                if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                    window.enhancedDashboard.render();
+                    console.log('✅ Safety refresh completed (enhanced)');
+                } else {
+                    updateDashboard();
+                    console.log('✅ Safety refresh completed (basic)');
+                }
+            } catch (error) {
+                console.error('❌ Error during safety refresh:', error);
+            }
+        }, 200); // Small delay to ensure all async operations complete
+        
     } else if (tabName === 'calendar') {
         // Show calendar
         if (calendarView) {

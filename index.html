@@ -3943,9 +3943,31 @@ function handleSuccessfulLogin(user) {
                         if (typeof saveData === 'function') {
                             saveData();
                         }
+                        // CRITICAL FIX: Refresh dashboard after YouTube URL migration
+                        console.log('🔄 Refreshing dashboard after YouTube URL migration...');
+                        if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                            window.enhancedDashboard.render();
+                            console.log('✅ Dashboard refreshed with YouTube URLs');
+                        } else if (typeof updateDashboard === 'function') {
+                            updateDashboard();
+                            console.log('✅ Basic dashboard refreshed with YouTube URLs');
+                        }
                     }
                 }
             }
+            
+            // ADDITIONAL FIX: Always refresh dashboard after all YouTube URL processing is complete
+            // This ensures video buttons show up immediately even for existing tasks
+            console.log('🎬 Ensuring dashboard shows all video buttons...');
+            setTimeout(() => {
+                if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                    window.enhancedDashboard.render();
+                    console.log('✅ Final dashboard refresh completed');
+                } else if (typeof updateDashboard === 'function') {
+                    updateDashboard();
+                    console.log('✅ Final basic dashboard refresh completed');
+                }
+            }, 100); // Small delay to ensure all processing is complete
             
             // Check if user needs the welcome tour (with safety check)
             if (typeof checkAndStartWelcomeTour === 'function') {
