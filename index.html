@@ -4438,6 +4438,29 @@ document.addEventListener('DOMContentLoaded', function() {
             // Event listener could be added here if needed
         }
     });
+    
+    // Listen for changes to HOA cost input and update display in real-time
+    const hoaCostInput = document.getElementById('hoa-cost');
+    if (hoaCostInput) {
+        hoaCostInput.addEventListener('input', function() {
+            const hoaCost = parseFloat(this.value) || 0;
+            const hoaDisplayElement = document.getElementById('hoa-fee-display');
+            const hoaAmountElement = document.getElementById('annual-hoa-amount');
+            
+            if (hoaCost > 0 && hoaDisplayElement && hoaAmountElement) {
+                const annualHoaCost = hoaCost * 12; // Convert monthly to yearly
+                hoaAmountElement.textContent = '$' + annualHoaCost;
+                hoaDisplayElement.classList.remove('hidden');
+                
+                // Also update homeData if it exists
+                if (window.homeData) {
+                    window.homeData.hoaCost = hoaCost;
+                }
+            } else if (hoaDisplayElement) {
+                hoaDisplayElement.classList.add('hidden');
+            }
+        });
+    }
 });
 </script>
 
