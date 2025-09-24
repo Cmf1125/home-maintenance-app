@@ -2014,6 +2014,8 @@ window.tasks.forEach(task => {
 });
     
     const totalTasks = window.tasks.filter(t => !t.isCompleted && t.dueDate).length;
+    const hoaCost = window.homeData?.hoaCost || 0;
+    const annualHoaCost = hoaCost * 12;
     
     // Native mobile All Tasks interface 
     allTasksView.innerHTML = `
@@ -2025,7 +2027,7 @@ window.tasks.forEach(task => {
 
                 <!-- Compact Overview with Native Styling -->
                 <div class="bg-white/90 backdrop-blur-sm rounded-xl p-4 mb-6 border border-white/20 shadow-sm">
-                    <div class="flex justify-center items-center gap-8 text-sm mb-4">
+                    <div class="flex justify-center items-center gap-6 text-sm mb-4">
                         <div class="text-center">
                             <div class="text-xl font-bold text-blue-600">${totalTasks}</div>
                             <div class="text-xs text-gray-600">Tasks</div>
@@ -2034,6 +2036,12 @@ window.tasks.forEach(task => {
                             <div class="text-xl font-bold text-green-600">$${Math.round(totalCost)}</div>
                             <div class="text-xs text-gray-600">Annual Cost</div>
                         </div>
+                        ${hoaCost > 0 ? `
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-purple-600">$${annualHoaCost}</div>
+                            <div class="text-xs text-gray-600">Annual HOA</div>
+                        </div>
+                        ` : ''}
                     </div>
                     <button onclick="event.stopPropagation(); window.closeDatePickerModal(); addTaskFromDashboard()" 
                             class="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 font-semibold shadow-lg transition-all duration-200">
