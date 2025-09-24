@@ -417,7 +417,7 @@ clearTaskPanel() {
                         <p class="text-gray-600 text-xs mb-2 line-clamp-2">${task.description || ''}</p>
                         <div class="flex items-center gap-3 text-xs text-gray-500">
                             <span>📋 ${task.category}</span>
-                            <span>💰 $${task.cost}</span>
+                            <span>💰 ${window.formatCurrency ? window.formatCurrency(task.cost) : '$' + Math.round(task.cost).toLocaleString()}</span>
                             <span>🔄 Every ${task.frequency} days</span>
                         </div>
                     </div>

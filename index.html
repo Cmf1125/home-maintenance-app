@@ -4449,7 +4449,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (hoaCost > 0 && hoaDisplayElement && hoaAmountElement) {
                 const annualHoaCost = hoaCost * 12; // Convert monthly to yearly
-                hoaAmountElement.textContent = '$' + annualHoaCost;
+                hoaAmountElement.textContent = window.formatCurrency ? window.formatCurrency(annualHoaCost) : '$' + Math.round(annualHoaCost).toLocaleString();
                 hoaDisplayElement.classList.remove('hidden');
                 
                 // Also update homeData if it exists

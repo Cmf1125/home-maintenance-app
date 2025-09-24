@@ -1,4 +1,13 @@
 // The Home Keeper App - Clean Simple Version with All Fixes
+
+// Helper function to format numbers with commas
+function formatCurrency(amount) {
+    return '$' + Math.round(amount).toLocaleString();
+}
+
+// Make formatCurrency globally available
+window.formatCurrency = formatCurrency;
+
 // App data
 let homeData = {};
 let tasks = [];
@@ -1436,7 +1445,7 @@ function renderSimpleTaskItem(task) {
             <!-- Row 2: Frequency + Cost -->
             <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
                 <span>Every ${task.frequency} days</span>
-                ${task.cost > 0 ? `<span class="text-green-600 font-medium">$${task.cost}</span>` : ''}
+                ${task.cost > 0 ? `<span class="text-green-600 font-medium">${formatCurrency(task.cost)}</span>` : ''}
             </div>
             
             <!-- Row 3: Review Button -->
@@ -2033,12 +2042,12 @@ window.tasks.forEach(task => {
                             <div class="text-xs text-gray-600">Tasks</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-xl font-bold text-green-600">$${Math.round(totalCost)}</div>
+                            <div class="text-xl font-bold text-green-600">${formatCurrency(totalCost)}</div>
                             <div class="text-xs text-gray-600">Annual Cost</div>
                         </div>
                         ${hoaCost > 0 ? `
                         <div class="text-center">
-                            <div class="text-xl font-bold text-purple-600">$${annualHoaCost}</div>
+                            <div class="text-xl font-bold text-purple-600">${formatCurrency(annualHoaCost)}</div>
                             <div class="text-xs text-gray-600">Annual HOA</div>
                         </div>
                         ` : ''}
@@ -2119,7 +2128,7 @@ function renderAllTaskCategories() {
                         <!-- Right: cost and arrow -->
                         <div class="flex items-center gap-3">
                             <span class="bg-white shadow px-3 py-1 rounded-full text-sm font-semibold text-green-600">
-                                $${Math.round(categoryCost)}/yr
+                                ${formatCurrency(categoryCost)}/yr
                             </span>
                             <span id="arrow-${categoryId}" class="text-gray-400 text-xl transition-transform duration-300">&#8250;</span>
                         </div>
@@ -2212,7 +2221,7 @@ if (isOverdue) {
             ${task.cost > 0 ? `
                 <div class="flex-shrink-0 text-right">
                     <span class="bg-green-100 text-green-800 text-sm font-semibold px-2.5 py-1 rounded-full">
-                        $${task.cost}
+                        ${formatCurrency(task.cost)}
                     </span>
                 </div>
             ` : ''}
@@ -2372,7 +2381,7 @@ function updateDashboard() {
     // Update annual cost display
     const annualCostElement = document.getElementById('annual-cost-display');
     if (annualCostElement) {
-        annualCostElement.textContent = '$' + Math.round(totalCost);
+        annualCostElement.textContent = formatCurrency(totalCost);
     }
 
     // Update HOA fee display
@@ -2382,7 +2391,7 @@ function updateDashboard() {
     
     if (hoaCost > 0 && hoaDisplayElement && hoaAmountElement) {
         const annualHoaCost = hoaCost * 12; // Convert monthly to yearly
-        hoaAmountElement.textContent = '$' + annualHoaCost;
+        hoaAmountElement.textContent = formatCurrency(annualHoaCost);
         hoaDisplayElement.classList.remove('hidden');
     } else if (hoaDisplayElement) {
         hoaDisplayElement.classList.add('hidden');
@@ -2397,7 +2406,7 @@ function updateDashboard() {
     // ADD THIS LINE: Set up click handlers for basic dashboard
     setupBasicDashboardClicks();
     
-    console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total, annual cost: $${Math.round(totalCost)}, annual HOA: $${hoaCost * 12}`);
+    console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total, annual cost: ${formatCurrency(totalCost)}, annual HOA: ${formatCurrency(hoaCost * 12)}`);
 }
 
 // Basic dashboard click handler for Total Tasks card

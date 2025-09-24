@@ -337,7 +337,7 @@ renderEnhancedTaskCard(task) {
     // Update annual cost display (now back on dashboard in maintenance summary)
     const annualCostElement = document.getElementById('annual-cost-display');
     if (annualCostElement) {
-        annualCostElement.textContent = '$' + Math.round(totalCost);
+        annualCostElement.textContent = window.formatCurrency(totalCost);
     }
 
     // Update HOA fee display
@@ -347,7 +347,7 @@ renderEnhancedTaskCard(task) {
     
     if (hoaCost > 0 && hoaDisplayElement && hoaAmountElement) {
         const annualHoaCost = hoaCost * 12; // Convert monthly to yearly
-        hoaAmountElement.textContent = '$' + annualHoaCost;
+        hoaAmountElement.textContent = window.formatCurrency(annualHoaCost);
         hoaDisplayElement.classList.remove('hidden');
     } else if (hoaDisplayElement) {
         hoaDisplayElement.classList.add('hidden');
@@ -373,7 +373,7 @@ renderEnhancedTaskCard(task) {
         homeAddressElement.innerHTML = `🏠 ${window.homeData.fullAddress} <span class="text-blue-600">(click to search on Zillow)</span>`;
     }
     
-    console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total, annual cost: $${Math.round(totalCost)}, annual HOA: $${hoaCost * 12}`);
+    console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total, annual cost: ${window.formatCurrency(totalCost)}, annual HOA: ${window.formatCurrency(hoaCost * 12)}`);
 }
 }
 
