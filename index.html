@@ -2179,6 +2179,50 @@ function showMainApp() {
         }
     };
 
+    // Show refresh button to help users see video buttons
+    window.showVideoRefreshButton = function() {
+        // Check if video buttons are already visible
+        const hasVideoButtons = document.querySelector('button[onclick*="openYouTubeVideo"]');
+        if (hasVideoButtons) {
+            console.log('✅ Video buttons are visible, no refresh needed');
+            return;
+        }
+
+        console.log('📺 Showing refresh button for video buttons');
+        
+        // Create refresh notification
+        const refreshNotification = document.createElement('div');
+        refreshNotification.id = 'video-refresh-notification';
+        refreshNotification.className = 'fixed top-20 left-4 right-4 bg-blue-500 text-white p-4 rounded-lg shadow-lg z-50 mx-auto max-w-sm';
+        refreshNotification.innerHTML = `
+            <div class="text-center">
+                <div class="mb-2">
+                    <span class="text-lg">📺</span>
+                    <strong>Video Buttons Ready!</strong>
+                </div>
+                <div class="text-sm mb-3">Refresh the page to see how-to videos for your tasks</div>
+                <button onclick="window.location.reload()" 
+                        class="bg-white text-blue-500 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors w-full">
+                    🔄 Refresh Page
+                </button>
+                <button onclick="document.getElementById('video-refresh-notification').remove()" 
+                        class="mt-2 text-blue-200 hover:text-white text-xs underline">
+                    Maybe later
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(refreshNotification);
+        
+        // Auto-remove after 10 seconds if not clicked
+        setTimeout(() => {
+            const notification = document.getElementById('video-refresh-notification');
+            if (notification) {
+                notification.remove();
+            }
+        }, 10000);
+    };
+
     // Generate YouTube search URL based on task name
     window.generateYouTubeSearch = function() {
         const taskNameField = document.getElementById('edit-task-name');
@@ -3956,6 +4000,11 @@ function handleSuccessfulLogin(user) {
                                 setTimeout(() => {
                                     window.enhancedDashboard.render();
                                     console.log('✅ Dashboard force-refreshed with YouTube URLs');
+                                        
+                                        // Show refresh button after a delay if video buttons still not visible
+                                        setTimeout(() => {
+                                            showVideoRefreshButton();
+                                        }, 1000);
                                 }, 50);
                             } else {
                                 window.enhancedDashboard.render();
