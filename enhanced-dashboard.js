@@ -282,33 +282,31 @@ renderEnhancedTaskCard(task) {
             <span class="text-xs text-gray-500">${categoryInfo.icon} ${task.category}</span>
         </div>
         
-        <!-- Row 2: Video Demo (if available) -->
-        ${task.youtubeUrl && task.youtubeUrl.includes('youtube.com') ? `
-        <div class="mb-2">
+        <!-- Row 2: Due Date + Video Demo -->
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-xs ${dueDateColor} font-medium">${dueDateDisplay}</span>
+            ${task.youtubeUrl && task.youtubeUrl.includes('youtube.com') ? `
             <button onclick="event.stopPropagation(); openYouTubeVideo('${task.youtubeUrl}')" 
                     class="bg-red-50 text-red-700 hover:bg-red-100 px-2 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1">
                 📺 Watch How-To Video
             </button>
+            ` : '<div></div>'}
         </div>
-        ` : `<!-- DEBUG: No valid YouTube URL for task: ${task.title} (${task.youtubeUrl || 'undefined'}) -->`}
         
-        <!-- Row 3: Due Date + Action Buttons -->
-        <div class="flex items-center justify-between gap-1">
-            <span class="text-xs ${dueDateColor} flex-shrink-0 min-w-0 max-w-[70px] truncate">${dueDateDisplay}</span>
-            <div class="flex gap-0.5 flex-shrink-0">
-                <button onclick="event.stopPropagation(); showTaskHistory(${task.id})" 
-                        class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-1 py-1 rounded text-xs font-medium transition-colors">
-                    History
-                </button>
-                <button onclick="event.stopPropagation(); completeTask(${task.id})" 
-                        class="bg-green-100 text-green-700 hover:bg-green-200 px-1 py-1 rounded text-xs font-medium transition-colors">
-                    Complete
-                </button>
-                <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
-                        class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-1 py-1 rounded text-xs font-medium transition-colors">
-                    Reschedule
-                </button>
-            </div>
+        <!-- Row 3: Action Buttons (Full Width) -->
+        <div class="flex gap-2 justify-center">
+            <button onclick="event.stopPropagation(); showTaskHistory(${task.id})" 
+                    class="bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-1 rounded text-xs font-medium transition-colors flex-1">
+                History
+            </button>
+            <button onclick="event.stopPropagation(); completeTask(${task.id})" 
+                    class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-xs font-medium transition-colors flex-1">
+                Complete
+            </button>
+            <button onclick="event.stopPropagation(); rescheduleTaskFromDashboard(${task.id}, event)"
+                    class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded text-xs font-medium transition-colors flex-1">
+                Reschedule
+            </button>
         </div>
     </div>
 `;
