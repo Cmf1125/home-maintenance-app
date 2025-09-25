@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Home Keeper - Professional Icon Generator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .preview-item {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border-radius: 20%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .style-options {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .color-option {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            margin: 5px;
+            cursor: pointer;
+            border: 3px solid transparent;
+        }
+        .color-option.selected {
+            border-color: #1d4ed8;
+        }
+        h1 {
+            text-align: center;
+            color: #1e293b;
+            margin-bottom: 30px;
+        }
+        .download-all {
+            background: #059669;
+            font-size: 16px;
+            padding: 15px 30px;
+        }
+        .download-all:hover {
+            background: #047857;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏠 The Home Keeper - Professional Icon Generator</h1>
+    
+    <div class="style-options">
+        <h3>Choose Style:</h3>
+        <div>
+            <label><input type="radio" name="style" value="gradient" checked> Gradient Background</label>
+            <label><input type="radio" name="style" value="solid"> Solid Background</label>
+            <label><input type="radio" name="style" value="modern"> Modern with Shadow</label>
+        </div>
+        
+        <h3>Choose Color Scheme:</h3>
+        <div id="color-options">
+            <div class="color-option selected" data-primary="#2563eb" data-secondary="#3b82f6" style="background: linear-gradient(135deg, #2563eb, #3b82f6)"></div>
+            <div class="color-option" data-primary="#059669" data-secondary="#10b981" style="background: linear-gradient(135deg, #059669, #10b981)"></div>
+            <div class="color-option" data-primary="#dc2626" data-secondary="#ef4444" style="background: linear-gradient(135deg, #dc2626, #ef4444)"></div>
+            <div class="color-option" data-primary="#7c3aed" data-secondary="#8b5cf6" style="background: linear-gradient(135deg, #7c3aed, #8b5cf6)"></div>
+            <div class="color-option" data-primary="#ea580c" data-secondary="#f97316" style="background: linear-gradient(135deg, #ea580c, #f97316)"></div>
+        </div>
+        
+        <button onclick="generateIcons()">🎨 Generate Icons</button>
+        <button onclick="downloadAll()" class="download-all">📦 Download All Icons</button>
+    </div>
+    
+    <div class="preview-container">
+        <div class="preview-item">
+            <h3>180×180 (iOS)</h3>
+            <canvas id="canvas180" width="180" height="180"></canvas>
+            <br>
+            <button onclick="downloadIcon('canvas180', 180)">Download iOS Icon</button>
+        </div>
+        <div class="preview-item">
+            <h3>192×192 (Android)</h3>
+            <canvas id="canvas192" width="192" height="192"></canvas>
+            <br>
+            <button onclick="downloadIcon('canvas192', 192)">Download Android Icon</button>
+        </div>
+        <div class="preview-item">
+            <h3>512×512 (Store)</h3>
+            <canvas id="canvas512" width="512" height="512"></canvas>
+            <br>
+            <button onclick="downloadIcon('canvas512', 512)">Download Store Icon</button>
+        </div>
+    </div>
+
+    <script>
+        let currentColors = { primary: '#2563eb', secondary: '#3b82f6' };
+        let currentStyle = 'gradient';
+        
+        // Color selection
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                currentColors.primary = this.dataset.primary;
+                currentColors.secondary = this.dataset.secondary;
+                generateIcons();
+            });
+        });
+        
+        // Style selection
+        document.querySelectorAll('input[name="style"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                currentStyle = this.value;
+                generateIcons();
+            });
+        });
+
+        function createProfessionalIcon(canvasId, size) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // Create background based on style
+            if (currentStyle === 'gradient') {
+                const gradient = ctx.createLinearGradient(0, 0, size, size);
+                gradient.addColorStop(0, currentColors.primary);
+                gradient.addColorStop(1, currentColors.secondary);
+                ctx.fillStyle = gradient;
+            } else if (currentStyle === 'solid') {
+                ctx.fillStyle = currentColors.primary;
+            } else if (currentStyle === 'modern') {
+                // Modern with subtle gradient and shadow effect
+                const gradient = ctx.createRadialGradient(size/2, size/3, 0, size/2, size/2, size*0.8);
+                gradient.addColorStop(0, currentColors.secondary);
+                gradient.addColorStop(1, currentColors.primary);
+                ctx.fillStyle = gradient;
+            }
+            
+            // Fill background with rounded corners
+            const radius = size * 0.22; // 22% radius for modern app icon look
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, radius);
+            ctx.fill();
+            
+            // Add subtle inner shadow for depth (modern style)
+            if (currentStyle === 'modern') {
+                const innerGradient = ctx.createLinearGradient(0, 0, 0, size);
+                innerGradient.addColorStop(0, 'rgba(255,255,255,0.15)');
+                innerGradient.addColorStop(0.5, 'rgba(255,255,255,0)');
+                innerGradient.addColorStop(1, 'rgba(0,0,0,0.1)');
+                ctx.fillStyle = innerGradient;
+                ctx.fill();
+            }
+            
+            // Draw professional house icon
+            drawHouseIcon(ctx, size);
+        }
+        
+        function drawHouseIcon(ctx, size) {
+            const scale = size / 512; // Base design on 512px
+            const centerX = size / 2;
+            const centerY = size / 2;
+            
+            ctx.fillStyle = 'white';
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3 * scale;
+            
+            // House base (rectangle)
+            const houseWidth = 160 * scale;
+            const houseHeight = 140 * scale;
+            const houseX = centerX - houseWidth / 2;
+            const houseY = centerY - houseHeight / 2 + 20 * scale;
+            
+            ctx.fillRect(houseX, houseY, houseWidth, houseHeight);
+            
+            // Roof (triangle)
+            ctx.beginPath();
+            ctx.moveTo(houseX - 20 * scale, houseY); // Left point
+            ctx.lineTo(centerX, houseY - 60 * scale); // Top point
+            ctx.lineTo(houseX + houseWidth + 20 * scale, houseY); // Right point
+            ctx.closePath();
+            ctx.fill();
+            
+            // Door
+            const doorWidth = 30 * scale;
+            const doorHeight = 60 * scale;
+            const doorX = centerX - doorWidth / 2;
+            const doorY = houseY + houseHeight - doorHeight;
+            
+            ctx.fillStyle = currentColors.primary;
+            ctx.fillRect(doorX, doorY, doorWidth, doorHeight);
+            
+            // Door handle
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(doorX + doorWidth - 8 * scale, doorY + doorHeight / 2, 2 * scale, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Windows
+            const windowSize = 25 * scale;
+            const windowY = houseY + 30 * scale;
+            
+            // Left window
+            ctx.fillStyle = currentColors.primary;
+            ctx.fillRect(houseX + 30 * scale, windowY, windowSize, windowSize);
+            
+            // Right window  
+            ctx.fillRect(houseX + houseWidth - 30 * scale - windowSize, windowY, windowSize, windowSize);
+            
+            // Window frames (crosses)
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2 * scale;
+            
+            // Left window cross
+            const leftWindowX = houseX + 30 * scale;
+            ctx.beginPath();
+            ctx.moveTo(leftWindowX + windowSize/2, windowY);
+            ctx.lineTo(leftWindowX + windowSize/2, windowY + windowSize);
+            ctx.moveTo(leftWindowX, windowY + windowSize/2);
+            ctx.lineTo(leftWindowX + windowSize, windowY + windowSize/2);
+            ctx.stroke();
+            
+            // Right window cross
+            const rightWindowX = houseX + houseWidth - 30 * scale - windowSize;
+            ctx.beginPath();
+            ctx.moveTo(rightWindowX + windowSize/2, windowY);
+            ctx.lineTo(rightWindowX + windowSize/2, windowY + windowSize);
+            ctx.moveTo(rightWindowX, windowY + windowSize/2);
+            ctx.lineTo(rightWindowX + windowSize, windowY + windowSize/2);
+            ctx.stroke();
+            
+            // Chimney
+            const chimneyWidth = 15 * scale;
+            const chimneyHeight = 40 * scale;
+            const chimneyX = centerX + 40 * scale;
+            const chimneyY = houseY - 60 * scale;
+            
+            ctx.fillStyle = 'white';
+            ctx.fillRect(chimneyX, chimneyY, chimneyWidth, chimneyHeight);
+            
+            // Add subtle shadow under roof for depth
+            if (currentStyle === 'modern' || currentStyle === 'gradient') {
+                ctx.fillStyle = 'rgba(0,0,0,0.1)';
+                ctx.fillRect(houseX, houseY, houseWidth, 5 * scale);
+            }
+        }
+
+        function generateIcons() {
+            createProfessionalIcon('canvas180', 180);
+            createProfessionalIcon('canvas192', 192);
+            createProfessionalIcon('canvas512', 512);
+        }
+
+        function downloadIcon(canvasId, size) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = `icon-${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        function downloadAll() {
+            setTimeout(() => downloadIcon('canvas180', 180), 100);
+            setTimeout(() => downloadIcon('canvas192', 192), 200);
+            setTimeout(() => downloadIcon('canvas512', 512), 300);
+        }
+
+        // Generate initial icons
+        generateIcons();
+    </script>
+</body>
+</html>

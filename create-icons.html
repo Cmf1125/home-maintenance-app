@@ -17,11 +17,12 @@
         ctx.fillStyle = '#2563eb';
         ctx.fillRect(0, 0, size, size);
         
-        // House emoji
-        ctx.font = `${size * 0.4}px Arial`;
+        // H logo (matching your app's branding)
+        ctx.font = `bold ${size * 0.5}px Inter, Arial, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('🏠', size/2, size/2);
+        ctx.fillStyle = 'white';
+        ctx.fillText('H', size/2, size/2);
         
         // Create download link
         const link = document.createElement('a');
