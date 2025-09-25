@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Generator</title>
+</head>
+<body>
+    <canvas id="canvas192" width="192" height="192"></canvas>
+    <canvas id="canvas512" width="512" height="512"></canvas>
+    <canvas id="canvas180" width="180" height="180"></canvas>
+    
+    <script>
+    function createIcon(canvasId, size) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
+        
+        // Blue background
+        ctx.fillStyle = '#2563eb';
+        ctx.fillRect(0, 0, size, size);
+        
+        // House emoji
+        ctx.font = `${size * 0.4}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🏠', size/2, size/2);
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.download = `icon-${size}.png`;
+        link.href = canvas.toDataURL();
+        document.body.appendChild(link);
+        
+        const button = document.createElement('button');
+        button.textContent = `Download ${size}x${size} Icon`;
+        button.onclick = () => link.click();
+        document.body.appendChild(button);
+        document.body.appendChild(document.createElement('br'));
+    }
+    
+    createIcon('canvas192', 192);
+    createIcon('canvas512', 512);
+    createIcon('canvas180', 180);
+    </script>
+</body>
+</html>

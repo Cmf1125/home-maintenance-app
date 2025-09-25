@@ -3932,6 +3932,9 @@ function proceedToTaskGeneration() {
     console.log('🚀 Proceeding to task generation...');
     
     // Use the new task generator system to get tasks with proper YouTube URLs
+    console.log('🔍 DEBUG: window.taskGenerator exists:', !!window.taskGenerator);
+    console.log('🔍 DEBUG: window.taskGenerator.createMaintenancePlan exists:', !!(window.taskGenerator && window.taskGenerator.createMaintenancePlan));
+    
     if (window.taskGenerator && window.taskGenerator.createMaintenancePlan) {
         console.log('🚀 Using new task generator with YouTube URLs');
         const result = window.taskGenerator.createMaintenancePlan();
@@ -3939,7 +3942,8 @@ function proceedToTaskGeneration() {
         window.tasks = result.tasks;
         console.log(`🚀 Generated ${result.tasks.length} tasks with YouTube URLs`);
     } else {
-        console.log('🚀 Fallback to old system');
+        console.log('🚀 Fallback to old system - task generator not available');
+        console.log('🔍 Available on window:', Object.keys(window).filter(k => k.includes('task') || k.includes('Task')));
         // Fallback to old system
         generateTaskTemplates();
         window.homeData = homeData;

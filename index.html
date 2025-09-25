@@ -100,6 +100,15 @@ body.setup-active #setup-form {
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="The Home Keeper">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- iOS Safari specific - won't affect calendar styling -->
+<meta name="apple-touch-fullscreen" content="yes">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+
+<!-- Prevent iOS from styling phone numbers and addresses -->
+<meta name="format-detection" content="telephone=no, address=no">
 
 <!-- App Icon -->
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='180' height='180' fill='%232563eb'/%3E%3Ctext x='90' y='110' font-family='Arial' font-size='50' fill='white' text-anchor='middle'%3E🏠%3C/text%3E%3C/svg%3E">
@@ -3082,6 +3091,21 @@ window.showEmailLogin = showEmailLogin;
     <script src="date-utils.js"></script>
     <script src="marketplace.js"></script>
     <script src="google-calendar-sync.js"></script>
+    
+    <!-- PWA Service Worker (minimal, non-invasive) -->
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function(registration) {
+                    console.log('✅ Service worker registered for PWA compliance');
+                })
+                .catch(function(error) {
+                    console.log('⚠️ Service worker registration failed (non-critical):', error);
+                });
+        });
+    }
+    </script>
     
     <!-- Rotating Benefits Animation -->
     <script>
