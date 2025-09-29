@@ -566,11 +566,8 @@ if (askForTasks) {
     const maintenanceTasks = this.generateMaintenanceTasks(newAppliance);
     
     if (maintenanceTasks.length > 0) {
-        window.tasks.push(...maintenanceTasks);
-        alert(`🔧 Generated ${maintenanceTasks.length} maintenance tasks!`);
-        
-        // Save again now that we have both appliance AND tasks
-        this.saveAppliances();
+        // Show task preview modal instead of immediately adding tasks
+        this.showTaskPreviewModal(maintenanceTasks, newAppliance);
     }
 } else {
     alert(`✅ Appliance "${newAppliance.name}" added successfully!`);
@@ -1858,8 +1855,151 @@ generateTasksForAppliance(applianceId) {
     const tasks = this.generateMaintenanceTasks(appliance);
     
     if (tasks.length > 0) {
-        window.tasks.push(...tasks);
+        // Show task preview modal instead of immediately adding tasks
+        this.showTaskPreviewModal(tasks, appliance);
+    }
+   } 
+
+// Method to show task preview modal with editing capabilities
+showTaskPreviewModal(tasks, appliance) {
+    // Remove any existing modal
+    const existingModal = document.getElementById('task-preview-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'task-preview-modal';
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(0,0,0,0.5); z-index: 10000; display: flex; 
+        align-items: center; justify-content: center; padding: 20px;
+    `;
+
+    modal.innerHTML = `
+        <div style="
+            background: white; border-radius: 12px; max-width: 600px; width: 100%; 
+            max-height: 80vh; overflow-y: auto; padding: 24px;
+        ">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; font-size: 20px; font-weight: 600;">
+                    🔧 Review Generated Tasks for ${appliance.name}
+                </h3>
+                <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                        style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+            </div>
+            
+            <p style="color: #666; margin-bottom: 20px;">
+                Review and edit the ${tasks.length} maintenance tasks generated for your ${appliance.name}. 
+                You can modify titles, descriptions, and due dates before adding them to your task list.
+            </p>
+            
+            <div id="task-preview-list">
+                ${tasks.map((task, index) => this.renderTaskPreviewItem(task, index)).join('')}
+            </div>
+            
+            <div style="display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end;">
+                <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                        style="
+                            background: #e5e7eb; color: #374151; border: none; 
+                            padding: 12px 24px; border-radius: 8px; font-weight: 500; cursor: pointer;
+                        ">
+                    Cancel
+                </button>
+                <button onclick="window.applianceManager.addPreviewedTasks()" 
+                        style="
+                            background: #2563eb; color: white; border: none; 
+                            padding: 12px 24px; border-radius: 8px; font-weight: 500; cursor: pointer;
+                        ">
+                    Add ${tasks.length} Tasks
+                </button>
+            </div>
+        </div>
+    `;
+
+    // Store tasks temporarily for editing
+    this.previewedTasks = [...tasks];
+    this.previewedAppliance = appliance;
+
+    document.body.appendChild(modal);
+}
+
+// Method to render individual task preview item with edit controls
+renderTaskPreviewItem(task, index) {
+    return `
+        <div style="
+            border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 12px;
+            background: #f9fafb;
+        ">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <input type="text" 
+                       value="${task.title}" 
+                       onchange="window.applianceManager.updatePreviewedTask(${index}, 'title', this.value)"
+                       style="
+                           font-weight: 600; font-size: 16px; border: 1px solid #d1d5db; 
+                           border-radius: 4px; padding: 8px; width: 100%; margin-right: 8px;
+                       ">
+                <span style="
+                    background: ${this.getCategoryColor(task.category)}; color: white; 
+                    padding: 4px 8px; border-radius: 4px; font-size: 12px; white-space: nowrap;
+                ">
+                    ${task.category}
+                </span>
+            </div>
+            
+            <textarea onchange="window.applianceManager.updatePreviewedTask(${index}, 'description', this.value)"
+                      style="
+                          width: 100%; border: 1px solid #d1d5db; border-radius: 4px; 
+                          padding: 8px; margin-bottom: 8px; min-height: 60px; resize: vertical;
+                      "
+                      placeholder="Task description...">${task.description || ''}</textarea>
+            
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <label style="font-size: 14px; color: #374151;">Due Date:</label>
+                <input type="date" 
+                       value="${task.dueDate ? task.dueDate.toISOString().split('T')[0] : ''}"
+                       onchange="window.applianceManager.updatePreviewedTask(${index}, 'dueDate', new Date(this.value))"
+                       style="border: 1px solid #d1d5db; border-radius: 4px; padding: 6px;">
+                <label style="font-size: 14px; color: #374151;">Priority:</label>
+                <select onchange="window.applianceManager.updatePreviewedTask(${index}, 'priority', this.value)"
+                        style="border: 1px solid #d1d5db; border-radius: 4px; padding: 6px;">
+                    <option value="Low" ${task.priority === 'Low' ? 'selected' : ''}>Low</option>
+                    <option value="Medium" ${task.priority === 'Medium' ? 'selected' : ''}>Medium</option>
+                    <option value="High" ${task.priority === 'High' ? 'selected' : ''}>High</option>
+                    <option value="Critical" ${task.priority === 'Critical' ? 'selected' : ''}>Critical</option>
+                </select>
+            </div>
+        </div>
+    `;
+}
+
+// Method to update a previewed task
+updatePreviewedTask(index, field, value) {
+    if (this.previewedTasks && this.previewedTasks[index]) {
+        this.previewedTasks[index][field] = value;
+    }
+}
+
+// Method to get category color for styling
+getCategoryColor(category) {
+    const colors = {
+        'HVAC': '#dc2626',
+        'Appliance': '#2563eb', 
+        'General': '#059669',
+        'Exterior': '#d97706',
+        'Safety': '#dc2626'
+    };
+    return colors[category] || '#6b7280';
+}
+
+// Method to add the previewed tasks to the main task list
+addPreviewedTasks() {
+    if (this.previewedTasks && this.previewedTasks.length > 0) {
+        // Add tasks to global task array
+        window.tasks.push(...this.previewedTasks);
         
+        // Save tasks and appliances
+        this.saveAppliances();
         if (typeof window.saveData === 'function') {
             window.saveData();
         }
@@ -1867,9 +2007,19 @@ generateTasksForAppliance(applianceId) {
         // Refresh current view
         this.render();
         
-        alert(`✅ Generated ${tasks.length} maintenance tasks for ${appliance.name}!`);
+        // Remove modal
+        const modal = document.getElementById('task-preview-modal');
+        if (modal) modal.remove();
+        
+        // Show success message
+        alert(`✅ Added ${this.previewedTasks.length} maintenance tasks for ${this.previewedAppliance.name}!`);
+        
+        // Clear temporary data
+        this.previewedTasks = null;
+        this.previewedAppliance = null;
     }
-   } 
+}
+
 }
 
 // appliances.js - Updated initialization section (replace the bottom part of your file)
