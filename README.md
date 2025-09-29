@@ -59,3 +59,4 @@ src/
 ## 🧰 Learning Goals
 
 This project is being built by a beginner learning frontend dev with guidance. Each feature is broken into a separate Git branch to encourage clean workflows.
+# Force deployment
