@@ -115,7 +115,7 @@ async saveAppliances() {
         const appliancesView = document.getElementById('appliances-view');
         if (!appliancesView) return;
         
-        const appliancesByCategory = this.groupAppliancesByCategory();
+        const appliancesByLocation = this.groupAppliancesByLocation();
         const totalAppliances = this.appliances.length;
         const appliancesNeedingAttention = this.getAppliancesNeedingAttention();
         
@@ -190,7 +190,7 @@ async saveAppliances() {
         </button>
     </div>
    <div class="appliances-list-container">
-    ${this.renderApplianceCategories(appliancesByCategory)}
+    ${this.renderAppliancesByLocation(appliancesByLocation)}
 </div>
 
 </div>
@@ -596,32 +596,30 @@ calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
     
     return expiration.toISOString().split('T')[0]; // Return as YYYY-MM-DD
 }
-    // Render appliances grouped by category
-    renderApplianceCategories(appliancesByCategory) {
-        if (Object.keys(appliancesByCategory).length === 0) {
+    // Render appliances grouped by location/room  
+    renderAppliancesByLocation(appliancesByLocation) {
+        if (Object.keys(appliancesByLocation).length === 0) {
             return '';
         }
         
         return `
             <div class="space-y-6">
-                ${Object.entries(appliancesByCategory).map(([categoryId, appliances]) => {
-                    const category = this.categories.find(c => c.id === categoryId);
-                    const categoryName = category ? category.name : 'Other';
-                    const categoryIcon = category ? category.icon : '🏠';
+                ${Object.entries(appliancesByLocation).map(([location, appliances]) => {
+                    const locationIcon = this.getLocationIcon(location);
                     
                     return `
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                             <div class="p-4 border-b border-gray-100">
                                 <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                    <span class="text-xl">${categoryIcon}</span>
-                                    ${categoryName}
+                                    <span class="text-xl">${locationIcon}</span>
+                                    ${location}
                                     <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs ml-2">
                                         ${appliances.length} appliance${appliances.length !== 1 ? 's' : ''}
                                     </span>
                                 </h3>
                             </div>
                             <div class="p-4">
-                                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                     ${appliances.map(appliance => this.renderApplianceCard(appliance)).join('')}
                                 </div>
                             </div>
@@ -630,6 +628,24 @@ calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
                 }).join('')}
             </div>
         `;
+    }
+
+    // Get appropriate icon for location/room
+    getLocationIcon(location) {
+        const locationLower = location.toLowerCase();
+        if (locationLower.includes('kitchen')) return '🍽️';
+        if (locationLower.includes('bathroom') || locationLower.includes('bath')) return '🚿';
+        if (locationLower.includes('bedroom') || locationLower.includes('bed')) return '🛏️';
+        if (locationLower.includes('living') || locationLower.includes('family')) return '🛋️';
+        if (locationLower.includes('dining')) return '🍽️';
+        if (locationLower.includes('laundry') || locationLower.includes('utility')) return '🧺';
+        if (locationLower.includes('garage')) return '🚗';
+        if (locationLower.includes('basement') || locationLower.includes('cellar')) return '🏠';
+        if (locationLower.includes('attic')) return '🏠';
+        if (locationLower.includes('office') || locationLower.includes('study')) return '💼';
+        if (locationLower.includes('outdoor') || locationLower.includes('yard') || locationLower.includes('patio')) return '🌿';
+        if (locationLower.includes('hvac') || locationLower.includes('mechanical')) return '🌡️';
+        return '🏠'; // Default icon
     }
 
 renderApplianceCard(appliance) {
@@ -1107,11 +1123,11 @@ deleteAppliance(applianceId) {
     }
     
     // Utility functions
-    groupAppliancesByCategory() {
+    groupAppliancesByLocation() {
         return this.appliances.reduce((groups, appliance) => {
-            const category = appliance.category || 'other';
-            if (!groups[category]) groups[category] = [];
-            groups[category].push(appliance);
+            const location = appliance.location || 'Unspecified';
+            if (!groups[location]) groups[location] = [];
+            groups[location].push(appliance);
             return groups;
         }, {});
     }
@@ -1238,17 +1254,17 @@ renderFilteredAppliances() {
         return;
     }
 
-   // Group filtered appliances by category and render
-const appliancesByCategory = filteredAppliances.reduce((groups, appliance) => {
-    const category = appliance.category || 'other';
-    if (!groups[category]) groups[category] = [];
-    groups[category].push(appliance);
+   // Group filtered appliances by location/room and render
+const appliancesByLocation = filteredAppliances.reduce((groups, appliance) => {
+    const location = appliance.location || 'Unspecified';
+    if (!groups[location]) groups[location] = [];
+    groups[location].push(appliance);
     return groups;
 }, {});
 
 const appliancesList = document.querySelector('.appliances-list-container');
 if (appliancesList) {
-    appliancesList.innerHTML = this.renderApplianceCategories(appliancesByCategory);
+    appliancesList.innerHTML = this.renderAppliancesByLocation(appliancesByLocation);
 }
 
 }
