@@ -115,7 +115,7 @@ async saveAppliances() {
         const appliancesView = document.getElementById('appliances-view');
         if (!appliancesView) return;
         
-        const appliancesByLocation = this.groupAppliancesByLocation();
+        const appliancesByCategory = this.groupAppliancesByCategory();
         const totalAppliances = this.appliances.length;
         const appliancesNeedingAttention = this.getAppliancesNeedingAttention();
         
@@ -190,7 +190,7 @@ async saveAppliances() {
         </button>
     </div>
    <div class="appliances-list-container">
-    ${this.renderAppliancesByLocation(appliancesByLocation)}
+    ${this.renderAppliancesByCategory(appliancesByCategory)}
 </div>
 
 </div>
@@ -289,12 +289,6 @@ renderAddForm() {
                                 <input type="text" id="appliance-serial"
                                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                                        placeholder="Serial number from appliance label">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                                <input type="text" id="appliance-location"
-                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                       placeholder="e.g., Kitchen, Basement, Garage">
                             </div>
                         </div>
                         
@@ -521,8 +515,8 @@ handleAddFormSubmit(event) {
     const price = parseFloat(document.getElementById('appliance-price').value) || 0;
     const warranty = parseInt(document.getElementById('appliance-warranty').value) || 0;
     const serial = document.getElementById('appliance-serial').value.trim();
-    const location = document.getElementById('appliance-location').value.trim();
     const notes = document.getElementById('appliance-notes').value.trim();
+    
     
     // Validate required fields
     if (!name) {
@@ -543,11 +537,15 @@ handleAddFormSubmit(event) {
         warrantyMonths: warranty,
         warrantyExpiration: this.calculateWarrantyExpiration(purchaseDate, warranty),
         serialNumber: serial,
-        location: location,
         notes: notes,
         photos: window.tempAppliancePhotos ? [...window.tempAppliancePhotos] : [], // Copy temp photos
         createdDate: new Date().toISOString()
     };
+    
+    // DEBUG: Log the created appliance object
+    console.log('🔧 Created appliance object:', newAppliance);
+    console.log('🔧 Location in object:', `"${newAppliance.location}"`);
+    
     
     // Add to appliances array
     this.appliances.push(newAppliance);
@@ -596,23 +594,24 @@ calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
     
     return expiration.toISOString().split('T')[0]; // Return as YYYY-MM-DD
 }
-    // Render appliances grouped by location/room  
-    renderAppliancesByLocation(appliancesByLocation) {
-        if (Object.keys(appliancesByLocation).length === 0) {
+    // Render appliances grouped by category
+    renderAppliancesByCategory(appliancesByCategory) {
+        if (Object.keys(appliancesByCategory).length === 0) {
             return '';
         }
         
         return `
             <div class="space-y-6">
-                ${Object.entries(appliancesByLocation).map(([location, appliances]) => {
-                    const locationIcon = this.getLocationIcon(location);
+                ${Object.entries(appliancesByCategory).map(([categoryId, appliances]) => {
+                    const category = this.categories.find(cat => cat.id === categoryId) || { name: 'Other', icon: '🏠' };
+                    const categoryIcon = category.icon;
                     
                     return `
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                             <div class="p-4 border-b border-gray-100">
                                 <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                    <span class="text-xl">${locationIcon}</span>
-                                    ${location}
+                                    <span class="text-xl">${categoryIcon}</span>
+                                    ${category.name}
                                     <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs ml-2">
                                         ${appliances.length} appliance${appliances.length !== 1 ? 's' : ''}
                                     </span>
@@ -679,11 +678,6 @@ renderApplianceCard(appliance) {
                         </div>
                     ` : ''}
                     
-                    ${appliance.location ? `
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-gray-500">📍 ${appliance.location}</span>
-                        </div>
-                    ` : ''}
                     ${appliance.serialNumber ? `
                         <div class="flex items-center gap-2">
                             <span class="text-xs text-gray-500">Serial # ${appliance.serialNumber}</span>
@@ -830,13 +824,6 @@ renderEditForm() {
                                        value="${this.currentAppliance.serialNumber || ''}"
                                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                                        placeholder="Serial number from appliance label">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                                <input type="text" id="edit-appliance-location"
-                                       value="${this.currentAppliance.location || ''}"
-                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                       placeholder="e.g., Kitchen, Basement, Garage">
                             </div>
                         </div>
                         
@@ -1031,7 +1018,6 @@ handleEditFormSubmit(event) {
     const price = parseFloat(document.getElementById('edit-appliance-price').value) || 0;
     const warranty = parseInt(document.getElementById('edit-appliance-warranty').value) || 0;
     const serial = document.getElementById('edit-appliance-serial').value.trim();
-    const location = document.getElementById('edit-appliance-location').value.trim();
     const notes = document.getElementById('edit-appliance-notes').value.trim();
     
     // Validate required fields
@@ -1051,7 +1037,6 @@ handleEditFormSubmit(event) {
     this.currentAppliance.warrantyMonths = warranty;
     this.currentAppliance.warrantyExpiration = this.calculateWarrantyExpiration(purchaseDate, warranty);
     this.currentAppliance.serialNumber = serial;
-    this.currentAppliance.location = location;
     this.currentAppliance.notes = notes;
     this.currentAppliance.lastModified = new Date().toISOString();
     
@@ -1123,11 +1108,11 @@ deleteAppliance(applianceId) {
     }
     
     // Utility functions
-    groupAppliancesByLocation() {
+    groupAppliancesByCategory() {
         return this.appliances.reduce((groups, appliance) => {
-            const location = appliance.location || 'Unspecified';
-            if (!groups[location]) groups[location] = [];
-            groups[location].push(appliance);
+            const category = appliance.category || 'other';
+            if (!groups[category]) groups[category] = [];
+            groups[category].push(appliance);
             return groups;
         }, {});
     }
@@ -1254,17 +1239,17 @@ renderFilteredAppliances() {
         return;
     }
 
-   // Group filtered appliances by location/room and render
-const appliancesByLocation = filteredAppliances.reduce((groups, appliance) => {
-    const location = appliance.location || 'Unspecified';
-    if (!groups[location]) groups[location] = [];
-    groups[location].push(appliance);
+   // Group filtered appliances by category and render
+const appliancesByCategory = filteredAppliances.reduce((groups, appliance) => {
+    const category = appliance.category || 'other';
+    if (!groups[category]) groups[category] = [];
+    groups[category].push(appliance);
     return groups;
 }, {});
 
 const appliancesList = document.querySelector('.appliances-list-container');
 if (appliancesList) {
-    appliancesList.innerHTML = this.renderAppliancesByLocation(appliancesByLocation);
+    appliancesList.innerHTML = this.renderAppliancesByCategory(appliancesByCategory);
 }
 
 }
@@ -1305,9 +1290,8 @@ showApplianceTasks(applianceId) {
                 <div style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
                     <div style="font-weight: 600; margin-bottom: 4px;">${appliance.manufacturer} ${appliance.model || ''}</div>
                     <div style="font-size: 12px; color: #6b7280;">
-                        ${appliance.location ? `📍 ${appliance.location}` : ''}
-                        ${appliance.serialNumber ? ` • 🔢 ${appliance.serialNumber}` : ''}
-                        ${appliance.purchaseDate ? ` • Purchased ${new Date(appliance.purchaseDate).getFullYear()}` : ''}
+                        ${appliance.serialNumber ? `🔢 ${appliance.serialNumber}` : ''}
+                        ${appliance.purchaseDate ? `${appliance.serialNumber ? ' • ' : ''}Purchased ${new Date(appliance.purchaseDate).getFullYear()}` : ''}
                     </div>
                 </div>
                 
