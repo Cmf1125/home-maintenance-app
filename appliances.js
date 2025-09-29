@@ -115,7 +115,6 @@ async saveAppliances() {
         const appliancesView = document.getElementById('appliances-view');
         if (!appliancesView) return;
         
-        const appliancesByCategory = this.groupAppliancesByCategory();
         const totalAppliances = this.appliances.length;
         const appliancesNeedingAttention = this.getAppliancesNeedingAttention();
         
@@ -180,19 +179,29 @@ async saveAppliances() {
     </div>
 </div>
 
-<!-- Appliances List with Filter Support -->
-<div class="appliances-section">
+<!-- Category Filter Bar -->
+<div class="bg-white rounded-xl p-4 shadow-lg">
     <div class="flex items-center justify-between mb-4">
-        <h3 class="appliances-list-title text-lg font-bold text-gray-900">All Appliances</h3>
+        <h3 class="text-lg font-bold text-gray-900">Filter by Category</h3>
         <button onclick="window.applianceManager.setFilter('all')" 
-                class="text-sm text-blue-600 hover:text-blue-800">
-            Show All
+                class="text-sm px-3 py-1 rounded-full ${this.currentFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}">
+            All
         </button>
     </div>
-   <div class="appliances-list-container">
-    ${this.renderAppliancesByCategory(appliancesByCategory)}
+    <div class="flex flex-wrap gap-2">
+        ${this.categories.map(category => `
+            <button onclick="window.applianceManager.setFilter('${category.id}')" 
+                    class="flex items-center gap-2 px-3 py-2 rounded-full text-sm transition-colors ${this.currentFilter === category.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}">
+                <span>${category.icon}</span>
+                ${category.name}
+            </button>
+        `).join('')}
+    </div>
 </div>
 
+<!-- Appliances Grid -->
+<div class="appliances-list-container">
+    ${this.renderAppliancesGrid()}
 </div>
                 
                 ${totalAppliances === 0 ? this.renderEmptyState() : ''}
@@ -594,37 +603,41 @@ calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
     
     return expiration.toISOString().split('T')[0]; // Return as YYYY-MM-DD
 }
-    // Render appliances grouped by category
-    renderAppliancesByCategory(appliancesByCategory) {
-        if (Object.keys(appliancesByCategory).length === 0) {
-            return '';
+    // Render appliances in a flat grid layout
+    renderAppliancesGrid() {
+        let filteredAppliances = this.appliances;
+        
+        // Apply current filter
+        if (this.currentFilter && this.currentFilter !== 'all') {
+            if (this.currentFilter === 'attention') {
+                filteredAppliances = this.getAppliancesNeedingAttention();
+            } else if (this.currentFilter === 'expiring') {
+                filteredAppliances = this.getWarrantiesExpiringSoon();
+            } else if (this.currentFilter === 'aging') {
+                filteredAppliances = this.getAgingAppliances();
+            } else if (this.currentFilter === 'missing') {
+                filteredAppliances = this.getAppliancesMissingInfo();
+            } else {
+                // Category filter
+                filteredAppliances = this.appliances.filter(appliance => appliance.category === this.currentFilter);
+            }
+        }
+        
+        if (filteredAppliances.length === 0) {
+            return `
+                <div class="text-center py-12">
+                    <div class="text-6xl mb-4">🔍</div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">No appliances found</h3>
+                    <p class="text-gray-600">Try adjusting your filter or add some appliances.</p>
+                </div>
+            `;
         }
         
         return `
-            <div class="space-y-6">
-                ${Object.entries(appliancesByCategory).map(([categoryId, appliances]) => {
-                    const category = this.categories.find(cat => cat.id === categoryId) || { name: 'Other', icon: '🏠' };
-                    const categoryIcon = category.icon;
-                    
-                    return `
-                        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                            <div class="p-4 border-b border-gray-100">
-                                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                    <span class="text-xl">${categoryIcon}</span>
-                                    ${category.name}
-                                    <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs ml-2">
-                                        ${appliances.length} appliance${appliances.length !== 1 ? 's' : ''}
-                                    </span>
-                                </h3>
-                            </div>
-                            <div class="p-4">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                    ${appliances.map(appliance => this.renderApplianceCard(appliance)).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('')}
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    ${filteredAppliances.map(appliance => this.renderApplianceCard(appliance)).join('')}
+                </div>
             </div>
         `;
     }
@@ -1108,14 +1121,6 @@ deleteAppliance(applianceId) {
     }
     
     // Utility functions
-    groupAppliancesByCategory() {
-        return this.appliances.reduce((groups, appliance) => {
-            const category = appliance.category || 'other';
-            if (!groups[category]) groups[category] = [];
-            groups[category].push(appliance);
-            return groups;
-        }, {});
-    }
     
     getAppliancesNeedingAttention() {
         return this.appliances.filter(appliance => {
@@ -1223,35 +1228,8 @@ getFilteredAppliances() {
 }
 
 renderFilteredAppliances() {
-    const filteredAppliances = this.getFilteredAppliances();
-    
-    if (filteredAppliances.length === 0) {
-        const appliancesList = document.querySelector('.appliances-list-container');
-        if (appliancesList) {
-            const emptyMessages = {
-                'attention': '🎉 No appliances need attention!',
-                'expiring': '✅ No warranties expiring soon!',
-                'aging': '👍 No appliances aging out!',
-                'missing': '✅ All appliance info complete!'
-            };
-            appliancesList.innerHTML = `<div class="text-center text-gray-500 py-8">${emptyMessages[this.currentFilter] || 'No appliances found.'}</div>`;
-        }
-        return;
-    }
-
-   // Group filtered appliances by category and render
-const appliancesByCategory = filteredAppliances.reduce((groups, appliance) => {
-    const category = appliance.category || 'other';
-    if (!groups[category]) groups[category] = [];
-    groups[category].push(appliance);
-    return groups;
-}, {});
-
-const appliancesList = document.querySelector('.appliances-list-container');
-if (appliancesList) {
-    appliancesList.innerHTML = this.renderAppliancesByCategory(appliancesByCategory);
-}
-
+    // Simply re-render the overview which now includes the grid
+    this.renderOverview();
 }
 // Show appliance tasks in modal
 showApplianceTasks(applianceId) {
