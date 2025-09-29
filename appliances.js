@@ -2077,6 +2077,12 @@ editApplianceTask(taskId) {
     // Store that we're editing from appliance view (but not the sequential flow)
     window.editingFromApplianceView = true;
     
+    // Close the appliance tasks modal to avoid z-index conflicts
+    const applianceModal = document.getElementById('appliance-tasks-modal');
+    if (applianceModal) {
+        applianceModal.style.display = 'none'; // Hide but don't remove so we can restore it
+    }
+    
     // Open the existing task editor
     if (window.TaskManager && window.TaskManager.openModal) {
         window.TaskManager.openModal(task, false);

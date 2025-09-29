@@ -2360,11 +2360,15 @@ if (originalTaskManagerSave && window.TaskManager) {
             }, 100);
         }
         
-        // If we were editing from appliance view, refresh the appliance modal
+        // If we were editing from appliance view, restore the appliance modal
         if (window.editingFromApplianceView) {
-            console.log('🔄 Refreshing appliance view after task edit...');
+            console.log('🔄 Restoring appliance view after task edit...');
             setTimeout(() => {
-                // The appliance modal should refresh automatically when reopened
+                // Restore the hidden appliance modal
+                const applianceModal = document.getElementById('appliance-tasks-modal');
+                if (applianceModal) {
+                    applianceModal.style.display = 'flex';
+                }
                 window.editingFromApplianceView = false;
             }, 100);
         }
@@ -2372,6 +2376,28 @@ if (originalTaskManagerSave && window.TaskManager) {
         return result;
     };
     console.log('✅ TaskManager.save enhanced for All Tasks refresh');
+}
+
+// Also override TaskManager close to handle appliance modal restoration
+const originalTaskManagerClose = window.TaskManager?.close;
+if (originalTaskManagerClose && window.TaskManager) {
+    window.TaskManager.close = function() {
+        // If we were editing from appliance view and user cancels, restore the modal
+        if (window.editingFromApplianceView) {
+            console.log('🔄 Restoring appliance view after task edit cancel...');
+            setTimeout(() => {
+                const applianceModal = document.getElementById('appliance-tasks-modal');
+                if (applianceModal) {
+                    applianceModal.style.display = 'flex';
+                }
+                window.editingFromApplianceView = false;
+            }, 100);
+        }
+        
+        // Call the original close function
+        return originalTaskManagerClose.apply(this, arguments);
+    };
+    console.log('✅ TaskManager.close enhanced for appliance modal restoration');
 }
 
 // Make the function globally available
