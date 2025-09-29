@@ -2352,6 +2352,14 @@ if (originalTaskManagerSave && window.TaskManager) {
             }, 100);
         }
         
+        // If we were editing appliance tasks, continue to next task
+        if (window.editingApplianceTasks && window.applianceTaskEditor) {
+            console.log('🔄 Moving to next appliance task...');
+            setTimeout(() => {
+                window.applianceTaskEditor.nextTask();
+            }, 100);
+        }
+        
         return result;
     };
     console.log('✅ TaskManager.save enhanced for All Tasks refresh');

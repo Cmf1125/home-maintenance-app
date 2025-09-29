@@ -1860,19 +1860,29 @@ generateTasksForAppliance(applianceId) {
     }
    } 
 
-// Method to show task preview modal with editing capabilities
+// Method to show task preview using existing task editor
 showTaskPreviewModal(tasks, appliance) {
     console.log('🔧 showTaskPreviewModal called with:', tasks.length, 'tasks for', appliance.name);
-    alert(`DEBUG: About to show preview modal for ${tasks.length} tasks for ${appliance.name}`);
     
+    // Store tasks and appliance for the editing flow
+    this.previewedTasks = [...tasks];
+    this.previewedAppliance = appliance;
+    this.currentTaskIndex = 0;
+    
+    // Show initial confirmation modal
+    this.showTaskReviewConfirmation(tasks, appliance);
+}
+
+// Method to show confirmation modal before editing tasks
+showTaskReviewConfirmation(tasks, appliance) {
     // Remove any existing modal
-    const existingModal = document.getElementById('task-preview-modal');
+    const existingModal = document.getElementById('task-review-confirmation');
     if (existingModal) {
         existingModal.remove();
     }
 
     const modal = document.createElement('div');
-    modal.id = 'task-preview-modal';
+    modal.id = 'task-review-confirmation';
     modal.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
         background: rgba(0,0,0,0.5); z-index: 10000; display: flex; 
@@ -1881,122 +1891,127 @@ showTaskPreviewModal(tasks, appliance) {
 
     modal.innerHTML = `
         <div style="
-            background: white; border-radius: 12px; max-width: 600px; width: 100%; 
-            max-height: 80vh; overflow-y: auto; padding: 24px;
+            background: white; border-radius: 12px; max-width: 500px; width: 100%; 
+            padding: 24px; text-align: center;
         ">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="margin: 0; font-size: 20px; font-weight: 600;">
-                    🔧 Review Generated Tasks for ${appliance.name}
-                </h3>
-                <button onclick="this.parentElement.parentElement.parentElement.remove()" 
-                        style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
-            </div>
+            <div style="font-size: 48px; margin-bottom: 16px;">🔧</div>
+            <h3 style="margin: 0 0 16px 0; font-size: 20px; font-weight: 600;">
+                Generated ${tasks.length} Tasks for ${appliance.name}
+            </h3>
             
-            <p style="color: #666; margin-bottom: 20px;">
-                Review and edit the ${tasks.length} maintenance tasks generated for your ${appliance.name}. 
-                You can modify titles, descriptions, and due dates before adding them to your task list.
+            <p style="color: #666; margin-bottom: 24px; line-height: 1.5;">
+                We've created ${tasks.length} maintenance tasks for your ${appliance.name}. 
+                You can review and edit each task before adding them to your task list.
             </p>
             
-            <div id="task-preview-list">
-                ${tasks.map((task, index) => this.renderTaskPreviewItem(task, index)).join('')}
+            <div style="background: #f9fafb; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+                <h4 style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #374151;">Generated Tasks:</h4>
+                <ul style="margin: 0; padding-left: 20px; text-align: left; color: #6b7280; font-size: 14px;">
+                    ${tasks.map(task => `<li style="margin-bottom: 4px;">${task.title}</li>`).join('')}
+                </ul>
             </div>
             
-            <div style="display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end;">
-                <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button onclick="window.applianceManager.cancelTaskPreview()" 
                         style="
                             background: #e5e7eb; color: #374151; border: none; 
                             padding: 12px 24px; border-radius: 8px; font-weight: 500; cursor: pointer;
                         ">
                     Cancel
                 </button>
-                <button onclick="window.applianceManager.addPreviewedTasks()" 
+                <button onclick="window.applianceManager.startTaskEditing()" 
                         style="
                             background: #2563eb; color: white; border: none; 
                             padding: 12px 24px; border-radius: 8px; font-weight: 500; cursor: pointer;
                         ">
-                    Add ${tasks.length} Tasks
+                    Review & Edit Tasks
+                </button>
+                <button onclick="window.applianceManager.addAllTasksWithoutEditing()" 
+                        style="
+                            background: #059669; color: white; border: none; 
+                            padding: 12px 24px; border-radius: 8px; font-weight: 500; cursor: pointer;
+                        ">
+                    Add All Tasks
                 </button>
             </div>
         </div>
     `;
 
-    // Store tasks temporarily for editing
-    this.previewedTasks = [...tasks];
-    this.previewedAppliance = appliance;
-
     document.body.appendChild(modal);
 }
 
-// Method to render individual task preview item with edit controls
-renderTaskPreviewItem(task, index) {
-    return `
-        <div style="
-            border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 12px;
-            background: #f9fafb;
-        ">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                <input type="text" 
-                       value="${task.title}" 
-                       onchange="window.applianceManager.updatePreviewedTask(${index}, 'title', this.value)"
-                       style="
-                           font-weight: 600; font-size: 16px; border: 1px solid #d1d5db; 
-                           border-radius: 4px; padding: 8px; width: 100%; margin-right: 8px;
-                       ">
-                <span style="
-                    background: ${this.getCategoryColor(task.category)}; color: white; 
-                    padding: 4px 8px; border-radius: 4px; font-size: 12px; white-space: nowrap;
-                ">
-                    ${task.category}
-                </span>
-            </div>
-            
-            <textarea onchange="window.applianceManager.updatePreviewedTask(${index}, 'description', this.value)"
-                      style="
-                          width: 100%; border: 1px solid #d1d5db; border-radius: 4px; 
-                          padding: 8px; margin-bottom: 8px; min-height: 60px; resize: vertical;
-                      "
-                      placeholder="Task description...">${task.description || ''}</textarea>
-            
-            <div style="display: flex; gap: 12px; align-items: center;">
-                <label style="font-size: 14px; color: #374151;">Due Date:</label>
-                <input type="date" 
-                       value="${task.dueDate ? task.dueDate.toISOString().split('T')[0] : ''}"
-                       onchange="window.applianceManager.updatePreviewedTask(${index}, 'dueDate', new Date(this.value))"
-                       style="border: 1px solid #d1d5db; border-radius: 4px; padding: 6px;">
-                <label style="font-size: 14px; color: #374151;">Priority:</label>
-                <select onchange="window.applianceManager.updatePreviewedTask(${index}, 'priority', this.value)"
-                        style="border: 1px solid #d1d5db; border-radius: 4px; padding: 6px;">
-                    <option value="Low" ${task.priority === 'Low' ? 'selected' : ''}>Low</option>
-                    <option value="Medium" ${task.priority === 'Medium' ? 'selected' : ''}>Medium</option>
-                    <option value="High" ${task.priority === 'High' ? 'selected' : ''}>High</option>
-                    <option value="Critical" ${task.priority === 'Critical' ? 'selected' : ''}>Critical</option>
-                </select>
-            </div>
-        </div>
-    `;
-}
-
-// Method to update a previewed task
-updatePreviewedTask(index, field, value) {
-    if (this.previewedTasks && this.previewedTasks[index]) {
-        this.previewedTasks[index][field] = value;
+// Method to start editing tasks one by one using existing task editor
+startTaskEditing() {
+    // Close confirmation modal
+    const confirmModal = document.getElementById('task-review-confirmation');
+    if (confirmModal) confirmModal.remove();
+    
+    // Add tasks to global array temporarily for editing
+    if (this.previewedTasks && this.previewedTasks.length > 0) {
+        // Add tasks to window.tasks so they can be edited
+        window.tasks.push(...this.previewedTasks);
+        
+        // Start editing the first task
+        this.editCurrentTask();
     }
 }
 
-// Method to get category color for styling
-getCategoryColor(category) {
-    const colors = {
-        'HVAC': '#dc2626',
-        'Appliance': '#2563eb', 
-        'General': '#059669',
-        'Exterior': '#d97706',
-        'Safety': '#dc2626'
-    };
-    return colors[category] || '#6b7280';
+// Method to edit the current task using existing task editor
+editCurrentTask() {
+    if (this.currentTaskIndex < this.previewedTasks.length) {
+        const task = this.previewedTasks[this.currentTaskIndex];
+        
+        // Store that we're in appliance task editing mode
+        window.editingApplianceTasks = true;
+        window.applianceTaskEditor = this;
+        
+        // Open the existing task editor
+        if (window.TaskManager && window.TaskManager.openModal) {
+            window.TaskManager.openModal(task, false);
+        } else {
+            console.error('❌ TaskManager not available');
+            alert('❌ Task editor not available');
+        }
+    } else {
+        // Done editing all tasks
+        this.finishTaskEditing();
+    }
 }
 
-// Method to add the previewed tasks to the main task list
-addPreviewedTasks() {
+// Method to continue to next task (called after editing one task)
+nextTask() {
+    this.currentTaskIndex++;
+    this.editCurrentTask();
+}
+
+// Method to finish editing and save all tasks
+finishTaskEditing() {
+    // Save tasks and appliances
+    this.saveAppliances();
+    if (typeof window.saveData === 'function') {
+        window.saveData();
+    }
+    
+    // Refresh current view
+    this.render();
+    
+    // Show success message
+    alert(`✅ Added ${this.previewedTasks.length} maintenance tasks for ${this.previewedAppliance.name}!`);
+    
+    // Clean up
+    window.editingApplianceTasks = false;
+    window.applianceTaskEditor = null;
+    this.previewedTasks = null;
+    this.previewedAppliance = null;
+    this.currentTaskIndex = 0;
+}
+
+// Method to add all tasks without editing
+addAllTasksWithoutEditing() {
+    // Close confirmation modal
+    const confirmModal = document.getElementById('task-review-confirmation');
+    if (confirmModal) confirmModal.remove();
+    
     if (this.previewedTasks && this.previewedTasks.length > 0) {
         // Add tasks to global task array
         window.tasks.push(...this.previewedTasks);
@@ -2010,10 +2025,6 @@ addPreviewedTasks() {
         // Refresh current view
         this.render();
         
-        // Remove modal
-        const modal = document.getElementById('task-preview-modal');
-        if (modal) modal.remove();
-        
         // Show success message
         alert(`✅ Added ${this.previewedTasks.length} maintenance tasks for ${this.previewedAppliance.name}!`);
         
@@ -2021,6 +2032,18 @@ addPreviewedTasks() {
         this.previewedTasks = null;
         this.previewedAppliance = null;
     }
+}
+
+// Method to cancel task preview
+cancelTaskPreview() {
+    // Close confirmation modal
+    const confirmModal = document.getElementById('task-review-confirmation');
+    if (confirmModal) confirmModal.remove();
+    
+    // Clear temporary data
+    this.previewedTasks = null;
+    this.previewedAppliance = null;
+    this.currentTaskIndex = 0;
 }
 
 }
