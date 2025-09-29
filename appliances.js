@@ -1862,6 +1862,9 @@ generateTasksForAppliance(applianceId) {
 
 // Method to show task preview modal with editing capabilities
 showTaskPreviewModal(tasks, appliance) {
+    console.log('🔧 showTaskPreviewModal called with:', tasks.length, 'tasks for', appliance.name);
+    alert(`DEBUG: About to show preview modal for ${tasks.length} tasks for ${appliance.name}`);
+    
     // Remove any existing modal
     const existingModal = document.getElementById('task-preview-modal');
     if (existingModal) {
