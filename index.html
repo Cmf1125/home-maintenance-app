@@ -3863,8 +3863,6 @@ function signInWithGoogle() {
     if (isMobile) {
         // Use redirect for mobile (works without Dynamic Links)
         console.log('📱 Mobile detected - using redirect auth');
-        // Store flag in sessionStorage since page will reload after redirect
-        sessionStorage.setItem('googleSignInInProgress', 'true');
         auth.signInWithRedirect(provider);
         return; // signInWithRedirect doesn't return a promise
     } else {
@@ -4164,22 +4162,13 @@ function handleNewUserSignup(user) {
     console.log('✅ New user ready for setup');
 }
     
-// Check for redirect result from Google Sign In (for mobile)
+// Check for redirect result from Google Sign In (for Safari iOS only)
 console.log('🔍 Checking for redirect result...');
-
-// Check if we're returning from a Google sign-in redirect
-const wasRedirectSignIn = sessionStorage.getItem('googleSignInInProgress') === 'true';
-if (wasRedirectSignIn) {
-    console.log('📱 Detected return from Google redirect sign-in');
-    window.googleSignInInProgress = true;
-}
-
 auth.getRedirectResult().then((result) => {
     console.log('📊 Redirect result:', result);
     if (result.user) {
         console.log('✅ Google redirect sign in success:', result.user.email);
-        // Clear the flag since we're handling the result now
-        sessionStorage.removeItem('googleSignInInProgress');
+        alert('✅ Redirect sign in success! Email: ' + result.user.email);
         
         // Handle the successful sign in (same logic as popup)
         loadUserDataEnhanced(result.user.uid).then(hasData => {
@@ -4192,27 +4181,14 @@ auth.getRedirectResult().then((result) => {
         }).catch(error => {
             console.error('❌ Error loading user data after redirect:', error);
             handleNewUserSignup(result.user);
-        }).finally(() => {
-            // Clear the Google sign-in flag after processing
-            window.googleSignInInProgress = false;
         });
     } else {
         console.log('ℹ️ No user in redirect result');
-        // Clear flag if no user found
-        if (wasRedirectSignIn) {
-            sessionStorage.removeItem('googleSignInInProgress');
-            window.googleSignInInProgress = false;
-        }
     }
 }).catch((error) => {
     console.error('❌ Redirect error:', error);
     if (error.code !== 'auth/no-redirect-pending') {
         alert('Redirect error: ' + error.message);
-    }
-    // Clear flag on error
-    if (wasRedirectSignIn) {
-        sessionStorage.removeItem('googleSignInInProgress');
-        window.googleSignInInProgress = false;
     }
 });
 
