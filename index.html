@@ -3857,19 +3857,8 @@ function signInWithGoogle() {
         prompt: 'select_account'
     });
     
-    // FIXED: Use redirect for mobile, popup for desktop (post-Dynamic Links shutdown)
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-        // Use redirect for mobile (works without Dynamic Links)
-        console.log('📱 Mobile detected - using redirect auth');
-        auth.signInWithRedirect(provider);
-        return; // signInWithRedirect doesn't return a promise
-    } else {
-        // Use popup for desktop (if supported)
-        console.log('🖥️ Desktop detected - using popup auth');
-        auth.signInWithPopup(provider)
-    }
+    // Use popup for all devices (the original working method)
+    auth.signInWithPopup(provider)
         .then((result) => {
             console.log('✅ Google sign in success:', result.user.email);
             
