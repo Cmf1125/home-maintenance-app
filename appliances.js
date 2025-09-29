@@ -1874,13 +1874,115 @@ generateTasksForAppliance(applianceId) {
 showTaskPreviewModal(tasks, appliance) {
     console.log('🔧 showTaskPreviewModal called with:', tasks.length, 'tasks for', appliance.name);
     
+    // Add tasks to global array first so they can be edited
+    window.tasks.push(...tasks);
+    
     // Store tasks and appliance for the editing flow
     this.previewedTasks = [...tasks];
     this.previewedAppliance = appliance;
-    this.currentTaskIndex = 0;
     
-    // Show initial confirmation modal
-    this.showTaskReviewConfirmation(tasks, appliance);
+    // Show the tasks directly like the existing "Review Tasks" modal
+    this.showGeneratedTasksModal(tasks, appliance);
+}
+
+// Method to show generated tasks modal (simplified version)
+showGeneratedTasksModal(tasks, appliance) {
+    // Remove any existing modal
+    const existingModal = document.getElementById('generated-tasks-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'generated-tasks-modal';
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(0,0,0,0.5); z-index: 99999; display: flex; 
+        align-items: center; justify-content: center; padding: 20px;
+    `;
+
+    modal.innerHTML = `
+        <div style="
+            background: white; border-radius: 12px; max-width: 600px; width: 100%; 
+            max-height: 80vh; overflow-y: auto; padding: 24px;
+        ">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; font-size: 20px; font-weight: 600;">
+                    🔧 Generated ${tasks.length} Tasks for ${appliance.name}
+                </h3>
+                <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                        style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+            </div>
+            
+            <p style="color: #666; margin-bottom: 20px;">
+                Review the generated maintenance tasks. You can edit any task or add them all to your task list.
+            </p>
+            
+            <div style="margin-bottom: 24px;">
+                ${tasks.map(task => this.renderGeneratedTaskItem(task, appliance.id)).join('')}
+            </div>
+            
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button onclick="window.applianceManager.cancelGeneratedTasks()" 
+                        style="
+                            background: #e5e7eb; color: #374151; border: none; 
+                            padding: 12px 24px; border-radius: 8px; font-weight: 500; cursor: pointer;
+                        ">
+                    Cancel
+                </button>
+                <button onclick="window.applianceManager.confirmGeneratedTasks()" 
+                        style="
+                            background: #059669; color: white; border: none; 
+                            padding: 12px 24px; border-radius: 8px; font-weight: 500; cursor: pointer;
+                        ">
+                    Add All ${tasks.length} Tasks
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+}
+
+// Method to render individual generated task item with edit button
+renderGeneratedTaskItem(task, applianceId) {
+    // Determine status styling (new tasks are pending by default)
+    const statusColor = '#f59e0b'; // Orange for new/pending
+    const statusText = 'New Task';
+    const cardBg = '#fefce8'; // Light yellow background for new tasks
+    
+    return `
+        <div style="
+            border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;
+            background: ${cardBg}; margin-bottom: 12px;
+        ">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                <h5 style="margin: 0; font-weight: 600; font-size: 14px; color: #1f2937;">${task.title}</h5>
+                <span style="
+                    background: ${task.category === 'HVAC' ? '#dc2626' : task.category === 'Appliance' ? '#2563eb' : '#059669'}; 
+                    color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; white-space: nowrap;
+                ">
+                    ${task.category}
+                </span>
+            </div>
+            ${task.description ? `<p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px;">${task.description}</p>` : ''}
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 12px; font-size: 12px; color: #6b7280;">
+                    <span style="color: ${statusColor}; font-weight: 500;">${statusText}</span>
+                    <span>🔄 Every ${task.frequency || 90} days</span>
+                    <span>⭐ ${task.priority || 'Medium'} priority</span>
+                </div>
+                <button onclick="window.applianceManager.editGeneratedTask(${task.id})"
+                        style="
+                            background: #dbeafe; color: #1d4ed8; border: none; padding: 6px 12px;
+                            border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 500;
+                        "
+                        title="Edit this task">
+                    Edit Task
+                </button>
+            </div>
+        </div>
+    `;
 }
 
 // Method to show confirmation modal before editing tasks
@@ -2061,6 +2163,79 @@ cancelTaskPreview() {
     this.previewedTasks = null;
     this.previewedAppliance = null;
     this.currentTaskIndex = 0;
+}
+
+// Method to edit a generated task (from Generated Tasks modal)
+editGeneratedTask(taskId) {
+    console.log('✏️ Editing generated task:', taskId);
+    
+    const task = window.tasks.find(t => t.id === taskId);
+    if (!task) {
+        console.error('❌ Task not found:', taskId);
+        alert('❌ Task not found');
+        return;
+    }
+    
+    // Store that we're editing from generated tasks view
+    window.editingFromGeneratedTasks = true;
+    
+    // Hide the generated tasks modal to avoid z-index conflicts
+    const generatedModal = document.getElementById('generated-tasks-modal');
+    if (generatedModal) {
+        generatedModal.style.display = 'none';
+    }
+    
+    // Open the existing task editor
+    if (window.TaskManager && window.TaskManager.openModal) {
+        window.TaskManager.openModal(task, false);
+    } else {
+        console.error('❌ TaskManager not available');
+        alert('❌ Task editor not available');
+    }
+}
+
+// Method to confirm and save all generated tasks
+confirmGeneratedTasks() {
+    // Close the modal
+    const generatedModal = document.getElementById('generated-tasks-modal');
+    if (generatedModal) generatedModal.remove();
+    
+    // Save tasks and appliances
+    this.saveAppliances();
+    if (typeof window.saveData === 'function') {
+        window.saveData();
+    }
+    
+    // Refresh current view
+    this.render();
+    
+    // Show success message
+    alert(`✅ Added ${this.previewedTasks.length} maintenance tasks for ${this.previewedAppliance.name}!`);
+    
+    // Clear temporary data
+    this.previewedTasks = null;
+    this.previewedAppliance = null;
+}
+
+// Method to cancel generated tasks
+cancelGeneratedTasks() {
+    // Remove the tasks we added
+    if (this.previewedTasks) {
+        this.previewedTasks.forEach(previewedTask => {
+            const index = window.tasks.findIndex(t => t.id === previewedTask.id);
+            if (index !== -1) {
+                window.tasks.splice(index, 1);
+            }
+        });
+    }
+    
+    // Close the modal
+    const generatedModal = document.getElementById('generated-tasks-modal');
+    if (generatedModal) generatedModal.remove();
+    
+    // Clear temporary data
+    this.previewedTasks = null;
+    this.previewedAppliance = null;
 }
 
 // Method to edit an existing appliance task (from Review Tasks modal)

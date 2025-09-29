@@ -2373,6 +2373,19 @@ if (originalTaskManagerSave && window.TaskManager) {
             }, 100);
         }
         
+        // If we were editing from generated tasks view, restore the generated tasks modal
+        if (window.editingFromGeneratedTasks) {
+            console.log('🔄 Restoring generated tasks view after task edit...');
+            setTimeout(() => {
+                // Restore the hidden generated tasks modal
+                const generatedModal = document.getElementById('generated-tasks-modal');
+                if (generatedModal) {
+                    generatedModal.style.display = 'flex';
+                }
+                window.editingFromGeneratedTasks = false;
+            }, 100);
+        }
+        
         return result;
     };
     console.log('✅ TaskManager.save enhanced for All Tasks refresh');
@@ -2391,6 +2404,18 @@ if (originalTaskManagerClose && window.TaskManager) {
                     applianceModal.style.display = 'flex';
                 }
                 window.editingFromApplianceView = false;
+            }, 100);
+        }
+        
+        // If we were editing from generated tasks view and user cancels, restore the modal
+        if (window.editingFromGeneratedTasks) {
+            console.log('🔄 Restoring generated tasks view after task edit cancel...');
+            setTimeout(() => {
+                const generatedModal = document.getElementById('generated-tasks-modal');
+                if (generatedModal) {
+                    generatedModal.style.display = 'flex';
+                }
+                window.editingFromGeneratedTasks = false;
             }, 100);
         }
         
