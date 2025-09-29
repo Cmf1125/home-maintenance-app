@@ -663,7 +663,7 @@ renderApplianceCard(appliance) {
     const warrantyStatus = this.getWarrantyStatus(appliance);
     
     return `
-        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
             <div class="cursor-pointer mb-4" onclick="window.applianceManager.showApplianceDetail('${appliance.id}')">
                 <h4 class="font-semibold text-gray-900 text-sm mb-1">${appliance.name}</h4>
                 <p class="text-xs text-gray-600 mb-2">${appliance.manufacturer} ${appliance.model || ''}</p>
