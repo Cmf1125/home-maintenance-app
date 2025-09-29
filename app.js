@@ -2360,6 +2360,15 @@ if (originalTaskManagerSave && window.TaskManager) {
             }, 100);
         }
         
+        // If we were editing from appliance view, refresh the appliance modal
+        if (window.editingFromApplianceView) {
+            console.log('🔄 Refreshing appliance view after task edit...');
+            setTimeout(() => {
+                // The appliance modal should refresh automatically when reopened
+                window.editingFromApplianceView = false;
+            }, 100);
+        }
+        
         return result;
     };
     console.log('✅ TaskManager.save enhanced for All Tasks refresh');

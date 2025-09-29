@@ -1349,14 +1349,24 @@ ${applianceTasks.map(task => {
                     <span style="color: ${statusColor}; font-weight: 500;">${statusText}</span>
                     <span>🔄 Every ${task.frequency} days</span>
                 </div>
-                <button onclick="window.applianceManager.removeApplianceTask(${task.id}, ${applianceId})"
-                        style="
-                            background: #fee2e2; color: #991b1b; border: none; padding: 4px 8px;
-                            border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 500;
-                        "
-                        title="Remove this task from this appliance">
-                    Remove Task
-                </button>
+                <div style="display: flex; gap: 6px;">
+                    <button onclick="window.applianceManager.editApplianceTask(${task.id})"
+                            style="
+                                background: #dbeafe; color: #1d4ed8; border: none; padding: 4px 8px;
+                                border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 500;
+                            "
+                            title="Edit this task">
+                        Edit Task
+                    </button>
+                    <button onclick="window.applianceManager.removeApplianceTask(${task.id}, ${applianceId})"
+                            style="
+                                background: #fee2e2; color: #991b1b; border: none; padding: 4px 8px;
+                                border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 500;
+                            "
+                            title="Remove this task from this appliance">
+                        Remove Task
+                    </button>
+                </div>
             </div>
         </div>
     `;
@@ -1981,7 +1991,14 @@ editCurrentTask() {
 // Method to continue to next task (called after editing one task)
 nextTask() {
     this.currentTaskIndex++;
-    this.editCurrentTask();
+    console.log(`🔄 Moving to task ${this.currentTaskIndex + 1} of ${this.previewedTasks.length}`);
+    
+    if (this.currentTaskIndex >= this.previewedTasks.length) {
+        console.log('✅ All tasks edited, finishing...');
+        this.finishTaskEditing();
+    } else {
+        this.editCurrentTask();
+    }
 }
 
 // Method to finish editing and save all tasks
@@ -2044,6 +2061,29 @@ cancelTaskPreview() {
     this.previewedTasks = null;
     this.previewedAppliance = null;
     this.currentTaskIndex = 0;
+}
+
+// Method to edit an existing appliance task (from Review Tasks modal)
+editApplianceTask(taskId) {
+    console.log('✏️ Editing appliance task:', taskId);
+    
+    const task = window.tasks.find(t => t.id === taskId);
+    if (!task) {
+        console.error('❌ Task not found:', taskId);
+        alert('❌ Task not found');
+        return;
+    }
+    
+    // Store that we're editing from appliance view (but not the sequential flow)
+    window.editingFromApplianceView = true;
+    
+    // Open the existing task editor
+    if (window.TaskManager && window.TaskManager.openModal) {
+        window.TaskManager.openModal(task, false);
+    } else {
+        console.error('❌ TaskManager not available');
+        alert('❌ Task editor not available');
+    }
 }
 
 }
