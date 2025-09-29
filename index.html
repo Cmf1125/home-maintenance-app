@@ -3869,6 +3869,7 @@ function signInWithGoogle() {
         // Use popup for desktop (if supported)
         console.log('🖥️ Desktop detected - using popup auth');
         auth.signInWithPopup(provider)
+    }
         .then((result) => {
             console.log('✅ Google sign in success:', result.user.email);
             
@@ -3912,7 +3913,6 @@ function signInWithGoogle() {
             alert('Google sign in failed: ' + error.message);
             window.googleSignInInProgress = false;
         });
-    } // Close the else block for desktop popup auth
 }
 
 function signOutUser() {
