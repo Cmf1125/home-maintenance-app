@@ -661,57 +661,15 @@ calculateWarrantyExpiration(purchaseDate, warrantyMonths) {
 renderApplianceCard(appliance) {
     const statusInfo = this.getApplianceStatus(appliance);
     const warrantyStatus = this.getWarrantyStatus(appliance);
-    const applianceTasks = this.getApplianceTasks(appliance.id);
-    console.log(`Appliance ${appliance.name} (ID: ${appliance.id}) has ${applianceTasks.length} tasks`);
     
     return `
         <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-            <!-- Clickable area for details -->
             <div class="cursor-pointer mb-4" onclick="window.applianceManager.showApplianceDetail('${appliance.id}')">
-                <div class="flex items-start justify-between mb-3">
-                    <div class="flex-1">
-                        <h4 class="font-semibold text-gray-900 text-sm">${appliance.name}</h4>
-                        <p class="text-xs text-gray-600">${appliance.manufacturer} ${appliance.model || ''}</p>
-                    </div>
-                    <div class="ml-2">
-                        ${statusInfo.icon}
-                    </div>
-                </div>
-                
-                <div class="space-y-2">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs ${statusInfo.colorClass}">${statusInfo.text}</span>
-                    </div>
-                    
-                    ${warrantyStatus ? `
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs ${warrantyStatus.colorClass}">🛡️ ${warrantyStatus.text}</span>
-                        </div>
-                    ` : ''}
-                    
-                    ${appliance.serialNumber ? `
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-gray-500">Serial # ${appliance.serialNumber}</span>
-                        </div>
-                    ` : ''}
-
-${appliance.purchaseDate ? (() => {
-    const years = Math.floor((Date.now() - new Date(appliance.purchaseDate)) / (1000*60*60*24*365));
-    const ageText = years < 1 ? '< 1 year' : `${years} year${years > 1 ? 's' : ''}`;
-    return `
-        <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-500">Purchased ${new Date(appliance.purchaseDate).getFullYear()}</span>
-        </div>
-        <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-500">Age: ${ageText}</span>
-        </div>
-    `;
-})() : ''}
-
-
+                <h4 class="font-semibold text-gray-900 text-sm mb-1">${appliance.name}</h4>
+                <p class="text-xs text-gray-600 mb-2">${appliance.manufacturer} ${appliance.model || ''}</p>
+                <span class="text-xs ${statusInfo.colorClass}">${statusInfo.text}</span>
             </div>
             
-            <!-- Action Buttons -->
             <div class="flex gap-2 pt-3 border-t border-gray-100">
                 <button onclick="event.stopPropagation(); window.applianceManager.editAppliance('${appliance.id}')" 
                         class="flex-1 bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
@@ -719,7 +677,7 @@ ${appliance.purchaseDate ? (() => {
                 </button>
                 <button onclick="event.stopPropagation(); window.applianceManager.showApplianceTasks('${appliance.id}')" 
                         class="flex-1 bg-green-100 text-green-700 hover:bg-green-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
-                    Review Tasks
+                    Tasks
                 </button>
             </div>
         </div>
