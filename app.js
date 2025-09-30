@@ -3244,6 +3244,9 @@ function clearData() {
 /**
  * Populate the property features form with current data (for the tab)
  */
+// Store the initial form state when the tab loads
+let initialFormState = null;
+
 function populatePropertyFeaturesTab() {
     if (!window.homeData || !window.homeData.features) {
         console.warn('⚠️ No homeData.features available for populating property features tab');
@@ -3304,6 +3307,48 @@ function populatePropertyFeaturesTab() {
         }
     });
     
+    // Capture the initial form state after populating
+    setTimeout(() => {
+        initialFormState = {
+            centralAC: document.getElementById('features-central-ac')?.checked || false,
+            miniSplits: document.getElementById('features-mini-splits')?.checked || false,
+            wallAC: document.getElementById('features-wall-ac')?.checked || false,
+            electricBaseboard: document.getElementById('features-electric-baseboard')?.checked || false,
+            boiler: document.getElementById('features-boiler')?.checked || false,
+            municipalWater: document.getElementById('features-municipal-water')?.checked || false,
+            wellWater: document.getElementById('features-well-water')?.checked || false,
+            sedimentFilter: document.getElementById('features-sediment-filter')?.checked || false,
+            uvFilter: document.getElementById('features-uv-filter')?.checked || false,
+            waterSoftener: document.getElementById('features-water-softener')?.checked || false,
+            wholeHouseFilter: document.getElementById('features-whole-house-filter')?.checked || false,
+            municipalSewer: document.getElementById('features-municipal-sewer')?.checked || false,
+            septic: document.getElementById('features-septic')?.checked || false,
+            fireplace: document.getElementById('features-fireplace')?.checked || false,
+            pool: document.getElementById('features-pool')?.checked || false,
+            deck: document.getElementById('features-deck')?.checked || false,
+            garage: document.getElementById('features-garage')?.checked || false,
+            basement: document.getElementById('features-basement')?.checked || false,
+            solarPanels: document.getElementById('features-solar-panels')?.checked || false,
+            batteryBackup: document.getElementById('features-battery-backup')?.checked || false,
+            sprinklerSystem: document.getElementById('features-sprinkler-system')?.checked || false,
+            securitySystem: document.getElementById('features-security-system')?.checked || false,
+            compositeRoof: document.getElementById('features-composite-roof')?.checked || false,
+            metalRoof: document.getElementById('features-metal-roof')?.checked || false,
+            tileRoof: document.getElementById('features-tile-roof')?.checked || false,
+            vinylSiding: document.getElementById('features-vinyl-siding')?.checked || false,
+            woodSiding: document.getElementById('features-wood-siding')?.checked || false,
+            aluminumSiding: document.getElementById('features-aluminum-siding')?.checked || false,
+            brickExterior: document.getElementById('features-brick-exterior')?.checked || false,
+            gutters: document.getElementById('features-gutters')?.checked || false,
+            windows: document.getElementById('features-windows')?.checked || false,
+            exteriorDoors: document.getElementById('features-exterior-doors')?.checked || false,
+            driveway: document.getElementById('features-driveway')?.checked || false,
+            fence: document.getElementById('features-fence')?.checked || false,
+            attic: document.getElementById('features-attic')?.checked || false
+        };
+        console.log('✅ Initial form state captured:', initialFormState);
+    }, 100);
+    
     console.log('📝 Property features tab populated with current data');
 }
 
@@ -3317,8 +3362,8 @@ function savePropertyFeaturesFromTab() {
         homeData.features = {};
     }
     
-    // Store old features to compare what changed
-    const oldFeatures = { ...homeData.features };
+    // Store old features to compare what changed - use captured initial state
+    const oldFeatures = initialFormState || {};
     console.log('🔍 DEBUG - oldFeatures at save time:', oldFeatures);
     
     // Get new feature values from tab form
