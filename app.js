@@ -3664,6 +3664,37 @@ function saveData() {
         })
         .then(() => {
             console.log('✅ Data saved successfully');
+            
+            // REFRESH: Check which view is active and refresh it after enhanced save
+            console.log('🔍 Enhanced save complete - checking for view refresh...');
+            const allTasksView = document.getElementById('all-tasks-view');
+            const dashboardView = document.getElementById('dashboard-view');
+            
+            if (allTasksView && !allTasksView.classList.contains('hidden')) {
+                // We're in All Tasks view - reload data then refresh
+                console.log('🔄 Refreshing All Tasks view after enhanced save...');
+                if (window.loadTasksFromFirebase) {
+                    window.loadTasksFromFirebase().then(() => {
+                        if (typeof renderAllTasksView === 'function') {
+                            renderAllTasksView();
+                            console.log('✅ All Tasks view refreshed with fresh data after enhanced save');
+                        }
+                    });
+                } else if (typeof renderAllTasksView === 'function') {
+                    renderAllTasksView();
+                }
+            } else if (dashboardView && !dashboardView.classList.contains('hidden')) {
+                // We're in main dashboard - reload data then refresh  
+                console.log('🔄 Refreshing dashboard after enhanced save...');
+                if (window.loadTasksFromFirebase) {
+                    window.loadTasksFromFirebase().then(() => {
+                        showTab('dashboard');
+                        console.log('✅ Dashboard refreshed with fresh data after enhanced save');
+                    });
+                } else {
+                    showTab('dashboard');
+                }
+            }
         })
         .catch((error) => {
             console.error('❌ Failed to save data:', error);
