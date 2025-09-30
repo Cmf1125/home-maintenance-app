@@ -2982,6 +2982,7 @@ function saveTaskFromEdit() {
     
     alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
     console.log('✅ Task save completed successfully');
+    console.log('🔍 Starting refresh check...');
     
     // Simple refresh: Check which view is active and refresh it
     const allTasksView = document.getElementById('all-tasks-view');
