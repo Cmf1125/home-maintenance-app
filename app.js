@@ -3319,6 +3319,7 @@ function savePropertyFeaturesFromTab() {
     
     // Store old features to compare what changed
     const oldFeatures = { ...homeData.features };
+    console.log('🔍 DEBUG - oldFeatures at save time:', oldFeatures);
     
     // Get new feature values from tab form
     const newFeatures = {
@@ -3363,7 +3364,9 @@ function savePropertyFeaturesFromTab() {
     };
     
     // Detect changes and show summary
+    console.log('🔍 DEBUG - newFeatures:', newFeatures);
     const changes = detectFeatureChanges(oldFeatures, newFeatures);
+    console.log('🔍 DEBUG - detected changes:', changes);
     
     // Update home data
     homeData.features = newFeatures;
