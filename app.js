@@ -2982,6 +2982,22 @@ function saveTaskFromEdit() {
     
     alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
     console.log('✅ Task save completed successfully');
+    
+    // Simple refresh: Check which view is active and refresh it
+    const allTasksView = document.getElementById('all-tasks-view');
+    const dashboardView = document.getElementById('dashboard-view');
+    
+    if (allTasksView && !allTasksView.classList.contains('hidden')) {
+        // We're in All Tasks view - refresh it
+        console.log('🔄 Refreshing All Tasks view after save...');
+        if (typeof renderAllTasksView === 'function') {
+            renderAllTasksView();
+        }
+    } else if (dashboardView && !dashboardView.classList.contains('hidden')) {
+        // We're in main dashboard - refresh it  
+        console.log('🔄 Refreshing dashboard after save...');
+        showTab('dashboard');
+    }
 }
 // Delete task from edit modal
 function deleteTaskFromEdit() {
