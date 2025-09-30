@@ -2988,15 +2988,29 @@ function saveTaskFromEdit() {
     const dashboardView = document.getElementById('dashboard-view');
     
     if (allTasksView && !allTasksView.classList.contains('hidden')) {
-        // We're in All Tasks view - refresh it
+        // We're in All Tasks view - reload data then refresh
         console.log('🔄 Refreshing All Tasks view after save...');
-        if (typeof renderAllTasksView === 'function') {
+        if (window.loadTasksFromFirebase) {
+            window.loadTasksFromFirebase().then(() => {
+                if (typeof renderAllTasksView === 'function') {
+                    renderAllTasksView();
+                    console.log('✅ All Tasks view refreshed with fresh data');
+                }
+            });
+        } else if (typeof renderAllTasksView === 'function') {
             renderAllTasksView();
         }
     } else if (dashboardView && !dashboardView.classList.contains('hidden')) {
-        // We're in main dashboard - refresh it  
+        // We're in main dashboard - reload data then refresh  
         console.log('🔄 Refreshing dashboard after save...');
-        showTab('dashboard');
+        if (window.loadTasksFromFirebase) {
+            window.loadTasksFromFirebase().then(() => {
+                showTab('dashboard');
+                console.log('✅ Dashboard refreshed with fresh data');
+            });
+        } else {
+            showTab('dashboard');
+        }
     }
 }
 // Delete task from edit modal
