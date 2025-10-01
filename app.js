@@ -5477,33 +5477,26 @@ function generatePlanningItems() {
     const items = [];
     const currentYear = new Date().getFullYear();
     
-    // Check roof age
+    // Check roof age (we collect this during onboarding)
     if (window.homeData?.features?.roofAge) {
         const roofAge = window.homeData.features.roofAge;
-        if (roofAge >= 20) {
+        if (roofAge >= 15) {
             items.push({
                 type: 'roof',
-                title: 'Roof Replacement',
-                description: `Your ${roofAge}-year-old roof is nearing end of life`,
+                title: roofAge >= 20 ? 'Roof Replacement' : 'Roof Replacement Planning',
+                description: roofAge >= 20 
+                    ? `Your ${roofAge}-year-old roof is nearing end of life (typical lifespan: 20-25 years)`
+                    : `Start budgeting for roof replacement - roof is ${roofAge} years old (typical lifespan: 20-25 years)`,
                 cost: '$15,000 - $25,000',
-                timeline: 'immediate',
-                priority: 'high',
-                icon: '🏠'
-            });
-        } else if (roofAge >= 15) {
-            items.push({
-                type: 'roof',
-                title: 'Roof Replacement Planning',
-                description: `Start budgeting for roof replacement in ${25 - roofAge} years`,
-                cost: '$15,000 - $25,000',
-                timeline: 'upcoming',
-                priority: 'medium',
-                icon: '🏠'
+                timeline: roofAge >= 20 ? 'immediate' : 'upcoming',
+                priority: roofAge >= 20 ? 'high' : 'medium',
+                icon: '🏠',
+                isEstimate: false // Roof age is collected during onboarding
             });
         }
     }
     
-    // Check appliances (if appliance data exists)
+    // Check appliances (use appliance tab data if available)
     if (window.appliances && window.appliances.length > 0) {
         window.appliances.forEach(appliance => {
             const age = appliance.age || 0;
@@ -5517,7 +5510,8 @@ function generatePlanningItems() {
                     cost: getApplianceReplacementCost(appliance.type),
                     timeline: age >= typicalLifespan ? 'immediate' : 'upcoming',
                     priority: age >= typicalLifespan ? 'high' : 'medium',
-                    icon: '⚙️'
+                    icon: '⚙️',
+                    isEstimate: false // Appliance data is actual, not estimate
                 });
             }
         });
@@ -5556,38 +5550,114 @@ function generatePlanningItems() {
         }
     }
     
-    // Check Water Heater age (use actual age if available, otherwise estimate from house age)
-    const waterHeaterAge = window.homeData?.systemAges?.waterHeater;
-    if (waterHeaterAge !== undefined) {
-        // Use actual water heater age
-        if (waterHeaterAge >= 8) {
-            items.push({
-                type: 'waterHeater',
-                title: 'Water Heater Replacement',
-                description: `Water heater is ${waterHeaterAge} years old (typical lifespan: 8-12 years)`,
-                cost: '$1,200 - $2,500',
-                timeline: waterHeaterAge >= 10 ? 'immediate' : 'upcoming',
-                priority: waterHeaterAge >= 10 ? 'high' : 'medium',
-                icon: '💧',
-                isEstimate: false
-            });
+    // Check all major home systems
+    const systemDefinitions = [
+        {
+            type: 'waterHeater',
+            title: 'Water Heater Replacement',
+            icon: '💧',
+            lifespan: { min: 8, max: 12, immediate: 10 },
+            cost: '$1,200 - $2,500'
+        },
+        {
+            type: 'furnace',
+            title: 'Furnace Replacement',
+            icon: '🔥',
+            lifespan: { min: 15, max: 20, immediate: 18 },
+            cost: '$3,000 - $6,000'
+        },
+        {
+            type: 'airConditioner',
+            title: 'Air Conditioner Replacement',
+            icon: '❄️',
+            lifespan: { min: 12, max: 18, immediate: 15 },
+            cost: '$3,000 - $7,000'
+        },
+        {
+            type: 'dishwasher',
+            title: 'Dishwasher Replacement',
+            icon: '🍽️',
+            lifespan: { min: 8, max: 12, immediate: 10 },
+            cost: '$400 - $1,200'
+        },
+        {
+            type: 'washingMachine',
+            title: 'Washing Machine Replacement',
+            icon: '👕',
+            lifespan: { min: 10, max: 14, immediate: 12 },
+            cost: '$500 - $1,500'
+        },
+        {
+            type: 'dryer',
+            title: 'Dryer Replacement',
+            icon: '🌪️',
+            lifespan: { min: 10, max: 15, immediate: 13 },
+            cost: '$400 - $1,200'
+        },
+        {
+            type: 'refrigerator',
+            title: 'Refrigerator Replacement',
+            icon: '🧊',
+            lifespan: { min: 10, max: 15, immediate: 13 },
+            cost: '$800 - $2,500'
+        },
+        {
+            type: 'garbageDisposal',
+            title: 'Garbage Disposal Replacement',
+            icon: '🗑️',
+            lifespan: { min: 8, max: 12, immediate: 10 },
+            cost: '$150 - $400'
+        },
+        {
+            type: 'windows',
+            title: 'Window Replacement',
+            icon: '🪟',
+            lifespan: { min: 20, max: 30, immediate: 25 },
+            cost: '$8,000 - $15,000'
+        },
+        {
+            type: 'flooring',
+            title: 'Flooring Replacement',
+            icon: '🏠',
+            lifespan: { min: 15, max: 25, immediate: 20 },
+            cost: '$5,000 - $12,000'
         }
-    } else if (window.homeData?.yearBuilt) {
-        // Fall back to house age estimate for water heater
-        const houseAge = currentYear - window.homeData.yearBuilt;
-        if (houseAge >= 8) {
-            items.push({
-                type: 'waterHeater',
-                title: 'Water Heater Replacement',
-                description: `Water heater likely needs replacement (house built in ${window.homeData.yearBuilt})`,
-                cost: '$1,200 - $2,500',
-                timeline: houseAge >= 12 ? 'immediate' : 'upcoming',
-                priority: houseAge >= 12 ? 'high' : 'medium',
-                icon: '💧',
-                isEstimate: true
-            });
+    ];
+
+    systemDefinitions.forEach(system => {
+        const actualAge = window.homeData?.systemAges?.[system.type];
+        
+        if (actualAge !== undefined) {
+            // Use actual system age
+            if (actualAge >= system.lifespan.min) {
+                items.push({
+                    type: system.type,
+                    title: system.title,
+                    description: `${system.title.replace(' Replacement', '')} is ${actualAge} years old (typical lifespan: ${system.lifespan.min}-${system.lifespan.max} years)`,
+                    cost: system.cost,
+                    timeline: actualAge >= system.lifespan.immediate ? 'immediate' : 'upcoming',
+                    priority: actualAge >= system.lifespan.immediate ? 'high' : 'medium',
+                    icon: system.icon,
+                    isEstimate: false
+                });
+            }
+        } else if (window.homeData?.yearBuilt) {
+            // Fall back to house age estimate
+            const houseAge = currentYear - window.homeData.yearBuilt;
+            if (houseAge >= system.lifespan.min) {
+                items.push({
+                    type: system.type,
+                    title: system.title,
+                    description: `${system.title.replace(' Replacement', '')} likely needs replacement (house built in ${window.homeData.yearBuilt})`,
+                    cost: system.cost,
+                    timeline: houseAge >= system.lifespan.immediate ? 'immediate' : 'upcoming',
+                    priority: houseAge >= system.lifespan.immediate ? 'high' : 'medium',
+                    icon: system.icon,
+                    isEstimate: true
+                });
+            }
         }
-    }
+    });
     
     // Add some generic planning items if we have relevant features
     if (window.homeData?.features?.deck) {
@@ -5717,6 +5787,25 @@ function updateSystemAge(systemType, systemTitle) {
     
     // Update modal content
     document.getElementById('system-type-display').textContent = systemTitle;
+    
+    // Update description based on system type
+    const systemInfo = {
+        'hvac': 'HVAC systems typically last 15-20 years.',
+        'waterHeater': 'Water heaters typically last 8-12 years.',
+        'furnace': 'Furnaces typically last 15-20 years.',
+        'airConditioner': 'Air conditioners typically last 12-18 years.',
+        'dishwasher': 'Dishwashers typically last 8-12 years.',
+        'washingMachine': 'Washing machines typically last 10-14 years.',
+        'dryer': 'Dryers typically last 10-15 years.',
+        'refrigerator': 'Refrigerators typically last 10-15 years.',
+        'garbageDisposal': 'Garbage disposals typically last 8-12 years.',
+        'windows': 'Windows typically last 20-30 years.',
+        'flooring': 'Flooring typically lasts 15-25 years.'
+    };
+    
+    const description = systemInfo[systemType] || 'Help us provide more accurate replacement planning.';
+    document.getElementById('system-age-description').textContent = 
+        `${description} Enter the actual age for more accurate planning.`;
     
     // Get current age if available
     const currentAge = window.homeData?.systemAges?.[systemType];
