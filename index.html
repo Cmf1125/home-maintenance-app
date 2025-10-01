@@ -1634,6 +1634,89 @@ function showMainApp() {
     <!-- Calendar will be rendered here by calendar.js -->
 </div>
 
+<!-- Planning & Budget View -->
+<div id="planning-view" class="hidden">
+    <div class="max-w-4xl mx-auto p-4 pb-20">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Planning & Budget</h1>
+            <p class="text-gray-600">Plan for major home expenses and replacements</p>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-red-700 text-sm font-medium">Immediate Attention</p>
+                        <p class="text-2xl font-bold text-red-800" id="immediate-count">0</p>
+                    </div>
+                    <div class="text-red-500 text-2xl">⚠️</div>
+                </div>
+            </div>
+            <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-200 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-yellow-700 text-sm font-medium">Next 2 Years</p>
+                        <p class="text-2xl font-bold text-yellow-800" id="upcoming-count">0</p>
+                    </div>
+                    <div class="text-yellow-500 text-2xl">📅</div>
+                </div>
+            </div>
+            <div class="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-700 text-sm font-medium">Future Planning</p>
+                        <p class="text-2xl font-bold text-green-800" id="future-count">0</p>
+                    </div>
+                    <div class="text-green-500 text-2xl">💰</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Planning Categories -->
+        <div class="space-y-6">
+            <!-- Immediate Attention -->
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">🚨 Immediate Attention</h2>
+                    <p class="text-sm text-gray-600">Items that need replacement or major repair soon</p>
+                </div>
+                <div class="p-6">
+                    <div id="immediate-items" class="space-y-4">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next 2 Years -->
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">📅 Next 2 Years</h2>
+                    <p class="text-sm text-gray-600">Start budgeting for these upcoming expenses</p>
+                </div>
+                <div class="p-6">
+                    <div id="upcoming-items" class="space-y-4">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Future Planning -->
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">💰 Future Planning (3-5 Years)</h2>
+                    <p class="text-sm text-gray-600">Long-term items to keep on your radar</p>
+                </div>
+                <div class="p-6">
+                    <div id="future-items" class="space-y-4">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Welcome Tour Overlay -->
 <div id="welcome-tour" class="tour-overlay hidden">
     <div id="tour-tooltip" class="tour-tooltip">
@@ -1668,7 +1751,7 @@ function showMainApp() {
 
 <!-- Bottom Navigation - Simplified -->
 <div class="bottom-nav fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-    <div class="grid grid-cols-4 gap-1 p-2 sm:gap-2 text-base">
+    <div class="grid grid-cols-5 gap-1 p-2 sm:gap-2 text-base">
         <button onclick="showTab('dashboard')" id="tab-dashboard" class="tab-btn flex flex-col items-center p-3 bg-blue-100 text-blue-700 font-semibold touch-btn">
             <div class="text-sm font-semibold mb-1">Dashboard</div>
         </button>
@@ -1677,6 +1760,9 @@ function showMainApp() {
         </button>
         <button onclick="showTab('appliances')" id="tab-appliances" class="tab-btn flex flex-col items-center p-3 text-blue-600 opacity-70 hover:opacity-100 font-semibold touch-btn">
             <div class="text-sm font-semibold mb-1">Appliances</div>
+        </button>
+        <button onclick="showTab('planning')" id="tab-planning" class="tab-btn flex flex-col items-center p-3 text-blue-600 opacity-70 hover:opacity-100 font-semibold touch-btn">
+            <div class="text-sm font-semibold mb-1">Planning</div>
         </button>
         <button onclick="showTab('marketplace')" id="tab-marketplace" class="tab-btn flex flex-col items-center p-3 text-blue-600 opacity-70 hover:opacity-100 font-semibold touch-btn">
             <div class="text-sm font-semibold mb-1">Shop</div>

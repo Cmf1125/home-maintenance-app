@@ -1759,7 +1759,7 @@ function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
 
     // UNIFIED: Always ensure header is visible on all main tabs
-    if (['dashboard', 'calendar', 'appliances', 'documents', 'marketplace'].includes(tabName)) {
+    if (['dashboard', 'calendar', 'appliances', 'documents', 'marketplace', 'planning'].includes(tabName)) {
         // Ensure main-app-active class is set (makes header sticky)
         document.body.classList.add('main-app-active');
         // Remove any conflicting header classes
@@ -1792,12 +1792,14 @@ function showTab(tabName) {
     const documentsView = document.getElementById('documents-view');
     const appliancesView = document.getElementById('appliances-view');
     const marketplaceView = document.getElementById('marketplace-view');
+    const planningView = document.getElementById('planning-view');
 
     if (dashboardView) dashboardView.classList.add('hidden');
     if (calendarView) calendarView.classList.add('hidden');
     if (documentsView) documentsView.classList.add('hidden');
     if (appliancesView) appliancesView.classList.add('hidden');
     if (marketplaceView) marketplaceView.classList.add('hidden');
+    if (planningView) planningView.classList.add('hidden');
     if (allTasksView) allTasksView.classList.add('hidden');
     
     // Hide property features view
@@ -2059,6 +2061,27 @@ function showTab(tabName) {
             }
         } catch (error) {
             console.error('❌ Error initializing marketplace:', error);
+        }
+    } else if (tabName === 'planning') {
+        // Show planning view
+        if (planningView) {
+            planningView.classList.remove('hidden');
+        }
+        
+        // Update tab styling  
+        const planningTab = document.getElementById('tab-planning');
+        if (planningTab) {
+            planningTab.classList.add('opacity-100');
+            planningTab.classList.remove('opacity-70');
+        }
+        
+        console.log('📊 Initializing planning & budget...');
+        
+        // Initialize planning functionality
+        try {
+            renderPlanningView();
+        } catch (error) {
+            console.error('❌ Error initializing planning:', error);
         }
     }
     
@@ -5435,3 +5458,192 @@ window.testReschedule = function() {
         }
     }
 };
+
+// ===== PLANNING & BUDGET FUNCTIONALITY =====
+
+function renderPlanningView() {
+    console.log('📊 Rendering planning view...');
+    
+    const planningItems = generatePlanningItems();
+    
+    // Sort items by priority and timeline
+    const immediateItems = planningItems.filter(item => item.timeline === 'immediate');
+    const upcomingItems = planningItems.filter(item => item.timeline === 'upcoming');
+    const futureItems = planningItems.filter(item => item.timeline === 'future');
+    
+    // Update counts
+    document.getElementById('immediate-count').textContent = immediateItems.length;
+    document.getElementById('upcoming-count').textContent = upcomingItems.length;
+    document.getElementById('future-count').textContent = futureItems.length;
+    
+    // Render items
+    renderPlanningSection('immediate-items', immediateItems);
+    renderPlanningSection('upcoming-items', upcomingItems);
+    renderPlanningSection('future-items', futureItems);
+}
+
+function generatePlanningItems() {
+    const items = [];
+    const currentYear = new Date().getFullYear();
+    
+    // Check roof age
+    if (window.homeData?.features?.roofAge) {
+        const roofAge = window.homeData.features.roofAge;
+        if (roofAge >= 20) {
+            items.push({
+                type: 'roof',
+                title: 'Roof Replacement',
+                description: `Your ${roofAge}-year-old roof is nearing end of life`,
+                cost: '$15,000 - $25,000',
+                timeline: 'immediate',
+                priority: 'high',
+                icon: '🏠'
+            });
+        } else if (roofAge >= 15) {
+            items.push({
+                type: 'roof',
+                title: 'Roof Replacement Planning',
+                description: `Start budgeting for roof replacement in ${25 - roofAge} years`,
+                cost: '$15,000 - $25,000',
+                timeline: 'upcoming',
+                priority: 'medium',
+                icon: '🏠'
+            });
+        }
+    }
+    
+    // Check appliances (if appliance data exists)
+    if (window.appliances && window.appliances.length > 0) {
+        window.appliances.forEach(appliance => {
+            const age = appliance.age || 0;
+            const typicalLifespan = getApplianceLifespan(appliance.type);
+            
+            if (age >= typicalLifespan - 2) {
+                items.push({
+                    type: 'appliance',
+                    title: `${appliance.name} Replacement`,
+                    description: `${appliance.type} is ${age} years old (typical lifespan: ${typicalLifespan} years)`,
+                    cost: getApplianceReplacementCost(appliance.type),
+                    timeline: age >= typicalLifespan ? 'immediate' : 'upcoming',
+                    priority: age >= typicalLifespan ? 'high' : 'medium',
+                    icon: '⚙️'
+                });
+            }
+        });
+    }
+    
+    // Check HVAC system age (based on property age as proxy)
+    if (window.homeData?.yearBuilt) {
+        const houseAge = currentYear - window.homeData.yearBuilt;
+        if (houseAge >= 18) {
+            items.push({
+                type: 'hvac',
+                title: 'HVAC System Replacement',
+                description: `HVAC system likely needs replacement (house built in ${window.homeData.yearBuilt})`,
+                cost: '$8,000 - $15,000',
+                timeline: houseAge >= 25 ? 'immediate' : 'upcoming',
+                priority: houseAge >= 25 ? 'high' : 'medium',
+                icon: '🌡️'
+            });
+        }
+    }
+    
+    // Add some generic planning items if we have relevant features
+    if (window.homeData?.features?.deck) {
+        items.push({
+            type: 'deck',
+            title: 'Deck Refinishing',
+            description: 'Wood decks typically need refinishing every 3-5 years',
+            cost: '$800 - $1,500',
+            timeline: 'upcoming',
+            priority: 'low',
+            icon: '🪵'
+        });
+    }
+    
+    if (window.homeData?.features?.driveway) {
+        items.push({
+            type: 'driveway',
+            title: 'Driveway Resurfacing',
+            description: 'Asphalt driveways need resurfacing every 10-15 years',
+            cost: '$3,000 - $6,000',
+            timeline: 'future',
+            priority: 'low',
+            icon: '🛣️'
+        });
+    }
+    
+    return items;
+}
+
+function renderPlanningSection(containerId, items) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    if (items.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-4">No items in this category</p>';
+        return;
+    }
+    
+    container.innerHTML = items.map(item => `
+        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+            <div class="flex items-start justify-between mb-2">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">${item.icon}</span>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">${item.title}</h3>
+                        <p class="text-sm text-gray-600">${item.description}</p>
+                    </div>
+                </div>
+                <span class="px-2 py-1 text-xs font-medium rounded-full ${getPriorityColors(item.priority)}">
+                    ${item.priority.toUpperCase()}
+                </span>
+            </div>
+            <div class="flex items-center justify-between mt-3">
+                <span class="text-lg font-bold text-gray-900">${item.cost}</span>
+                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                    Learn More →
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getPriorityColors(priority) {
+    switch (priority) {
+        case 'high': return 'bg-red-100 text-red-800';
+        case 'medium': return 'bg-yellow-100 text-yellow-800';
+        case 'low': return 'bg-green-100 text-green-800';
+        default: return 'bg-gray-100 text-gray-800';
+    }
+}
+
+function getApplianceLifespan(type) {
+    const lifespans = {
+        'refrigerator': 12,
+        'dishwasher': 10,
+        'washing-machine': 11,
+        'dryer': 13,
+        'oven': 15,
+        'microwave': 9,
+        'water-heater': 10,
+        'furnace': 18,
+        'air-conditioner': 15
+    };
+    return lifespans[type] || 12;
+}
+
+function getApplianceReplacementCost(type) {
+    const costs = {
+        'refrigerator': '$800 - $2,500',
+        'dishwasher': '$400 - $1,200',
+        'washing-machine': '$500 - $1,500',
+        'dryer': '$400 - $1,200',
+        'oven': '$600 - $2,000',
+        'microwave': '$100 - $400',
+        'water-heater': '$800 - $1,800',
+        'furnace': '$3,000 - $8,000',
+        'air-conditioner': '$3,000 - $7,000'
+    };
+    return costs[type] || '$500 - $2,000';
+}
