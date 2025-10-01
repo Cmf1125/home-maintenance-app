@@ -2349,18 +2349,36 @@ if (isOverdue) {
             </div>
         </div>
         
-        <!-- Mobile-Optimized Button Row -->
-        <div class="flex gap-2">
-            <button onclick="showTaskHistory(${task.id})" 
-                class="flex-1 bg-gray-100 text-gray-700 text-sm py-2 px-3 rounded-lg hover:bg-gray-200 transition-all duration-200 font-medium" 
-                title="View task history">
-                History
-            </button>
-            <button onclick="editTaskFromAllTasks(${task.id})" 
-                class="flex-1 bg-blue-100 text-blue-700 text-sm py-2 px-3 rounded-lg hover:bg-blue-200 transition-all duration-200 font-medium" 
-                title="Edit task">
-                Edit
-            </button>
+        <!-- Enhanced Button Row with Shop & Video -->
+        <div class="space-y-2">
+            <!-- Top Row: Video & Shop Buttons -->
+            <div class="flex gap-2">
+                ${task.youtubeUrl && task.youtubeUrl.includes('youtube.com') ? `
+                <button onclick="openYouTubeVideo('${task.youtubeUrl}')" 
+                    class="flex-1 bg-red-50 text-red-700 text-xs py-2 px-2 rounded-lg hover:bg-red-100 transition-all duration-200 font-medium flex items-center justify-center gap-1" 
+                    title="Watch how-to video">
+                    📺 How-To
+                </button>
+                ` : ''}
+                <button onclick="openTaskShop('${task.title}', '${task.category}')" 
+                    class="flex-1 bg-blue-50 text-blue-700 text-xs py-2 px-2 rounded-lg hover:bg-blue-100 transition-all duration-200 font-medium flex items-center justify-center gap-1" 
+                    title="Shop for supplies">
+                    🛒 Shop
+                </button>
+            </div>
+            <!-- Bottom Row: History & Edit Buttons -->
+            <div class="flex gap-2">
+                <button onclick="showTaskHistory(${task.id})" 
+                    class="flex-1 bg-gray-100 text-gray-700 text-sm py-2 px-3 rounded-lg hover:bg-gray-200 transition-all duration-200 font-medium" 
+                    title="View task history">
+                    History
+                </button>
+                <button onclick="editTaskFromAllTasks(${task.id})" 
+                    class="flex-1 bg-blue-100 text-blue-700 text-sm py-2 px-3 rounded-lg hover:bg-blue-200 transition-all duration-200 font-medium" 
+                    title="Edit task">
+                    Edit
+                </button>
+            </div>
         </div>
     </div>
 `;
