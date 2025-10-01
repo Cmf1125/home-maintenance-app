@@ -5647,3 +5647,98 @@ function getApplianceReplacementCost(type) {
     };
     return costs[type] || '$500 - $2,000';
 }
+
+// ===== CONTEXTUAL SHOPPING FUNCTIONALITY =====
+
+function openTaskShop(taskTitle, taskCategory) {
+    console.log(`🛒 Opening shop for task: ${taskTitle} (${taskCategory})`);
+    
+    // Generate contextual search terms based on task title and category
+    const searchTerms = generateShopSearchTerms(taskTitle, taskCategory);
+    
+    // Open multiple relevant shopping links in new tabs
+    searchTerms.forEach((searchTerm, index) => {
+        setTimeout(() => {
+            window.open(`https://www.amazon.com/s?k=${encodeURIComponent(searchTerm)}&ref=nb_sb_noss`, '_blank');
+        }, index * 500); // Stagger by 500ms to avoid popup blocking
+    });
+}
+
+function generateShopSearchTerms(taskTitle, taskCategory) {
+    const title = taskTitle.toLowerCase();
+    let searchTerms = [];
+    
+    // Task-specific search terms
+    if (title.includes('filter')) {
+        if (title.includes('air') || title.includes('hvac')) {
+            searchTerms.push('HVAC air filter');
+        } else if (title.includes('water')) {
+            searchTerms.push('water filter replacement');
+        } else if (title.includes('sediment')) {
+            searchTerms.push('sediment water filter');
+        } else if (title.includes('uv')) {
+            searchTerms.push('UV water filter replacement');
+        } else {
+            searchTerms.push('replacement filter');
+        }
+    }
+    
+    if (title.includes('clean')) {
+        if (title.includes('gutter')) {
+            searchTerms.push('gutter cleaning tools', 'gutter guards');
+        } else if (title.includes('mini-split') || title.includes('mini split')) {
+            searchTerms.push('mini split cleaning kit', 'HVAC coil cleaner');
+        } else if (title.includes('dryer')) {
+            searchTerms.push('dryer vent cleaning kit');
+        } else {
+            searchTerms.push('cleaning supplies');
+        }
+    }
+    
+    if (title.includes('inspect') || title.includes('check')) {
+        if (title.includes('roof')) {
+            searchTerms.push('roof inspection ladder', 'roof safety equipment');
+        } else if (title.includes('smoke detector')) {
+            searchTerms.push('smoke detector battery', '9V batteries');
+        } else if (title.includes('carbon monoxide')) {
+            searchTerms.push('carbon monoxide detector', 'CO detector battery');
+        } else {
+            searchTerms.push('inspection tools', 'flashlight');
+        }
+    }
+    
+    if (title.includes('caulk') || title.includes('seal')) {
+        searchTerms.push('exterior caulk', 'caulk gun', 'weatherproofing supplies');
+    }
+    
+    if (title.includes('paint') || title.includes('stain')) {
+        searchTerms.push('exterior paint', 'paint brushes', 'painting supplies');
+    }
+    
+    if (title.includes('battery')) {
+        searchTerms.push('9V batteries', 'smoke detector batteries');
+    }
+    
+    // Category-based fallbacks
+    if (searchTerms.length === 0) {
+        switch (taskCategory) {
+            case 'HVAC':
+                searchTerms.push('HVAC maintenance supplies');
+                break;
+            case 'Water Systems':
+                searchTerms.push('plumbing supplies');
+                break;
+            case 'Safety':
+                searchTerms.push('home safety equipment');
+                break;
+            case 'Exterior':
+                searchTerms.push('home exterior maintenance');
+                break;
+            default:
+                searchTerms.push('home maintenance supplies');
+        }
+    }
+    
+    // Limit to 2 search terms to avoid too many tabs
+    return searchTerms.slice(0, 2);
+}

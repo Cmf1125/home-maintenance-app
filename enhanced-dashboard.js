@@ -282,15 +282,21 @@ renderEnhancedTaskCard(task) {
             <span class="text-xs text-gray-500">${categoryInfo.icon} ${task.category}</span>
         </div>
         
-        <!-- Row 2: Due Date + Video Demo -->
+        <!-- Row 2: Due Date + Action Buttons -->
         <div class="flex items-center justify-between mb-2">
             <span class="text-xs ${dueDateColor} font-medium">${dueDateDisplay}</span>
-            ${task.youtubeUrl && task.youtubeUrl.includes('youtube.com') ? `
-            <button onclick="event.stopPropagation(); openYouTubeVideo('${task.youtubeUrl}')" 
-                    class="bg-red-50 text-red-700 hover:bg-red-100 px-2 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1">
-                📺 Watch How-To Video
-            </button>
-            ` : '<div></div>'}
+            <div class="flex gap-1">
+                ${task.youtubeUrl && task.youtubeUrl.includes('youtube.com') ? `
+                <button onclick="event.stopPropagation(); openYouTubeVideo('${task.youtubeUrl}')" 
+                        class="bg-red-50 text-red-700 hover:bg-red-100 px-2 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1">
+                    📺 How-To
+                </button>
+                ` : ''}
+                <button onclick="event.stopPropagation(); openTaskShop('${task.title}', '${task.category}')" 
+                        class="bg-blue-50 text-blue-700 hover:bg-blue-100 px-2 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1">
+                    🛒 Shop
+                </button>
+            </div>
         </div>
         
         <!-- Row 3: Action Buttons (Full Width) -->
