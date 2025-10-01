@@ -605,6 +605,271 @@ class TaskGenerator {
             });
         }
 
+        // ===== STRUCTURAL SYSTEMS =====
+        
+        // Roofing Systems
+        if (homeData.features.compositeRoof) {
+            tasks.push({
+                id: id++,
+                title: 'Inspect Composite Roof',
+                category: 'Exterior',
+                frequency: 365,
+                cost: 200,
+                priority: this.getAutoPriority('Inspect Composite Roof', 'Exterior'),
+                description: 'Check shingles for damage, missing pieces, and granule loss',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=composite+roof+inspection+maintenance',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        if (homeData.features.metalRoof) {
+            tasks.push({
+                id: id++,
+                title: 'Inspect Metal Roof',
+                category: 'Exterior',
+                frequency: 730,
+                cost: 150,
+                priority: this.getAutoPriority('Inspect Metal Roof', 'Exterior'),
+                description: 'Check for rust, loose fasteners, and damaged panels',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=metal+roof+inspection+maintenance',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        if (homeData.features.tileRoof) {
+            tasks.push({
+                id: id++,
+                title: 'Inspect Tile Roof',
+                category: 'Exterior',
+                frequency: 365,
+                cost: 250,
+                priority: this.getAutoPriority('Inspect Tile Roof', 'Exterior'),
+                description: 'Check for cracked, broken, or displaced tiles',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=tile+roof+inspection+maintenance',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        // Siding Systems
+        if (homeData.features.vinylSiding) {
+            tasks.push({
+                id: id++,
+                title: 'Clean and Inspect Vinyl Siding',
+                category: 'Exterior',
+                frequency: 365,
+                cost: 50,
+                priority: this.getAutoPriority('Clean and Inspect Vinyl Siding', 'Exterior'),
+                description: 'Pressure wash siding and check for cracks or loose panels',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=vinyl+siding+cleaning+maintenance',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        if (homeData.features.woodSiding) {
+            tasks.push({
+                id: id++,
+                title: 'Stain/Paint Wood Siding',
+                category: 'Exterior',
+                frequency: 1095,
+                cost: 800,
+                priority: this.getAutoPriority('Stain/Paint Wood Siding', 'Exterior'),
+                description: 'Inspect, prep, and re-stain or paint wood siding',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=wood+siding+staining+painting+maintenance',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        if (homeData.features.aluminumSiding) {
+            tasks.push({
+                id: id++,
+                title: 'Clean and Inspect Aluminum Siding',
+                category: 'Exterior',
+                frequency: 365,
+                cost: 75,
+                priority: this.getAutoPriority('Clean and Inspect Aluminum Siding', 'Exterior'),
+                description: 'Clean siding and check for dents, scratches, or oxidation',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=aluminum+siding+cleaning+maintenance',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        if (homeData.features.brickExterior) {
+            tasks.push({
+                id: id++,
+                title: 'Inspect Brick and Mortar',
+                category: 'Exterior',
+                frequency: 730,
+                cost: 300,
+                priority: this.getAutoPriority('Inspect Brick and Mortar', 'Exterior'),
+                description: 'Check mortar joints and repoint as needed',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=brick+mortar+inspection+repointing',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        // ===== EXTERIOR ELEMENTS =====
+        
+        if (homeData.features.gutters) {
+            tasks.push({
+                id: id++,
+                title: 'Clean Gutters and Downspouts',
+                category: 'Exterior',
+                frequency: 180,
+                cost: 150,
+                priority: this.getAutoPriority('Clean Gutters and Downspouts', 'Exterior'),
+                description: 'Remove debris and check for proper drainage',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=how+to+clean+gutters+downspouts',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        if (homeData.features.windows) {
+            tasks.push({
+                id: id++,
+                title: 'Inspect and Clean Windows',
+                category: 'Exterior',
+                frequency: 180,
+                cost: 100,
+                priority: this.getAutoPriority('Inspect and Clean Windows', 'Exterior'),
+                description: 'Clean windows and check seals, caulking, and hardware',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=window+cleaning+maintenance+inspection',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        if (homeData.features.exteriorDoors) {
+            tasks.push({
+                id: id++,
+                title: 'Maintain Exterior Doors',
+                category: 'Exterior',
+                frequency: 365,
+                cost: 50,
+                priority: this.getAutoPriority('Maintain Exterior Doors', 'Exterior'),
+                description: 'Check weatherstripping, lubricate hinges, and touch up paint',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=exterior+door+maintenance+weatherstripping',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        // ===== OUTDOOR FEATURES =====
+        
+        if (homeData.features.driveway) {
+            tasks.push({
+                id: id++,
+                title: 'Seal and Repair Driveway',
+                category: 'Exterior',
+                frequency: 1095,
+                cost: 400,
+                priority: this.getAutoPriority('Seal and Repair Driveway', 'Exterior'),
+                description: 'Fill cracks and apply sealcoat to protect asphalt',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=driveway+sealing+crack+repair',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        if (homeData.features.fence) {
+            tasks.push({
+                id: id++,
+                title: 'Inspect and Maintain Fence',
+                category: 'Exterior',
+                frequency: 365,
+                cost: 100,
+                priority: this.getAutoPriority('Inspect and Maintain Fence', 'Exterior'),
+                description: 'Check for damage, clean, and stain/paint as needed',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=fence+maintenance+inspection+staining',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        if (homeData.features.attic) {
+            tasks.push({
+                id: id++,
+                title: 'Inspect Attic Insulation',
+                category: 'General',
+                frequency: 730,
+                cost: 0,
+                priority: this.getAutoPriority('Inspect Attic Insulation', 'General'),
+                description: 'Check insulation levels and look for air leaks',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=attic+insulation+inspection+maintenance',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        // ===== WATER SYSTEMS =====
+        
+        if (homeData.features.municipalWater) {
+            tasks.push({
+                id: id++,
+                title: 'Test Water Quality',
+                category: 'Water Systems',
+                frequency: 365,
+                cost: 50,
+                priority: this.getAutoPriority('Test Water Quality', 'Water Systems'),
+                description: 'Test municipal water for chlorine levels and potential contaminants',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=home+water+quality+testing',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
+        if (homeData.features.municipalSewer) {
+            tasks.push({
+                id: id++,
+                title: 'Inspect Sewer Connection',
+                category: 'Water Systems',
+                frequency: 1095,
+                cost: 200,
+                priority: this.getAutoPriority('Inspect Sewer Connection', 'Water Systems'),
+                description: 'Check for tree root intrusion and blockages',
+                youtubeUrl: 'https://www.youtube.com/results?search_query=sewer+line+inspection+maintenance',
+                dueDate: null,
+                lastCompleted: null,
+                isCompleted: false,
+                isTemplate: true
+            });
+        }
+
         // Generate regional seasonal tasks
         if (homeData.state) {
             const climateRegion = this.getClimateRegion(homeData.state);

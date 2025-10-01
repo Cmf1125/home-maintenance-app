@@ -1019,6 +1019,85 @@ function generateExpandedFeatureTasks(startingId = 1000) {
         });
     }
 
+    // 🔧 Generator Tasks (fix naming mismatch)
+    if (features.generator || features.backupGenerator) {
+        expandedTasks.push({
+            id: id++,
+            title: 'Generator Exercise Run',
+            category: 'Safety',
+            frequency: 30,
+            cost: 10,
+            priority: getAutoPriority('Generator Exercise Run', 'Safety'),
+            description: 'Run generator monthly to keep engine components lubricated',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+    }
+
+    // 💦 Irrigation/Sprinkler Tasks (fix naming mismatch)
+    if (features.irrigation || features.sprinklerSystem) {
+        expandedTasks.push({
+            id: id++,
+            title: 'Sprinkler System Winterization',
+            category: 'Exterior',
+            frequency: 365,
+            cost: 120,
+            priority: getAutoPriority('Sprinkler System Winterization', 'Exterior'),
+            description: 'Blow out irrigation lines before freezing weather',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+        
+        expandedTasks.push({
+            id: id++,
+            title: 'Sprinkler System Spring Startup',
+            category: 'Exterior',
+            frequency: 365,
+            cost: 100,
+            priority: getAutoPriority('Sprinkler System Spring Startup', 'Exterior'),
+            description: 'Inspect and test all zones after winter shutdown',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+    }
+
+    // 🍳 Outdoor Kitchen Tasks
+    if (features.outdoorKitchen) {
+        expandedTasks.push({
+            id: id++,
+            title: 'Clean Outdoor Kitchen',
+            category: 'Exterior',
+            frequency: 30,
+            cost: 50,
+            priority: getAutoPriority('Clean Outdoor Kitchen', 'Exterior'),
+            description: 'Deep clean grill, prep surfaces, and check gas connections',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+        
+        expandedTasks.push({
+            id: id++,
+            title: 'Winterize Outdoor Kitchen',
+            category: 'Exterior',
+            frequency: 365,
+            cost: 100,
+            priority: getAutoPriority('Winterize Outdoor Kitchen', 'Exterior'),
+            description: 'Protect outdoor appliances and plumbing from winter weather',
+            dueDate: null,
+            lastCompleted: null,
+            isCompleted: false,
+            isTemplate: true
+        });
+    }
+
     console.log(`✅ Generated ${expandedTasks.length} tasks for expanded features`);
     return expandedTasks;
 }
@@ -3346,7 +3425,6 @@ function populatePropertyFeaturesTab() {
             fence: document.getElementById('features-fence')?.checked || false,
             attic: document.getElementById('features-attic')?.checked || false
         };
-        console.log('✅ Initial form state captured:', initialFormState);
     }, 100);
     
     console.log('📝 Property features tab populated with current data');
@@ -3364,8 +3442,6 @@ function savePropertyFeaturesFromTab() {
     
     // Store old features to compare what changed - use captured initial state
     const oldFeatures = initialFormState || {};
-    console.log('🔍 DEBUG - oldFeatures at save time:', oldFeatures);
-    
     // Get new feature values from tab form
     const newFeatures = {
         centralAC: document.getElementById('features-central-ac')?.checked || false,
@@ -3409,9 +3485,7 @@ function savePropertyFeaturesFromTab() {
     };
     
     // Detect changes and show summary
-    console.log('🔍 DEBUG - newFeatures:', newFeatures);
     const changes = detectFeatureChanges(oldFeatures, newFeatures);
-    console.log('🔍 DEBUG - detected changes:', changes);
     
     // Update home data
     homeData.features = newFeatures;
