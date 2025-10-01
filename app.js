@@ -5523,8 +5523,24 @@ function generatePlanningItems() {
         });
     }
     
-    // Check HVAC system age (based on property age as proxy)
-    if (window.homeData?.yearBuilt) {
+    // Check HVAC system age (use actual age if available, otherwise estimate from house age)
+    const hvacAge = window.homeData?.systemAges?.hvac;
+    if (hvacAge !== undefined) {
+        // Use actual HVAC age
+        if (hvacAge >= 15) {
+            items.push({
+                type: 'hvac',
+                title: 'HVAC System Replacement',
+                description: `HVAC system is ${hvacAge} years old (typical lifespan: 15-20 years)`,
+                cost: '$8,000 - $15,000',
+                timeline: hvacAge >= 18 ? 'immediate' : 'upcoming',
+                priority: hvacAge >= 18 ? 'high' : 'medium',
+                icon: '🌡️',
+                isEstimate: false
+            });
+        }
+    } else if (window.homeData?.yearBuilt) {
+        // Fall back to house age estimate
         const houseAge = currentYear - window.homeData.yearBuilt;
         if (houseAge >= 18) {
             items.push({
@@ -5534,7 +5550,41 @@ function generatePlanningItems() {
                 cost: '$8,000 - $15,000',
                 timeline: houseAge >= 25 ? 'immediate' : 'upcoming',
                 priority: houseAge >= 25 ? 'high' : 'medium',
-                icon: '🌡️'
+                icon: '🌡️',
+                isEstimate: true
+            });
+        }
+    }
+    
+    // Check Water Heater age (use actual age if available, otherwise estimate from house age)
+    const waterHeaterAge = window.homeData?.systemAges?.waterHeater;
+    if (waterHeaterAge !== undefined) {
+        // Use actual water heater age
+        if (waterHeaterAge >= 8) {
+            items.push({
+                type: 'waterHeater',
+                title: 'Water Heater Replacement',
+                description: `Water heater is ${waterHeaterAge} years old (typical lifespan: 8-12 years)`,
+                cost: '$1,200 - $2,500',
+                timeline: waterHeaterAge >= 10 ? 'immediate' : 'upcoming',
+                priority: waterHeaterAge >= 10 ? 'high' : 'medium',
+                icon: '💧',
+                isEstimate: false
+            });
+        }
+    } else if (window.homeData?.yearBuilt) {
+        // Fall back to house age estimate for water heater
+        const houseAge = currentYear - window.homeData.yearBuilt;
+        if (houseAge >= 8) {
+            items.push({
+                type: 'waterHeater',
+                title: 'Water Heater Replacement',
+                description: `Water heater likely needs replacement (house built in ${window.homeData.yearBuilt})`,
+                cost: '$1,200 - $2,500',
+                timeline: houseAge >= 12 ? 'immediate' : 'upcoming',
+                priority: houseAge >= 12 ? 'high' : 'medium',
+                icon: '💧',
+                isEstimate: true
             });
         }
     }
@@ -5584,6 +5634,13 @@ function renderPlanningSection(containerId, items) {
                     <div>
                         <h3 class="font-semibold text-gray-900">${item.title}</h3>
                         <p class="text-sm text-gray-600">${item.description}</p>
+                        ${item.isEstimate ? `
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full">
+                                📅 Estimate based on house age
+                            </span>
+                        </div>
+                        ` : ''}
                     </div>
                 </div>
                 <span class="px-2 py-1 text-xs font-medium rounded-full ${getPriorityColors(item.priority)}">
@@ -5592,9 +5649,17 @@ function renderPlanningSection(containerId, items) {
             </div>
             <div class="flex items-center justify-between mt-3">
                 <span class="text-lg font-bold text-gray-900">${item.cost}</span>
-                <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                    Learn More →
-                </button>
+                <div class="flex gap-2">
+                    ${item.isEstimate ? `
+                    <button onclick="updateSystemAge('${item.type}', '${item.title}')" 
+                            class="bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1 rounded text-xs font-medium transition-colors">
+                        📝 Update Age
+                    </button>
+                    ` : ''}
+                    <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        Learn More →
+                    </button>
+                </div>
             </div>
         </div>
     `).join('');
@@ -5637,6 +5702,97 @@ function getApplianceReplacementCost(type) {
         'air-conditioner': '$3,000 - $7,000'
     };
     return costs[type] || '$500 - $2,000';
+}
+
+// ===== SYSTEM AGE UPDATE FUNCTIONALITY =====
+
+let currentSystemType = null;
+let currentSystemTitle = null;
+
+function updateSystemAge(systemType, systemTitle) {
+    console.log(`📝 Opening system age update for: ${systemType} - ${systemTitle}`);
+    
+    currentSystemType = systemType;
+    currentSystemTitle = systemTitle;
+    
+    // Update modal content
+    document.getElementById('system-type-display').textContent = systemTitle;
+    
+    // Get current age if available
+    const currentAge = window.homeData?.systemAges?.[systemType];
+    const ageInput = document.getElementById('system-age-input');
+    if (currentAge !== undefined) {
+        ageInput.value = currentAge;
+    } else {
+        ageInput.value = '';
+    }
+    
+    // Show modal
+    document.getElementById('system-age-modal').classList.remove('hidden');
+}
+
+function closeSystemAgeModal() {
+    document.getElementById('system-age-modal').classList.add('hidden');
+    currentSystemType = null;
+    currentSystemTitle = null;
+}
+
+function saveSystemAge() {
+    const ageInput = document.getElementById('system-age-input');
+    const selectedAge = parseInt(ageInput.value);
+    
+    if (isNaN(selectedAge) || selectedAge < 0) {
+        alert('Please select a valid age for the system.');
+        return;
+    }
+    
+    // Initialize systemAges if it doesn't exist
+    if (!window.homeData.systemAges) {
+        window.homeData.systemAges = {};
+    }
+    
+    // Save the system age
+    window.homeData.systemAges[currentSystemType] = selectedAge;
+    
+    console.log(`✅ Saved ${currentSystemType} age: ${selectedAge} years`);
+    
+    // Save to Firebase
+    if (window.currentUser) {
+        saveUserDataToFirebaseEnhanced(window.currentUser.uid, window.homeData, window.tasks || [])
+            .then(() => {
+                console.log('✅ System age saved to Firebase');
+                
+                // Refresh planning view to show updated data
+                renderPlanningView();
+                
+                // Show success message
+                showToast(`✅ Updated ${currentSystemTitle} age to ${selectedAge} years`);
+            })
+            .catch((error) => {
+                console.error('❌ Error saving system age:', error);
+                showToast('❌ Error saving system age');
+            });
+    }
+    
+    // Close modal
+    closeSystemAgeModal();
+}
+
+function showToast(message) {
+    // Simple toast notification
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity';
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    // Fade out after 3 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 300);
+    }, 3000);
 }
 
 // ===== CONTEXTUAL SHOPPING FUNCTIONALITY =====
