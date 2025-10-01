@@ -1759,7 +1759,7 @@ function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
 
     // UNIFIED: Always ensure header is visible on all main tabs
-    if (['dashboard', 'calendar', 'appliances', 'documents', 'marketplace', 'planning'].includes(tabName)) {
+    if (['dashboard', 'calendar', 'appliances', 'documents', 'planning'].includes(tabName)) {
         // Ensure main-app-active class is set (makes header sticky)
         document.body.classList.add('main-app-active');
         // Remove any conflicting header classes
@@ -1791,14 +1791,12 @@ function showTab(tabName) {
     const calendarView = document.getElementById('calendar-view');
     const documentsView = document.getElementById('documents-view');
     const appliancesView = document.getElementById('appliances-view');
-    const marketplaceView = document.getElementById('marketplace-view');
     const planningView = document.getElementById('planning-view');
 
     if (dashboardView) dashboardView.classList.add('hidden');
     if (calendarView) calendarView.classList.add('hidden');
     if (documentsView) documentsView.classList.add('hidden');
     if (appliancesView) appliancesView.classList.add('hidden');
-    if (marketplaceView) marketplaceView.classList.add('hidden');
     if (planningView) planningView.classList.add('hidden');
     if (allTasksView) allTasksView.classList.add('hidden');
     
@@ -2036,31 +2034,6 @@ function showTab(tabName) {
             
         } catch (error) {
             console.error('❌ Error initializing appliances:', error);
-        }
-    } else if (tabName === 'marketplace') {
-        // Show marketplace view
-        if (marketplaceView) {
-            marketplaceView.classList.remove('hidden');
-        }
-        
-        // Update tab styling  
-        const marketplaceTab = document.getElementById('tab-marketplace');
-        if (marketplaceTab) {
-            marketplaceTab.classList.add('opacity-100');
-            marketplaceTab.classList.remove('opacity-70');
-        }
-        
-        console.log('🛍️ Switching to marketplace tab...');
-        
-        // Initialize marketplace products
-        try {
-            if (window.marketplaceManager && typeof window.marketplaceManager.renderMarketplace === 'function') {
-                window.marketplaceManager.renderMarketplace();
-            } else {
-                console.log('🛍️ Marketplace manager not found, using basic display');
-            }
-        } catch (error) {
-            console.error('❌ Error initializing marketplace:', error);
         }
     } else if (tabName === 'planning') {
         // Show planning view
