@@ -3243,15 +3243,80 @@ window.showEmailLogin = showEmailLogin;
     
     <!-- PWA Service Worker (minimal, non-invasive) -->
     <script>
+    // Enhanced Service Worker with Error Recovery
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
             navigator.serviceWorker.register('/sw.js')
                 .then(function(registration) {
                     console.log('✅ Service worker registered for PWA compliance');
+                    
+                    // Listen for service worker updates
+                    registration.addEventListener('updatefound', () => {
+                        console.log('[SW] Update found, installing new version...');
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('[SW] New version available - refreshing...');
+                                window.location.reload();
+                            }
+                        });
+                    });
                 })
                 .catch(function(error) {
                     console.log('⚠️ Service worker registration failed (non-critical):', error);
                 });
+        });
+    }
+
+    // Global error handler for PWA cache issues
+    window.addEventListener('error', (event) => {
+        console.error('[PWA] JavaScript error detected:', event.error);
+        
+        // If we detect critical errors that might be cache-related
+        if (event.error && (
+            event.error.message.includes('Loading') ||
+            event.error.message.includes('fetch') ||
+            event.error.message.includes('network')
+        )) {
+            console.log('[PWA] Possible cache corruption detected, clearing caches...');
+            clearPWACache();
+        }
+    });
+
+    // Function to clear PWA cache manually
+    window.clearPWACache = function() {
+        if ('serviceWorker' in navigator && 'caches' in window) {
+            // Send message to service worker to clear caches
+            navigator.serviceWorker.ready.then((registration) => {
+                if (registration.active) {
+                    const messageChannel = new MessageChannel();
+                    messageChannel.port1.onmessage = (event) => {
+                        if (event.data && event.data.success) {
+                            console.log('[PWA] Cache cleared successfully');
+                            setTimeout(() => window.location.reload(), 1000);
+                        }
+                    };
+                    registration.active.postMessage(
+                        { type: 'CLEAR_CACHE' },
+                        [messageChannel.port2]
+                    );
+                }
+            });
+        }
+    };
+
+    // Add manual cache clear button for debugging (only show in dev mode)
+    if (window.location.hostname === 'localhost' || window.location.search.includes('debug=true')) {
+        document.addEventListener('DOMContentLoaded', () => {
+            const debugButton = document.createElement('button');
+            debugButton.innerHTML = '🗑️ Clear PWA Cache';
+            debugButton.style.cssText = 'position:fixed;top:10px;right:10px;z-index:9999;background:red;color:white;padding:10px;border:none;border-radius:5px;font-size:12px;';
+            debugButton.onclick = () => {
+                if (confirm('Clear PWA cache and reload?')) {
+                    clearPWACache();
+                }
+            };
+            document.body.appendChild(debugButton);
         });
     }
     </script>
