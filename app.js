@@ -5911,68 +5911,68 @@ function openTaskShop(taskTitle, taskCategory) {
 function generateShopSearchTerms(taskTitle, taskCategory) {
     const title = taskTitle.toLowerCase();
     
-    // Curated product recommendations for specific tasks
+    // Curated product recommendations for specific tasks (single most relevant product)
     const curatedProducts = {
         // HVAC & Air Quality
-        'clean mini-split filters': ['mini split cleaning kit coil cleaner', 'HVAC coil cleaning spray'],
-        'clean mini split filters': ['mini split cleaning kit coil cleaner', 'HVAC coil cleaning spray'],
-        'replace air filter': ['HVAC air filter 16x25x1', 'furnace filter MERV 11'],
-        'clean dryer vent': ['dryer vent cleaning kit', 'dryer lint brush flexible'],
-        'dryer vent cleaning': ['dryer vent cleaning kit', 'dryer lint brush flexible'],
+        'clean mini-split filters': 'mini split cleaning kit coil cleaner',
+        'clean mini split filters': 'mini split cleaning kit coil cleaner',
+        'replace air filter': 'HVAC air filter 16x25x1',
+        'clean dryer vent': 'dryer vent cleaning kit',
+        'dryer vent cleaning': 'dryer vent cleaning kit',
         
         // Water Systems
-        'replace sediment filter': ['whole house sediment filter 5 micron', 'water filter housing wrench'],
-        'replace uv filter': ['UV water filter bulb replacement', 'UV sterilizer quartz sleeve'],
-        'replace viqua sediment filter': ['whole house sediment filter 5 micron', 'water filter housing wrench'],
-        'test water quality': ['home water test kit TDS', 'water testing strips bacteria'],
+        'replace sediment filter': 'whole house sediment filter 5 micron',
+        'replace uv filter': 'UV water filter bulb replacement',
+        'replace viqua sediment filter': 'whole house sediment filter 5 micron',
+        'test water quality': 'home water test kit TDS',
         
         // Safety & Batteries
-        'test smoke detector': ['9V lithium batteries smoke detector', 'smoke detector tester spray'],
-        'replace smoke detector battery': ['9V lithium battery 10 year', 'smoke alarm batteries'],
-        'smoke detector battery': ['9V lithium battery 10 year', 'smoke alarm batteries'],
-        'test carbon monoxide detector': ['carbon monoxide detector battery', 'CO detector tester'],
-        'carbon monoxide detector': ['carbon monoxide detector battery', 'CO detector tester'],
+        'test smoke detector': '9V lithium batteries smoke detector',
+        'replace smoke detector battery': '9V lithium battery 10 year',
+        'smoke detector battery': '9V lithium battery 10 year',
+        'test carbon monoxide detector': 'carbon monoxide detector battery',
+        'carbon monoxide detector': 'carbon monoxide detector battery',
         
         // Cleaning & Maintenance
-        'clean gutters': ['gutter cleaning tools scoop', 'telescoping gutter cleaner'],
-        'gutter cleaning': ['gutter cleaning tools scoop', 'telescoping gutter cleaner'],
-        'caulk windows': ['exterior silicone caulk paintable', 'caulk gun professional grade'],
-        'weatherstrip doors': ['door weatherstrip seal foam', 'weatherstripping adhesive'],
-        'clean outdoor furniture': ['outdoor furniture cleaner deck', 'pressure washer detergent'],
+        'clean gutters': 'gutter cleaning tools scoop',
+        'gutter cleaning': 'gutter cleaning tools scoop',
+        'caulk windows': 'exterior silicone caulk paintable',
+        'weatherstrip doors': 'door weatherstrip seal foam',
+        'clean outdoor furniture': 'outdoor furniture cleaner deck',
         
         // Seasonal & Exterior
-        'winterize outdoor faucets': ['outdoor faucet covers insulated', 'pipe insulation foam'],
-        'trim bushes': ['hedge trimmer cordless', 'pruning shears bypass'],
-        'prune trees': ['pruning shears bypass', 'pole saw telescoping'],
-        'mulch garden beds': ['organic mulch bags', 'landscape fabric'],
+        'winterize outdoor faucets': 'outdoor faucet covers insulated',
+        'trim bushes': 'hedge trimmer cordless',
+        'prune trees': 'pruning shears bypass',
+        'mulch garden beds': 'organic mulch bags',
         
         // Septic & Plumbing
-        'flush septic': ['septic tank treatment bacteria', 'septic system additive'],
-        'septic flush': ['septic tank treatment bacteria', 'septic system additive'],
-        'monthly septic pod flush': ['septic tank treatment bacteria', 'septic system additive'],
-        'septic pod flush': ['septic tank treatment bacteria', 'septic system additive'],
-        'lubricate garage door': ['garage door lubricant spray', 'lithium grease garage door'],
-        'garage door lubrication': ['garage door lubricant spray', 'lithium grease garage door'],
+        'flush septic': 'septic tank treatment bacteria',
+        'septic flush': 'septic tank treatment bacteria',
+        'monthly septic pod flush': 'septic tank treatment bacteria',
+        'septic pod flush': 'septic tank treatment bacteria',
+        'lubricate garage door': 'garage door lubricant spray',
+        'garage door lubrication': 'garage door lubricant spray',
         
         // Filters & Replacements
-        'air filter': ['HVAC air filter', 'furnace filter MERV 11'],
-        'furnace filter': ['HVAC air filter', 'furnace filter MERV 11'],
-        'water filter': ['water filter replacement cartridge', 'water filter housing wrench'],
+        'air filter': 'HVAC air filter',
+        'furnace filter': 'furnace filter MERV 11',
+        'water filter': 'water filter replacement cartridge',
         
         // General Cleaning
-        'pressure wash': ['pressure washer detergent', 'surface cleaner attachment'],
-        'deck cleaning': ['deck cleaner brightener', 'deck stain brush'],
-        'window cleaning': ['window cleaner squeegee', 'microfiber window cloths']
+        'pressure wash': 'pressure washer detergent',
+        'deck cleaning': 'deck cleaner brightener',
+        'window cleaning': 'window cleaner squeegee'
     };
     
     // Check for exact matches first
     const exactMatch = curatedProducts[title];
     if (exactMatch) {
-        return exactMatch;
+        return [exactMatch]; // Return as single-item array
     }
     
     // Check for partial matches with better keyword matching
-    for (const [taskName, products] of Object.entries(curatedProducts)) {
+    for (const [taskName, product] of Object.entries(curatedProducts)) {
         // Split task names into keywords for better matching
         const taskKeywords = taskName.split(' ');
         const titleWords = title.split(' ');
@@ -5983,19 +5983,19 @@ function generateShopSearchTerms(taskTitle, taskCategory) {
         );
         
         if (hasKeywordMatch || title.includes(taskName) || taskName.includes(title)) {
-            return products;
+            return [product]; // Return as single-item array
         }
     }
     
     // Fallback to keyword-based searches for uncurated tasks
     if (title.includes('filter') && title.includes('air')) {
-        return ['HVAC air filter', 'furnace filter'];
+        return ['HVAC air filter'];
     }
     if (title.includes('battery')) {
-        return ['9V batteries', 'smoke detector batteries'];
+        return ['9V batteries'];
     }
     if (title.includes('caulk')) {
-        return ['exterior caulk', 'caulk gun'];
+        return ['exterior caulk'];
     }
     
     // Return empty array if no good matches - this will hide the shop button
