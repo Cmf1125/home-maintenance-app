@@ -2,7 +2,7 @@
   "name": "The Home Keeper",
   "short_name": "Home Keeper",
   "description": "Smart home maintenance tracking and task management",
-  "start_url": "/?v=2025093001",
+  "start_url": "/?v=2025100202",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2563eb",

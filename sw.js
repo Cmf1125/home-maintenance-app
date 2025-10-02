@@ -1,7 +1,7 @@
 // Minimal Service Worker for PWA compliance
 // This is intentionally basic to avoid breaking existing functionality
 
-const CACHE_NAME = 'home-keeper-v1';
+const CACHE_NAME = 'home-keeper-v5';
 
 // Only cache essential files - avoid caching dynamic content
 const urlsToCache = [
