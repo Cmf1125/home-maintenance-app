@@ -2360,11 +2360,13 @@ if (isOverdue) {
                     📺 How-To
                 </button>
                 ` : ''}
+                ${hasRelevantShopLinks(task.title, task.category) ? `
                 <button onclick="openTaskShop('${task.title}', '${task.category}')" 
                     class="flex-1 bg-blue-50 text-blue-700 text-xs py-2 px-2 rounded-lg hover:bg-blue-100 transition-all duration-200 font-medium flex items-center justify-center gap-1" 
                     title="Shop for supplies">
                     🛒 Shop
                 </button>
+                ` : ''}
             </div>
             <!-- Bottom Row: History & Edit Buttons -->
             <div class="flex gap-2">
@@ -5886,6 +5888,34 @@ function showToast(message) {
 
 // ===== CONTEXTUAL SHOPPING FUNCTIONALITY =====
 
+function hasRelevantShopLinks(taskTitle, taskCategory) {
+    const title = taskTitle.toLowerCase();
+    
+    // Only show shop button for tasks where we have specific, relevant products
+    const relevantTasks = [
+        // Filters & Replacements
+        'filter', 'replace filter', 'air filter', 'water filter', 'sediment filter', 'uv filter',
+        
+        // Batteries
+        'battery', 'smoke detector', 'carbon monoxide',
+        
+        // Cleaning with specific supplies
+        'clean mini-split', 'clean mini split', 'clean gutter', 'clean dryer vent',
+        
+        // Caulking & Sealing  
+        'caulk', 'seal', 'weatherstrip',
+        
+        // Painting & Staining
+        'paint', 'stain', 'touch up',
+        
+        // Specific tools/supplies
+        'test water', 'flush septic', 'clean coil'
+    ];
+    
+    // Check if task title contains any relevant keywords
+    return relevantTasks.some(keyword => title.includes(keyword));
+}
+
 function openTaskShop(taskTitle, taskCategory) {
     console.log(`🛒 Opening shop for task: ${taskTitle} (${taskCategory})`);
     
@@ -5955,25 +5985,8 @@ function generateShopSearchTerms(taskTitle, taskCategory) {
         searchTerms.push('9V batteries', 'smoke detector batteries');
     }
     
-    // Category-based fallbacks
-    if (searchTerms.length === 0) {
-        switch (taskCategory) {
-            case 'HVAC':
-                searchTerms.push('HVAC maintenance supplies');
-                break;
-            case 'Water Systems':
-                searchTerms.push('plumbing supplies');
-                break;
-            case 'Safety':
-                searchTerms.push('home safety equipment');
-                break;
-            case 'Exterior':
-                searchTerms.push('home exterior maintenance');
-                break;
-            default:
-                searchTerms.push('home maintenance supplies');
-        }
-    }
+    // No generic fallbacks - if we don't have specific products, don't show shop button
+    // This prevents irrelevant results like "chimney inspection" → "cleaning supplies"
     
     // Limit to 2 search terms to avoid too many tabs
     return searchTerms.slice(0, 2);
