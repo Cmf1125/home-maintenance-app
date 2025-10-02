@@ -288,13 +288,13 @@ renderEnhancedTaskCard(task) {
             <div class="flex gap-1">
                 ${task.youtubeUrl && task.youtubeUrl.includes('youtube.com') ? `
                 <button onclick="event.stopPropagation(); openYouTubeVideo('${task.youtubeUrl}')" 
-                        class="bg-red-50 text-red-700 hover:bg-red-100 px-2 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1">
+                        class="bg-red-50 text-red-700 hover:bg-red-100 px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-1">
                     📺 How-To
                 </button>
                 ` : ''}
                 ${hasRelevantShopLinks(task.title, task.category) ? `
                 <button onclick="event.stopPropagation(); openTaskShop('${task.title}', '${task.category}')" 
-                        class="bg-blue-50 text-blue-700 hover:bg-blue-100 px-2 py-1 rounded text-xs font-medium transition-colors flex items-center gap-1">
+                        class="bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-1">
                     🛒 Shop
                 </button>
                 ` : ''}
