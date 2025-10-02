@@ -5915,32 +5915,54 @@ function generateShopSearchTerms(taskTitle, taskCategory) {
     const curatedProducts = {
         // HVAC & Air Quality
         'clean mini-split filters': ['mini split cleaning kit coil cleaner', 'HVAC coil cleaning spray'],
+        'clean mini split filters': ['mini split cleaning kit coil cleaner', 'HVAC coil cleaning spray'],
         'replace air filter': ['HVAC air filter 16x25x1', 'furnace filter MERV 11'],
         'clean dryer vent': ['dryer vent cleaning kit', 'dryer lint brush flexible'],
+        'dryer vent cleaning': ['dryer vent cleaning kit', 'dryer lint brush flexible'],
         
         // Water Systems
         'replace sediment filter': ['whole house sediment filter 5 micron', 'water filter housing wrench'],
         'replace uv filter': ['UV water filter bulb replacement', 'UV sterilizer quartz sleeve'],
+        'replace viqua sediment filter': ['whole house sediment filter 5 micron', 'water filter housing wrench'],
         'test water quality': ['home water test kit TDS', 'water testing strips bacteria'],
         
         // Safety & Batteries
         'test smoke detector': ['9V lithium batteries smoke detector', 'smoke detector tester spray'],
         'replace smoke detector battery': ['9V lithium battery 10 year', 'smoke alarm batteries'],
+        'smoke detector battery': ['9V lithium battery 10 year', 'smoke alarm batteries'],
         'test carbon monoxide detector': ['carbon monoxide detector battery', 'CO detector tester'],
+        'carbon monoxide detector': ['carbon monoxide detector battery', 'CO detector tester'],
         
         // Cleaning & Maintenance
         'clean gutters': ['gutter cleaning tools scoop', 'telescoping gutter cleaner'],
+        'gutter cleaning': ['gutter cleaning tools scoop', 'telescoping gutter cleaner'],
         'caulk windows': ['exterior silicone caulk paintable', 'caulk gun professional grade'],
         'weatherstrip doors': ['door weatherstrip seal foam', 'weatherstripping adhesive'],
+        'clean outdoor furniture': ['outdoor furniture cleaner deck', 'pressure washer detergent'],
         
         // Seasonal & Exterior
         'winterize outdoor faucets': ['outdoor faucet covers insulated', 'pipe insulation foam'],
-        'clean outdoor furniture': ['outdoor furniture cleaner deck', 'pressure washer detergent'],
         'trim bushes': ['hedge trimmer cordless', 'pruning shears bypass'],
+        'prune trees': ['pruning shears bypass', 'pole saw telescoping'],
+        'mulch garden beds': ['organic mulch bags', 'landscape fabric'],
         
         // Septic & Plumbing
-        'flush septic system': ['septic tank treatment bacteria', 'septic system additive'],
-        'lubricate garage door': ['garage door lubricant spray', 'lithium grease garage door']
+        'flush septic': ['septic tank treatment bacteria', 'septic system additive'],
+        'septic flush': ['septic tank treatment bacteria', 'septic system additive'],
+        'monthly septic pod flush': ['septic tank treatment bacteria', 'septic system additive'],
+        'septic pod flush': ['septic tank treatment bacteria', 'septic system additive'],
+        'lubricate garage door': ['garage door lubricant spray', 'lithium grease garage door'],
+        'garage door lubrication': ['garage door lubricant spray', 'lithium grease garage door'],
+        
+        // Filters & Replacements
+        'air filter': ['HVAC air filter', 'furnace filter MERV 11'],
+        'furnace filter': ['HVAC air filter', 'furnace filter MERV 11'],
+        'water filter': ['water filter replacement cartridge', 'water filter housing wrench'],
+        
+        // General Cleaning
+        'pressure wash': ['pressure washer detergent', 'surface cleaner attachment'],
+        'deck cleaning': ['deck cleaner brightener', 'deck stain brush'],
+        'window cleaning': ['window cleaner squeegee', 'microfiber window cloths']
     };
     
     // Check for exact matches first
@@ -5949,9 +5971,18 @@ function generateShopSearchTerms(taskTitle, taskCategory) {
         return exactMatch;
     }
     
-    // Check for partial matches
+    // Check for partial matches with better keyword matching
     for (const [taskName, products] of Object.entries(curatedProducts)) {
-        if (title.includes(taskName) || taskName.includes(title)) {
+        // Split task names into keywords for better matching
+        const taskKeywords = taskName.split(' ');
+        const titleWords = title.split(' ');
+        
+        // Check if key words match
+        const hasKeywordMatch = taskKeywords.some(keyword => 
+            titleWords.some(word => word.includes(keyword) || keyword.includes(word))
+        );
+        
+        if (hasKeywordMatch || title.includes(taskName) || taskName.includes(title)) {
             return products;
         }
     }
