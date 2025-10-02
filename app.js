@@ -5889,31 +5889,9 @@ function showToast(message) {
 // ===== CONTEXTUAL SHOPPING FUNCTIONALITY =====
 
 function hasRelevantShopLinks(taskTitle, taskCategory) {
-    const title = taskTitle.toLowerCase();
-    
-    // Only show shop button for tasks where we have specific, relevant products
-    const relevantTasks = [
-        // Filters & Replacements
-        'filter', 'replace filter', 'air filter', 'water filter', 'sediment filter', 'uv filter',
-        
-        // Batteries
-        'battery', 'smoke detector', 'carbon monoxide',
-        
-        // Cleaning with specific supplies
-        'clean mini-split', 'clean mini split', 'clean gutter', 'clean dryer vent',
-        
-        // Caulking & Sealing  
-        'caulk', 'seal', 'weatherstrip',
-        
-        // Painting & Staining
-        'paint', 'stain', 'touch up',
-        
-        // Specific tools/supplies
-        'test water', 'flush septic', 'clean coil'
-    ];
-    
-    // Check if task title contains any relevant keywords
-    return relevantTasks.some(keyword => title.includes(keyword));
+    // Simply check if we have curated products for this task
+    const searchTerms = generateShopSearchTerms(taskTitle, taskCategory);
+    return searchTerms.length > 0;
 }
 
 function openTaskShop(taskTitle, taskCategory) {
@@ -5932,62 +5910,63 @@ function openTaskShop(taskTitle, taskCategory) {
 
 function generateShopSearchTerms(taskTitle, taskCategory) {
     const title = taskTitle.toLowerCase();
-    let searchTerms = [];
     
-    // Task-specific search terms
-    if (title.includes('filter')) {
-        if (title.includes('air') || title.includes('hvac')) {
-            searchTerms.push('HVAC air filter');
-        } else if (title.includes('water')) {
-            searchTerms.push('water filter replacement');
-        } else if (title.includes('sediment')) {
-            searchTerms.push('sediment water filter');
-        } else if (title.includes('uv')) {
-            searchTerms.push('UV water filter replacement');
-        } else {
-            searchTerms.push('replacement filter');
+    // Curated product recommendations for specific tasks
+    const curatedProducts = {
+        // HVAC & Air Quality
+        'clean mini-split filters': ['mini split cleaning kit coil cleaner', 'HVAC coil cleaning spray'],
+        'replace air filter': ['HVAC air filter 16x25x1', 'furnace filter MERV 11'],
+        'clean dryer vent': ['dryer vent cleaning kit', 'dryer lint brush flexible'],
+        
+        // Water Systems
+        'replace sediment filter': ['whole house sediment filter 5 micron', 'water filter housing wrench'],
+        'replace uv filter': ['UV water filter bulb replacement', 'UV sterilizer quartz sleeve'],
+        'test water quality': ['home water test kit TDS', 'water testing strips bacteria'],
+        
+        // Safety & Batteries
+        'test smoke detector': ['9V lithium batteries smoke detector', 'smoke detector tester spray'],
+        'replace smoke detector battery': ['9V lithium battery 10 year', 'smoke alarm batteries'],
+        'test carbon monoxide detector': ['carbon monoxide detector battery', 'CO detector tester'],
+        
+        // Cleaning & Maintenance
+        'clean gutters': ['gutter cleaning tools scoop', 'telescoping gutter cleaner'],
+        'caulk windows': ['exterior silicone caulk paintable', 'caulk gun professional grade'],
+        'weatherstrip doors': ['door weatherstrip seal foam', 'weatherstripping adhesive'],
+        
+        // Seasonal & Exterior
+        'winterize outdoor faucets': ['outdoor faucet covers insulated', 'pipe insulation foam'],
+        'clean outdoor furniture': ['outdoor furniture cleaner deck', 'pressure washer detergent'],
+        'trim bushes': ['hedge trimmer cordless', 'pruning shears bypass'],
+        
+        // Septic & Plumbing
+        'flush septic system': ['septic tank treatment bacteria', 'septic system additive'],
+        'lubricate garage door': ['garage door lubricant spray', 'lithium grease garage door']
+    };
+    
+    // Check for exact matches first
+    const exactMatch = curatedProducts[title];
+    if (exactMatch) {
+        return exactMatch;
+    }
+    
+    // Check for partial matches
+    for (const [taskName, products] of Object.entries(curatedProducts)) {
+        if (title.includes(taskName) || taskName.includes(title)) {
+            return products;
         }
     }
     
-    if (title.includes('clean')) {
-        if (title.includes('gutter')) {
-            searchTerms.push('gutter cleaning tools', 'gutter guards');
-        } else if (title.includes('mini-split') || title.includes('mini split')) {
-            searchTerms.push('mini split cleaning kit', 'HVAC coil cleaner');
-        } else if (title.includes('dryer')) {
-            searchTerms.push('dryer vent cleaning kit');
-        } else {
-            searchTerms.push('cleaning supplies');
-        }
+    // Fallback to keyword-based searches for uncurated tasks
+    if (title.includes('filter') && title.includes('air')) {
+        return ['HVAC air filter', 'furnace filter'];
     }
-    
-    if (title.includes('inspect') || title.includes('check')) {
-        if (title.includes('roof')) {
-            searchTerms.push('roof inspection ladder', 'roof safety equipment');
-        } else if (title.includes('smoke detector')) {
-            searchTerms.push('smoke detector battery', '9V batteries');
-        } else if (title.includes('carbon monoxide')) {
-            searchTerms.push('carbon monoxide detector', 'CO detector battery');
-        } else {
-            searchTerms.push('inspection tools', 'flashlight');
-        }
-    }
-    
-    if (title.includes('caulk') || title.includes('seal')) {
-        searchTerms.push('exterior caulk', 'caulk gun', 'weatherproofing supplies');
-    }
-    
-    if (title.includes('paint') || title.includes('stain')) {
-        searchTerms.push('exterior paint', 'paint brushes', 'painting supplies');
-    }
-    
     if (title.includes('battery')) {
-        searchTerms.push('9V batteries', 'smoke detector batteries');
+        return ['9V batteries', 'smoke detector batteries'];
+    }
+    if (title.includes('caulk')) {
+        return ['exterior caulk', 'caulk gun'];
     }
     
-    // No generic fallbacks - if we don't have specific products, don't show shop button
-    // This prevents irrelevant results like "chimney inspection" → "cleaning supplies"
-    
-    // Limit to 2 search terms to avoid too many tabs
-    return searchTerms.slice(0, 2);
+    // Return empty array if no good matches - this will hide the shop button
+    return [];
 }
