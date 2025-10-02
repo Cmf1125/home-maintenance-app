@@ -4167,8 +4167,11 @@ function handleSuccessfulLogin(user) {
     document.getElementById('setup-form').classList.add('hidden');
     document.getElementById('setup-form').style.display = 'none';
     
-    // Load data FIRST, then show dashboard
+    // Load data FIRST, then show dashboard - with mobile retry logic
+    console.log('📱 Starting data load for mobile/desktop...');
+    
     loadUserDataEnhanced(user.uid).then(hasData => {
+        console.log('✅ Data load completed, hasData:', hasData);
         if (hasData) {
             // NOW show the app with data already loaded
             const header = document.getElementById('app-header');
@@ -4305,6 +4308,35 @@ function handleSuccessfulLogin(user) {
         } else {
             handleNewUserSignup(user);
         }
+    }).catch(error => {
+        console.error('❌ Error loading user data:', error);
+        console.log('🔄 Attempting retry for mobile compatibility...');
+        
+        // Mobile retry logic - try one more time after a short delay
+        setTimeout(() => {
+            loadUserDataEnhanced(user.uid).then(hasData => {
+                if (hasData) {
+                    console.log('✅ Retry successful - showing app');
+                    document.getElementById('main-app').classList.remove('hidden');
+                    document.body.classList.add('main-app-active');
+                    showTab('dashboard');
+                    
+                    // Update dashboard
+                    if (window.enhancedDashboard && window.enhancedDashboard.render) {
+                        window.enhancedDashboard.render();
+                    } else if (typeof updateDashboard === 'function') {
+                        updateDashboard();
+                    }
+                } else {
+                    console.log('🚫 Retry failed - showing setup');
+                    handleNewUserSignup(user);
+                }
+            }).catch(retryError => {
+                console.error('❌ Retry also failed:', retryError);
+                // Final fallback to setup
+                handleNewUserSignup(user);
+            });
+        }, 2000);
     });
 }
 
@@ -4397,12 +4429,18 @@ auth.getRedirectResult().then((result) => {
 
 // Listen for authentication state changes
 let authProcessing = false;
+let lastAuthUser = null;
 auth.onAuthStateChanged((user) => {
-    if (authProcessing) {
-        console.log('⚠️ Auth state change ignored - already processing');
-        return; // Prevent duplicate processing
+    // Prevent duplicate processing for same user
+    const userKey = user ? user.uid : null;
+    if (authProcessing || userKey === lastAuthUser) {
+        console.log('⚠️ Auth state change ignored - already processing or same user');
+        return;
     }
+    
     authProcessing = true;
+    lastAuthUser = userKey;
+    console.log('🔄 Processing auth state change for:', user ? user.email : 'signed out');
     
     if (user) {
         // User is signed in
@@ -4441,8 +4479,8 @@ auth.onAuthStateChanged((user) => {
         document.body.style.cssText = 'padding: 0 !important; margin: 0 !important; overflow-x: hidden;';
     }
     
-    // Reset the flag after a short delay
-    setTimeout(() => { authProcessing = false; }, 1000);
+    // Reset the flag immediately after processing
+    authProcessing = false;
 });
     
 </script>
