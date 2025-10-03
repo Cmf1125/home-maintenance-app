@@ -5696,6 +5696,12 @@ function generatePlanningItems() {
         });
     }
     
+    // Add custom planning items
+    const customItems = window.homeData?.customPlanningItems || [];
+    customItems.forEach(customItem => {
+        items.push(customItem);
+    });
+    
     // Filter out hidden items
     const hiddenItems = window.homeData?.hiddenPlanningItems || [];
     const filteredItems = items.filter(item => {
@@ -5704,7 +5710,7 @@ function generatePlanningItems() {
         );
     });
     
-    console.log(`📊 Generated ${items.length} planning items, ${filteredItems.length} after filtering hidden items`);
+    console.log(`📊 Generated ${items.length} planning items (${customItems.length} custom), ${filteredItems.length} after filtering hidden items`);
     
     return filteredItems;
 }
@@ -5932,6 +5938,99 @@ function deletePlanningItem(itemType, itemTitle) {
         .catch((error) => {
             console.error('❌ Error saving hidden planning item:', error);
             showToast('❌ Error removing item from planning');
+        });
+    }
+}
+
+// Add Planning Item Modal Functions
+function showAddPlanningItemModal() {
+    document.getElementById('add-planning-item-modal').classList.remove('hidden');
+}
+
+function closeAddPlanningItemModal() {
+    document.getElementById('add-planning-item-modal').classList.add('hidden');
+    // Clear form
+    document.getElementById('custom-item-name').value = '';
+    document.getElementById('custom-item-description').value = '';
+    document.getElementById('custom-item-cost').value = '';
+    document.getElementById('custom-item-timeline').value = 'upcoming';
+    document.getElementById('custom-item-priority').value = 'medium';
+    document.getElementById('custom-item-icon').value = '';
+}
+
+function saveCustomPlanningItem() {
+    // Get form values
+    const name = document.getElementById('custom-item-name').value.trim();
+    const description = document.getElementById('custom-item-description').value.trim();
+    const cost = document.getElementById('custom-item-cost').value.trim();
+    const timeline = document.getElementById('custom-item-timeline').value;
+    const priority = document.getElementById('custom-item-priority').value;
+    const icon = document.getElementById('custom-item-icon').value.trim() || '🏠';
+    
+    // Validate required fields
+    if (!name) {
+        alert('Please enter an item name');
+        document.getElementById('custom-item-name').focus();
+        return;
+    }
+    
+    if (!description) {
+        alert('Please enter a description');
+        document.getElementById('custom-item-description').focus();
+        return;
+    }
+    
+    if (!cost) {
+        alert('Please enter an estimated cost');
+        document.getElementById('custom-item-cost').focus();
+        return;
+    }
+    
+    console.log('💾 Saving custom planning item:', name);
+    
+    // Create custom planning item
+    const customItem = {
+        type: 'custom',
+        title: name,
+        description: description,
+        cost: cost,
+        timeline: timeline,
+        priority: priority,
+        icon: icon,
+        isCustom: true,
+        isEstimate: false,
+        createdAt: new Date().toISOString()
+    };
+    
+    // Initialize custom planning items if it doesn't exist
+    if (!window.homeData.customPlanningItems) {
+        window.homeData.customPlanningItems = [];
+    }
+    
+    // Add to custom items list
+    window.homeData.customPlanningItems.push(customItem);
+    
+    // Save to Firebase
+    if (window.currentUser) {
+        const db = firebase.firestore();
+        db.collection('users').doc(window.currentUser.uid).update({
+            'features.customPlanningItems': window.homeData.customPlanningItems
+        })
+        .then(() => {
+            console.log('✅ Custom planning item saved to Firebase');
+            
+            // Refresh planning view
+            renderPlanningView();
+            
+            // Close modal
+            closeAddPlanningItemModal();
+            
+            // Show success message
+            showToast(`✅ Added "${name}" to planning`);
+        })
+        .catch((error) => {
+            console.error('❌ Error saving custom planning item:', error);
+            showToast('❌ Error adding item to planning');
         });
     }
 }
