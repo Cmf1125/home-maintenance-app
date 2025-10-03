@@ -1759,7 +1759,7 @@ function showTab(tabName) {
     console.log(`🔄 Switching to tab: ${tabName}`);
 
     // UNIFIED: Always ensure header is visible on all main tabs
-    if (['dashboard', 'calendar', 'appliances', 'documents', 'planning'].includes(tabName)) {
+    if (['dashboard', 'calendar', 'appliances', 'documents', 'planning', 'vendors'].includes(tabName)) {
         // Ensure main-app-active class is set (makes header sticky)
         document.body.classList.add('main-app-active');
         // Remove any conflicting header classes
@@ -1792,12 +1792,14 @@ function showTab(tabName) {
     const documentsView = document.getElementById('documents-view');
     const appliancesView = document.getElementById('appliances-view');
     const planningView = document.getElementById('planning-view');
+    const vendorsView = document.getElementById('vendors-view');
 
     if (dashboardView) dashboardView.classList.add('hidden');
     if (calendarView) calendarView.classList.add('hidden');
     if (documentsView) documentsView.classList.add('hidden');
     if (appliancesView) appliancesView.classList.add('hidden');
     if (planningView) planningView.classList.add('hidden');
+    if (vendorsView) vendorsView.classList.add('hidden');
     if (allTasksView) allTasksView.classList.add('hidden');
     
     // Hide property features view
@@ -2059,6 +2061,26 @@ function showTab(tabName) {
             renderPlanningView();
         } catch (error) {
             console.error('❌ Error initializing planning:', error);
+        }
+    }
+    
+    if (tabName === 'vendors') {
+        if (vendorsView) vendorsView.classList.remove('hidden');
+        
+        // Update tab styling  
+        const vendorsTab = document.getElementById('tab-vendors');
+        if (vendorsTab) {
+            vendorsTab.classList.add('opacity-100');
+            vendorsTab.classList.remove('opacity-70');
+        }
+        
+        console.log('📇 Initializing vendors directory...');
+        
+        // Initialize vendors functionality
+        try {
+            loadVendors();
+        } catch (error) {
+            console.error('❌ Error initializing vendors:', error);
         }
     }
     
@@ -3864,6 +3886,15 @@ async function loadData() {
             if (userData.homeData && userData.tasks) {
                 window.homeData = userData.homeData;
                 window.tasks = userData.tasks;
+                
+                // Load vendors if they exist
+                if (userData.vendors) {
+                    vendors = userData.vendors;
+                    console.log(`✅ Loaded ${vendors.length} vendors from Firebase`);
+                } else {
+                    vendors = [];
+                    console.log('📂 No vendors found, starting with empty list');
+                }
                 
                 // Restore dates - handle both old nextDue and new dueDate formats
                 tasks.forEach(task => {
@@ -6226,3 +6257,256 @@ function generateShopSearchTerms(taskTitle, taskCategory) {
     // Return empty array if no good matches - this will hide the shop button
     return [];
 }
+
+// ===== VENDOR DIRECTORY FUNCTIONALITY =====
+
+// Global vendor data
+let vendors = [];
+
+// Load vendors from Firebase
+async function loadVendors() {
+    if (!window.auth?.currentUser) {
+        console.log('⚠️ No authenticated user, skipping vendor load');
+        return;
+    }
+
+    try {
+        const userDoc = await window.db.collection('users').doc(window.auth.currentUser.uid).get();
+        if (userDoc.exists && userDoc.data().vendors) {
+            vendors = userDoc.data().vendors;
+            console.log(`✅ Loaded ${vendors.length} vendors from Firebase`);
+            renderVendors();
+        } else {
+            vendors = [];
+            console.log('📂 No vendors found, starting with empty list');
+            renderVendors();
+        }
+    } catch (error) {
+        console.error('❌ Error loading vendors:', error);
+        vendors = [];
+        renderVendors();
+    }
+}
+
+// Save vendors to Firebase
+async function saveVendors() {
+    if (!window.auth?.currentUser) {
+        console.error('❌ No authenticated user for saving vendors');
+        return;
+    }
+
+    try {
+        await window.db.collection('users').doc(window.auth.currentUser.uid).update({
+            vendors: vendors
+        });
+        console.log('✅ Vendors saved to Firebase');
+    } catch (error) {
+        console.error('❌ Error saving vendors:', error);
+        throw error;
+    }
+}
+
+// Render vendors in the list
+function renderVendors() {
+    const vendorsList = document.getElementById('vendors-list');
+    if (!vendorsList) return;
+
+    if (vendors.length === 0) {
+        vendorsList.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <div class="text-4xl mb-4">📞</div>
+                <p class="text-lg font-medium mb-2">No vendors added yet</p>
+                <p class="text-sm">Add your preferred service providers to keep their contact info handy</p>
+            </div>
+        `;
+        return;
+    }
+
+    vendorsList.innerHTML = vendors.map(vendor => `
+        <div class="bg-white rounded-lg shadow p-4 border">
+            <div class="flex justify-between items-start mb-3">
+                <div class="flex-1">
+                    <h3 class="font-semibold text-lg text-gray-900">${vendor.name}</h3>
+                    <p class="text-sm text-gray-600">${vendor.service}</p>
+                </div>
+                <button onclick="deleteVendor('${vendor.id}')" 
+                        class="text-red-500 hover:text-red-700 p-1">
+                    🗑️
+                </button>
+            </div>
+            
+            <div class="space-y-2 text-sm">
+                ${vendor.phone ? `
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-500">📞</span>
+                        <a href="tel:${vendor.phone}" class="text-blue-600 hover:underline">${vendor.phone}</a>
+                    </div>
+                ` : ''}
+                
+                ${vendor.email ? `
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-500">✉️</span>
+                        <a href="mailto:${vendor.email}" class="text-blue-600 hover:underline">${vendor.email}</a>
+                    </div>
+                ` : ''}
+                
+                ${vendor.website ? `
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-500">🌐</span>
+                        <a href="${vendor.website}" target="_blank" class="text-blue-600 hover:underline">Website</a>
+                    </div>
+                ` : ''}
+                
+                ${vendor.notes ? `
+                    <div class="flex items-start gap-2">
+                        <span class="text-gray-500">📝</span>
+                        <span class="text-gray-700">${vendor.notes}</span>
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+// Show add vendor modal
+function showAddVendorModal() {
+    const modal = document.getElementById('add-vendor-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        // Clear form
+        document.getElementById('vendor-name').value = '';
+        document.getElementById('vendor-service').value = '';
+        document.getElementById('vendor-phone').value = '';
+        document.getElementById('vendor-email').value = '';
+        document.getElementById('vendor-website').value = '';
+        document.getElementById('vendor-notes').value = '';
+        // Focus on name field
+        document.getElementById('vendor-name').focus();
+    }
+}
+
+// Close add vendor modal
+function closeAddVendorModal() {
+    const modal = document.getElementById('add-vendor-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+// Add vendor
+async function addVendor() {
+    const name = document.getElementById('vendor-name').value.trim();
+    const service = document.getElementById('vendor-service').value.trim();
+    const phone = document.getElementById('vendor-phone').value.trim();
+    const email = document.getElementById('vendor-email').value.trim();
+    const website = document.getElementById('vendor-website').value.trim();
+    const notes = document.getElementById('vendor-notes').value.trim();
+
+    // Validation
+    if (!name) {
+        alert('❌ Vendor name is required');
+        document.getElementById('vendor-name').focus();
+        return;
+    }
+
+    if (!service) {
+        alert('❌ Service type is required');
+        document.getElementById('vendor-service').focus();
+        return;
+    }
+
+    if (!phone && !email && !website) {
+        alert('❌ At least one contact method (phone, email, or website) is required');
+        return;
+    }
+
+    // Email validation
+    if (email && !email.includes('@')) {
+        alert('❌ Please enter a valid email address');
+        document.getElementById('vendor-email').focus();
+        return;
+    }
+
+    // Website validation
+    if (website && !website.startsWith('http')) {
+        const confirmAdd = confirm('⚠️ Website should start with http:// or https://. Add anyway?');
+        if (!confirmAdd) {
+            document.getElementById('vendor-website').focus();
+            return;
+        }
+    }
+
+    try {
+        // Create vendor object
+        const vendor = {
+            id: Date.now().toString(), // Simple ID generation
+            name: name,
+            service: service,
+            phone: phone || null,
+            email: email || null,
+            website: website || null,
+            notes: notes || null,
+            dateAdded: new Date().toISOString()
+        };
+
+        // Add to vendors array
+        vendors.push(vendor);
+
+        // Save to Firebase
+        await saveVendors();
+
+        // Re-render vendors list
+        renderVendors();
+
+        // Close modal
+        closeAddVendorModal();
+
+        // Show success message
+        showToast(`✅ Added ${name} to vendor directory`);
+
+        console.log('✅ Vendor added successfully:', vendor);
+
+    } catch (error) {
+        console.error('❌ Error adding vendor:', error);
+        showToast('❌ Error adding vendor');
+    }
+}
+
+// Delete vendor
+async function deleteVendor(vendorId) {
+    const vendor = vendors.find(v => v.id === vendorId);
+    if (!vendor) {
+        console.error('❌ Vendor not found:', vendorId);
+        return;
+    }
+
+    const confirmDelete = confirm(`Are you sure you want to delete "${vendor.name}"?\n\nThis action cannot be undone.`);
+    if (!confirmDelete) return;
+
+    try {
+        // Remove from vendors array
+        vendors = vendors.filter(v => v.id !== vendorId);
+
+        // Save to Firebase
+        await saveVendors();
+
+        // Re-render vendors list
+        renderVendors();
+
+        // Show success message
+        showToast(`✅ Deleted ${vendor.name} from vendor directory`);
+
+        console.log('✅ Vendor deleted successfully:', vendor.name);
+
+    } catch (error) {
+        console.error('❌ Error deleting vendor:', error);
+        showToast('❌ Error deleting vendor');
+    }
+}
+
+// Make vendor functions globally available
+window.loadVendors = loadVendors;
+window.showAddVendorModal = showAddVendorModal;
+window.closeAddVendorModal = closeAddVendorModal;
+window.addVendor = addVendor;
+window.deleteVendor = deleteVendor;
