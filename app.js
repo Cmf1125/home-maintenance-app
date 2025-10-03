@@ -2366,6 +2366,12 @@ if (isOverdue) {
                     title="Shop for supplies">
                     🛒 Shop
                 </button>
+                ` : needsProfessionalService(task.title, task.category) ? `
+                <button onclick="findProfessionalService('${task.title}', '${task.category}')" 
+                    class="flex-1 bg-green-50 text-green-700 text-xs py-2 px-2 rounded-lg hover:bg-green-100 transition-all duration-200 font-medium flex items-center justify-center gap-1" 
+                    title="Find local professionals">
+                    👷 Find Pro
+                </button>
                 ` : ''}
             </div>
             <!-- Bottom Row: History & Edit Buttons -->
@@ -5888,10 +5894,50 @@ function showToast(message) {
 
 // ===== CONTEXTUAL SHOPPING FUNCTIONALITY =====
 
+// Professional service tasks that require contractors, not DIY supplies
+const professionalServiceTasks = [
+    'chimney inspection and cleaning',
+    'chimney inspection', 
+    'chimney cleaning',
+    'inspect chimney',
+    'clean chimney',
+    'hvac maintenance',
+    'furnace maintenance', 
+    'air conditioning maintenance',
+    'electrical inspection',
+    'plumbing inspection',
+    'roof inspection',
+    'foundation inspection',
+    'septic pumping',
+    'septic inspection',
+    'pest control',
+    'termite inspection',
+    'tree removal',
+    'major appliance repair',
+    'water heater maintenance',
+    'sewer line inspection'
+];
+
+function isProfessionalServiceTask(taskTitle) {
+    const title = taskTitle.toLowerCase();
+    return professionalServiceTasks.some(serviceTask => 
+        title.includes(serviceTask) || serviceTask.includes(title)
+    );
+}
+
 function hasRelevantShopLinks(taskTitle, taskCategory) {
-    // Simply check if we have curated products for this task
+    // Don't show shop button for professional service tasks
+    if (isProfessionalServiceTask(taskTitle)) {
+        return false;
+    }
+    
+    // Check if we have curated products for this task
     const searchTerms = generateShopSearchTerms(taskTitle, taskCategory);
     return searchTerms.length > 0;
+}
+
+function needsProfessionalService(taskTitle, taskCategory) {
+    return isProfessionalServiceTask(taskTitle);
 }
 
 function openTaskShop(taskTitle, taskCategory) {
@@ -5900,12 +5946,26 @@ function openTaskShop(taskTitle, taskCategory) {
     // Generate contextual search terms based on task title and category
     const searchTerms = generateShopSearchTerms(taskTitle, taskCategory);
     
-    // Open multiple relevant shopping links in new tabs
-    searchTerms.forEach((searchTerm, index) => {
-        setTimeout(() => {
-            window.open(`https://www.amazon.com/s?k=${encodeURIComponent(searchTerm)}&ref=nb_sb_noss`, '_blank');
-        }, index * 500); // Stagger by 500ms to avoid popup blocking
-    });
+    // Open single most relevant shopping link
+    if (searchTerms.length > 0) {
+        window.open(`https://www.amazon.com/s?k=${encodeURIComponent(searchTerms[0])}&ref=nb_sb_noss`, '_blank');
+    }
+}
+
+function findProfessionalService(taskTitle, taskCategory) {
+    console.log(`👷 Finding professional for task: ${taskTitle} (${taskCategory})`);
+    
+    // Create search terms for professional services
+    const cleanTitle = taskTitle.toLowerCase()
+        .replace(/inspect|check|test/g, '')
+        .replace(/and/g, '')
+        .trim();
+    
+    const locationSearch = window.homeData?.city || 'near me';
+    const searchQuery = `${cleanTitle} service ${locationSearch}`;
+    
+    // Open Google search for local professionals
+    window.open(`https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`, '_blank');
 }
 
 function generateShopSearchTerms(taskTitle, taskCategory) {
@@ -5936,6 +5996,11 @@ function generateShopSearchTerms(taskTitle, taskCategory) {
         // Cleaning & Maintenance
         'clean gutters': 'gutter cleaning tools scoop',
         'gutter cleaning': 'gutter cleaning tools scoop',
+        'chimney inspection and cleaning': 'chimney cleaning kit brush rod',
+        'chimney inspection': 'chimney cleaning kit brush rod',
+        'chimney cleaning': 'chimney cleaning kit brush rod',
+        'inspect chimney': 'chimney cleaning kit brush rod',
+        'clean chimney': 'chimney cleaning kit brush rod',
         'caulk windows': 'exterior silicone caulk paintable',
         'weatherstrip doors': 'door weatherstrip seal foam',
         'clean outdoor furniture': 'outdoor furniture cleaner deck',
