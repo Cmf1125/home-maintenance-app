@@ -282,24 +282,28 @@ renderEnhancedTaskCard(task) {
             <span class="text-xs text-gray-500">${categoryInfo.icon} ${task.category}</span>
         </div>
         
-        <!-- Row 2: Due Date + Action Buttons -->
+        <!-- Row 2: Due Date -->
         <div class="flex items-center justify-between mb-2">
             <span class="text-xs ${dueDateColor} font-medium">${dueDateDisplay}</span>
-            <div class="flex gap-1">
-                ${task.youtubeUrl && task.youtubeUrl.includes('youtube.com') ? `
-                <button onclick="event.stopPropagation(); openYouTubeVideo('${task.youtubeUrl}')" 
-                        class="bg-red-50 text-red-700 hover:bg-red-100 px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-1">
-                    📺 How-To
-                </button>
-                ` : ''}
-                ${hasRelevantShopLinks(task.title, task.category) ? `
-                <button onclick="event.stopPropagation(); openTaskShop('${task.title}', '${task.category}')" 
-                        class="bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-1">
-                    🛒 Shop
-                </button>
-                ` : ''}
-            </div>
         </div>
+        
+        <!-- Row 2.5: Shop & Video Buttons (Full Width) -->
+        ${(task.youtubeUrl && task.youtubeUrl.includes('youtube.com')) || hasRelevantShopLinks(task.title, task.category) ? `
+        <div class="flex gap-2 mb-2">
+            ${task.youtubeUrl && task.youtubeUrl.includes('youtube.com') ? `
+            <button onclick="event.stopPropagation(); openYouTubeVideo('${task.youtubeUrl}')" 
+                    class="flex-1 bg-red-50 text-red-700 hover:bg-red-100 py-2 px-3 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1">
+                📺 How-To
+            </button>
+            ` : ''}
+            ${hasRelevantShopLinks(task.title, task.category) ? `
+            <button onclick="event.stopPropagation(); openTaskShop('${task.title}', '${task.category}')" 
+                    class="flex-1 bg-blue-50 text-blue-700 hover:bg-blue-100 py-2 px-3 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1">
+                🛒 Shop
+            </button>
+            ` : ''}
+        </div>
+        ` : ''}
         
         <!-- Row 3: Action Buttons (Full Width) -->
         <div class="flex gap-2 justify-center">
