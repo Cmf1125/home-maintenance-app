@@ -5748,10 +5748,6 @@ function renderPlanningSection(containerId, items) {
                         📝 Update Age
                     </button>
                     ` : ''}
-                    <button onclick="alert('Planning helps you budget for major home expenses and track when systems need replacement. Set accurate ages for better cost estimates.')" 
-                            class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                        Learn More →
-                    </button>
                     <button onclick="deletePlanningItem('${item.type}', '${item.title}')" 
                             class="bg-red-50 text-red-700 hover:bg-red-100 px-2 py-1 rounded text-xs font-medium transition-colors" 
                             title="Remove this item from planning">
