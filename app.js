@@ -1809,8 +1809,8 @@ function showTab(tabName) {
     // CRITICAL FIX: Show/hide main-app container based on tab
     const mainApp = document.getElementById('main-app');
     if (mainApp) {
-        if (tabName === 'calendar' || tabName === 'planning') {
-            // Calendar and Planning are full-screen, hide main-app (and its footer)
+        if (tabName === 'calendar' || tabName === 'planning' || tabName === 'vendors') {
+            // Calendar, Planning, and Vendors are full-screen, hide main-app (and its footer)
             mainApp.classList.add('hidden');
             console.log('✅ Main app container hidden for full-screen tab:', tabName);
         } else {
@@ -1820,10 +1820,10 @@ function showTab(tabName) {
         }
     }
     
-    // Hide footer on calendar and planning tabs
+    // Hide footer on calendar, planning, and vendors tabs
     const footer = document.querySelector('footer');
     if (footer) {
-        if (tabName === 'calendar' || tabName === 'planning') {
+        if (tabName === 'calendar' || tabName === 'planning' || tabName === 'vendors') {
             footer.style.display = 'none';
         } else {
             footer.style.display = '';
