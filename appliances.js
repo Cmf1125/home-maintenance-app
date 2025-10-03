@@ -679,6 +679,10 @@ renderApplianceCard(appliance) {
                         class="flex-1 bg-green-100 text-green-700 hover:bg-green-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors">
                     Tasks
                 </button>
+                <button onclick="event.stopPropagation(); window.applianceManager.deleteAppliance('${appliance.id}')" 
+                        class="bg-red-100 text-red-700 hover:bg-red-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors" title="Delete appliance">
+                    🗑️
+                </button>
             </div>
         </div>
     `;
@@ -694,6 +698,58 @@ editAppliance(applianceId) {
     } else {
         console.error('Appliance not found:', applianceId);
         alert('❌ Appliance not found');
+    }
+}
+
+// Delete appliance method
+deleteAppliance(applianceId) {
+    const appliance = this.appliances.find(a => a.id == applianceId);
+    if (!appliance) {
+        console.error('Appliance not found:', applianceId);
+        alert('❌ Appliance not found');
+        return;
+    }
+    
+    // Confirm deletion
+    const confirmMessage = `Are you sure you want to delete "${appliance.name}"?\n\nThis will also remove any associated tasks and cannot be undone.`;
+    if (!confirm(confirmMessage)) {
+        return;
+    }
+    
+    console.log('🗑️ Deleting appliance:', appliance.name);
+    
+    // Remove from appliances array
+    const applianceIndex = this.appliances.findIndex(a => a.id == applianceId);
+    if (applianceIndex > -1) {
+        this.appliances.splice(applianceIndex, 1);
+    }
+    
+    // Remove associated tasks
+    if (window.tasks && Array.isArray(window.tasks)) {
+        const tasksToRemove = window.tasks.filter(task => task.applianceId == applianceId);
+        if (tasksToRemove.length > 0) {
+            console.log(`🗑️ Removing ${tasksToRemove.length} associated tasks`);
+            window.tasks = window.tasks.filter(task => task.applianceId != applianceId);
+        }
+    }
+    
+    // Update global appliance data
+    window.applianceData = this.appliances;
+    
+    // Save to Firebase
+    this.saveAppliances();
+    
+    // Refresh the view
+    this.render();
+    
+    // Show success message
+    console.log('✅ Appliance deleted successfully');
+    
+    // Update dashboard if it exists
+    if (window.enhancedDashboard && window.enhancedDashboard.render) {
+        window.enhancedDashboard.render();
+    } else if (typeof updateDashboard === 'function') {
+        updateDashboard();
     }
 }
 

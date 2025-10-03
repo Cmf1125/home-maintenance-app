@@ -1807,10 +1807,10 @@ function showTab(tabName) {
     // CRITICAL FIX: Show/hide main-app container based on tab
     const mainApp = document.getElementById('main-app');
     if (mainApp) {
-        if (tabName === 'calendar') {
-            // Calendar is full-screen, hide main-app (and its footer)
+        if (tabName === 'calendar' || tabName === 'planning') {
+            // Calendar and Planning are full-screen, hide main-app (and its footer)
             mainApp.classList.add('hidden');
-            console.log('✅ Main app container hidden for full-screen calendar');
+            console.log('✅ Main app container hidden for full-screen tab:', tabName);
         } else {
             // All other tabs need main-app visible
             mainApp.classList.remove('hidden');
@@ -1818,10 +1818,14 @@ function showTab(tabName) {
         }
     }
     
-    // Show footer on all tabs except calendar
+    // Hide footer on calendar and planning tabs
     const footer = document.querySelector('footer');
-    if (footer && tabName !== 'calendar') {
-        footer.style.display = '';
+    if (footer) {
+        if (tabName === 'calendar' || tabName === 'planning') {
+            footer.style.display = 'none';
+        } else {
+            footer.style.display = '';
+        }
     }
     
     // Reset body styles for non-calendar tabs (restore normal spacing)
