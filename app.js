@@ -5696,7 +5696,17 @@ function generatePlanningItems() {
         });
     }
     
-    return items;
+    // Filter out hidden items
+    const hiddenItems = window.homeData?.hiddenPlanningItems || [];
+    const filteredItems = items.filter(item => {
+        return !hiddenItems.some(hidden => 
+            hidden.type === item.type && hidden.title === item.title
+        );
+    });
+    
+    console.log(`📊 Generated ${items.length} planning items, ${filteredItems.length} after filtering hidden items`);
+    
+    return filteredItems;
 }
 
 function renderPlanningSection(containerId, items) {
@@ -5738,8 +5748,14 @@ function renderPlanningSection(containerId, items) {
                         📝 Update Age
                     </button>
                     ` : ''}
-                    <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                    <button onclick="alert('Planning helps you budget for major home expenses and track when systems need replacement. Set accurate ages for better cost estimates.')" 
+                            class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                         Learn More →
+                    </button>
+                    <button onclick="deletePlanningItem('${item.type}', '${item.title}')" 
+                            class="bg-red-50 text-red-700 hover:bg-red-100 px-2 py-1 rounded text-xs font-medium transition-colors" 
+                            title="Remove this item from planning">
+                        🗑️
                     </button>
                 </div>
             </div>
@@ -5877,6 +5893,51 @@ function saveSystemAge() {
     
     // Close modal
     closeSystemAgeModal();
+}
+
+// Delete planning item function
+function deletePlanningItem(itemType, itemTitle) {
+    const confirmMessage = `Are you sure you want to remove "${itemTitle}" from your planning?\n\nThis will hide it from all planning calculations.`;
+    if (!confirm(confirmMessage)) {
+        return;
+    }
+    
+    console.log('🗑️ Deleting planning item:', itemTitle, 'Type:', itemType);
+    
+    // Initialize hidden planning items if it doesn't exist
+    if (!window.homeData.hiddenPlanningItems) {
+        window.homeData.hiddenPlanningItems = [];
+    }
+    
+    // Add to hidden items list
+    const hiddenItem = {
+        type: itemType,
+        title: itemTitle,
+        hiddenAt: new Date().toISOString()
+    };
+    
+    window.homeData.hiddenPlanningItems.push(hiddenItem);
+    
+    // Save to Firebase
+    if (window.currentUser) {
+        const db = firebase.firestore();
+        db.collection('users').doc(window.currentUser.uid).update({
+            'features.hiddenPlanningItems': window.homeData.hiddenPlanningItems
+        })
+        .then(() => {
+            console.log('✅ Hidden planning item saved to Firebase');
+            
+            // Refresh planning view
+            renderPlanningView();
+            
+            // Show success message
+            showToast(`✅ Removed "${itemTitle}" from planning`);
+        })
+        .catch((error) => {
+            console.error('❌ Error saving hidden planning item:', error);
+            showToast('❌ Error removing item from planning');
+        });
+    }
 }
 
 function showToast(message) {
