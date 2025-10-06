@@ -2076,9 +2076,17 @@ function showTab(tabName) {
         
         console.log('📇 Initializing vendors directory...');
         
-        // Initialize vendors functionality
+        // Initialize vendors functionality with mobile-specific handling
         try {
+            // Load vendors data
             loadVendors();
+            
+            // MOBILE FIX: Ensure vendors are rendered after a short delay for mobile
+            setTimeout(() => {
+                console.log('🔄 Mobile-specific vendors refresh...');
+                renderVendors();
+            }, 100);
+            
         } catch (error) {
             console.error('❌ Error initializing vendors:', error);
         }
@@ -6267,6 +6275,8 @@ let vendors = [];
 async function loadVendors() {
     if (!window.auth?.currentUser) {
         console.log('⚠️ No authenticated user, skipping vendor load');
+        // Still render empty state for testing
+        renderVendors();
         return;
     }
 
@@ -6309,7 +6319,12 @@ async function saveVendors() {
 // Render vendors in the list
 function renderVendors() {
     const vendorsList = document.getElementById('vendors-list');
-    if (!vendorsList) return;
+    if (!vendorsList) {
+        console.error('❌ vendors-list element not found');
+        return;
+    }
+    
+    console.log(`🔄 Rendering ${vendors.length} vendors`);
 
     if (vendors.length === 0) {
         vendorsList.innerHTML = `
