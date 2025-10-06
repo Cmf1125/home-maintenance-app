@@ -59,13 +59,21 @@ class EnhancedDashboard {
     }
 
     setFilter(filterType) {
-    this.currentFilter = filterType;
-    this.updateFilterUI();
-    this.renderFilteredTasks();
-    
-    // 🎯 NEW: Smooth scroll to task list with visual feedback
-    this.scrollToTaskList();
-}
+        // 🎯 NEW: Toggle functionality - if clicking the same filter, return to 'all'
+        if (this.currentFilter === filterType) {
+            console.log(`🔄 Toggling ${filterType} filter back to 'all'`);
+            this.currentFilter = 'all';
+        } else {
+            console.log(`🔄 Setting filter to: ${filterType}`);
+            this.currentFilter = filterType;
+        }
+        
+        this.updateFilterUI();
+        this.renderFilteredTasks();
+        
+        // 🎯 Smooth scroll to task list with visual feedback
+        this.scrollToTaskList();
+    }
 
     // Add this method to your EnhancedDashboard class:
     scrollToTaskList() {
