@@ -1,5 +1,5 @@
 // Robust Service Worker with automatic error recovery and cache management
-const CACHE_VERSION = Date.now(); // Use timestamp for automatic versioning
+const CACHE_VERSION = `${Date.now()}-vendor-fix`; // Use timestamp for automatic versioning
 const CACHE_NAME = `home-keeper-v${CACHE_VERSION}`;
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `dynamic-${CACHE_VERSION}`;
@@ -89,9 +89,13 @@ self.addEventListener('fetch', (event) => {
 async function handleRequest(request) {
   const url = new URL(request.url);
   
-  // For HTML pages, always try network first to get fresh content
-  if (request.mode === 'navigate' || url.pathname.endsWith('.html')) {
+  // For HTML pages and JavaScript files, always try network first to get fresh content
+  if (request.mode === 'navigate' || 
+      url.pathname.endsWith('.html') || 
+      url.pathname.endsWith('.js') ||
+      url.pathname === '/') {
     try {
+      console.log('[SW] Network-first for:', url.pathname);
       const networkResponse = await fetch(request);
       if (networkResponse.ok) {
         // Cache successful responses
@@ -110,7 +114,7 @@ async function handleRequest(request) {
     }
   }
   
-  // For other assets, try cache first, then network
+  // For CSS and other assets, try cache first, then network
   const cachedResponse = await caches.match(request);
   if (cachedResponse) {
     return cachedResponse;

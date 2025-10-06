@@ -3481,6 +3481,24 @@ window.showEmailLogin = showEmailLogin;
                     console.log('⚠️ Service worker registration failed (non-critical):', error);
                 });
         });
+        
+        // MOBILE CACHE FIX: Force cache refresh on mobile for vendor updates
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+            console.log('[PWA] Mobile detected - checking for vendor updates...');
+            
+            // Check if this is the first load after a potential update
+            const lastCacheUpdate = localStorage.getItem('lastCacheUpdate');
+            const currentVersion = '2025.10.06.01';
+            
+            if (lastCacheUpdate !== currentVersion) {
+                console.log('[PWA] New version detected on mobile - clearing cache...');
+                setTimeout(() => {
+                    clearPWACache();
+                    localStorage.setItem('lastCacheUpdate', currentVersion);
+                }, 2000); // Wait 2 seconds for initial load
+            }
+        }
     }
 
     // Global error handler for PWA cache issues
@@ -3941,6 +3959,24 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+
+// MOBILE CACHE FIX: Configure Firestore for better mobile performance
+try {
+    // Enable offline persistence
+    db.enablePersistence({ synchronizeTabs: true })
+        .then(() => {
+            console.log('🔥 Firebase offline persistence enabled');
+        })
+        .catch((err) => {
+            if (err.code === 'failed-precondition') {
+                console.warn('⚠️ Firebase persistence failed: Multiple tabs open');
+            } else if (err.code === 'unimplemented') {
+                console.warn('⚠️ Firebase persistence not supported in this browser');
+            }
+        });
+} catch (error) {
+    console.warn('⚠️ Firebase persistence setup failed:', error);
+}
 
 console.log('🔥 Firebase initialized');
 
