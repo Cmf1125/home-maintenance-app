@@ -224,13 +224,14 @@ class EnhancedDashboard {
         }
 
         // Debug logging before rendering
-        console.log('🎬 DEBUG: Task YouTube URL status:');
-        filteredTasks.slice(0, 3).forEach(task => {
-            console.log(`  - "${task.title}": ${task.youtubeUrl ? '✅ HAS URL' : '❌ NO URL'} (${task.youtubeUrl || 'undefined'})`);
+        console.log('🎬 DEBUG: Task YouTube URL status for new accounts:');
+        filteredTasks.slice(0, 5).forEach(task => {
+            const hasValidUrl = task.youtubeUrl && task.youtubeUrl.includes('youtube.com');
+            console.log(`  - "${task.title}": ${task.youtubeUrl ? '✅ HAS URL' : '❌ NO URL'} | Valid: ${hasValidUrl ? '✅' : '❌'} | URL: ${task.youtubeUrl || 'undefined'}`);
         });
         
         tasksList.innerHTML = filteredTasks.map(task => this.renderEnhancedTaskCard(task)).join('');
-        console.log(`✅ Rendered ${filteredTasks.length} tasks, ${filteredTasks.filter(t => t.youtubeUrl).length} have video URLs`);
+        console.log(`✅ Rendered ${filteredTasks.length} tasks, ${filteredTasks.filter(t => t.youtubeUrl).length} have video URLs, ${filteredTasks.filter(t => t.youtubeUrl && t.youtubeUrl.includes('youtube.com')).length} have valid YouTube URLs`);
     }
 
 renderEnhancedTaskCard(task) {
@@ -238,6 +239,16 @@ renderEnhancedTaskCard(task) {
     const taskDate = new Date(task.dueDate);
     const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
     const isOverdue = daysUntilDue < 0;
+    
+    // 🎬 NEW: Ensure all tasks have YouTube URLs for new accounts
+    if (!task.youtubeUrl) {
+        const searchQuery = task.title.toLowerCase()
+            .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+            .replace(/\s+/g, '+') // Replace spaces with +
+            .trim();
+        task.youtubeUrl = `https://www.youtube.com/results?search_query=how+to+${searchQuery}+maintenance`;
+        console.log(`🎬 Generated missing YouTube URL for "${task.title}": ${task.youtubeUrl}`);
+    }
     
     // Enhanced Safety task detection
     const isSafetyTask = task.category === 'Safety' || task.priority === 'high' || 
@@ -294,7 +305,7 @@ renderEnhancedTaskCard(task) {
         <div class="flex items-center justify-between mb-2">
             <span class="text-xs ${dueDateColor} font-medium">${dueDateDisplay}</span>
             <div class="flex gap-2">
-                ${task.youtubeUrl && task.youtubeUrl.includes('youtube.com') ? `
+                ${task.youtubeUrl && (task.youtubeUrl.includes('youtube.com') || task.youtubeUrl.includes('youtu.be')) ? `
                 <button onclick="event.stopPropagation(); openYouTubeVideo('${task.youtubeUrl}')" 
                         class="bg-red-50 text-red-700 hover:bg-red-100 px-3 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 whitespace-nowrap h-7">
                     📺 How-To

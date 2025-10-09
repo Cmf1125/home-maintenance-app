@@ -2297,6 +2297,16 @@ function toggleCategoryTasks(button) {
 }
 
 function renderAllTasksTaskItem(task) {
+    // 🎬 NEW: Ensure all tasks have YouTube URLs for new accounts
+    if (!task.youtubeUrl) {
+        const searchQuery = task.title.toLowerCase()
+            .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+            .replace(/\s+/g, '+') // Replace spaces with +
+            .trim();
+        task.youtubeUrl = `https://www.youtube.com/results?search_query=how+to+${searchQuery}+maintenance`;
+        console.log(`🎬 Generated missing YouTube URL for "${task.title}": ${task.youtubeUrl}`);
+    }
+    
     const now = new Date();
     const taskDate = new Date(task.dueDate);
     const daysUntilDue = Math.ceil((taskDate - now) / (24 * 60 * 60 * 1000));
@@ -2387,7 +2397,7 @@ if (isOverdue) {
         <div class="space-y-2">
             <!-- Top Row: Video & Shop Buttons -->
             <div class="flex gap-2">
-                ${task.youtubeUrl && task.youtubeUrl.includes('youtube.com') ? `
+                ${task.youtubeUrl && (task.youtubeUrl.includes('youtube.com') || task.youtubeUrl.includes('youtu.be')) ? `
                 <button onclick="openYouTubeVideo('${task.youtubeUrl}')" 
                     class="flex-1 bg-red-50 text-red-700 text-xs py-2 px-2 rounded-lg hover:bg-red-100 transition-all duration-200 font-medium flex items-center justify-center gap-1" 
                     title="Watch how-to video">
