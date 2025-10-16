@@ -6352,7 +6352,7 @@ function renderVendors() {
             <div class="flex justify-between items-start mb-3">
                 <div class="flex-1">
                     <h3 class="font-semibold text-lg text-gray-900">${vendor.name}</h3>
-                    <p class="text-sm text-gray-600">${vendor.service}</p>
+                    <p class="text-sm text-gray-600">${vendor.category} • Contact: ${vendor.contact}</p>
                 </div>
                 <button onclick="deleteVendor('${vendor.id}')" 
                         class="text-red-500 hover:text-red-700 p-1">
@@ -6400,10 +6400,11 @@ function showAddVendorModal() {
         modal.classList.remove('hidden');
         // Clear form
         document.getElementById('vendor-name').value = '';
-        document.getElementById('vendor-service').value = '';
+        document.getElementById('vendor-contact').value = '';
         document.getElementById('vendor-phone').value = '';
         document.getElementById('vendor-email').value = '';
         document.getElementById('vendor-website').value = '';
+        document.getElementById('vendor-category').value = '';
         document.getElementById('vendor-notes').value = '';
         // Focus on name field
         document.getElementById('vendor-name').focus();
@@ -6421,10 +6422,11 @@ function closeAddVendorModal() {
 // Add vendor
 async function addVendor() {
     const name = document.getElementById('vendor-name').value.trim();
-    const service = document.getElementById('vendor-service').value.trim();
+    const contact = document.getElementById('vendor-contact').value.trim();
     const phone = document.getElementById('vendor-phone').value.trim();
     const email = document.getElementById('vendor-email').value.trim();
     const website = document.getElementById('vendor-website').value.trim();
+    const category = document.getElementById('vendor-category').value.trim();
     const notes = document.getElementById('vendor-notes').value.trim();
 
     // Validation
@@ -6434,9 +6436,9 @@ async function addVendor() {
         return;
     }
 
-    if (!service) {
-        alert('❌ Service type is required');
-        document.getElementById('vendor-service').focus();
+    if (!contact) {
+        alert('❌ Contact person is required');
+        document.getElementById('vendor-contact').focus();
         return;
     }
 
@@ -6466,7 +6468,8 @@ async function addVendor() {
         const vendor = {
             id: Date.now().toString(), // Simple ID generation
             name: name,
-            service: service,
+            contact: contact,
+            category: category,
             phone: phone || null,
             email: email || null,
             website: website || null,
