@@ -4169,10 +4169,35 @@ function initializeNotificationUI() {
         console.log('🔍 Looking for notification button...', !!notificationButton);
         
         if (notificationButton) {
-            notificationButton.style.display = 'flex !important';
-            notificationButton.style.visibility = 'visible';
-            notificationButton.style.opacity = '1';
-            console.log('✅ Notification button found and forced visible');
+            // Get current styles before forcing
+            const computedStyle = window.getComputedStyle(notificationButton);
+            console.log('🎨 Button current styles:', {
+                display: computedStyle.display,
+                visibility: computedStyle.visibility,
+                opacity: computedStyle.opacity,
+                position: computedStyle.position,
+                zIndex: computedStyle.zIndex,
+                height: computedStyle.height,
+                width: computedStyle.width
+            });
+            
+            // Force all possible display issues
+            notificationButton.style.cssText = `
+                display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                position: relative !important;
+                z-index: 9999 !important;
+                background-color: red !important;
+                color: white !important;
+                border: 3px solid blue !important;
+                min-height: 50px !important;
+                width: 100% !important;
+            `;
+            
+            console.log('✅ Notification button found and AGGRESSIVELY styled');
+            console.log('📍 Button parent:', notificationButton.parentElement?.tagName);
+            console.log('📍 Button innerHTML:', notificationButton.innerHTML);
         } else {
             console.error('❌ Notification button NOT found in DOM');
             // List all elements with 'notification' in ID or class
