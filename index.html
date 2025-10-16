@@ -55,7 +55,6 @@ body.setup-active #setup-form {
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js"></script>
 
 <!-- Google Identity Services -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -384,17 +383,6 @@ function showMainApp() {
   
   <div class="border-t border-gray-100 my-1"></div>
   
-  <!-- Push Notifications -->
-  <button id="notifications-btn" onclick="toggleNotifications(); closeSettingsDropdown()"
-          class="w-full text-left px-4 py-2 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-3">
-    <span>🔔</span>
-    <div class="flex-1">
-      <div class="font-medium" id="notifications-text">Enable Notifications</div>
-      <div class="text-xs text-gray-500" id="notifications-status">Get maintenance reminders</div>
-    </div>
-  </button>
-  
-  <div class="border-t border-gray-100 my-1"></div>
   
   <button onclick="exportTaskList(); closeSettingsDropdown()"
           class="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3">
@@ -2912,26 +2900,6 @@ function showMainApp() {
     const dd  = document.getElementById('settings-dropdown');
     const btn = getSettingsButton();
     if (!dd || !btn) return;
-    
-    // DEBUG: Force show notification button when dropdown opens
-    setTimeout(() => {
-      const notificationBtn = document.getElementById('notifications-btn');
-      if (notificationBtn) {
-        notificationBtn.style.cssText = `
-          display: flex !important;
-          visibility: visible !important;
-          opacity: 1 !important;
-          background-color: red !important;
-          color: white !important;
-          border: 3px solid blue !important;
-          min-height: 50px !important;
-          width: 100% !important;
-          z-index: 999999 !important;
-          position: relative !important;
-        `;
-        console.log('🔴 FORCED notification button visible in settings dropdown');
-      }
-    }, 100);
 
     const isHidden = dd.classList.contains('hidden');
 
@@ -3920,7 +3888,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-const messaging = firebase.messaging();
 
 // MOBILE CACHE FIX: Configure Firestore for better mobile performance
 try {
@@ -3942,334 +3909,6 @@ try {
 
 console.log('🔥 Firebase initialized');
 
-// ===== PUSH NOTIFICATIONS FUNCTIONALITY =====
-
-let userNotificationToken = null;
-
-// Check if push notifications are supported
-function isPushNotificationSupported() {
-    return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
-}
-
-// Request notification permission and get FCM token
-async function requestNotificationPermission() {
-    if (!isPushNotificationSupported()) {
-        console.warn('⚠️ Push notifications not supported in this browser');
-        return false;
-    }
-
-    try {
-        // Request permission
-        const permission = await Notification.requestPermission();
-        
-        if (permission === 'granted') {
-            console.log('✅ Notification permission granted');
-            
-            // Get FCM token
-            const token = await messaging.getToken({
-                vapidKey: 'BEXqyKHS_UxfUxd6NeZoVi5sRPLya5AJNitct4u3cdHB7yJ11SIPf2gQ5EMfIF8Jj0KqH7pbS7FtEL57679SZJQ'
-            });
-            
-            if (token) {
-                console.log('🔐 FCM Token received:', token);
-                userNotificationToken = token;
-                
-                // Save token to user's Firebase document
-                if (window.auth?.currentUser) {
-                    await saveNotificationTokenToFirebase(token);
-                }
-                
-                return true;
-            } else {
-                console.warn('⚠️ No registration token available');
-                return false;
-            }
-        } else {
-            console.log('❌ Notification permission denied');
-            return false;
-        }
-    } catch (error) {
-        console.error('❌ Error requesting notification permission:', error);
-        return false;
-    }
-}
-
-// Save notification token to user's Firebase document
-async function saveNotificationTokenToFirebase(token) {
-    if (!window.auth?.currentUser) return;
-    
-    try {
-        await db.collection('users').doc(window.auth.currentUser.uid).update({
-            notificationToken: token,
-            notificationsEnabled: true,
-            lastTokenUpdate: new Date().toISOString()
-        });
-        console.log('✅ Notification token saved to Firebase');
-    } catch (error) {
-        console.error('❌ Error saving notification token:', error);
-    }
-}
-
-// Handle foreground messages
-messaging.onMessage((payload) => {
-    console.log('📱 Foreground message received:', payload);
-    
-    const notificationTitle = payload.notification?.title || 'The Home Keeper';
-    const notificationOptions = {
-        body: payload.notification?.body || 'You have a maintenance reminder',
-        icon: '/icon-192.png',
-        badge: '/icon-192.png',
-        tag: 'home-keeper-notification',
-        requireInteraction: true,
-        actions: [
-            {
-                action: 'view',
-                title: 'View Tasks'
-            },
-            {
-                action: 'dismiss',
-                title: 'Dismiss'
-            }
-        ]
-    };
-
-    // Show notification if page is visible
-    if (document.visibilityState === 'visible') {
-        new Notification(notificationTitle, notificationOptions);
-    }
-});
-
-// Show notification permission prompt to user
-function showNotificationPrompt() {
-    const promptHTML = `
-        <div id="notification-prompt" class="fixed top-4 left-4 right-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-lg z-50 max-w-md mx-auto">
-            <div class="flex items-start gap-3">
-                <div class="flex-shrink-0">
-                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span class="text-lg">🔔</span>
-                    </div>
-                </div>
-                <div class="flex-1">
-                    <h3 class="font-semibold text-blue-900 mb-1">Enable Notifications</h3>
-                    <p class="text-sm text-blue-700 mb-3">Get reminders for upcoming maintenance tasks and never miss important home care.</p>
-                    <div class="flex gap-2">
-                        <button onclick="enableNotifications()" class="bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium hover:bg-blue-700 transition-colors">
-                            Enable
-                        </button>
-                        <button onclick="dismissNotificationPrompt()" class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm font-medium hover:bg-gray-300 transition-colors">
-                            Not Now
-                        </button>
-                    </div>
-                </div>
-                <button onclick="dismissNotificationPrompt()" class="text-blue-400 hover:text-blue-600">
-                    ×
-                </button>
-            </div>
-        </div>
-    `;
-    
-    // Add to page
-    document.body.insertAdjacentHTML('beforeend', promptHTML);
-    
-    // Auto-hide after 10 seconds
-    setTimeout(() => {
-        dismissNotificationPrompt();
-    }, 10000);
-}
-
-// Enable notifications when user clicks the button
-async function enableNotifications() {
-    const success = await requestNotificationPermission();
-    dismissNotificationPrompt();
-    
-    if (success) {
-        showToast('✅ Notifications enabled! You\'ll get maintenance reminders.');
-    } else {
-        showToast('❌ Could not enable notifications. Please check your browser settings.');
-    }
-}
-
-// Dismiss notification prompt
-function dismissNotificationPrompt() {
-    const prompt = document.getElementById('notification-prompt');
-    if (prompt) {
-        prompt.remove();
-    }
-    
-    // Remember that user dismissed it (don't show again for 24 hours)
-    localStorage.setItem('notificationPromptDismissed', Date.now().toString());
-}
-
-// Check if we should show notification prompt
-function checkNotificationPrompt() {
-    // Don't show if notifications already granted
-    if (Notification.permission === 'granted') {
-        return;
-    }
-    
-    // Don't show if user dismissed recently (24 hours)
-    const lastDismissed = localStorage.getItem('notificationPromptDismissed');
-    if (lastDismissed) {
-        const hoursSinceLastDismiss = (Date.now() - parseInt(lastDismissed)) / (1000 * 60 * 60);
-        if (hoursSinceLastDismiss < 24) {
-            return;
-        }
-    }
-    
-    // Show prompt after user has been using app for a minute
-    setTimeout(() => {
-        if (window.auth?.currentUser && isPushNotificationSupported()) {
-            showNotificationPrompt();
-        }
-    }, 60000); // 1 minute delay
-}
-
-// Toggle notifications from settings menu
-async function toggleNotifications() {
-    if (Notification.permission === 'granted') {
-        // Disable notifications
-        await disableNotifications();
-    } else {
-        // Enable notifications
-        await enableNotifications();
-    }
-    updateNotificationUI();
-}
-
-// Disable notifications
-async function disableNotifications() {
-    if (window.auth?.currentUser) {
-        try {
-            await db.collection('users').doc(window.auth.currentUser.uid).update({
-                notificationsEnabled: false
-            });
-            showToast('🔕 Notifications disabled');
-        } catch (error) {
-            console.error('❌ Error disabling notifications:', error);
-        }
-    }
-}
-
-// Update notification UI in settings
-function updateNotificationUI() {
-    const textElement = document.getElementById('notifications-text');
-    const statusElement = document.getElementById('notifications-status');
-    const buttonElement = document.getElementById('notifications-btn');
-    
-    console.log('🔔 updateNotificationUI called');
-    console.log('🔔 Button element found:', !!buttonElement);
-    console.log('🔔 Text element found:', !!textElement);
-    console.log('🔔 Push supported:', isPushNotificationSupported());
-    console.log('🔔 Notification permission:', Notification.permission);
-    
-    if (textElement && statusElement) {
-        if (Notification.permission === 'granted') {
-            textElement.textContent = 'Notifications Enabled';
-            statusElement.textContent = 'You\'ll get maintenance reminders';
-        } else {
-            textElement.textContent = 'Enable Notifications';
-            statusElement.textContent = 'Get maintenance reminders';
-        }
-    }
-    
-    // Always show the button, even if push isn't supported
-    if (buttonElement) {
-        buttonElement.style.display = 'flex';
-        console.log('🔔 Notification button forced to show');
-    }
-}
-
-// Initialize notification UI when user logs in
-function initializeNotificationUI() {
-    console.log('🚀 initializeNotificationUI called');
-    
-    // FORCE SHOW NOTIFICATION BUTTON - DEBUG VERSION
-    setTimeout(() => {
-        const notificationButton = document.getElementById('notifications-btn');
-        console.log('🔍 Looking for notification button...', !!notificationButton);
-        
-        if (notificationButton) {
-            // Get current styles before forcing
-            const computedStyle = window.getComputedStyle(notificationButton);
-            console.log('🎨 Button current styles:', {
-                display: computedStyle.display,
-                visibility: computedStyle.visibility,
-                opacity: computedStyle.opacity,
-                position: computedStyle.position,
-                zIndex: computedStyle.zIndex,
-                height: computedStyle.height,
-                width: computedStyle.width
-            });
-            
-            // Force all possible display issues
-            notificationButton.style.cssText = `
-                display: flex !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-                position: relative !important;
-                z-index: 9999 !important;
-                background-color: red !important;
-                color: white !important;
-                border: 3px solid blue !important;
-                min-height: 50px !important;
-                width: 100% !important;
-            `;
-            
-            console.log('✅ Notification button found and AGGRESSIVELY styled');
-            console.log('📍 Button parent:', notificationButton.parentElement?.tagName);
-            console.log('📍 Button innerHTML:', notificationButton.innerHTML);
-            
-            // Check if parent containers are hiding it
-            let currentElement = notificationButton;
-            while (currentElement && currentElement !== document.body) {
-                const parentStyle = window.getComputedStyle(currentElement);
-                console.log(`🔍 Element ${currentElement.tagName}#${currentElement.id}:`, {
-                    display: parentStyle.display,
-                    visibility: parentStyle.visibility,
-                    opacity: parentStyle.opacity,
-                    overflow: parentStyle.overflow,
-                    height: parentStyle.height,
-                    maxHeight: parentStyle.maxHeight
-                });
-                currentElement = currentElement.parentElement;
-            }
-            
-            // Try scrolling to the button
-            notificationButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-            console.error('❌ Notification button NOT found in DOM');
-            // List all elements with 'notification' in ID or class
-            const allElements = document.querySelectorAll('*[id*="notification"], *[class*="notification"]');
-            console.log('🔍 Elements with "notification":', allElements);
-        }
-    }, 1000); // 1 second delay to ensure DOM is loaded
-    
-    updateNotificationUI();
-    
-    // Also check if FCM token exists and is current
-    if (Notification.permission === 'granted' && !userNotificationToken) {
-        // Silently get FCM token if permission already granted
-        messaging.getToken({
-            vapidKey: 'BEXqyKHS_UxfUxd6NeZoVi5sRPLya5AJNitct4u3cdHB7yJ11SIPf2gQ5EMfIF8Jj0KqH7pbS7FtEL57679SZJQ'
-        }).then((token) => {
-            if (token) {
-                userNotificationToken = token;
-                saveNotificationTokenToFirebase(token);
-            }
-        }).catch((error) => {
-            console.warn('⚠️ Could not retrieve FCM token:', error);
-        });
-    }
-}
-
-// Make functions globally available
-window.requestNotificationPermission = requestNotificationPermission;
-window.enableNotifications = enableNotifications;
-window.dismissNotificationPrompt = dismissNotificationPrompt;
-window.checkNotificationPrompt = checkNotificationPrompt;
-window.toggleNotifications = toggleNotifications;
-window.updateNotificationUI = updateNotificationUI;
-window.initializeNotificationUI = initializeNotificationUI;
 
 // ===== STEP 1: ADD THESE BACKUP FUNCTIONS TO index.html =====
 // Add these BEFORE any existing Firebase functions (don't replace anything yet)
@@ -4836,9 +4475,6 @@ function handleSuccessfulLogin(user) {
                 console.log('✅ Documents manager updated with loaded data');
             }
             
-            // 🔔 Initialize notification UI and check if we should show prompt
-            initializeNotificationUI();
-            checkNotificationPrompt();
             
         } else {
             handleNewUserSignup(user);
