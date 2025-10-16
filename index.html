@@ -4198,6 +4198,24 @@ function initializeNotificationUI() {
             console.log('✅ Notification button found and AGGRESSIVELY styled');
             console.log('📍 Button parent:', notificationButton.parentElement?.tagName);
             console.log('📍 Button innerHTML:', notificationButton.innerHTML);
+            
+            // Check if parent containers are hiding it
+            let currentElement = notificationButton;
+            while (currentElement && currentElement !== document.body) {
+                const parentStyle = window.getComputedStyle(currentElement);
+                console.log(`🔍 Element ${currentElement.tagName}#${currentElement.id}:`, {
+                    display: parentStyle.display,
+                    visibility: parentStyle.visibility,
+                    opacity: parentStyle.opacity,
+                    overflow: parentStyle.overflow,
+                    height: parentStyle.height,
+                    maxHeight: parentStyle.maxHeight
+                });
+                currentElement = currentElement.parentElement;
+            }
+            
+            // Try scrolling to the button
+            notificationButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
         } else {
             console.error('❌ Notification button NOT found in DOM');
             // List all elements with 'notification' in ID or class
