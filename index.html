@@ -4161,6 +4161,26 @@ function updateNotificationUI() {
 
 // Initialize notification UI when user logs in
 function initializeNotificationUI() {
+    console.log('🚀 initializeNotificationUI called');
+    
+    // FORCE SHOW NOTIFICATION BUTTON - DEBUG VERSION
+    setTimeout(() => {
+        const notificationButton = document.getElementById('notifications-btn');
+        console.log('🔍 Looking for notification button...', !!notificationButton);
+        
+        if (notificationButton) {
+            notificationButton.style.display = 'flex !important';
+            notificationButton.style.visibility = 'visible';
+            notificationButton.style.opacity = '1';
+            console.log('✅ Notification button found and forced visible');
+        } else {
+            console.error('❌ Notification button NOT found in DOM');
+            // List all elements with 'notification' in ID or class
+            const allElements = document.querySelectorAll('*[id*="notification"], *[class*="notification"]');
+            console.log('🔍 Elements with "notification":', allElements);
+        }
+    }, 1000); // 1 second delay to ensure DOM is loaded
+    
     updateNotificationUI();
     
     // Also check if FCM token exists and is current
