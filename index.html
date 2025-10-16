@@ -2912,6 +2912,26 @@ function showMainApp() {
     const dd  = document.getElementById('settings-dropdown');
     const btn = getSettingsButton();
     if (!dd || !btn) return;
+    
+    // DEBUG: Force show notification button when dropdown opens
+    setTimeout(() => {
+      const notificationBtn = document.getElementById('notifications-btn');
+      if (notificationBtn) {
+        notificationBtn.style.cssText = `
+          display: flex !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+          background-color: red !important;
+          color: white !important;
+          border: 3px solid blue !important;
+          min-height: 50px !important;
+          width: 100% !important;
+          z-index: 999999 !important;
+          position: relative !important;
+        `;
+        console.log('🔴 FORCED notification button visible in settings dropdown');
+      }
+    }, 100);
 
     const isHidden = dd.classList.contains('hidden');
 
