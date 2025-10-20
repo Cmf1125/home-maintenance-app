@@ -3945,7 +3945,7 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
                 firebaseTask.lastCompleted = firebase.firestore.Timestamp.fromDate(firebaseTask.lastCompleted);
             }
             
-            // CRITICAL FIX: Handle completion history dates
+            // CRITICAL FIX: Handle completion history dates and remove photos for Firebase compatibility
             if (firebaseTask.completionHistory && Array.isArray(firebaseTask.completionHistory)) {
                 firebaseTask.completionHistory = firebaseTask.completionHistory.map(record => {
                     const firebaseRecord = { ...record };
@@ -3969,6 +3969,13 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
                         firebaseRecord.nextDueDate = firebase.firestore.Timestamp.fromDate(new Date(firebaseRecord.nextDueDate));
                     } else if (firebaseRecord.nextDueDate instanceof Date) {
                         firebaseRecord.nextDueDate = firebase.firestore.Timestamp.fromDate(firebaseRecord.nextDueDate);
+                    }
+                    
+                    // TEMPORARY FIX: Remove photos from Firebase save (they're too large for Firestore)
+                    // Store photo count instead of the actual photos
+                    if (firebaseRecord.photos && Array.isArray(firebaseRecord.photos)) {
+                        firebaseRecord.photoCount = firebaseRecord.photos.length;
+                        delete firebaseRecord.photos; // Remove photos to prevent Firebase error
                     }
                     
                     return firebaseRecord;
