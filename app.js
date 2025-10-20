@@ -5259,21 +5259,32 @@ function showTaskHistory(taskId) {
             .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
             .map((record, index) => {
                 // Handle different date formats (Date object, string, timestamp)
+                console.log('🔍 Debug completion record:', record);
+                console.log('🔍 completedAt value:', record.completedAt);
+                console.log('🔍 completedAt type:', typeof record.completedAt);
+                
                 let date;
                 if (record.completedAt instanceof Date) {
                     date = record.completedAt;
+                    console.log('📅 Using Date object');
                 } else if (typeof record.completedAt === 'string') {
                     date = new Date(record.completedAt);
+                    console.log('📅 Parsing string to date:', date);
                 } else if (typeof record.completedAt === 'number') {
                     date = new Date(record.completedAt);
+                    console.log('📅 Parsing timestamp to date:', date);
                 } else {
                     date = new Date(); // Fallback to current date
+                    console.log('📅 Using fallback current date');
                 }
                 
                 // Check if date is valid
                 if (isNaN(date.getTime())) {
-                    console.warn('Invalid date found in completion record:', record.completedAt);
+                    console.warn('❌ Invalid date found in completion record:', record.completedAt);
                     date = new Date(); // Fallback to current date
+                    console.log('📅 Using fallback after invalid date');
+                } else {
+                    console.log('✅ Valid date:', date.toLocaleDateString());
                 }
                 
                 const photosHtml = record.photos && record.photos.length > 0 ? 
