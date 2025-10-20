@@ -2834,15 +2834,15 @@ function processTaskCompletion(taskId, completionData = {}) {
     const oldDueDate = task.dueDate ? new Date(task.dueDate) : new Date();
     const completionDate = new Date();
     
-    // Create completion record
+    // Create completion record with ISO string dates for better compatibility
     const completionRecord = {
         id: Date.now(), // Simple ID
-        completedAt: completionDate,
+        completedAt: completionDate.toISOString(), // Store as ISO string for better Firebase compatibility
         actualCost: completionData.actualCost || 0,
         notes: completionData.notes || '',
         photos: completionData.photos || [],
-        previousDueDate: oldDueDate,
-        nextDueDate: null // Will be set below
+        previousDueDate: oldDueDate.toISOString(),
+        nextDueDate: null // Will be set below as ISO string
     };
     
     // Initialize completionHistory if it doesn't exist
@@ -2856,7 +2856,7 @@ function processTaskCompletion(taskId, completionData = {}) {
     
     // Calculate next due date from current due date + frequency
     const nextDueDate = new Date(oldDueDate.getTime() + task.frequency * 24 * 60 * 60 * 1000);
-    completionRecord.nextDueDate = nextDueDate;
+    completionRecord.nextDueDate = nextDueDate.toISOString();
     
     // Add completion record to history
     task.completionHistory.push(completionRecord);
@@ -5258,7 +5258,24 @@ function showTaskHistory(taskId) {
         historyHTML = completionHistory
             .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
             .map((record, index) => {
-                const date = new Date(record.completedAt);
+                // Handle different date formats (Date object, string, timestamp)
+                let date;
+                if (record.completedAt instanceof Date) {
+                    date = record.completedAt;
+                } else if (typeof record.completedAt === 'string') {
+                    date = new Date(record.completedAt);
+                } else if (typeof record.completedAt === 'number') {
+                    date = new Date(record.completedAt);
+                } else {
+                    date = new Date(); // Fallback to current date
+                }
+                
+                // Check if date is valid
+                if (isNaN(date.getTime())) {
+                    console.warn('Invalid date found in completion record:', record.completedAt);
+                    date = new Date(); // Fallback to current date
+                }
+                
                 const photosHtml = record.photos && record.photos.length > 0 ? 
                     `<div class="mt-2">
                         <div class="text-sm font-medium text-gray-700 mb-1">📷 Photos (${record.photos.length})</div>
