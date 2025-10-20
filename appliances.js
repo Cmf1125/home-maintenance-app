@@ -416,13 +416,13 @@ updateAddFormPhotoPreview() {
     
     previewGrid.innerHTML = window.tempAppliancePhotos.map((photo, index) => `
         <div class="relative group">
-            <img src="${photo.data}" alt="Preview" 
+            <img src="${photo.url || photo.data}" alt="Preview" 
                  class="w-full h-20 object-cover rounded border">
             <button onclick="window.applianceManager.removeAddFormPhoto(${index})"
                     class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
                 ×
             </button>
-            <div class="text-xs text-gray-500 mt-1 truncate">${photo.fileName}</div>
+            <div class="text-xs text-gray-500 mt-1 truncate">${photo.name || photo.fileName}</div>
         </div>
     `).join('');
 }
@@ -863,7 +863,7 @@ renderEditForm() {
                                         <div class="grid grid-cols-3 gap-2">
                                             ${this.currentAppliance.photos.map((photo, index) => `
                                                 <div class="relative group">
-                                                    <img src="${photo.data}" alt="Appliance photo" 
+                                                    <img src="${photo.url || photo.data}" alt="Appliance photo" 
                                                          class="w-full h-20 object-cover rounded cursor-pointer"
                                                          onclick="window.applianceManager.viewPhoto('${this.currentAppliance.id}', ${index})">
                                                     <button onclick="window.applianceManager.deletePhoto('${this.currentAppliance.id}', ${index})"
@@ -990,10 +990,10 @@ viewPhoto(applianceId, photoIndex) {
     
     modal.innerHTML = `
         <div class="max-w-4xl max-h-full">
-            <img src="${photo.data}" alt="Appliance photo" 
+            <img src="${photo.url || photo.data}" alt="Appliance photo" 
                  class="max-w-full max-h-full object-contain rounded-lg">
             <div class="text-center mt-4">
-                <p class="text-white text-sm">${photo.fileName}</p>
+                <p class="text-white text-sm">${photo.name || photo.fileName}</p>
                 <p class="text-gray-300 text-xs">Click anywhere to close</p>
             </div>
         </div>
@@ -1003,7 +1003,7 @@ viewPhoto(applianceId, photoIndex) {
 }
 
 // Delete photo
-deletePhoto(applianceId, photoIndex) {
+async deletePhoto(applianceId, photoIndex) {
     const appliance = this.appliances.find(a => a.id == applianceId);
     if (!appliance || !appliance.photos || !appliance.photos[photoIndex]) {
         alert('❌ Photo not found');
@@ -1011,6 +1011,20 @@ deletePhoto(applianceId, photoIndex) {
     }
     
     if (confirm('Delete this photo?')) {
+        const photo = appliance.photos[photoIndex];
+        
+        // If photo has a Firebase path, delete it from storage
+        if (photo.path && window.storage) {
+            try {
+                const storageRef = window.storage.ref(photo.path);
+                await storageRef.delete();
+                console.log('🗑️ Photo deleted from Firebase Storage:', photo.path);
+            } catch (error) {
+                console.warn('⚠️ Failed to delete photo from Firebase Storage:', error);
+                // Continue with removal even if Firebase delete fails
+            }
+        }
+        
         appliance.photos.splice(photoIndex, 1);
         this.saveAppliances();
         

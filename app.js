@@ -2824,12 +2824,18 @@ function completeTask(taskId) {
 // Original task completion logic - now called from modal
 function processTaskCompletion(taskId, completionData = {}) {
     console.log(`✅ Processing completion for task ${taskId}...`);
+    console.log('🔍 DEBUG: Completion data received:', completionData);
+    console.log('🔍 DEBUG: window.tasks exists:', !!window.tasks);
+    console.log('🔍 DEBUG: window.tasks length:', window.tasks?.length);
     
     const task = window.tasks.find(t => t.id === taskId);
     if (!task) {
         console.error('❌ Task not found:', taskId);
+        console.log('🔍 DEBUG: Available task IDs:', window.tasks?.map(t => t.id));
         return false;
     }
+    
+    console.log('✅ DEBUG: Task found:', task.title);
 
     const oldDueDate = task.dueDate ? new Date(task.dueDate) : new Date();
     const completionDate = new Date();
@@ -2844,6 +2850,9 @@ function processTaskCompletion(taskId, completionData = {}) {
         previousDueDate: oldDueDate.toISOString(),
         nextDueDate: null // Will be set below as ISO string
     };
+    
+    console.log('📷 DEBUG: completionRecord.photos:', completionRecord.photos);
+    console.log('📷 DEBUG: completionRecord.photos length:', completionRecord.photos?.length);
     
     // Initialize completionHistory if it doesn't exist
     if (!task.completionHistory) {
@@ -5107,47 +5116,86 @@ function enhancedTaskCompletion() {
 }
 
 // Handle photo upload
-function handlePhotoUpload(event) {
+async function handlePhotoUpload(event) {
     const files = event.target.files;
     if (!files || files.length === 0) return;
     
     const previewContainer = document.getElementById('photo-preview');
     
-    Array.from(files).forEach((file, index) => {
-        if (file.size > 5 * 1024 * 1024) { // 5MB limit
-            alert(`Photo "${file.name}" is too large. Please use photos under 5MB.`);
-            return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
+    console.log(`📷 Uploading ${files.length} photos to Firebase Storage...`);
+    
+    // Show upload progress
+    const uploadStatus = document.createElement('div');
+    uploadStatus.className = 'text-sm text-blue-600 mb-2';
+    uploadStatus.textContent = 'Uploading photos...';
+    previewContainer.appendChild(uploadStatus);
+    
+    try {
+        for (const file of files) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                alert(`Photo "${file.name}" is too large. Please use photos under 5MB.`);
+                continue;
+            }
+            
+            console.log(`📷 Uploading: ${file.name}`);
+            
+            // Create unique filename
+            const timestamp = Date.now();
+            const userId = window.auth?.currentUser?.uid || 'anonymous';
+            const taskId = window.currentCompletingTask?.id || 'unknown';
+            const fileName = `completion-photos/${userId}/${taskId}/${timestamp}-${file.name}`;
+            
+            // Upload to Firebase Storage
+            const storageRef = window.storage.ref(fileName);
+            const uploadTask = await storageRef.put(file);
+            
+            // Get download URL
+            const downloadURL = await uploadTask.ref.getDownloadURL();
+            
             const photoData = {
                 name: file.name,
-                data: e.target.result, // base64 string
+                url: downloadURL,
+                path: fileName,
                 size: file.size,
                 uploadedAt: new Date().toISOString()
             };
             
             window.completionPhotos.push(photoData);
+            console.log(`✅ Photo uploaded: ${file.name}`);
             
             // Create preview element
             const previewDiv = document.createElement('div');
-            previewDiv.className = 'flex items-center justify-between bg-gray-50 p-2 rounded border';
+            previewDiv.className = 'flex items-center justify-between bg-gray-50 p-2 rounded border mb-2';
             previewDiv.innerHTML = `
                 <div class="flex items-center">
-                    <img src="${e.target.result}" class="w-12 h-12 object-cover rounded mr-3">
+                    <img src="${downloadURL}" class="w-12 h-12 object-cover rounded mr-3">
                     <div>
                         <div class="text-sm font-medium">${file.name}</div>
-                        <div class="text-xs text-gray-500">${(file.size / 1024).toFixed(1)}KB</div>
+                        <div class="text-xs text-gray-500">${(file.size / 1024).toFixed(1)}KB • Uploaded</div>
                     </div>
                 </div>
                 <button onclick="removeCompletionPhoto(${window.completionPhotos.length - 1})" 
                         class="text-red-500 hover:text-red-700 ml-2">×</button>
             `;
             previewContainer.appendChild(previewDiv);
-        };
-        reader.readAsDataURL(file);
-    });
+        }
+        
+        // Remove upload status
+        uploadStatus.textContent = '✅ All photos uploaded successfully';
+        setTimeout(() => {
+            if (uploadStatus.parentNode) {
+                uploadStatus.parentNode.removeChild(uploadStatus);
+            }
+        }, 2000);
+        
+    } catch (error) {
+        console.error('❌ Error uploading photos:', error);
+        uploadStatus.textContent = '❌ Photo upload failed';
+        uploadStatus.className = 'text-sm text-red-600 mb-2';
+    }
+    
+    // Clear the input
+    event.target.value = '';
 }
 
 // Remove a completion photo
@@ -5164,7 +5212,7 @@ function removeCompletionPhoto(index) {
             previewDiv.className = 'flex items-center justify-between bg-gray-50 p-2 rounded border';
             previewDiv.innerHTML = `
                 <div class="flex items-center">
-                    <img src="${photo.data}" class="w-12 h-12 object-cover rounded mr-3">
+                    <img src="${photo.url || photo.data}" class="w-12 h-12 object-cover rounded mr-3">
                     <div>
                         <div class="text-sm font-medium">${photo.name}</div>
                         <div class="text-xs text-gray-500">${(photo.size / 1024).toFixed(1)}KB</div>
@@ -5196,6 +5244,11 @@ function confirmTaskCompletion() {
     };
     
     console.log('📝 Completion data:', completionData);
+    console.log('📷 DEBUG: window.completionPhotos array:', window.completionPhotos);
+    console.log('📷 DEBUG: Number of photos:', window.completionPhotos.length);
+    if (window.completionPhotos.length > 0) {
+        console.log('📷 DEBUG: First photo:', window.completionPhotos[0]);
+    }
     
     // Process the completion using existing logic
     const success = processTaskCompletion(window.currentCompletingTask.id, completionData);
@@ -5258,7 +5311,7 @@ function showTaskHistory(taskId) {
         historyHTML = completionHistory
             .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
             .map((record, index) => {
-                // Handle different date formats (Date object, string, timestamp)
+                // Handle different date formats (Date object, string, timestamp, Firebase Timestamp)
                 console.log('🔍 Debug completion record:', record);
                 console.log('🔍 completedAt value:', record.completedAt);
                 console.log('🔍 completedAt type:', typeof record.completedAt);
@@ -5267,6 +5320,10 @@ function showTaskHistory(taskId) {
                 if (record.completedAt instanceof Date) {
                     date = record.completedAt;
                     console.log('📅 Using Date object');
+                } else if (record.completedAt && typeof record.completedAt.toDate === 'function') {
+                    // Firebase Timestamp
+                    date = record.completedAt.toDate();
+                    console.log('📅 Converting Firebase Timestamp to date:', date);
                 } else if (typeof record.completedAt === 'string') {
                     date = new Date(record.completedAt);
                     console.log('📅 Parsing string to date:', date);
@@ -5274,6 +5331,7 @@ function showTaskHistory(taskId) {
                     date = new Date(record.completedAt);
                     console.log('📅 Parsing timestamp to date:', date);
                 } else {
+                    console.warn('⚠️ Unknown date format, using current date as fallback');
                     date = new Date(); // Fallback to current date
                     console.log('📅 Using fallback current date');
                 }
@@ -5292,9 +5350,9 @@ function showTaskHistory(taskId) {
                         <div class="text-sm font-medium text-gray-700 mb-1">📷 Photos (${record.photos.length})</div>
                         <div class="flex gap-2 flex-wrap">
                             ${record.photos.map((photo, photoIndex) => 
-                                `<img src="${photo.data}" class="w-16 h-16 object-cover rounded border cursor-pointer" 
-                                      onclick="showPhotoModal('${photo.data}', '${photo.name}')"
-                                      title="${photo.name}">`
+                                `<img src="${photo.url || photo.data}" class="w-16 h-16 object-cover rounded border cursor-pointer" 
+                                      onclick="showPhotoModal('${photo.url || photo.data}', '${photo.name || photo.fileName}')"
+                                      title="${photo.name || photo.fileName}">`
                             ).join('')}
                         </div>
                     </div>` : '';

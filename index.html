@@ -55,6 +55,7 @@ body.setup-active #setup-form {
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
 <!-- Google Identity Services -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -3888,10 +3889,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+const storage = firebase.storage();
 
 // Make Firebase instances globally available
 window.auth = auth;
 window.db = db;
+window.storage = storage;
 
 // MOBILE CACHE FIX: Configure Firestore for better mobile performance
 try {
@@ -3971,11 +3974,17 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
                         firebaseRecord.nextDueDate = firebase.firestore.Timestamp.fromDate(firebaseRecord.nextDueDate);
                     }
                     
-                    // TEMPORARY FIX: Remove photos from Firebase save (they're too large for Firestore)
-                    // Store photo count instead of the actual photos
+                    // NEW: Keep photos for Firebase save (now using URLs from Firebase Storage)
+                    // No need to remove photos anymore as they use URLs instead of base64
                     if (firebaseRecord.photos && Array.isArray(firebaseRecord.photos)) {
-                        firebaseRecord.photoCount = firebaseRecord.photos.length;
-                        delete firebaseRecord.photos; // Remove photos to prevent Firebase error
+                        // Ensure photos are properly formatted for Firebase
+                        firebaseRecord.photos = firebaseRecord.photos.map(photo => ({
+                            name: photo.name || photo.fileName,
+                            url: photo.url,
+                            path: photo.path,
+                            size: photo.size,
+                            uploadedAt: photo.uploadedAt || photo.uploadDate
+                        }));
                     }
                     
                     return firebaseRecord;
