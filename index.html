@@ -3945,6 +3945,36 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
                 firebaseTask.lastCompleted = firebase.firestore.Timestamp.fromDate(firebaseTask.lastCompleted);
             }
             
+            // CRITICAL FIX: Handle completion history dates
+            if (firebaseTask.completionHistory && Array.isArray(firebaseTask.completionHistory)) {
+                firebaseTask.completionHistory = firebaseTask.completionHistory.map(record => {
+                    const firebaseRecord = { ...record };
+                    
+                    // Convert completedAt to Firebase Timestamp if needed
+                    if (typeof firebaseRecord.completedAt === 'string') {
+                        firebaseRecord.completedAt = firebase.firestore.Timestamp.fromDate(new Date(firebaseRecord.completedAt));
+                    } else if (firebaseRecord.completedAt instanceof Date) {
+                        firebaseRecord.completedAt = firebase.firestore.Timestamp.fromDate(firebaseRecord.completedAt);
+                    }
+                    
+                    // Convert previousDueDate to Firebase Timestamp if needed
+                    if (typeof firebaseRecord.previousDueDate === 'string') {
+                        firebaseRecord.previousDueDate = firebase.firestore.Timestamp.fromDate(new Date(firebaseRecord.previousDueDate));
+                    } else if (firebaseRecord.previousDueDate instanceof Date) {
+                        firebaseRecord.previousDueDate = firebase.firestore.Timestamp.fromDate(firebaseRecord.previousDueDate);
+                    }
+                    
+                    // Convert nextDueDate to Firebase Timestamp if needed
+                    if (typeof firebaseRecord.nextDueDate === 'string') {
+                        firebaseRecord.nextDueDate = firebase.firestore.Timestamp.fromDate(new Date(firebaseRecord.nextDueDate));
+                    } else if (firebaseRecord.nextDueDate instanceof Date) {
+                        firebaseRecord.nextDueDate = firebase.firestore.Timestamp.fromDate(firebaseRecord.nextDueDate);
+                    }
+                    
+                    return firebaseRecord;
+                });
+            }
+            
             return firebaseTask;
         });
         
@@ -4023,6 +4053,36 @@ async function loadUserDataEnhanced(userId) {
                         task.lastCompleted = task.lastCompleted.toDate();
                     } else if (task.lastCompleted && typeof task.lastCompleted === 'string') {
                         task.lastCompleted = new Date(task.lastCompleted);
+                    }
+                    
+                    // CRITICAL FIX: Convert completion history Firebase Timestamps back to JavaScript Dates
+                    if (task.completionHistory && Array.isArray(task.completionHistory)) {
+                        task.completionHistory = task.completionHistory.map(record => {
+                            const fixedRecord = { ...record };
+                            
+                            // Convert completedAt from Firebase Timestamp to Date
+                            if (fixedRecord.completedAt && fixedRecord.completedAt.toDate) {
+                                fixedRecord.completedAt = fixedRecord.completedAt.toDate();
+                            } else if (typeof fixedRecord.completedAt === 'string') {
+                                fixedRecord.completedAt = new Date(fixedRecord.completedAt);
+                            }
+                            
+                            // Convert previousDueDate from Firebase Timestamp to Date
+                            if (fixedRecord.previousDueDate && fixedRecord.previousDueDate.toDate) {
+                                fixedRecord.previousDueDate = fixedRecord.previousDueDate.toDate();
+                            } else if (typeof fixedRecord.previousDueDate === 'string') {
+                                fixedRecord.previousDueDate = new Date(fixedRecord.previousDueDate);
+                            }
+                            
+                            // Convert nextDueDate from Firebase Timestamp to Date
+                            if (fixedRecord.nextDueDate && fixedRecord.nextDueDate.toDate) {
+                                fixedRecord.nextDueDate = fixedRecord.nextDueDate.toDate();
+                            } else if (typeof fixedRecord.nextDueDate === 'string') {
+                                fixedRecord.nextDueDate = new Date(fixedRecord.nextDueDate);
+                            }
+                            
+                            return fixedRecord;
+                        });
                     }
                 });
   
