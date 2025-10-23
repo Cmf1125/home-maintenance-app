@@ -3977,14 +3977,38 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
                     // NEW: Keep photos for Firebase save (now using URLs from Firebase Storage)
                     // No need to remove photos anymore as they use URLs instead of base64
                     if (firebaseRecord.photos && Array.isArray(firebaseRecord.photos)) {
-                        // Ensure photos are properly formatted for Firebase
-                        firebaseRecord.photos = firebaseRecord.photos.map(photo => ({
-                            name: photo.name || photo.fileName,
-                            url: photo.url,
-                            path: photo.path,
-                            size: photo.size,
-                            uploadedAt: photo.uploadedAt || photo.uploadDate
-                        }));
+                        console.log('📷 DEBUG: Processing photos for Firebase save:', firebaseRecord.photos);
+                        
+                        // Filter out photos that don't have URLs (invalid Firebase Storage photos)
+                        // and ensure photos are properly formatted for Firebase
+                        firebaseRecord.photos = firebaseRecord.photos
+                            .filter(photo => photo.url || photo.data) // Keep photos with URL or legacy base64 data
+                            .map(photo => {
+                                if (photo.url) {
+                                    // New Firebase Storage photo - keep URL format
+                                    return {
+                                        name: photo.name || photo.fileName,
+                                        url: photo.url,
+                                        path: photo.path,
+                                        size: photo.size,
+                                        uploadedAt: photo.uploadedAt || photo.uploadDate
+                                    };
+                                } else {
+                                    // Legacy base64 photo - convert to count for now (too large for Firestore)
+                                    console.log('⚠️ Found legacy base64 photo, converting to photo count');
+                                    return null; // Will be filtered out
+                                }
+                            })
+                            .filter(photo => photo !== null); // Remove null entries
+                        
+                        // If no valid photos remain, set photoCount for backwards compatibility
+                        if (firebaseRecord.photos.length === 0 && record.photos && record.photos.length > 0) {
+                            firebaseRecord.photoCount = record.photos.length;
+                            delete firebaseRecord.photos;
+                            console.log('📷 No valid Firebase Storage photos, set photoCount:', firebaseRecord.photoCount);
+                        } else {
+                            console.log('📷 Saved', firebaseRecord.photos.length, 'Firebase Storage photos');
+                        }
                     }
                     
                     return firebaseRecord;
