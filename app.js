@@ -5124,6 +5124,17 @@ async function handlePhotoUpload(event) {
     
     console.log(`📷 Uploading ${files.length} photos to Firebase Storage...`);
     
+    // Check if Firebase Storage is available
+    if (!window.storage) {
+        console.error('❌ Firebase Storage not available');
+        console.log('🔍 DEBUG: window.storage:', window.storage);
+        console.log('🔍 DEBUG: window.auth:', window.auth);
+        console.log('🔍 DEBUG: window.db:', window.db);
+        console.log('🔍 DEBUG: firebase object:', typeof firebase !== 'undefined' ? firebase : 'undefined');
+        alert('❌ Photo upload unavailable. Please refresh the page and try again.');
+        return;
+    }
+    
     // Show upload progress
     const uploadStatus = document.createElement('div');
     uploadStatus.className = 'text-sm text-blue-600 mb-2';
@@ -5190,8 +5201,20 @@ async function handlePhotoUpload(event) {
         
     } catch (error) {
         console.error('❌ Error uploading photos:', error);
-        uploadStatus.textContent = '❌ Photo upload failed';
+        console.error('❌ Error details:', error.message);
+        console.error('❌ Error code:', error.code);
+        console.error('❌ Full error object:', error);
+        uploadStatus.textContent = `❌ Photo upload failed: ${error.message || 'Unknown error'}`;
         uploadStatus.className = 'text-sm text-red-600 mb-2';
+        
+        // Check if it's a Firebase permission issue
+        if (error.code === 'storage/unauthorized') {
+            alert('❌ Photo upload permission denied. Please check Firebase Storage rules.');
+        } else if (error.code === 'storage/unknown') {
+            alert('❌ Firebase Storage error. Please try again or contact support.');
+        } else {
+            alert(`❌ Photo upload failed: ${error.message || 'Unknown error'}`);
+        }
     }
     
     // Clear the input
