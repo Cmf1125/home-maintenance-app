@@ -3948,8 +3948,10 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
                 firebaseTask.lastCompleted = firebase.firestore.Timestamp.fromDate(firebaseTask.lastCompleted);
             }
             
-            // CRITICAL FIX: Handle completion history dates and remove photos for Firebase compatibility
+            // CRITICAL FIX: Handle completion history dates and keep photos for Firebase compatibility
             if (firebaseTask.completionHistory && Array.isArray(firebaseTask.completionHistory)) {
+                console.log('🔍 DEBUG: Processing task with completion history:', firebaseTask.title);
+                console.log('🔍 DEBUG: Completion history length:', firebaseTask.completionHistory.length);
                 firebaseTask.completionHistory = firebaseTask.completionHistory.map(record => {
                     const firebaseRecord = { ...record };
                     

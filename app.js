@@ -5274,6 +5274,7 @@ function confirmTaskCompletion() {
     }
     
     // Process the completion using existing logic
+    console.log('🔍 DEBUG: About to call processTaskCompletion with data:', completionData);
     const success = processTaskCompletion(window.currentCompletingTask.id, completionData);
     
     if (success !== false) {
