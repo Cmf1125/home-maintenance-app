@@ -1,0 +1,43 @@
+{
+  "packageId": "com.homekeeper.app",
+  "host": "your-domain.com",
+  "name": "The Home Keeper",
+  "launcherName": "Home Keeper", 
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#2563eb",
+  "navigationColor": "#2563eb",
+  "backgroundColor": "#ffffff",
+  "startUrl": "/",
+  "iconUrl": "https://your-domain.com/icon-512.png",
+  "maskableIconUrl": "https://your-domain.com/icon-512.png",
+  "monochromeIconUrl": "https://your-domain.com/icon-512.png",
+  "shortcuts": [
+    {
+      "name": "Add Task",
+      "short_name": "Add Task",
+      "url": "/?action=add-task",
+      "icons": [
+        {
+          "src": "https://your-domain.com/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "generator": "pwabuilder-cloudapk",
+  "generatorVersion": "2.0.0",
+  "webManifestUrl": "https://your-domain.com/manifest.json",
+  "features": {
+    "locationDelegation": {
+      "enabled": false
+    },
+    "playBilling": {
+      "enabled": false  
+    }
+  },
+  "minSdkVersion": 19,
+  "targetSdkVersion": 33,
+  "versionCode": 1,
+  "versionName": "1.0"
+}

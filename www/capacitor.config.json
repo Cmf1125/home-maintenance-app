@@ -1,0 +1,9 @@
+{
+  "appId": "com.thehomekeeper.app",
+  "appName": "The Home Keeper",
+  "webDir": "www",
+  "server": {
+    "url": "https://www.thehomekeeper.com",
+    "cleartext": true
+  }
+}

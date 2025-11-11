@@ -1,0 +1,25 @@
+{
+  "name": "home-maintenance-app",
+  "version": "1.0.0",
+  "description": "A simple app to help homeowners stay on top of seasonal and system-based maintenance tasks. This is a learning project in progress — organized by modular features and branches.",
+  "main": "app-backup.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/Cmf1125/home-maintenance-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cmf1125/home-maintenance-app/issues"
+  },
+  "homepage": "https://github.com/Cmf1125/home-maintenance-app#readme",
+  "dependencies": {
+    "@capacitor/cli": "^6.2.1",
+    "@capacitor/core": "^6.2.1",
+    "@capacitor/ios": "^6.2.1"
+  }
+}

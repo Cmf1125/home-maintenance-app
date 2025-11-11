@@ -1,0 +1,22 @@
+{
+  "packageId": "com.homekeeper.app",
+  "name": "The Home Keeper",
+  "webDir": "./",
+  "webManifestUrl": "https://your-domain.com/manifest.json",
+  "iconPath": "./icon-512.png",
+  "maskableIconPath": "./icon-512.png",
+  "monochromIconPath": "./icon-512.png",
+  "backgroundColor": "#ffffff",
+  "themeColor": "#2563eb",
+  "navigationColor": "#2563eb",
+  "orientation": "portrait",
+  "display": "standalone",
+  "startUrl": "/",
+  "shortcutIconPath": "./icon-192.png",
+  "splashScreenFadeOutDuration": 300,
+  "enableNotifications": false,
+  "twaGenerator": {
+    "template": "bubblewrap",
+    "version": "1.19.4"
+  }
+}
