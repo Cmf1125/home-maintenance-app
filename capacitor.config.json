@@ -1,9 +1,11 @@
 {
   "appId": "com.thehomekeeper.app",
-  "appName": "The Home Keeper",
+  "appName": "The Home Keeper", 
   "webDir": "www",
   "server": {
-    "url": "https://www.thehomekeeper.com",
-    "cleartext": true
+    "url": "https://thehomekeeper.com"
+  },
+  "ios": {
+    "contentInset": "automatic"
   }
 }
