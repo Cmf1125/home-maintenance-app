@@ -4853,9 +4853,9 @@ async function signInWithApple_Web() {
             
             // Initialize Apple ID SDK
             AppleID.auth.init({
-                clientId: 'com.thehomekeeper.app', // Your app's bundle ID
+                clientId: 'com.thehomekeeper.app.web', // Service ID for web
                 scope: 'name email',
-                redirectURI: 'https://thehomekeeper.com', // Your domain from capacitor config
+                redirectURI: 'https://thehomekeeper.com', // Must match exactly in Apple Console
                 state: 'homekeeper-web-signin',
                 nonce: 'homekeeper-' + Date.now() + '-' + Math.random(),
                 usePopup: true // Use popup for better UX
