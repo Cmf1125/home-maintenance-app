@@ -61,6 +61,8 @@ body.setup-active #setup-form {
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <!-- Google API Client Library for Calendar API -->
 <script src="https://apis.google.com/js/api.js" async defer></script>
+<!-- Apple Sign In JS SDK -->
+<script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
   
     <!-- PWA Configuration -->
 <link rel="manifest" href="manifest.json">
@@ -4789,42 +4791,17 @@ auth.onAuthStateChanged((user) => {
     authProcessing = false;
 });
 
-// Apple Sign-In Function (separate from Google/Firebase auth)
+// Apple Sign-In Function (supports both iOS and web)
 async function signInWithApple() {
     try {
         console.log('🍎 Starting Apple Sign-In...');
         
-        // Only works on iOS/macOS, graceful fallback for web
-        if (!window.Capacitor || window.Capacitor.getPlatform() === 'web') {
-            alert('Apple Sign-In is only available on iOS devices. Please use Google Sign-In or email/password.');
-            return;
+        // Check if running on iOS/native app
+        if (window.Capacitor && window.Capacitor.getPlatform() !== 'web') {
+            return await signInWithApple_iOS();
+        } else {
+            return await signInWithApple_Web();
         }
-        
-        // Import the Apple Sign-In plugin
-        const { SignInWithApple } = await import('@capacitor-community/apple-sign-in');
-        
-        // Request Apple Sign-In
-        const result = await SignInWithApple.authorize({
-            requestedScopes: ['email', 'name']
-        });
-        
-        console.log('🍎 Apple Sign-In result:', result);
-        
-        // Create user object for Firebase (keeping your existing flow)
-        const appleUser = {
-            uid: `apple-${result.response.user}`,
-            email: result.response.email || 'private@example.com',
-            displayName: result.response.givenName && result.response.familyName 
-                ? `${result.response.givenName} ${result.response.familyName}` 
-                : 'Apple User',
-            isAppleUser: true
-        };
-        
-        // Set global user (same as your Google auth)
-        window.currentUser = appleUser;
-        
-        // Use your existing successful login handler
-        handleSuccessfulLogin(appleUser);
         
     } catch (error) {
         console.error('🍎 Apple Sign-In error:', error);
@@ -4832,6 +4809,95 @@ async function signInWithApple() {
             alert('Apple Sign-In failed. Please try email/password login.');
         }
     }
+}
+
+// iOS Native Apple Sign-In
+async function signInWithApple_iOS() {
+    // Import the Apple Sign-In plugin
+    const { SignInWithApple } = await import('@capacitor-community/apple-sign-in');
+    
+    // Request Apple Sign-In
+    const result = await SignInWithApple.authorize({
+        requestedScopes: ['email', 'name']
+    });
+    
+    console.log('🍎 Apple Sign-In iOS result:', result);
+    
+    // Create user object for Firebase (keeping your existing flow)
+    const appleUser = {
+        uid: `apple-${result.response.user}`,
+        email: result.response.email || 'private@example.com',
+        displayName: result.response.givenName && result.response.familyName 
+            ? `${result.response.givenName} ${result.response.familyName}` 
+            : 'Apple User',
+        isAppleUser: true
+    };
+    
+    // Set global user (same as your Google auth)
+    window.currentUser = appleUser;
+    
+    // Use your existing successful login handler
+    handleSuccessfulLogin(appleUser);
+}
+
+// Web Apple Sign-In using Apple JS SDK
+async function signInWithApple_Web() {
+    return new Promise((resolve, reject) => {
+        try {
+            // Wait for Apple SDK to load
+            if (!window.AppleID) {
+                alert('Apple Sign-In is loading. Please try again in a moment.');
+                reject(new Error('Apple SDK not loaded'));
+                return;
+            }
+            
+            // Initialize Apple ID SDK
+            AppleID.auth.init({
+                clientId: 'com.thehomekeeper.app', // Your app's bundle ID
+                scope: 'name email',
+                redirectURI: 'https://thehomekeeper.com', // Your domain from capacitor config
+                state: 'homekeeper-web-signin',
+                nonce: 'homekeeper-' + Date.now() + '-' + Math.random(),
+                usePopup: true // Use popup for better UX
+            });
+            
+            // Listen for success/error events
+            document.addEventListener('AppleIDSignInOnSuccess', (event) => {
+                console.log('🍎 Apple Sign-In Web success:', event.detail);
+                
+                const { authorization, user } = event.detail;
+                
+                // Create user object consistent with iOS flow
+                const appleUser = {
+                    uid: `apple-${user?.id || authorization.user}`,
+                    email: user?.email || 'private@example.com',
+                    displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
+                    isAppleUser: true,
+                    authorizationCode: authorization.code,
+                    identityToken: authorization.id_token
+                };
+                
+                // Set global user
+                window.currentUser = appleUser;
+                
+                // Use existing successful login handler
+                handleSuccessfulLogin(appleUser);
+                resolve(appleUser);
+            });
+            
+            document.addEventListener('AppleIDSignInOnFailure', (event) => {
+                console.error('🍎 Apple Sign-In Web error:', event.detail);
+                reject(new Error(event.detail.error || 'Apple Sign-In failed'));
+            });
+            
+            // Trigger Apple Sign-In
+            AppleID.auth.signIn();
+            
+        } catch (error) {
+            console.error('🍎 Apple Sign-In Web initialization error:', error);
+            reject(error);
+        }
+    });
 }
     
 </script>
