@@ -4862,27 +4862,89 @@ async function signInWithApple_Web() {
             });
             
             // Listen for success/error events
-            document.addEventListener('AppleIDSignInOnSuccess', (event) => {
+            document.addEventListener('AppleIDSignInOnSuccess', async (event) => {
                 console.log('🍎 Apple Sign-In Web success:', event.detail);
                 
                 const { authorization, user } = event.detail;
+                const userEmail = user?.email;
                 
-                // Create user object consistent with iOS flow
-                const appleUser = {
-                    uid: `apple-${user?.id || authorization.user}`,
-                    email: user?.email || 'private@example.com',
-                    displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
-                    isAppleUser: true,
-                    authorizationCode: authorization.code,
-                    identityToken: authorization.id_token
-                };
+                // Handle private email (Hide My Email) option
+                if (!userEmail || userEmail.includes('privaterelay.appleid.com') || userEmail === 'private@example.com') {
+                    console.log('🍎 Apple user using private email relay');
+                    const appleUser = {
+                        uid: `apple-${authorization.user || Date.now()}`,
+                        email: userEmail || `apple-${Date.now()}@privaterelay.appleid.com`,
+                        displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
+                        isAppleUser: true,
+                        authorizationCode: authorization.code,
+                        identityToken: authorization.id_token
+                    };
+                    window.currentUser = appleUser;
+                    handleSuccessfulLogin(appleUser);
+                    resolve(appleUser);
+                    return;
+                }
                 
-                // Set global user
-                window.currentUser = appleUser;
+                console.log('🍎 Apple Sign-In with public email:', userEmail);
                 
-                // Use existing successful login handler
-                handleSuccessfulLogin(appleUser);
-                resolve(appleUser);
+                // Check for existing accounts with same email
+                try {
+                    const existingMethods = await auth.fetchSignInMethodsForEmail(userEmail);
+                    console.log('🔍 Checking existing sign-in methods for', userEmail, ':', existingMethods);
+                    
+                    if (existingMethods && existingMethods.length > 0) {
+                        // Email exists - handle account linking gracefully
+                        console.log('⚠️ Email already exists with other sign-in method');
+                        
+                        // Create Apple user but mark for account linking
+                        const appleUser = {
+                            uid: `apple-${authorization.user || Date.now()}`,
+                            email: userEmail,
+                            displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
+                            isAppleUser: true,
+                            needsLinking: true,
+                            existingMethods: existingMethods,
+                            authorizationCode: authorization.code,
+                            identityToken: authorization.id_token
+                        };
+                        
+                        // Sign in successfully and let app handle linking
+                        window.currentUser = appleUser;
+                        handleSuccessfulLogin(appleUser);
+                        resolve(appleUser);
+                        return;
+                    }
+                    
+                    // Email is available - create new Apple account
+                    const appleUser = {
+                        uid: `apple-${authorization.user || Date.now()}`,
+                        email: userEmail,
+                        displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
+                        isAppleUser: true,
+                        authorizationCode: authorization.code,
+                        identityToken: authorization.id_token
+                    };
+                    
+                    console.log('✅ Creating new Apple account');
+                    window.currentUser = appleUser;
+                    handleSuccessfulLogin(appleUser);
+                    resolve(appleUser);
+                    
+                } catch (error) {
+                    console.error('❌ Error checking email methods:', error);
+                    // Proceed with sign-in on error
+                    const appleUser = {
+                        uid: `apple-${authorization.user || Date.now()}`,
+                        email: userEmail,
+                        displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
+                        isAppleUser: true,
+                        authorizationCode: authorization.code,
+                        identityToken: authorization.id_token
+                    };
+                    window.currentUser = appleUser;
+                    handleSuccessfulLogin(appleUser);
+                    resolve(appleUser);
+                }
             });
             
             document.addEventListener('AppleIDSignInOnFailure', (event) => {
