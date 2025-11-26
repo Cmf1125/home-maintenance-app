@@ -295,6 +295,15 @@ function showMainApp() {
                                     </svg>
                                     <span>Continue with Google</span>
                                 </button>
+                                
+                                <!-- Apple Sign In Button -->
+                                <button onclick="signInWithApple()" 
+                                        class="w-full mt-3 bg-black text-white py-3 rounded-xl hover:bg-gray-800 font-medium shadow-sm transition-all duration-300 flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                                    </svg>
+                                    <span>Continue with Apple</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -3891,6 +3900,17 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
 
+// iOS-specific authentication fixes
+if (window.Capacitor && window.Capacitor.getPlatform() === 'ios') {
+    console.log('🍎 iOS detected - setting up iOS authentication fixes');
+    
+    // Set persistence to LOCAL for iOS
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    
+    // Override popup blocking detection for iOS
+    window.isIOSApp = true;
+}
+
 // Make Firebase instances globally available
 window.auth = auth;
 window.db = db;
@@ -4351,6 +4371,15 @@ function showDebugMessage(message) {
 
 function signInWithGoogle() {
     window.googleSignInInProgress = true; // Flag to prevent auto-login
+    
+    // Check if we're running on iOS through Capacitor
+    if (window.Capacitor && window.Capacitor.getPlatform() === 'ios') {
+        // Use native iOS Google Sign-In
+        console.log('🍎 Using native iOS Google sign-in');
+        window.nativeGoogleSignIn();
+        return;
+    }
+    
     const provider = new firebase.auth.GoogleAuthProvider();
     
     // Force account selection every time
@@ -4759,6 +4788,51 @@ auth.onAuthStateChanged((user) => {
     // Reset the flag immediately after processing
     authProcessing = false;
 });
+
+// Apple Sign-In Function (separate from Google/Firebase auth)
+async function signInWithApple() {
+    try {
+        console.log('🍎 Starting Apple Sign-In...');
+        
+        // Only works on iOS/macOS, graceful fallback for web
+        if (!window.Capacitor || window.Capacitor.getPlatform() === 'web') {
+            alert('Apple Sign-In is only available on iOS devices. Please use Google Sign-In or email/password.');
+            return;
+        }
+        
+        // Import the Apple Sign-In plugin
+        const { SignInWithApple } = await import('@capacitor-community/apple-sign-in');
+        
+        // Request Apple Sign-In
+        const result = await SignInWithApple.authorize({
+            requestedScopes: ['email', 'name']
+        });
+        
+        console.log('🍎 Apple Sign-In result:', result);
+        
+        // Create user object for Firebase (keeping your existing flow)
+        const appleUser = {
+            uid: `apple-${result.response.user}`,
+            email: result.response.email || 'private@example.com',
+            displayName: result.response.givenName && result.response.familyName 
+                ? `${result.response.givenName} ${result.response.familyName}` 
+                : 'Apple User',
+            isAppleUser: true
+        };
+        
+        // Set global user (same as your Google auth)
+        window.currentUser = appleUser;
+        
+        // Use your existing successful login handler
+        handleSuccessfulLogin(appleUser);
+        
+    } catch (error) {
+        console.error('🍎 Apple Sign-In error:', error);
+        if (error.message !== 'User canceled') {
+            alert('Apple Sign-In failed. Please try email/password login.');
+        }
+    }
+}
     
 </script>
 <script>
@@ -5110,6 +5184,70 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<!-- iOS Notifications (only loads on iOS) -->
+<script>
+if (window.Capacitor && window.Capacitor.getPlatform() === 'ios') {
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = 'ios-notifications.js';
+    document.head.appendChild(script);
+    console.log('📱 Loading iOS notification service...');
+    
+    // iOS native Google sign-in implementation
+    console.log('🍎 Setting up iOS native Google sign-in');
+    
+    // Create iOS Google Sign-In implementation
+    window.nativeGoogleSignIn = async function() {
+        try {
+            console.log('🍎 Starting native iOS Google sign-in...');
+            
+            // Initialize Google Sign-In for iOS using Capacitor Plugins
+            const { GoogleAuth } = window.Capacitor.Plugins;
+            
+            // Initialize the plugin
+            await GoogleAuth.initialize({
+                clientId: '434638918453-ht6h5s8v9u0e6h1u8t9v1u0e6h1u8t9v.apps.googleusercontent.com',
+                scopes: ['profile', 'email'],
+                grantOfflineAccess: true,
+                forceCodeForRefreshToken: true
+            });
+            
+            // Perform the sign-in
+            const result = await GoogleAuth.signIn();
+            console.log('🍎 Native Google sign-in success:', result);
+            
+            // Convert native result to Firebase token
+            const credential = firebase.auth.GoogleAuthProvider.credential(result.authentication.idToken);
+            
+            // Sign in to Firebase
+            const userCredential = await firebase.auth().signInWithCredential(credential);
+            console.log('✅ Firebase sign-in success with native token');
+            
+            // Handle successful login the same way as web
+            loadUserDataEnhanced(userCredential.user.uid).then(hasData => {
+                if (hasData) {
+                    handleSuccessfulLogin(userCredential.user);
+                } else {
+                    handleNewUserSignup(userCredential.user);
+                }
+            });
+            
+        } catch (error) {
+            console.error('❌ Native Google sign-in error:', error);
+            alert('Google sign-in failed. Please try email/password login.');
+        }
+    };
+    
+    // Override the web Google sign-in button for iOS
+    setTimeout(() => {
+        const googleButton = document.getElementById('google-signin-btn');
+        if (googleButton) {
+            googleButton.onclick = window.nativeGoogleSignIn;
+            googleButton.innerHTML = '🔍 Sign in with Google';
+        }
+    }, 1000);
+}
+</script>
 
 </body>
 </html>
