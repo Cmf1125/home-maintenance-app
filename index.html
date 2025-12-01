@@ -4488,6 +4488,12 @@ window.signOutUser = signOutUser;   // <-- make it callable from HTML
 function handleSuccessfulLogin(user) {
     console.log('🏠 User logged in, loading data first...');
     
+    // Store user email for account linking
+    if (user.email && !user.email.includes('homekeeper.app')) {
+        localStorage.setItem('userEmail', user.email);
+        console.log('💾 Stored user email for account linking:', user.email);
+    }
+    
     // Hide login screen immediately
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('setup-form').classList.add('hidden');
@@ -4701,6 +4707,12 @@ function handleNewUserSignup(user) {
     // Store user info globally and pre-populate name if available
     window.currentUser = user;
     
+    // Store user email for account linking  
+    if (user.email && !user.email.includes('homekeeper.app')) {
+        localStorage.setItem('userEmail', user.email);
+        console.log('💾 Stored user email for account linking:', user.email);
+    }
+    
     // Check if we need to show name field for Apple users
     if (!user.displayName || user.displayName === 'Apple User' || user.needsName) {
         console.log('👤 Showing name field for user without proper name');
@@ -4811,6 +4823,48 @@ auth.onAuthStateChanged((user) => {
     authProcessing = false;
 });
 
+// Check if an account with this email already exists (for account linking)
+async function checkForExistingAccountByEmail(email) {
+    try {
+        console.log(`🔍 Checking for existing account with email: ${email}`);
+        
+        if (!email || email.includes('homekeeper.app') || email.includes('example.com')) {
+            // Skip check for placeholder emails
+            return null;
+        }
+        
+        // Search for existing user data by email in Firebase
+        // This is a simplified approach - we'll check localStorage and Firebase
+        
+        // First check localStorage for email-based data
+        const storedUserEmail = localStorage.getItem('userEmail');
+        if (storedUserEmail === email) {
+            console.log('🔍 Found matching email in localStorage');
+            
+            // Try to load data for this email
+            const homeDataStr = localStorage.getItem('homeData');
+            const tasksStr = localStorage.getItem('tasks');
+            
+            if (homeDataStr || tasksStr) {
+                return {
+                    homeData: homeDataStr ? JSON.parse(homeDataStr) : null,
+                    tasks: tasksStr ? JSON.parse(tasksStr) : []
+                };
+            }
+        }
+        
+        // TODO: Add Firebase query to search for accounts by email
+        // For now, we'll use localStorage approach
+        
+        console.log('🔍 No existing account found for this email');
+        return null;
+        
+    } catch (error) {
+        console.error('❌ Error checking for existing account:', error);
+        return null;
+    }
+}
+
 // Handle Apple Sign In redirect on page load
 function handleAppleSignInRedirect() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -4853,20 +4907,38 @@ function handleAppleSignInRedirect() {
             
             window.currentUser = appleUser;
             
-            // Check if this is a new user based on data, same as Google Sign In
-            loadUserDataEnhanced(appleUser.uid).then(hasData => {
-                console.log(`🔍 Apple Sign In Route Check: hasData = ${hasData}`);
-                
-                if (hasData) {
-                    console.log('➡️ Routing to main dashboard (existing Apple user)');
+            // Check if this email already has data (account linking)
+            checkForExistingAccountByEmail(appleUser.email).then(existingData => {
+                if (existingData) {
+                    console.log('🔗 Found existing account with same email - linking accounts');
+                    
+                    // Use existing user data but update with Apple info
+                    window.currentUser = appleUser;
+                    window.homeData = existingData.homeData;
+                    window.tasks = existingData.tasks || [];
+                    
+                    console.log('➡️ Routing to main dashboard (linked Apple account)');
                     handleSuccessfulLogin(appleUser);
                 } else {
-                    console.log('➡️ Routing to setup flow (new Apple user)');
-                    handleNewUserSignup(appleUser);
+                    console.log('🔍 No existing account found - checking Apple user data');
+                    
+                    // Check if this Apple user specifically has data
+                    loadUserDataEnhanced(appleUser.uid).then(hasData => {
+                        if (hasData) {
+                            console.log('➡️ Routing to main dashboard (existing Apple user)');
+                            handleSuccessfulLogin(appleUser);
+                        } else {
+                            console.log('➡️ Routing to setup flow (new Apple user)');
+                            handleNewUserSignup(appleUser);
+                        }
+                    }).catch(error => {
+                        console.error('❌ Error loading Apple user data:', error);
+                        handleNewUserSignup(appleUser);
+                    });
                 }
             }).catch(error => {
-                console.error('❌ Error loading Apple user data:', error);
-                console.log('🔄 Defaulting to setup flow for safety');
+                console.error('❌ Error checking for existing account:', error);
+                // Fallback to normal flow
                 handleNewUserSignup(appleUser);
             });
             
