@@ -4831,7 +4831,23 @@ function handleAppleSignInRedirect() {
             };
             
             window.currentUser = appleUser;
-            handleSuccessfulLogin(appleUser);
+            
+            // Check if this is a new user based on data, same as Google Sign In
+            loadUserDataEnhanced(appleUser.uid).then(hasData => {
+                console.log(`🔍 Apple Sign In Route Check: hasData = ${hasData}`);
+                
+                if (hasData) {
+                    console.log('➡️ Routing to main dashboard (existing Apple user)');
+                    handleSuccessfulLogin(appleUser);
+                } else {
+                    console.log('➡️ Routing to setup flow (new Apple user)');
+                    handleNewUserSignup(appleUser);
+                }
+            }).catch(error => {
+                console.error('❌ Error loading Apple user data:', error);
+                console.log('🔄 Defaulting to setup flow for safety');
+                handleNewUserSignup(appleUser);
+            });
             
             // Clean up URL parameters
             window.history.replaceState({}, document.title, window.location.pathname);
