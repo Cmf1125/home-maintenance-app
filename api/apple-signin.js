@@ -10,7 +10,13 @@ export default async function handler(req, res) {
         // Get Apple's POST data
         const { code, state, error, id_token, user } = req.body;
         
-        console.log('Apple Sign In callback received:', { code, state, error, user });
+        console.log('Apple Sign In callback received:', { 
+            code: code ? 'present' : 'missing', 
+            state, 
+            error, 
+            user: user || 'no user data',
+            fullBody: req.body 
+        });
         
         // Handle error case
         if (error) {

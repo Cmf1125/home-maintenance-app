@@ -4825,10 +4825,16 @@ function handleAppleSignInRedirect() {
             const appleUser = {
                 uid: 'apple-' + Date.now(),
                 email: userInfo.email || 'apple-user@homekeeper.app',
-                displayName: userInfo.name ? `${userInfo.name.firstName || ''} ${userInfo.name.lastName || ''}`.trim() : 'Apple User',
+                displayName: userInfo.name ? `${userInfo.name.firstName || ''} ${userInfo.name.lastName || ''}`.trim() : null,
                 isAppleUser: true,
                 authorizationCode: code
             };
+            
+            // If no name provided, we'll ask during setup
+            if (!appleUser.displayName) {
+                appleUser.displayName = 'Apple User'; // Temporary name
+                appleUser.needsName = true; // Flag to ask for name during setup
+            }
             
             window.currentUser = appleUser;
             
