@@ -4826,41 +4826,50 @@ auth.onAuthStateChanged((user) => {
 // Check if an account with this email already exists (for account linking)
 async function checkForExistingAccountByEmail(email) {
     try {
-        console.log(`🔍 Checking for existing account with email: ${email}`);
+        console.log(`🔍 Checking Firebase for existing account with email: ${email}`);
         
         if (!email || email.includes('homekeeper.app') || email.includes('example.com')) {
             // Skip check for placeholder emails
+            console.log('🔍 Skipping placeholder email');
             return null;
         }
         
-        // Search for existing user data by email in Firebase
-        // This is a simplified approach - we'll check localStorage and Firebase
+        // Query Firebase for any user document that contains this email
+        const usersCollection = db.collection('users');
         
-        // First check localStorage for email-based data
-        const storedUserEmail = localStorage.getItem('userEmail');
-        if (storedUserEmail === email) {
-            console.log('🔍 Found matching email in localStorage');
+        // We need to search through all user documents to find one with this email
+        // Since Firebase doesn't allow querying by email directly, we'll check common patterns
+        
+        console.log('🔍 Searching Firebase users collection...');
+        
+        // Try to find user by email in their profile data
+        const querySnapshot = await usersCollection.get();
+        
+        for (const doc of querySnapshot.docs) {
+            const userData = doc.data();
             
-            // Try to load data for this email
-            const homeDataStr = localStorage.getItem('homeData');
-            const tasksStr = localStorage.getItem('tasks');
-            
-            if (homeDataStr || tasksStr) {
+            // Check if this user document contains the email we're looking for
+            if (userData.email === email || 
+                userData.userEmail === email ||
+                (userData.homeData && userData.homeData.email === email)) {
+                
+                console.log(`🔗 Found existing account! User ID: ${doc.id}`);
+                
+                // Return the existing user's data
                 return {
-                    homeData: homeDataStr ? JSON.parse(homeDataStr) : null,
-                    tasks: tasksStr ? JSON.parse(tasksStr) : []
+                    userId: doc.id,
+                    homeData: userData.homeData || null,
+                    tasks: userData.tasks || [],
+                    email: email
                 };
             }
         }
         
-        // TODO: Add Firebase query to search for accounts by email
-        // For now, we'll use localStorage approach
-        
-        console.log('🔍 No existing account found for this email');
+        console.log('🔍 No existing Firebase account found for this email');
         return null;
         
     } catch (error) {
-        console.error('❌ Error checking for existing account:', error);
+        console.error('❌ Error checking Firebase for existing account:', error);
         return null;
     }
 }
