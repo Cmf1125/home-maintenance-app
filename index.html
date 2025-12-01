@@ -4799,22 +4799,33 @@ auth.onAuthStateChanged((user) => {
 // Handle Apple Sign In redirect on page load
 function handleAppleSignInRedirect() {
     const urlParams = new URLSearchParams(window.location.search);
+    const appleSuccess = urlParams.get('apple_success');
+    const appleError = urlParams.get('apple_error');
     const code = urlParams.get('code');
-    const state = urlParams.get('state');
-    const error = urlParams.get('error');
+    const userParam = urlParams.get('user');
     
-    if (state === 'apple_signin') {
-        if (error) {
-            console.error('🍎 Apple Sign-In redirect error:', error);
-            alert('Apple Sign-In failed: ' + error);
+    if (appleSuccess || appleError) {
+        if (appleError) {
+            console.error('🍎 Apple Sign-In error:', appleError);
+            alert('Apple Sign-In failed: ' + appleError);
         } else if (code) {
-            console.log('🍎 Apple Sign-In redirect success with code:', code);
+            console.log('🍎 Apple Sign-In success with code:', code);
+            
+            // Parse user info if provided
+            let userInfo = {};
+            if (userParam) {
+                try {
+                    userInfo = JSON.parse(decodeURIComponent(userParam));
+                } catch (e) {
+                    console.warn('Could not parse user info:', e);
+                }
+            }
             
             // Create user object from redirect
             const appleUser = {
                 uid: 'apple-' + Date.now(),
-                email: 'apple-user@homekeeper.app', // We don't get email in redirect flow
-                displayName: 'Apple User',
+                email: userInfo.email || 'apple-user@homekeeper.app',
+                displayName: userInfo.name ? `${userInfo.name.firstName || ''} ${userInfo.name.lastName || ''}`.trim() : 'Apple User',
                 isAppleUser: true,
                 authorizationCode: code
             };
@@ -4898,7 +4909,7 @@ async function signInWithApple_Web() {
             AppleID.auth.init({
                 clientId: 'com.thehomekeeper.app.signin',
                 scope: 'name email',
-                redirectURI: 'https://thehomekeeper.com',
+                redirectURI: 'https://thehomekeeper.com/api/apple-signin',
                 state: 'apple_signin',
                 usePopup: false,
                 response_type: 'code',
