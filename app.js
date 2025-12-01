@@ -1577,6 +1577,18 @@ function goBackToHomeSetup() {
 // CLEAN SIMPLE VERSION: Complete task setup with smart due dates
 function finishTaskSetup() {
     console.log('🚀 Starting clean simple task setup completion...');
+    
+    // Update user's display name if provided during setup
+    const userNameInput = document.getElementById('user-name');
+    if (userNameInput && userNameInput.value.trim() && window.currentUser) {
+        const newName = userNameInput.value.trim();
+        console.log(`👤 Updating user display name to: ${newName}`);
+        window.currentUser.displayName = newName;
+        
+        // Store the updated name for future use
+        localStorage.setItem('userDisplayName', newName);
+    }
+    
     console.log(`📊 Processing ${tasks.length} tasks...`);
     
     let successCount = 0;
@@ -1686,6 +1698,16 @@ if (taskSetupEl) {
 
 document.getElementById('main-app').classList.remove('hidden');
 document.getElementById('header-subtitle').textContent = homeData.fullAddress;
+
+    // Update dashboard welcome message with user's name
+    const dashboardSubtitle = document.getElementById('dashboard-subtitle');
+    if (dashboardSubtitle && window.currentUser) {
+        const userName = window.currentUser.displayName ? 
+            `Welcome, ${window.currentUser.displayName.split(' ')[0]}` : 
+            'Welcome back';
+        dashboardSubtitle.textContent = `${userName} • ${homeData.fullAddress}`;
+        console.log(`👋 Updated dashboard welcome: ${userName}`);
+    }
 
     // Show bottom navigation
     document.body.classList.add('main-app-active');
