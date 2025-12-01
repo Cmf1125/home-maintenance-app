@@ -4859,7 +4859,7 @@ async function signInWithApple_Web() {
             AppleID.auth.init({
                 clientId: 'com.thehomekeeper.app.signin',
                 scope: 'name email',
-                redirectURI: 'https://thehomekeeper.com',
+                redirectURI: 'https://thehomekeeper.com/apple-signin-callback',
                 usePopup: false // Use redirect instead of popup for static sites
             });
             

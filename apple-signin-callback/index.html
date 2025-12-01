@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple Sign In Callback</title>
+</head>
+<body>
+    <script>
+        // Handle Apple Sign In callback
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        const error = urlParams.get('error');
+        
+        if (error) {
+            console.error('Apple Sign In error:', error);
+            // Redirect back to main page with error
+            window.location.href = '/?apple_error=' + encodeURIComponent(error);
+        } else if (code) {
+            console.log('Apple Sign In success with code:', code);
+            // Redirect back to main page with success
+            window.location.href = '/?apple_success=true&code=' + encodeURIComponent(code);
+        } else {
+            // No valid response, redirect back to main page
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
