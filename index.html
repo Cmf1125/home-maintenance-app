@@ -4735,6 +4735,11 @@ auth.getRedirectResult().then((result) => {
     }
 });
 
+// Check for Apple Sign In redirect on page load
+document.addEventListener('DOMContentLoaded', function() {
+    handleAppleSignInRedirect();
+});
+
 // Listen for authentication state changes
 let authProcessing = false;
 let lastAuthUser = null;
@@ -4790,6 +4795,40 @@ auth.onAuthStateChanged((user) => {
     // Reset the flag immediately after processing
     authProcessing = false;
 });
+
+// Handle Apple Sign In redirect on page load
+function handleAppleSignInRedirect() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+    const error = urlParams.get('error');
+    
+    if (state === 'apple_signin') {
+        if (error) {
+            console.error('🍎 Apple Sign-In redirect error:', error);
+            alert('Apple Sign-In failed: ' + error);
+        } else if (code) {
+            console.log('🍎 Apple Sign-In redirect success with code:', code);
+            
+            // Create user object from redirect
+            const appleUser = {
+                uid: 'apple-' + Date.now(),
+                email: 'apple-user@homekeeper.app', // We don't get email in redirect flow
+                displayName: 'Apple User',
+                isAppleUser: true,
+                authorizationCode: code
+            };
+            
+            window.currentUser = appleUser;
+            handleSuccessfulLogin(appleUser);
+            
+            // Clean up URL parameters
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        return true; // Handled redirect
+    }
+    return false; // Not a redirect
+}
 
 // Apple Sign-In Function (supports both iOS and web)
 async function signInWithApple() {
@@ -4855,12 +4894,15 @@ async function signInWithApple_Web() {
             document.removeEventListener('AppleIDSignInOnSuccess', window.appleSuccessHandler);
             document.removeEventListener('AppleIDSignInOnFailure', window.appleFailureHandler);
             
-            // Initialize Apple ID SDK for redirect flow (works with static sites)
+            // Initialize Apple ID SDK for redirect flow with response_mode=query
             AppleID.auth.init({
                 clientId: 'com.thehomekeeper.app.signin',
                 scope: 'name email',
-                redirectURI: 'https://thehomekeeper.com/apple-signin-callback',
-                usePopup: false // Use redirect instead of popup for static sites
+                redirectURI: 'https://thehomekeeper.com',
+                state: 'apple_signin',
+                usePopup: false,
+                response_type: 'code',
+                response_mode: 'query' // This forces GET instead of POST
             });
             
             // Create and store event handlers to prevent duplicates
