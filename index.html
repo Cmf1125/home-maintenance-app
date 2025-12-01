@@ -4855,18 +4855,12 @@ async function signInWithApple_Web() {
             document.removeEventListener('AppleIDSignInOnSuccess', window.appleSuccessHandler);
             document.removeEventListener('AppleIDSignInOnFailure', window.appleFailureHandler);
             
-            // Initialize Apple ID SDK (only once per page load)
-            if (!window.appleIDInitialized) {
-                AppleID.auth.init({
-                    clientId: 'com.thehomekeeper.app.signin', // Service ID for web
-                    scope: 'name email',
-                    redirectURI: 'https://thehomekeeper.com', // Must match exactly in Apple Console
-                    state: 'homekeeper-web-signin',
-                    nonce: 'homekeeper-' + Date.now() + '-' + Math.random(),
-                    usePopup: true // Use popup for better UX
-                });
-                window.appleIDInitialized = true;
-            }
+            // Initialize Apple ID SDK with minimal configuration
+            AppleID.auth.init({
+                clientId: 'com.thehomekeeper.app.signin',
+                scope: 'name email',
+                redirectURI: 'https://thehomekeeper.com'
+            });
             
             // Create and store event handlers to prevent duplicates
             window.appleSuccessHandler = async (event) => {
