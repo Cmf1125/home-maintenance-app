@@ -4853,7 +4853,7 @@ async function signInWithApple_Web() {
             
             // Initialize Apple ID SDK
             AppleID.auth.init({
-                clientId: 'com.thehomekeeper.app.web', // Service ID for web
+                clientId: 'com.thehomekeeper.app.signin', // Service ID for web
                 scope: 'name email',
                 redirectURI: 'https://thehomekeeper.com', // Must match exactly in Apple Console
                 state: 'homekeeper-web-signin',
