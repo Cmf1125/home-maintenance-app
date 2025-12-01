@@ -4964,7 +4964,9 @@ async function signInWithApple_Web() {
             document.addEventListener('AppleIDSignInOnFailure', window.appleFailureHandler);
             
             // Trigger Apple Sign-In
+            console.log('🍎 About to trigger AppleID.auth.signIn()...');
             AppleID.auth.signIn();
+            console.log('🍎 AppleID.auth.signIn() called successfully');
             
         } catch (error) {
             console.error('🍎 Apple Sign-In Web initialization error:', error);
