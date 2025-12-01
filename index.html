@@ -4851,18 +4851,25 @@ async function signInWithApple_Web() {
                 return;
             }
             
-            // Initialize Apple ID SDK
-            AppleID.auth.init({
-                clientId: 'com.thehomekeeper.app.signin', // Service ID for web
-                scope: 'name email',
-                redirectURI: 'https://home-maintenance-buavp9auj-christines-projects-e4966797.vercel.app', // Must match exactly in Apple Console
-                state: 'homekeeper-web-signin',
-                nonce: 'homekeeper-' + Date.now() + '-' + Math.random(),
-                usePopup: true // Use popup for better UX
-            });
+            // Clean up any existing event listeners to prevent duplicate flows
+            document.removeEventListener('AppleIDSignInOnSuccess', window.appleSuccessHandler);
+            document.removeEventListener('AppleIDSignInOnFailure', window.appleFailureHandler);
             
-            // Listen for success/error events
-            document.addEventListener('AppleIDSignInOnSuccess', async (event) => {
+            // Initialize Apple ID SDK (only once per page load)
+            if (!window.appleIDInitialized) {
+                AppleID.auth.init({
+                    clientId: 'com.thehomekeeper.app.signin', // Service ID for web
+                    scope: 'name email',
+                    redirectURI: 'https://thehomekeeper.com', // Must match exactly in Apple Console
+                    state: 'homekeeper-web-signin',
+                    nonce: 'homekeeper-' + Date.now() + '-' + Math.random(),
+                    usePopup: true // Use popup for better UX
+                });
+                window.appleIDInitialized = true;
+            }
+            
+            // Create and store event handlers to prevent duplicates
+            window.appleSuccessHandler = async (event) => {
                 console.log('🍎 Apple Sign-In Web success:', event.detail);
                 
                 const { authorization, user } = event.detail;
@@ -4945,12 +4952,16 @@ async function signInWithApple_Web() {
                     handleSuccessfulLogin(appleUser);
                     resolve(appleUser);
                 }
-            });
+            };
             
-            document.addEventListener('AppleIDSignInOnFailure', (event) => {
+            window.appleFailureHandler = (event) => {
                 console.error('🍎 Apple Sign-In Web error:', event.detail);
                 reject(new Error(event.detail.error || 'Apple Sign-In failed'));
-            });
+            };
+            
+            // Add event listeners
+            document.addEventListener('AppleIDSignInOnSuccess', window.appleSuccessHandler);
+            document.addEventListener('AppleIDSignInOnFailure', window.appleFailureHandler);
             
             // Trigger Apple Sign-In
             AppleID.auth.signIn();
