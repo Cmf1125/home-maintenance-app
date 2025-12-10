@@ -1,11 +1,27 @@
 {
   "appId": "com.thehomekeeper.app",
   "appName": "The Home Keeper", 
-  "webDir": "www",
-  "server": {
-    "url": "https://thehomekeeper.com"
-  },
+  "webDir": ".",
+  "bundledWebRuntime": false,
   "ios": {
-    "contentInset": "automatic"
+    "contentInset": "automatic",
+    "allowsLinkPreview": false,
+    "backgroundColor": "#ffffff",
+    "scheme": "The Home Keeper"
+  },
+  "plugins": {
+    "Camera": {
+      "permissions": ["camera", "photos"]
+    },
+    "LocalNotifications": {
+      "smallIcon": "icon-192",
+      "iconColor": "#007AFF",
+      "sound": "beep.wav"
+    },
+    "Haptics": {},
+    "Device": {},
+    "Filesystem": {
+      "iosDatabaseLocation": "Documents"
+    }
   }
 }

@@ -7,6 +7,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Native iOS Styles -->
+    <link rel="stylesheet" href="native-ios-styles.css">
+    
+    <!-- iOS PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Home Keeper">
+    <link rel="apple-touch-icon" href="icon-180.png">
+    
+    <!-- iOS Safe Area Support -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <style>
 * {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -46,6 +58,16 @@ body.setup-active #setup-form {
 }
 </style>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Capacitor Core -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@capacitor/core@8/dist/capacitor.js"></script>
+    
+    <!-- Capacitor iOS Bundle (only loads on iOS) -->
+    <script type="module">
+        if (window.Capacitor?.getPlatform() === 'ios') {
+            import('https://cdn.jsdelivr.net/npm/@capacitor/ios@8/dist/plugin.js');
+        }
+    </script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="calendar.css"> 
     <link rel="stylesheet" href="enhanced-styles.css">
@@ -5554,6 +5576,251 @@ if (window.Capacitor && window.Capacitor.getPlatform() === 'ios') {
         }
     }, 1000);
 }
+
+// Initialize Native iOS Features
+if (window.Capacitor && window.Capacitor.getPlatform() === 'ios') {
+    // Load native features module
+    import('./native-ios-features.js').then(module => {
+        const nativeFeatures = module.default;
+        
+        // Initialize native features
+        nativeFeatures.initialize().then(() => {
+            console.log('🍎 Native iOS features loaded successfully');
+            
+            // Add native behaviors to existing UI
+            enhanceTasksWithNativeFeatures();
+            
+        }).catch(error => {
+            console.error('❌ Failed to initialize native features:', error);
+        });
+    });
+}
+
+// Enhance existing task functionality with native iOS features
+function enhanceTasksWithNativeFeatures() {
+    if (!window.nativeFeatures) return;
+    
+    // Override task completion with haptic feedback
+    const originalCompleteTask = window.completeTask;
+    if (originalCompleteTask) {
+        window.completeTask = async function(taskId) {
+            await window.nativeFeatures.successHaptic();
+            originalCompleteTask(taskId);
+        };
+    }
+    
+    // Override task editing with haptic feedback
+    const originalEditTask = window.editTask;
+    if (originalEditTask) {
+        window.editTask = async function(taskId) {
+            await window.nativeFeatures.lightHaptic();
+            originalEditTask(taskId);
+        };
+    }
+    
+    // Add photo capture buttons to tasks
+    addPhotoCaptureButtons();
+    
+    // Add native notification scheduling
+    addNativeNotificationSupport();
+}
+
+// Add photo capture buttons to existing tasks
+function addPhotoCaptureButtons() {
+    const observer = new MutationObserver(() => {
+        const taskCards = document.querySelectorAll('.task-item, .task-card');
+        
+        taskCards.forEach(card => {
+            if (card.querySelector('.photo-capture-btn')) return; // Already has button
+            
+            const taskId = card.getAttribute('data-task-id') || 
+                          card.querySelector('[data-task-id]')?.getAttribute('data-task-id');
+            
+            if (taskId) {
+                const photoBtn = document.createElement('button');
+                photoBtn.className = 'photo-capture-btn';
+                photoBtn.innerHTML = '📸';
+                photoBtn.title = 'Document Progress';
+                photoBtn.onclick = async (e) => {
+                    e.stopPropagation();
+                    await captureTaskPhoto(taskId);
+                };
+                
+                // Find action area or create one
+                let actionArea = card.querySelector('.task-actions, .action-buttons');
+                if (!actionArea) {
+                    actionArea = document.createElement('div');
+                    actionArea.className = 'task-actions';
+                    card.appendChild(actionArea);
+                }
+                
+                actionArea.appendChild(photoBtn);
+                
+                // Add photo gallery if photos exist
+                const photos = window.nativeFeatures?.getTaskPhotos(taskId) || [];
+                if (photos.length > 0) {
+                    const gallery = document.createElement('div');
+                    gallery.innerHTML = window.nativeFeatures.createPhotoGallery(taskId);
+                    card.appendChild(gallery);
+                }
+            }
+        });
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Capture photo for task
+async function captureTaskPhoto(taskId) {
+    if (!window.nativeFeatures) return;
+    
+    // Show loading overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'photo-capture-overlay';
+    overlay.innerHTML = `
+        <h3>📸 Document Progress</h3>
+        <p>Take a photo to track your maintenance task progress</p>
+        <div class="ios-spinner"></div>
+    `;
+    document.body.appendChild(overlay);
+    
+    try {
+        const result = await window.nativeFeatures.captureTaskPhoto(taskId);
+        
+        if (result.success) {
+            // Store photo with task
+            window.nativeFeatures.storeTaskPhoto(taskId, result);
+            
+            // Show success message
+            showNativeAlert('📸 Photo Saved', 'Your progress photo has been saved successfully!');
+            
+            // Refresh task display
+            setTimeout(() => {
+                addPhotoCaptureButtons(); // Refresh photo galleries
+            }, 1000);
+        } else {
+            showNativeAlert('❌ Photo Failed', result.error || 'Unable to capture photo');
+        }
+    } catch (error) {
+        console.error('Photo capture error:', error);
+        showNativeAlert('❌ Camera Error', 'Unable to access camera');
+    } finally {
+        overlay.remove();
+    }
+}
+
+// Add native notification support to task scheduling
+function addNativeNotificationSupport() {
+    // Override task creation/editing to include notifications
+    const originalSaveTask = window.saveTask;
+    if (originalSaveTask) {
+        window.saveTask = async function(taskData) {
+            const result = originalSaveTask(taskData);
+            
+            // Schedule native notification if enabled
+            if (window.nativeFeatures && taskData.nextDue) {
+                try {
+                    await window.nativeFeatures.scheduleTaskReminder(taskData);
+                } catch (error) {
+                    console.error('Failed to schedule notification:', error);
+                }
+            }
+            
+            return result;
+        };
+    }
+}
+
+// Show native iOS-style alert
+function showNativeAlert(title, message, actions = [{ text: 'OK' }]) {
+    const alert = document.createElement('div');
+    alert.className = 'ios-alert';
+    
+    alert.innerHTML = `
+        <h3>${title}</h3>
+        <p>${message}</p>
+        <div class="ios-alert-actions">
+            ${actions.map((action, index) => `
+                <button class="ios-alert-action ${index === 0 ? 'primary' : ''}" 
+                        onclick="this.parentElement.parentElement.remove(); ${action.handler || ''}">
+                    ${action.text}
+                </button>
+            `).join('')}
+        </div>
+    `;
+    
+    document.body.appendChild(alert);
+    
+    // Add overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.3); z-index: 1000;
+    `;
+    overlay.onclick = () => {
+        alert.remove();
+        overlay.remove();
+    };
+    
+    document.body.insertBefore(overlay, alert);
+    
+    // Auto-remove after 5 seconds if no action
+    setTimeout(() => {
+        if (document.body.contains(alert)) {
+            alert.remove();
+            overlay.remove();
+        }
+    }, 5000);
+}
+
+// Add notification permission banner if needed
+function addNotificationBanner() {
+    if (!window.nativeFeatures || !('Notification' in window)) return;
+    
+    if (Notification.permission === 'default') {
+        const banner = document.createElement('div');
+        banner.className = 'notification-banner';
+        banner.innerHTML = `
+            <h4>🔔 Enable Reminders</h4>
+            <p>Get notified about upcoming maintenance tasks</p>
+            <button onclick="requestNotificationPermission(this.parentElement)">
+                Enable Notifications
+            </button>
+        `;
+        
+        // Insert after header
+        const header = document.querySelector('.header, h1');
+        if (header) {
+            header.parentNode.insertBefore(banner, header.nextSibling);
+        }
+    }
+}
+
+// Request notification permission
+async function requestNotificationPermission(banner) {
+    if (!window.nativeFeatures) return;
+    
+    const granted = await window.nativeFeatures.requestNotificationPermissions();
+    
+    if (granted) {
+        banner.innerHTML = `
+            <h4>✅ Notifications Enabled</h4>
+            <p>You'll receive reminders for your maintenance tasks</p>
+        `;
+        setTimeout(() => banner.remove(), 3000);
+    } else {
+        banner.innerHTML = `
+            <h4>❌ Notifications Disabled</h4>
+            <p>You can enable them later in Settings</p>
+        `;
+    }
+}
+
+// Initialize notification banner on page load
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(addNotificationBanner, 2000);
+});
+
 </script>
 
 </body>

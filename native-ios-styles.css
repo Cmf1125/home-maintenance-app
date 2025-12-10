@@ -1,0 +1,425 @@
+/* Native iOS Styles for Home Maintenance App */
+
+/* iOS-specific safe area handling */
+:root {
+    --safe-area-top: 0px;
+    --ios-blue: #007AFF;
+    --ios-gray: #F2F2F7;
+    --ios-border: #C6C6C8;
+    --ios-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* iOS momentum scrolling */
+* {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Native iOS button styling */
+.ios-button {
+    background: var(--ios-blue);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    color: white;
+    font-size: 17px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: var(--ios-shadow);
+}
+
+.ios-button:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+}
+
+.ios-button.secondary {
+    background: var(--ios-gray);
+    color: var(--ios-blue);
+}
+
+/* Photo capture button */
+.photo-capture-btn {
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    margin: 10px auto;
+}
+
+.photo-capture-btn:active {
+    transform: scale(0.9);
+}
+
+.photo-capture-btn:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Photo gallery styles */
+.photo-gallery {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 16px 0;
+    box-shadow: var(--ios-shadow);
+    border: 1px solid var(--ios-border);
+}
+
+.photo-gallery h4 {
+    margin: 0 0 12px 0;
+    color: #1C1C1E;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+}
+
+.photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.photo-item:active {
+    transform: scale(0.95);
+}
+
+.photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-date {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 9px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* Photo modal */
+.photo-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--safe-area-top) 20px 20px 20px;
+}
+
+.photo-modal-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+.photo-modal-content img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 12px;
+}
+
+.close-modal {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Task card enhancements */
+.task-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 8px 0;
+    box-shadow: var(--ios-shadow);
+    border: 1px solid var(--ios-border);
+    transition: all 0.3s ease;
+}
+
+.task-card:active {
+    transform: scale(0.98);
+}
+
+.task-card.completed {
+    background: #F0F9FF;
+    border-color: #BAE6FD;
+}
+
+.task-card .task-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.task-action-btn {
+    background: var(--ios-gray);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: var(--ios-blue);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 80px;
+}
+
+.task-action-btn:active {
+    transform: scale(0.95);
+    background: #E5E5EA;
+}
+
+.task-action-btn.primary {
+    background: var(--ios-blue);
+    color: white;
+}
+
+.task-action-btn.danger {
+    background: #FF3B30;
+    color: white;
+}
+
+/* Notification permission banner */
+.notification-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px;
+    border-radius: 12px;
+    margin: 16px 0;
+    text-align: center;
+}
+
+.notification-banner h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.notification-banner p {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.notification-banner button {
+    background: white;
+    color: #667eea;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Tablet-specific layouts */
+.tablet-layout .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.tablet-layout .photo-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+
+.tablet-layout .task-actions {
+    justify-content: flex-end;
+}
+
+.tablet-layout .task-action-btn {
+    flex: 0 0 auto;
+    min-width: 100px;
+}
+
+/* Dynamic Island device enhancements */
+.dynamic-island-device .header {
+    padding-top: calc(var(--safe-area-top) + 20px);
+}
+
+/* iOS-style alerts and modals */
+.ios-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 280px;
+    text-align: center;
+    z-index: 1001;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.ios-alert h3 {
+    margin: 0 0 12px 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: #1C1C1E;
+}
+
+.ios-alert p {
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    color: #3C3C43;
+    line-height: 1.4;
+}
+
+.ios-alert-actions {
+    display: flex;
+    border-top: 1px solid #C6C6C8;
+    margin: 0 -24px -24px -24px;
+}
+
+.ios-alert-action {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 12px;
+    font-size: 17px;
+    color: var(--ios-blue);
+    font-weight: 400;
+    border-right: 1px solid #C6C6C8;
+}
+
+.ios-alert-action:last-child {
+    border-right: none;
+}
+
+.ios-alert-action.primary {
+    font-weight: 600;
+}
+
+.ios-alert-action:active {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* iOS-style loading spinner */
+.ios-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #C6C6C8;
+    border-top: 2px solid var(--ios-blue);
+    border-radius: 50%;
+    animation: ios-spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes ios-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Photo capture overlay */
+.photo-capture-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    color: white;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.photo-capture-overlay h3 {
+    margin: 0 0 16px 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.photo-capture-overlay p {
+    margin: 0 0 32px 0;
+    font-size: 16px;
+    opacity: 0.8;
+    max-width: 300px;
+}
+
+/* Success animations */
+@keyframes success-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.success-animation {
+    animation: success-pulse 0.3s ease;
+}
+
+/* iOS-style segmented control for task filters */
+.ios-segmented-control {
+    display: flex;
+    background: var(--ios-gray);
+    border-radius: 8px;
+    padding: 2px;
+    margin: 16px 0;
+}
+
+.ios-segment {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #3C3C43;
+    transition: all 0.2s ease;
+}
+
+.ios-segment.active {
+    background: white;
+    color: #1C1C1E;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ios-segment:active {
+    transform: scale(0.98);
+}
