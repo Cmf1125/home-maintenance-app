@@ -7,6 +7,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Native iOS Styles -->
+    <link rel="stylesheet" href="native-ios-styles.css">
+    
+    <!-- iOS PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Home Keeper">
+    <link rel="apple-touch-icon" href="icon-180.png">
+    
+    <!-- iOS Safe Area Support -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <style>
 * {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -46,6 +58,16 @@ body.setup-active #setup-form {
 }
 </style>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Capacitor Core -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@capacitor/core@8/dist/capacitor.js"></script>
+    
+    <!-- Capacitor iOS Bundle (only loads on iOS) -->
+    <script type="module">
+        if (window.Capacitor?.getPlatform() === 'ios') {
+            import('https://cdn.jsdelivr.net/npm/@capacitor/ios@8/dist/plugin.js');
+        }
+    </script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="calendar.css"> 
     <link rel="stylesheet" href="enhanced-styles.css">
@@ -441,6 +463,14 @@ function showMainApp() {
                 <p class="text-gray-600 mb-2">We'll create a simple maintenance plan just for you</p>
                 <p class="text-sm text-blue-700 font-medium">💡 Don't worry - you can change these details anytime later!</p>
             </div>
+            
+     <!-- Name Field (for Apple users without name) -->
+        <div id="name-field" class="hidden mb-6">
+         <label class="block text-sm font-medium text-gray-700 mb-2">What should we call you?</label>
+        <input type="text" id="user-name" placeholder="Your first name" 
+            class="w-full px-4 py-4 bg-white/90 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm text-gray-900 placeholder-gray-500">
+        </div>
+            
      <!-- Address -->
         <div>
          <label class="block text-sm font-medium text-gray-700 mb-2 mt-2 mt-2">Street Address</label>
@@ -4480,6 +4510,12 @@ window.signOutUser = signOutUser;   // <-- make it callable from HTML
 function handleSuccessfulLogin(user) {
     console.log('🏠 User logged in, loading data first...');
     
+    // Store user email for account linking
+    if (user.email && !user.email.includes('homekeeper.app')) {
+        localStorage.setItem('userEmail', user.email);
+        console.log('💾 Stored user email for account linking:', user.email);
+    }
+    
     // Hide login screen immediately
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('setup-form').classList.add('hidden');
@@ -4693,8 +4729,21 @@ function handleNewUserSignup(user) {
     // Store user info globally and pre-populate name if available
     window.currentUser = user;
     
-    // If user has a name from Google/profile, show welcome message
-    if (user.displayName) {
+    // Store user email for account linking  
+    if (user.email && !user.email.includes('homekeeper.app')) {
+        localStorage.setItem('userEmail', user.email);
+        console.log('💾 Stored user email for account linking:', user.email);
+    }
+    
+    // Check if we need to show name field for Apple users
+    if (!user.displayName || user.displayName === 'Apple User' || user.needsName) {
+        console.log('👤 Showing name field for user without proper name');
+        const nameField = document.getElementById('name-field');
+        if (nameField) {
+            nameField.classList.remove('hidden');
+        }
+    } else {
+        // User has a name from Google/profile, show welcome message
         console.log(`👋 Setting welcome message for ${user.displayName.split(' ')[0]}`);
         const setupTitle = document.querySelector('#setup-form h2');
         if (setupTitle) {
@@ -4733,6 +4782,11 @@ auth.getRedirectResult().then((result) => {
     if (error.code !== 'auth/no-redirect-pending') {
         alert('Redirect error: ' + error.message);
     }
+});
+
+// Check for Apple Sign In redirect on page load
+document.addEventListener('DOMContentLoaded', function() {
+    handleAppleSignInRedirect();
 });
 
 // Listen for authentication state changes
@@ -4790,6 +4844,142 @@ auth.onAuthStateChanged((user) => {
     // Reset the flag immediately after processing
     authProcessing = false;
 });
+
+// Check if an account with this email already exists (for account linking)
+async function checkForExistingAccountByEmail(email) {
+    try {
+        console.log(`🔍 Checking Firebase for existing account with email: ${email}`);
+        
+        if (!email || email.includes('homekeeper.app') || email.includes('example.com')) {
+            // Skip check for placeholder emails
+            console.log('🔍 Skipping placeholder email');
+            return null;
+        }
+        
+        // Query Firebase for any user document that contains this email
+        const usersCollection = db.collection('users');
+        
+        // We need to search through all user documents to find one with this email
+        // Since Firebase doesn't allow querying by email directly, we'll check common patterns
+        
+        console.log('🔍 Searching Firebase users collection...');
+        
+        // Try to find user by email in their profile data
+        const querySnapshot = await usersCollection.get();
+        
+        for (const doc of querySnapshot.docs) {
+            const userData = doc.data();
+            
+            // Check if this user document contains the email we're looking for
+            if (userData.email === email || 
+                userData.userEmail === email ||
+                (userData.homeData && userData.homeData.email === email)) {
+                
+                console.log(`🔗 Found existing account! User ID: ${doc.id}`);
+                
+                // Return the existing user's data
+                return {
+                    userId: doc.id,
+                    homeData: userData.homeData || null,
+                    tasks: userData.tasks || [],
+                    email: email
+                };
+            }
+        }
+        
+        console.log('🔍 No existing Firebase account found for this email');
+        return null;
+        
+    } catch (error) {
+        console.error('❌ Error checking Firebase for existing account:', error);
+        return null;
+    }
+}
+
+// Handle Apple Sign In redirect on page load
+function handleAppleSignInRedirect() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const appleSuccess = urlParams.get('apple_success');
+    const appleError = urlParams.get('apple_error');
+    const code = urlParams.get('code');
+    const userParam = urlParams.get('user');
+    
+    if (appleSuccess || appleError) {
+        if (appleError) {
+            console.error('🍎 Apple Sign-In error:', appleError);
+            alert('Apple Sign-In failed: ' + appleError);
+        } else if (code) {
+            console.log('🍎 Apple Sign-In success with code:', code);
+            
+            // Parse user info if provided
+            let userInfo = {};
+            if (userParam) {
+                try {
+                    userInfo = JSON.parse(decodeURIComponent(userParam));
+                } catch (e) {
+                    console.warn('Could not parse user info:', e);
+                }
+            }
+            
+            // Create user object from redirect
+            const appleUser = {
+                uid: 'apple-' + Date.now(),
+                email: userInfo.email || 'apple-user@homekeeper.app',
+                displayName: userInfo.name ? `${userInfo.name.firstName || ''} ${userInfo.name.lastName || ''}`.trim() : null,
+                isAppleUser: true,
+                authorizationCode: code
+            };
+            
+            // If no name provided, we'll ask during setup
+            if (!appleUser.displayName) {
+                appleUser.displayName = 'Apple User'; // Temporary name
+                appleUser.needsName = true; // Flag to ask for name during setup
+            }
+            
+            window.currentUser = appleUser;
+            
+            // Check if this email already has data (account linking)
+            checkForExistingAccountByEmail(appleUser.email).then(existingData => {
+                if (existingData) {
+                    console.log('🔗 Found existing account with same email - linking accounts');
+                    
+                    // Use existing user data but update with Apple info
+                    window.currentUser = appleUser;
+                    window.homeData = existingData.homeData;
+                    window.tasks = existingData.tasks || [];
+                    
+                    console.log('➡️ Routing to main dashboard (linked Apple account)');
+                    handleSuccessfulLogin(appleUser);
+                } else {
+                    console.log('🔍 No existing account found - checking Apple user data');
+                    
+                    // Check if this Apple user specifically has data
+                    loadUserDataEnhanced(appleUser.uid).then(hasData => {
+                        if (hasData) {
+                            console.log('➡️ Routing to main dashboard (existing Apple user)');
+                            handleSuccessfulLogin(appleUser);
+                        } else {
+                            console.log('➡️ Routing to setup flow (new Apple user)');
+                            handleNewUserSignup(appleUser);
+                        }
+                    }).catch(error => {
+                        console.error('❌ Error loading Apple user data:', error);
+                        handleNewUserSignup(appleUser);
+                    });
+                }
+            }).catch(error => {
+                console.error('❌ Error checking for existing account:', error);
+                // Fallback to normal flow
+                handleNewUserSignup(appleUser);
+            });
+            
+            // Clean up URL parameters
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        return true; // Handled redirect
+    }
+    return false; // Not a redirect
+}
 
 // Apple Sign-In Function (supports both iOS and web)
 async function signInWithApple() {
@@ -4851,47 +5041,120 @@ async function signInWithApple_Web() {
                 return;
             }
             
-            // Initialize Apple ID SDK
+            // Clean up any existing event listeners to prevent duplicate flows
+            document.removeEventListener('AppleIDSignInOnSuccess', window.appleSuccessHandler);
+            document.removeEventListener('AppleIDSignInOnFailure', window.appleFailureHandler);
+            
+            // Initialize Apple ID SDK for redirect flow with response_mode=query
             AppleID.auth.init({
-                clientId: 'com.thehomekeeper.app.web', // Service ID for web
+                clientId: 'com.thehomekeeper.app.signin',
                 scope: 'name email',
-                redirectURI: 'https://thehomekeeper.com', // Must match exactly in Apple Console
-                state: 'homekeeper-web-signin',
-                nonce: 'homekeeper-' + Date.now() + '-' + Math.random(),
-                usePopup: true // Use popup for better UX
+                redirectURI: 'https://www.thehomekeeper.com/api/apple-signin',
+                state: 'apple_signin',
+                usePopup: false,
+                response_type: 'code',
+                response_mode: 'query' // This forces GET instead of POST
             });
             
-            // Listen for success/error events
-            document.addEventListener('AppleIDSignInOnSuccess', (event) => {
+            // Create and store event handlers to prevent duplicates
+            window.appleSuccessHandler = async (event) => {
                 console.log('🍎 Apple Sign-In Web success:', event.detail);
                 
                 const { authorization, user } = event.detail;
+                const userEmail = user?.email;
                 
-                // Create user object consistent with iOS flow
-                const appleUser = {
-                    uid: `apple-${user?.id || authorization.user}`,
-                    email: user?.email || 'private@example.com',
-                    displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
-                    isAppleUser: true,
-                    authorizationCode: authorization.code,
-                    identityToken: authorization.id_token
-                };
+                // Handle private email (Hide My Email) option
+                if (!userEmail || userEmail.includes('privaterelay.appleid.com') || userEmail === 'private@example.com') {
+                    console.log('🍎 Apple user using private email relay');
+                    const appleUser = {
+                        uid: `apple-${authorization.user || Date.now()}`,
+                        email: userEmail || `apple-${Date.now()}@privaterelay.appleid.com`,
+                        displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
+                        isAppleUser: true,
+                        authorizationCode: authorization.code,
+                        identityToken: authorization.id_token
+                    };
+                    window.currentUser = appleUser;
+                    handleSuccessfulLogin(appleUser);
+                    resolve(appleUser);
+                    return;
+                }
                 
-                // Set global user
-                window.currentUser = appleUser;
+                console.log('🍎 Apple Sign-In with public email:', userEmail);
                 
-                // Use existing successful login handler
-                handleSuccessfulLogin(appleUser);
-                resolve(appleUser);
-            });
+                // Check for existing accounts with same email
+                try {
+                    const existingMethods = await auth.fetchSignInMethodsForEmail(userEmail);
+                    console.log('🔍 Checking existing sign-in methods for', userEmail, ':', existingMethods);
+                    
+                    if (existingMethods && existingMethods.length > 0) {
+                        // Email exists - handle account linking gracefully
+                        console.log('⚠️ Email already exists with other sign-in method');
+                        
+                        // Create Apple user but mark for account linking
+                        const appleUser = {
+                            uid: `apple-${authorization.user || Date.now()}`,
+                            email: userEmail,
+                            displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
+                            isAppleUser: true,
+                            needsLinking: true,
+                            existingMethods: existingMethods,
+                            authorizationCode: authorization.code,
+                            identityToken: authorization.id_token
+                        };
+                        
+                        // Sign in successfully and let app handle linking
+                        window.currentUser = appleUser;
+                        handleSuccessfulLogin(appleUser);
+                        resolve(appleUser);
+                        return;
+                    }
+                    
+                    // Email is available - create new Apple account
+                    const appleUser = {
+                        uid: `apple-${authorization.user || Date.now()}`,
+                        email: userEmail,
+                        displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
+                        isAppleUser: true,
+                        authorizationCode: authorization.code,
+                        identityToken: authorization.id_token
+                    };
+                    
+                    console.log('✅ Creating new Apple account');
+                    window.currentUser = appleUser;
+                    handleSuccessfulLogin(appleUser);
+                    resolve(appleUser);
+                    
+                } catch (error) {
+                    console.error('❌ Error checking email methods:', error);
+                    // Proceed with sign-in on error
+                    const appleUser = {
+                        uid: `apple-${authorization.user || Date.now()}`,
+                        email: userEmail,
+                        displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
+                        isAppleUser: true,
+                        authorizationCode: authorization.code,
+                        identityToken: authorization.id_token
+                    };
+                    window.currentUser = appleUser;
+                    handleSuccessfulLogin(appleUser);
+                    resolve(appleUser);
+                }
+            };
             
-            document.addEventListener('AppleIDSignInOnFailure', (event) => {
+            window.appleFailureHandler = (event) => {
                 console.error('🍎 Apple Sign-In Web error:', event.detail);
                 reject(new Error(event.detail.error || 'Apple Sign-In failed'));
-            });
+            };
+            
+            // Add event listeners
+            document.addEventListener('AppleIDSignInOnSuccess', window.appleSuccessHandler);
+            document.addEventListener('AppleIDSignInOnFailure', window.appleFailureHandler);
             
             // Trigger Apple Sign-In
+            console.log('🍎 About to trigger AppleID.auth.signIn()...');
             AppleID.auth.signIn();
+            console.log('🍎 AppleID.auth.signIn() called successfully');
             
         } catch (error) {
             console.error('🍎 Apple Sign-In Web initialization error:', error);
@@ -5313,6 +5576,251 @@ if (window.Capacitor && window.Capacitor.getPlatform() === 'ios') {
         }
     }, 1000);
 }
+
+// Initialize Native iOS Features
+if (window.Capacitor && window.Capacitor.getPlatform() === 'ios') {
+    // Load native features module
+    import('./native-ios-features.js').then(module => {
+        const nativeFeatures = module.default;
+        
+        // Initialize native features
+        nativeFeatures.initialize().then(() => {
+            console.log('🍎 Native iOS features loaded successfully');
+            
+            // Add native behaviors to existing UI
+            enhanceTasksWithNativeFeatures();
+            
+        }).catch(error => {
+            console.error('❌ Failed to initialize native features:', error);
+        });
+    });
+}
+
+// Enhance existing task functionality with native iOS features
+function enhanceTasksWithNativeFeatures() {
+    if (!window.nativeFeatures) return;
+    
+    // Override task completion with haptic feedback
+    const originalCompleteTask = window.completeTask;
+    if (originalCompleteTask) {
+        window.completeTask = async function(taskId) {
+            await window.nativeFeatures.successHaptic();
+            originalCompleteTask(taskId);
+        };
+    }
+    
+    // Override task editing with haptic feedback
+    const originalEditTask = window.editTask;
+    if (originalEditTask) {
+        window.editTask = async function(taskId) {
+            await window.nativeFeatures.lightHaptic();
+            originalEditTask(taskId);
+        };
+    }
+    
+    // Add photo capture buttons to tasks
+    addPhotoCaptureButtons();
+    
+    // Add native notification scheduling
+    addNativeNotificationSupport();
+}
+
+// Add photo capture buttons to existing tasks
+function addPhotoCaptureButtons() {
+    const observer = new MutationObserver(() => {
+        const taskCards = document.querySelectorAll('.task-item, .task-card');
+        
+        taskCards.forEach(card => {
+            if (card.querySelector('.photo-capture-btn')) return; // Already has button
+            
+            const taskId = card.getAttribute('data-task-id') || 
+                          card.querySelector('[data-task-id]')?.getAttribute('data-task-id');
+            
+            if (taskId) {
+                const photoBtn = document.createElement('button');
+                photoBtn.className = 'photo-capture-btn';
+                photoBtn.innerHTML = '📸';
+                photoBtn.title = 'Document Progress';
+                photoBtn.onclick = async (e) => {
+                    e.stopPropagation();
+                    await captureTaskPhoto(taskId);
+                };
+                
+                // Find action area or create one
+                let actionArea = card.querySelector('.task-actions, .action-buttons');
+                if (!actionArea) {
+                    actionArea = document.createElement('div');
+                    actionArea.className = 'task-actions';
+                    card.appendChild(actionArea);
+                }
+                
+                actionArea.appendChild(photoBtn);
+                
+                // Add photo gallery if photos exist
+                const photos = window.nativeFeatures?.getTaskPhotos(taskId) || [];
+                if (photos.length > 0) {
+                    const gallery = document.createElement('div');
+                    gallery.innerHTML = window.nativeFeatures.createPhotoGallery(taskId);
+                    card.appendChild(gallery);
+                }
+            }
+        });
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Capture photo for task
+async function captureTaskPhoto(taskId) {
+    if (!window.nativeFeatures) return;
+    
+    // Show loading overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'photo-capture-overlay';
+    overlay.innerHTML = `
+        <h3>📸 Document Progress</h3>
+        <p>Take a photo to track your maintenance task progress</p>
+        <div class="ios-spinner"></div>
+    `;
+    document.body.appendChild(overlay);
+    
+    try {
+        const result = await window.nativeFeatures.captureTaskPhoto(taskId);
+        
+        if (result.success) {
+            // Store photo with task
+            window.nativeFeatures.storeTaskPhoto(taskId, result);
+            
+            // Show success message
+            showNativeAlert('📸 Photo Saved', 'Your progress photo has been saved successfully!');
+            
+            // Refresh task display
+            setTimeout(() => {
+                addPhotoCaptureButtons(); // Refresh photo galleries
+            }, 1000);
+        } else {
+            showNativeAlert('❌ Photo Failed', result.error || 'Unable to capture photo');
+        }
+    } catch (error) {
+        console.error('Photo capture error:', error);
+        showNativeAlert('❌ Camera Error', 'Unable to access camera');
+    } finally {
+        overlay.remove();
+    }
+}
+
+// Add native notification support to task scheduling
+function addNativeNotificationSupport() {
+    // Override task creation/editing to include notifications
+    const originalSaveTask = window.saveTask;
+    if (originalSaveTask) {
+        window.saveTask = async function(taskData) {
+            const result = originalSaveTask(taskData);
+            
+            // Schedule native notification if enabled
+            if (window.nativeFeatures && taskData.nextDue) {
+                try {
+                    await window.nativeFeatures.scheduleTaskReminder(taskData);
+                } catch (error) {
+                    console.error('Failed to schedule notification:', error);
+                }
+            }
+            
+            return result;
+        };
+    }
+}
+
+// Show native iOS-style alert
+function showNativeAlert(title, message, actions = [{ text: 'OK' }]) {
+    const alert = document.createElement('div');
+    alert.className = 'ios-alert';
+    
+    alert.innerHTML = `
+        <h3>${title}</h3>
+        <p>${message}</p>
+        <div class="ios-alert-actions">
+            ${actions.map((action, index) => `
+                <button class="ios-alert-action ${index === 0 ? 'primary' : ''}" 
+                        onclick="this.parentElement.parentElement.remove(); ${action.handler || ''}">
+                    ${action.text}
+                </button>
+            `).join('')}
+        </div>
+    `;
+    
+    document.body.appendChild(alert);
+    
+    // Add overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.3); z-index: 1000;
+    `;
+    overlay.onclick = () => {
+        alert.remove();
+        overlay.remove();
+    };
+    
+    document.body.insertBefore(overlay, alert);
+    
+    // Auto-remove after 5 seconds if no action
+    setTimeout(() => {
+        if (document.body.contains(alert)) {
+            alert.remove();
+            overlay.remove();
+        }
+    }, 5000);
+}
+
+// Add notification permission banner if needed
+function addNotificationBanner() {
+    if (!window.nativeFeatures || !('Notification' in window)) return;
+    
+    if (Notification.permission === 'default') {
+        const banner = document.createElement('div');
+        banner.className = 'notification-banner';
+        banner.innerHTML = `
+            <h4>🔔 Enable Reminders</h4>
+            <p>Get notified about upcoming maintenance tasks</p>
+            <button onclick="requestNotificationPermission(this.parentElement)">
+                Enable Notifications
+            </button>
+        `;
+        
+        // Insert after header
+        const header = document.querySelector('.header, h1');
+        if (header) {
+            header.parentNode.insertBefore(banner, header.nextSibling);
+        }
+    }
+}
+
+// Request notification permission
+async function requestNotificationPermission(banner) {
+    if (!window.nativeFeatures) return;
+    
+    const granted = await window.nativeFeatures.requestNotificationPermissions();
+    
+    if (granted) {
+        banner.innerHTML = `
+            <h4>✅ Notifications Enabled</h4>
+            <p>You'll receive reminders for your maintenance tasks</p>
+        `;
+        setTimeout(() => banner.remove(), 3000);
+    } else {
+        banner.innerHTML = `
+            <h4>❌ Notifications Disabled</h4>
+            <p>You can enable them later in Settings</p>
+        `;
+    }
+}
+
+// Initialize notification banner on page load
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(addNotificationBanner, 2000);
+});
+
 </script>
 
 </body>

@@ -15,6 +15,13 @@
       "scale" : "3x"
     },
     {
+      "filename" : "AppIcon-76.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "size" : "76x76",
+      "scale" : "1x"
+    },
+    {
       "filename" : "AppIcon-152.png",
       "idiom" : "universal",
       "platform" : "ios",
