@@ -4399,31 +4399,14 @@ function signInWithGoogle() {
     
     // Use popup for all devices (the original working method)
     auth.signInWithPopup(provider)
-        .then((result) => {
+        .then(async (result) => {
             console.log('✅ Google sign in success:', result.user.email);
             
-            // Check if this is a new user based on data, not account creation
-            loadUserDataEnhanced(result.user.uid).then(hasData => {
-                console.log(`🔍 Google Sign In Route Check: hasData = ${hasData}`);
-                console.log(`🏠 homeData exists: ${!!window.homeData?.fullAddress}`);
-                console.log(`📋 tasks count: ${window.tasks?.length || 0}`);
-                
-                if (hasData) {
-                    console.log('➡️ Routing to main dashboard (existing user)');
-                    handleSuccessfulLogin(result.user);
-                } else {
-                    console.log('➡️ Routing to setup flow (new user)');
-                    handleNewUserSignup(result.user);
-                }
-                
-                // Clear the flag after routing is complete
-                window.googleSignInInProgress = false;
-            }).catch(error => {
-                console.error('❌ Error loading user data:', error);
-                console.log('🔄 Defaulting to setup flow for safety');
-                handleNewUserSignup(result.user);
-                window.googleSignInInProgress = false;
-            });
+            // Use enhanced account linking
+            await signInWithGoogleLinked(result);
+            
+            // Clear the flag after routing is complete
+            window.googleSignInInProgress = false;
         })
         .catch((error) => {
             console.error('❌ Google sign in error:', error);
@@ -4483,6 +4466,275 @@ function signOutUser() {
     });
 }    
 window.signOutUser = signOutUser;   // <-- make it callable from HTML
+
+// ===== ACCOUNT LINKING SYSTEM =====
+// Enhanced account linking between Apple Sign In and Google Sign In
+
+// Check if an email is already associated with an existing account
+async function checkExistingAccount(email) {
+    try {
+        // First check Firebase Auth methods
+        const methods = await auth.fetchSignInMethodsForEmail(email);
+        if (methods && methods.length > 0) {
+            console.log('🔍 Found existing auth methods for', email, ':', methods);
+            return { hasAuth: true, methods: methods };
+        }
+
+        // Check Firestore for any user with this email in their profile
+        const usersSnapshot = await db.collection('users')
+            .where('email', '==', email)
+            .limit(1)
+            .get();
+        
+        if (!usersSnapshot.empty) {
+            const existingUserDoc = usersSnapshot.docs[0];
+            console.log('🔍 Found existing user data for email:', email);
+            return { 
+                hasData: true, 
+                userId: existingUserDoc.id, 
+                userData: existingUserDoc.data() 
+            };
+        }
+
+        // Also check localStorage for stored email
+        const storedEmail = localStorage.getItem('userEmail');
+        if (storedEmail === email) {
+            console.log('🔍 Found matching email in localStorage');
+            return { hasLocalStorage: true };
+        }
+
+        return { hasAuth: false, hasData: false };
+    } catch (error) {
+        console.error('❌ Error checking existing account:', error);
+        return { hasAuth: false, hasData: false, error: error.message };
+    }
+}
+
+// Merge user data from existing account into current account
+async function linkAccountData(currentUserId, existingUserData, currentUserEmail) {
+    try {
+        console.log('🔗 Linking account data for', currentUserEmail);
+        
+        if (!existingUserData) {
+            console.log('ℹ️ No existing data to merge');
+            return true;
+        }
+
+        // Store link information for future reference
+        const linkInfo = {
+            linkedAt: firebase.firestore.Timestamp.now(),
+            linkedEmail: currentUserEmail,
+            originalUserId: existingUserData.userId || 'unknown',
+            linkType: 'account_merge'
+        };
+
+        // Merge the data into current user's document
+        const mergeData = {
+            ...existingUserData,
+            email: currentUserEmail,
+            linkedAccounts: linkInfo,
+            updatedAt: firebase.firestore.Timestamp.now()
+        };
+
+        // Remove sensitive fields that shouldn't be copied
+        delete mergeData.uid;
+        delete mergeData.userId;
+
+        await db.collection('users').doc(currentUserId).set(mergeData, { merge: true });
+        console.log('✅ Account data successfully linked and merged');
+
+        return true;
+    } catch (error) {
+        console.error('❌ Error linking account data:', error);
+        return false;
+    }
+}
+
+// Show account linking dialog to user
+function showAccountLinkingDialog(existingMethods, userEmail, onLink, onCancel) {
+    // Create modal dialog
+    const modalHtml = `
+        <div id="account-linking-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-2xl p-6 max-w-md mx-4 shadow-2xl">
+                <div class="text-center">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Account Found</h3>
+                    <p class="text-gray-600 mb-6">
+                        We found an existing account with <strong>${userEmail}</strong>. 
+                        Would you like to link your accounts so you can sign in with either method?
+                    </p>
+                    <div class="text-sm text-gray-500 mb-6">
+                        Existing sign-in methods: ${existingMethods.join(', ')}
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="handleAccountLinking(true)" 
+                                class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-colors">
+                            Link Accounts
+                        </button>
+                        <button onclick="handleAccountLinking(false)" 
+                                class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-xl hover:bg-gray-300 transition-colors">
+                            Continue Separately
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Add to page
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Set up handlers
+    window.handleAccountLinking = (shouldLink) => {
+        const modal = document.getElementById('account-linking-modal');
+        if (modal) modal.remove();
+        
+        if (shouldLink) {
+            onLink();
+        } else {
+            onCancel();
+        }
+        
+        // Clean up
+        delete window.handleAccountLinking;
+    };
+}
+
+// Enhanced Apple Sign In with account linking
+async function signInWithAppleLinked(authResult, userInfo) {
+    const userEmail = userInfo.email || `appleid${authResult.user || Date.now()}@homekeeper.app`;
+    
+    try {
+        // Check for existing accounts
+        const existingAccount = await checkExistingAccount(userEmail);
+        
+        const appleUser = {
+            uid: `apple-${authResult.user || Date.now()}`,
+            email: userEmail,
+            displayName: userInfo?.name ? 
+                `${userInfo.name.firstName || ''} ${userInfo.name.lastName || ''}`.trim() : 'Apple User',
+            isAppleUser: true,
+            authorizationCode: authResult.code,
+            identityToken: authResult.id_token,
+            providerId: 'apple.com'
+        };
+
+        window.currentUser = appleUser;
+
+        // If account exists, offer to link
+        if (existingAccount.hasAuth || existingAccount.hasData) {
+            console.log('🔗 Found existing account, offering to link');
+            
+            return new Promise((resolve) => {
+                showAccountLinkingDialog(
+                    existingAccount.methods || ['google.com'], 
+                    userEmail,
+                    async () => {
+                        // User chose to link
+                        console.log('✅ User chose to link accounts');
+                        
+                        if (existingAccount.userData) {
+                            await linkAccountData(appleUser.uid, existingAccount.userData, userEmail);
+                        }
+                        
+                        handleSuccessfulLogin(appleUser);
+                        resolve(appleUser);
+                    },
+                    () => {
+                        // User chose separate account
+                        console.log('➡️ User chose separate account');
+                        handleNewUserSignup(appleUser);
+                        resolve(appleUser);
+                    }
+                );
+            });
+        } else {
+            // No existing account found
+            console.log('🆕 No existing account found, checking Apple user data');
+            
+            const hasAppleData = await loadUserDataEnhanced(appleUser.uid);
+            if (hasAppleData) {
+                handleSuccessfulLogin(appleUser);
+            } else {
+                handleNewUserSignup(appleUser);
+            }
+            
+            return appleUser;
+        }
+    } catch (error) {
+        console.error('❌ Error in Apple Sign In linking:', error);
+        handleNewUserSignup(appleUser);
+        return appleUser;
+    }
+}
+
+// Enhanced Google Sign In with account linking  
+async function signInWithGoogleLinked(result) {
+    const user = result.user;
+    const userEmail = user.email;
+    
+    try {
+        // Check if this email was previously used with Apple Sign In
+        const existingAccount = await checkExistingAccount(userEmail);
+        
+        if (existingAccount.hasData && !existingAccount.hasAuth) {
+            console.log('🔗 Found existing Apple account data, offering to link');
+            
+            return new Promise((resolve) => {
+                showAccountLinkingDialog(
+                    ['apple.com'], 
+                    userEmail,
+                    async () => {
+                        // User chose to link - load existing data
+                        console.log('✅ User chose to link with existing Apple account');
+                        
+                        // Load the existing Apple user data into current session
+                        window.homeData = existingAccount.userData.homeData || {};
+                        window.tasks = existingAccount.userData.tasks || [];
+                        
+                        // Update the user document to reflect Google sign in
+                        await linkAccountData(user.uid, existingAccount.userData, userEmail);
+                        
+                        handleSuccessfulLogin(user);
+                        resolve(result);
+                    },
+                    () => {
+                        // User chose separate account - check normal Google data
+                        console.log('➡️ User chose separate Google account');
+                        loadUserDataEnhanced(user.uid).then(hasData => {
+                            if (hasData) {
+                                handleSuccessfulLogin(user);
+                            } else {
+                                handleNewUserSignup(user);
+                            }
+                            resolve(result);
+                        });
+                    }
+                );
+            });
+        } else {
+            // Normal Google sign in flow
+            const hasData = await loadUserDataEnhanced(user.uid);
+            if (hasData) {
+                handleSuccessfulLogin(user);
+            } else {
+                handleNewUserSignup(user);
+            }
+            return result;
+        }
+    } catch (error) {
+        console.error('❌ Error in Google Sign In linking:', error);
+        // Fallback to normal flow
+        const hasData = await loadUserDataEnhanced(user.uid);
+        if (hasData) {
+            handleSuccessfulLogin(user);
+        } else {
+            handleNewUserSignup(user);
+        }
+        return result;
+    }
+}
+
+// ===== END ACCOUNT LINKING SYSTEM =====
     
 // Handle successful login (existing user)
 function handleSuccessfulLogin(user) {
@@ -4740,18 +4992,8 @@ auth.getRedirectResult().then((result) => {
         console.log('✅ Google redirect sign in success:', result.user.email);
         alert('✅ Redirect sign in success! Email: ' + result.user.email);
         
-        // Handle the successful sign in (same logic as popup)
-        loadUserDataEnhanced(result.user.uid).then(hasData => {
-            console.log('📋 Has data:', hasData);
-            if (hasData) {
-                handleSuccessfulLogin(result.user);
-            } else {
-                handleNewUserSignup(result.user);
-            }
-        }).catch(error => {
-            console.error('❌ Error loading user data after redirect:', error);
-            handleNewUserSignup(result.user);
-        });
+        // Handle the successful sign in with account linking
+        signInWithGoogleLinked(result);
     } else {
         console.log('ℹ️ No user in redirect result');
     }
@@ -5039,84 +5281,14 @@ async function signInWithApple_Web() {
                 console.log('🍎 Apple Sign-In Web success:', event.detail);
                 
                 const { authorization, user } = event.detail;
-                const userEmail = user?.email;
                 
-                // Handle private email (Hide My Email) option
-                if (!userEmail || userEmail.includes('privaterelay.appleid.com') || userEmail === 'private@example.com') {
-                    console.log('🍎 Apple user using private email relay');
-                    const appleUser = {
-                        uid: `apple-${authorization.user || Date.now()}`,
-                        email: userEmail || `apple-${Date.now()}@privaterelay.appleid.com`,
-                        displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
-                        isAppleUser: true,
-                        authorizationCode: authorization.code,
-                        identityToken: authorization.id_token
-                    };
-                    window.currentUser = appleUser;
-                    handleSuccessfulLogin(appleUser);
-                    resolve(appleUser);
-                    return;
-                }
-                
-                console.log('🍎 Apple Sign-In with public email:', userEmail);
-                
-                // Check for existing accounts with same email
                 try {
-                    const existingMethods = await auth.fetchSignInMethodsForEmail(userEmail);
-                    console.log('🔍 Checking existing sign-in methods for', userEmail, ':', existingMethods);
-                    
-                    if (existingMethods && existingMethods.length > 0) {
-                        // Email exists - handle account linking gracefully
-                        console.log('⚠️ Email already exists with other sign-in method');
-                        
-                        // Create Apple user but mark for account linking
-                        const appleUser = {
-                            uid: `apple-${authorization.user || Date.now()}`,
-                            email: userEmail,
-                            displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
-                            isAppleUser: true,
-                            needsLinking: true,
-                            existingMethods: existingMethods,
-                            authorizationCode: authorization.code,
-                            identityToken: authorization.id_token
-                        };
-                        
-                        // Sign in successfully and let app handle linking
-                        window.currentUser = appleUser;
-                        handleSuccessfulLogin(appleUser);
-                        resolve(appleUser);
-                        return;
-                    }
-                    
-                    // Email is available - create new Apple account
-                    const appleUser = {
-                        uid: `apple-${authorization.user || Date.now()}`,
-                        email: userEmail,
-                        displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
-                        isAppleUser: true,
-                        authorizationCode: authorization.code,
-                        identityToken: authorization.id_token
-                    };
-                    
-                    console.log('✅ Creating new Apple account');
-                    window.currentUser = appleUser;
-                    handleSuccessfulLogin(appleUser);
+                    // Use enhanced account linking
+                    const appleUser = await signInWithAppleLinked(authorization, user);
                     resolve(appleUser);
-                    
                 } catch (error) {
-                    console.error('❌ Error checking email methods:', error);
-                    // Proceed with sign-in on error
-                    const appleUser = {
-                        uid: `apple-${authorization.user || Date.now()}`,
-                        email: userEmail,
-                        displayName: user?.name ? `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim() : 'Apple User',
-                        isAppleUser: true,
-                        authorizationCode: authorization.code,
-                        identityToken: authorization.id_token
-                    };
-                    window.currentUser = appleUser;
-                    handleSuccessfulLogin(appleUser);
-                    resolve(appleUser);
+                    console.error('❌ Error in Apple Sign-In linking:', error);
+                    reject(error);
                 }
             };
             
@@ -5530,14 +5702,8 @@ if (window.Capacitor && window.Capacitor.getPlatform() === 'ios') {
             const userCredential = await firebase.auth().signInWithCredential(credential);
             console.log('✅ Firebase sign-in success with native token');
             
-            // Handle successful login the same way as web
-            loadUserDataEnhanced(userCredential.user.uid).then(hasData => {
-                if (hasData) {
-                    handleSuccessfulLogin(userCredential.user);
-                } else {
-                    handleNewUserSignup(userCredential.user);
-                }
-            });
+            // Handle successful login with account linking
+            await signInWithGoogleLinked(userCredential);
             
         } catch (error) {
             console.error('❌ Native Google sign-in error:', error);
