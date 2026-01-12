@@ -182,7 +182,7 @@ function showMainApp() {
 </script>
 
 <!-- Native Login Screen -->
-<div id="login-screen" class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 min-h-screen relative overflow-hidden">
+<div id="login-screen" class="hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 min-h-screen relative overflow-hidden">
     <!-- Background decorative elements -->
     <div class="absolute inset-0">
         <div class="absolute top-0 left-0 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
@@ -246,6 +246,11 @@ function showMainApp() {
                                 </div>
                                 <h2 class="text-xl font-bold text-gray-900">Sign In</h2>
                                 <p class="text-gray-600 text-sm mt-1">Welcome back</p>
+                                <!-- Temporary: Clear old data button -->
+                                <button onclick="localStorage.clear(); alert('Old data cleared! Refresh the page.'); location.reload();"
+                                        class="mt-3 text-xs text-red-600 hover:text-red-800 underline">
+                                    Clear old data & refresh
+                                </button>
                             </div>
                         
                             <!-- Sign In Form -->
@@ -4459,7 +4464,14 @@ function signOutUser() {
         window.currentUser = null;
         window.homeData = {};
         window.tasks = [];
-        
+
+        // Clear ALL localStorage to remove old data
+        localStorage.removeItem('casaCareData');
+        localStorage.removeItem('user');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userDisplayName');
+        console.log('✅ LocalStorage cleared');
+
         // Show login screen and hide other screens
         document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('setup-form').classList.add('hidden');
