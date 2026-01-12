@@ -1,5 +1,6 @@
 // Robust Service Worker with automatic error recovery and cache management
-const CACHE_VERSION = `${Date.now()}-vendor-fix`; // Use timestamp for automatic versioning
+// Updated: 2026-01-12 - Force cache refresh for mobile fix
+const CACHE_VERSION = `${Date.now()}-mobile-fix`; // Use timestamp for automatic versioning
 const CACHE_NAME = `home-keeper-v${CACHE_VERSION}`;
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `dynamic-${CACHE_VERSION}`;
