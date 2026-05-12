@@ -21,18 +21,9 @@ body:has(#login-screen:not(.hidden)):not(.main-app-active) {
 }
 
 #login-screen:not(.hidden) {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    z-index: 9999 !important;
-    background: #f9fafb !important;
-    padding-top: 2rem !important; /* Override any centering */
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-    display: block !important; /* Override flex centering */
-    overflow-y: auto !important; /* Allow scrolling */
+    display: block !important;
+    min-height: 100vh;
+    overflow-y: auto;
 }
 
 /* Only override specific elements that might add top spacing */
