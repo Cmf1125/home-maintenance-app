@@ -59,6 +59,15 @@ body.setup-active #setup-form {
 </style>
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Capacitor Core -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@capacitor/core@8/dist/capacitor.js"></script>
+    
+    <!-- Capacitor iOS Bundle (only loads on iOS) -->
+    <script type="module">
+        if (window.Capacitor?.getPlatform() === 'ios') {
+            import('https://cdn.jsdelivr.net/npm/@capacitor/ios@8/dist/plugin.js');
+        }
+    </script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="calendar.css"> 
     <link rel="stylesheet" href="enhanced-styles.css">
@@ -336,7 +345,15 @@ function showMainApp() {
 
 
 
-<!-- App Header -->
+<!-- Simple Test Header -->
+<div id="test-header" style="position: fixed; top: 0; left: 0; width: 100%; height: 60px; background: red; z-index: 9999; display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px; height: 100%; color: white;">
+        <span>The Home Keeper</span>
+        <button onclick="alert('Settings clicked!')" style="background: white; color: black; padding: 10px;">Settings ⚙️</button>
+    </div>
+</div>
+
+<!-- Original Header (for debugging) -->
 <div id="app-header" style="position: fixed; top: 0; left: 0; width: 100%; background: white; border-bottom: 1px solid #e5e7eb; z-index: 9999; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: none;">
     <div class="px-4 py-4">
         <div class="flex items-center justify-between">
@@ -436,7 +453,7 @@ function showMainApp() {
 </div> <!-- Closes: login-screen -->
 
 <!-- Native Setup Form -->
-<div id="setup-form" class="hidden bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col" style="display: none;">
+<div id="setup-form" class="hidden bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col">
     <div class="flex-1 flex flex-col justify-start px-6 py-6">
         <div class="max-w-sm mx-auto w-full">
 <div class="space-y-6">
@@ -1024,7 +1041,7 @@ function showMainApp() {
 </div> <!-- This closes #setup-form -->
 
         <!-- Native Property Confirmation Page -->
-<div id="property-confirmation" class="hidden bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col" style="display: none;">
+<div id="property-confirmation" class="hidden bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col">
     <div class="flex-1 flex flex-col justify-center px-6 py-12">
         <div class="max-w-2xl mx-auto w-full">
             <!-- Header Section -->
@@ -1070,7 +1087,7 @@ function showMainApp() {
 </div>
 
 <!-- Native Task Setup Screen -->
-<div id="task-setup" class="hidden bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col" style="display: none;">
+<div id="task-setup" class="hidden bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col">
     <div class="flex-1 flex flex-col justify-center px-6 py-12">
         <div class="max-w-4xl mx-auto w-full">
             <!-- Header Section -->

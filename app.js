@@ -4137,9 +4137,7 @@ function showPropertyConfirmation() {
 
     // Show confirmation page
     document.getElementById('setup-form').style.display = 'none';
-    const propConf = document.getElementById('property-confirmation');
-    propConf.classList.remove('hidden');
-    propConf.style.display = 'flex';
+    document.getElementById('property-confirmation').classList.remove('hidden');
 }
 
 // ENHANCED: updateConfirmationSummary function with new categories
@@ -4311,9 +4309,7 @@ function proceedToTaskGeneration() {
     }
     
    // Hide confirmation page and setup form
-    const propConfEl = document.getElementById('property-confirmation');
-    propConfEl.classList.add('hidden');
-    propConfEl.style.display = 'none';
+    document.getElementById('property-confirmation').classList.add('hidden');
     document.getElementById('setup-form').style.display = 'none';
     
     // Show task setup
