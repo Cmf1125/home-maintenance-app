@@ -1,6 +1,16 @@
 /* Clean Layout CSS - Updated to Fix All Issues */
 
 /* ========================================
+   SCREEN VISIBILITY — prevent flex/hidden conflict on iOS
+   ID+class selector beats plain class, so this always wins
+   ======================================== */
+#setup-form.hidden,
+#property-confirmation.hidden,
+#task-setup.hidden {
+    display: none !important;
+}
+
+/* ========================================
    RESET AND BASE LAYOUT
    ======================================== */
 body {
