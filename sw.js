@@ -1,6 +1,6 @@
 // Robust Service Worker with automatic error recovery and cache management
-// Updated: 2026-01-12 - Force cache refresh for mobile fix
-const CACHE_VERSION = `${Date.now()}-mobile-fix`; // Use timestamp for automatic versioning
+// Updated: 2026-05-12 - Force cache refresh to fix setup form overlay on mobile
+const CACHE_VERSION = '2026-05-12-overlay-fix';
 const CACHE_NAME = `home-keeper-v${CACHE_VERSION}`;
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `dynamic-${CACHE_VERSION}`;
