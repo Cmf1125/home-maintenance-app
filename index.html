@@ -4512,15 +4512,28 @@ function showAccountLinkingDialog(existingMethods, userEmail, onLink, onCancel) 
 }
 
 // Enhanced Apple Sign In with account linking
+// Decode Apple's id_token JWT to get the stable 'sub' (user ID)
+// Apple only sends the 'user' field on first sign-in; the JWT sub is always present
+function getAppleSubFromToken(idToken) {
+    try {
+        const payload = JSON.parse(atob(idToken.split('.')[1]));
+        return payload.sub || null;
+    } catch (e) {
+        return null;
+    }
+}
+
 async function signInWithAppleLinked(authResult, userInfo) {
-    const userEmail = userInfo.email || `appleid${authResult.user || Date.now()}@homekeeper.app`;
-    
+    // Use JWT sub as the stable ID — works on every sign-in, not just the first
+    const stableAppleId = getAppleSubFromToken(authResult.id_token) || authResult.user;
+    const userEmail = userInfo?.email || `appleid${stableAppleId || Date.now()}@homekeeper.app`;
+
     try {
         // Check for existing accounts
         const existingAccount = await checkExistingAccount(userEmail);
-        
+
         const appleUser = {
-            uid: `apple-${authResult.user || Date.now()}`,
+            uid: `apple-${stableAppleId || Date.now()}`,
             email: userEmail,
             displayName: userInfo?.name ? 
                 `${userInfo.name.firstName || ''} ${userInfo.name.lastName || ''}`.trim() : 'Apple User',
