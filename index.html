@@ -80,9 +80,7 @@ body.setup-active #setup-form {
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <!-- Google API Client Library for Calendar API -->
 <script src="https://apis.google.com/js/api.js" async defer></script>
-<!-- Apple Sign In JS SDK -->
-<script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
-  
+
     <!-- PWA Configuration -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2563eb">
@@ -5056,111 +5054,30 @@ function handleAppleSignInRedirect() {
     return false; // Not a redirect
 }
 
-// Apple Sign-In Function (supports both iOS and web)
+// Apple Sign-In using Firebase's built-in OAuth provider
+// Uses a real Firebase UID — stable and consistent across every sign-in
 async function signInWithApple() {
     try {
-        
-        // Check if running on iOS/native app
-        if (window.Capacitor && window.Capacitor.getPlatform() !== 'web') {
-            return await signInWithApple_iOS();
+        const provider = new firebase.auth.OAuthProvider('apple.com');
+        provider.addScope('email');
+        provider.addScope('name');
+
+        const result = await firebase.auth().signInWithPopup(provider);
+        const user = result.user;
+        window.currentUser = user;
+
+        // Check for existing data and route accordingly
+        const hasData = await loadUserDataEnhanced(user.uid);
+        if (hasData) {
+            handleSuccessfulLogin(user);
         } else {
-            return await signInWithApple_Web();
+            handleNewUserSignup(user);
         }
-        
     } catch (error) {
-        console.error('🍎 Apple Sign-In error:', error);
-        if (error.message !== 'User canceled') {
-            alert('Apple Sign-In failed. Please try email/password login.');
-        }
+        if (error.code === 'auth/popup-closed-by-user') return;
+        console.error('Apple Sign-In error:', error);
+        alert('Apple Sign-In failed. Please try Google or email/password login.');
     }
-}
-
-// iOS Native Apple Sign-In
-async function signInWithApple_iOS() {
-    // Import the Apple Sign-In plugin
-    const { SignInWithApple } = await import('@capacitor-community/apple-sign-in');
-    
-    // Request Apple Sign-In
-    const result = await SignInWithApple.authorize({
-        requestedScopes: ['email', 'name']
-    });
-    
-    
-    // Create user object for Firebase (keeping your existing flow)
-    const appleUser = {
-        uid: `apple-${result.response.user}`,
-        email: result.response.email || 'private@example.com',
-        displayName: result.response.givenName && result.response.familyName 
-            ? `${result.response.givenName} ${result.response.familyName}` 
-            : 'Apple User',
-        isAppleUser: true
-    };
-    
-    // Set global user (same as your Google auth)
-    window.currentUser = appleUser;
-    
-    // Use your existing successful login handler
-    handleSuccessfulLogin(appleUser);
-}
-
-// Web Apple Sign-In using Apple JS SDK
-async function signInWithApple_Web() {
-    return new Promise((resolve, reject) => {
-        try {
-            // Wait for Apple SDK to load
-            if (!window.AppleID) {
-                alert('Apple Sign-In is loading. Please try again in a moment.');
-                reject(new Error('Apple SDK not loaded'));
-                return;
-            }
-            
-            // Clean up any existing event listeners to prevent duplicate flows
-            document.removeEventListener('AppleIDSignInOnSuccess', window.appleSuccessHandler);
-            document.removeEventListener('AppleIDSignInOnFailure', window.appleFailureHandler);
-            
-            // Initialize Apple ID SDK for redirect flow with response_mode=query
-            AppleID.auth.init({
-                clientId: 'com.thehomekeeper.app.signin',
-                scope: 'name email',
-                redirectURI: 'https://www.thehomekeeper.com/api/apple-signin',
-                state: 'apple_signin',
-                usePopup: false,
-                response_type: 'code',
-                response_mode: 'query' // This forces GET instead of POST
-            });
-            
-            // Create and store event handlers to prevent duplicates
-            window.appleSuccessHandler = async (event) => {
-                
-                const { authorization, user } = event.detail;
-                
-                try {
-                    // Use enhanced account linking
-                    const appleUser = await signInWithAppleLinked(authorization, user);
-                    resolve(appleUser);
-                } catch (error) {
-                    console.error('❌ Error in Apple Sign-In linking:', error);
-                    reject(error);
-                }
-            };
-            
-            window.appleFailureHandler = (event) => {
-                console.error('🍎 Apple Sign-In Web error:', event.detail);
-                reject(new Error(event.detail.error || 'Apple Sign-In failed'));
-            };
-            
-            // Add event listeners
-            document.addEventListener('AppleIDSignInOnSuccess', window.appleSuccessHandler);
-            document.addEventListener('AppleIDSignInOnFailure', window.appleFailureHandler);
-            
-            // Trigger Apple Sign-In
-            AppleID.auth.signIn();
-            
-        } catch (error) {
-            console.error('🍎 Apple Sign-In Web initialization error:', error);
-            reject(error);
-        }
-    });
 }
     
 </script>
