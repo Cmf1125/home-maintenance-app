@@ -13,7 +13,6 @@ class CasaCareDocuments {
             receipts: ['image/jpeg', 'image/png', 'application/pdf']
         };
         
-        console.log('📄 Documents Module: Initializing with enhanced UX...');
         this.init();
     }
     
@@ -21,14 +20,12 @@ class CasaCareDocuments {
         this.loadDocuments();
         this.bindEvents();
         this.render();
-        console.log('✅ Documents Module: Enhanced UX initialized');
     }
     
     // Load documents using direct global reference like appliances
     loadDocuments() {
         try {
             this.documents = Array.isArray(window.documentsData) ? window.documentsData : [];
-            console.log(`📄 Documents: Loaded ${this.documents.length} documents from global data`);
         } catch (error) {
             console.error('❌ Documents: Error loading documents:', error);
             this.documents = [];
@@ -38,7 +35,6 @@ class CasaCareDocuments {
     // Save documents using direct global reference like appliances
     saveDocuments() {
         try {
-            console.log('💾 Documents: Using integrated save to preserve all data...');
             
             // Update direct global reference like appliances
             window.documentsData = this.documents;
@@ -51,7 +47,6 @@ class CasaCareDocuments {
             // Use main save function to preserve ALL data
             if (typeof window.saveData === 'function') {
                 window.saveData();
-                console.log('✅ Documents: Saved using integrated system');
             } else {
                 console.error('❌ Main saveData function not available');
             }
@@ -345,7 +340,6 @@ class CasaCareDocuments {
             if (titleField) titleField.focus();
         }, 100);
         
-        console.log('📝 Document edit modal opened for:', doc.title);
     }
     
     // NEW: Populate edit modal with document data
@@ -403,7 +397,6 @@ class CasaCareDocuments {
             modal.style.display = 'none';
         }
         this.currentDocument = null;
-        console.log('✅ Document edit modal closed');
     }
     
     // NEW: Save document edits
@@ -438,7 +431,6 @@ class CasaCareDocuments {
         this.render();
         
         alert(`✅ Document "${title}" updated successfully!`);
-        console.log('✅ Document updated:', this.currentDocument);
     }
     
     // NEW: Confirm and delete document
@@ -467,7 +459,6 @@ class CasaCareDocuments {
             this.render();
             
             alert(`✅ Document "${docTitle}" deleted successfully!`);
-            console.log('🗑️ Document deleted:', docTitle);
         }
     }
     
@@ -747,7 +738,6 @@ class CasaCareDocuments {
             alert('❌ Unable to open file. Please check your popup blocker settings.');
         }
         
-        console.log('📎 File opened with mobile-friendly close:', doc.title);
     }
     
     // Enhanced render upload interface (keeping existing functionality)
@@ -1024,4 +1014,3 @@ window.openDocumentFile = function(documentId) {
     }
 };
 
-console.log('📄 Enhanced Documents Module: Loaded with improved UX - clickable cards, better modals, and integrated file access');

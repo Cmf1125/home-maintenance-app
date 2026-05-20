@@ -17,20 +17,17 @@ class ApplianceManager {
             { id: 'other', name: 'Other', icon: '🏠' }
         ];
         
-        console.log('⚙️ Appliance Manager: Initializing...');
         this.init();
     }
     
     init() {
         this.loadAppliances();
         this.bindEvents();
-        console.log('✅ Appliance Manager: Initialized');
     }
     
     loadAppliances() {
   // Data is loaded after login via loadAppliancesFromFirebase in index.html
   this.appliances = Array.isArray(window.applianceData) ? window.applianceData : [];
-  console.log(`⚙️ Appliances: Initialized with ${this.appliances.length} appliances`);
 }
     setAppliances(appliances) {
   this.appliances = Array.isArray(appliances) ? appliances : [];
@@ -39,7 +36,6 @@ class ApplianceManager {
 
 async saveAppliances() {
   try {
-    console.log('💾 Appliances: Using integrated save to preserve all data...');
     
     // FIXED: Update global reference first
     window.applianceData = this.appliances;
@@ -52,7 +48,6 @@ async saveAppliances() {
     // FIXED: Use main save function to preserve ALL data
     if (typeof window.saveData === 'function') {
       window.saveData();
-      console.log('✅ Appliances: Saved using integrated system');
     } else {
       console.error('❌ Main saveData function not available');
     }
@@ -391,7 +386,6 @@ handleAddFormPhotoUpload(event) {
         // Update preview
         this.updateAddFormPhotoPreview();
         
-        console.log('📸 Photo added to temp storage:', file.name);
     };
     
     reader.readAsDataURL(file);
@@ -432,7 +426,6 @@ removeAddFormPhoto(index) {
     if (window.tempAppliancePhotos && window.tempAppliancePhotos[index]) {
         window.tempAppliancePhotos.splice(index, 1);
         this.updateAddFormPhotoPreview();
-        console.log('🗑️ Photo removed from temp storage');
     }
 }
 
@@ -552,8 +545,6 @@ handleAddFormSubmit(event) {
     };
     
     // DEBUG: Log the created appliance object
-    console.log('🔧 Created appliance object:', newAppliance);
-    console.log('🔧 Location in object:', `"${newAppliance.location}"`);
     
     
     // Add to appliances array
@@ -590,7 +581,6 @@ if (askForTasks) {
     alert(`✅ Appliance "${name}" added successfully${photoText}!`);
     this.showOverview();
     
-    console.log('✅ New appliance added:', newAppliance);
 }
     
 // Calculate warranty expiration date
@@ -716,7 +706,6 @@ deleteAppliance(applianceId) {
         return;
     }
     
-    console.log('🗑️ Deleting appliance:', appliance.name);
     
     // Remove from appliances array
     const applianceIndex = this.appliances.findIndex(a => a.id == applianceId);
@@ -728,7 +717,6 @@ deleteAppliance(applianceId) {
     if (window.tasks && Array.isArray(window.tasks)) {
         const tasksToRemove = window.tasks.filter(task => task.applianceId == applianceId);
         if (tasksToRemove.length > 0) {
-            console.log(`🗑️ Removing ${tasksToRemove.length} associated tasks`);
             window.tasks = window.tasks.filter(task => task.applianceId != applianceId);
         }
     }
@@ -743,7 +731,6 @@ deleteAppliance(applianceId) {
     this.render();
     
     // Show success message
-    console.log('✅ Appliance deleted successfully');
     
     // Update dashboard if it exists
     if (window.enhancedDashboard && window.enhancedDashboard.render) {
@@ -959,14 +946,12 @@ handlePhotoUpload(event, context = 'add') {
             // Re-render the edit form to show the new photo
             this.renderEditForm();
             
-            console.log('📸 Photo added to appliance:', this.currentAppliance.name);
         } else {
             // Store temporarily for add form
             if (!window.tempAppliancePhotos) window.tempAppliancePhotos = [];
             window.tempAppliancePhotos.push(photoData);
             
             // Update add form preview (you'll need to implement this)
-            console.log('📸 Photo added to temp storage');
         }
     };
     
@@ -1018,7 +1003,6 @@ async deletePhoto(applianceId, photoIndex) {
             try {
                 const storageRef = window.storage.ref(photo.path);
                 await storageRef.delete();
-                console.log('🗑️ Photo deleted from Firebase Storage:', photo.path);
             } catch (error) {
                 console.warn('⚠️ Failed to delete photo from Firebase Storage:', error);
                 // Continue with removal even if Firebase delete fails
@@ -1035,7 +1019,6 @@ async deletePhoto(applianceId, photoIndex) {
             this.render();
         }
         
-        console.log('🗑️ Photo deleted from appliance:', appliance.name);
     }
 }
 
@@ -1086,7 +1069,6 @@ handleEditFormSubmit(event) {
     alert(`✅ Appliance "${name}" updated successfully!`);
     this.showOverview();
     
-    console.log('✅ Appliance updated:', this.currentAppliance);
 }
 
 // Delete appliance
@@ -1104,7 +1086,6 @@ deleteAppliance(applianceId) {
         alert(`✅ Appliance "${appliance.name}" deleted successfully!`);
         this.showOverview();
         
-        console.log('🗑️ Appliance deleted:', appliance.name);
     }
 }
     
@@ -1267,7 +1248,6 @@ showApplianceTasks(applianceId) {
     
     // Get tasks for this appliance
     const applianceTasks = this.getApplianceTasks(applianceId);
-    console.log(`Found ${applianceTasks.length} tasks for appliance ${appliance.name}`);
     
     // Create modal
     const existingModal = document.getElementById('appliance-tasks-modal');
@@ -1490,7 +1470,6 @@ removeApplianceTask(taskId, applianceId) {
             document.getElementById('appliance-tasks-modal').remove();
             alert(`✅ Task removed from ${appliance.name}`);
             
-            console.log('🗑️ Task removed:', task.title);
         }
     }
 }    
@@ -1786,7 +1765,6 @@ addApplianceWithTasks(applianceData) {
             window.saveData();
         }
         
-        console.log(`✅ Added ${maintenanceTasks.length} maintenance tasks for ${applianceData.name}`);
     }
     
     return {
@@ -1876,7 +1854,6 @@ generateTasksForAppliance(applianceId) {
 
 // Method to show task preview using existing task editor
 showTaskPreviewModal(tasks, appliance) {
-    console.log('🔧 showTaskPreviewModal called with:', tasks.length, 'tasks for', appliance.name);
     
     // Add tasks to global array first so they can be edited
     window.tasks.push(...tasks);
@@ -2097,10 +2074,8 @@ editCurrentTask() {
 // Method to continue to next task (called after editing one task)
 nextTask() {
     this.currentTaskIndex++;
-    console.log(`🔄 Moving to task ${this.currentTaskIndex + 1} of ${this.previewedTasks.length}`);
     
     if (this.currentTaskIndex >= this.previewedTasks.length) {
-        console.log('✅ All tasks edited, finishing...');
         this.finishTaskEditing();
     } else {
         this.editCurrentTask();
@@ -2171,7 +2146,6 @@ cancelTaskPreview() {
 
 // Method to edit a generated task (from Generated Tasks modal)
 editGeneratedTask(taskId) {
-    console.log('✏️ Editing generated task:', taskId);
     
     const task = window.tasks.find(t => t.id === taskId);
     if (!task) {
@@ -2244,7 +2218,6 @@ cancelGeneratedTasks() {
 
 // Method to edit an existing appliance task (from Review Tasks modal)
 editApplianceTask(taskId) {
-    console.log('✏️ Editing appliance task:', taskId);
     
     const task = window.tasks.find(t => t.id === taskId);
     if (!task) {
@@ -2281,7 +2254,6 @@ window.ApplianceManager = ApplianceManager;
 // Initialize when DOM is ready or immediately if already ready
 function initializeApplianceManager() {
     if (!window.applianceManager) {
-        console.log('⚙️ Creating new appliance manager instance...');
         window.applianceManager = new ApplianceManager();
     }
     return window.applianceManager;
@@ -2298,4 +2270,3 @@ if (document.readyState === 'loading') {
 // Make the initialization function available globally for manual initialization
 window.initializeApplianceManager = initializeApplianceManager;
 
-console.log('⚙️ Appliance Manager Module: Loaded successfully');

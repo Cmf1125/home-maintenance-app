@@ -60,11 +60,9 @@ async function toggleGoogleCalendarSync() {
             if (confirm) {
                 await window.googleCalendarSync.signOutFromGoogle();
                 updateCalendarSyncUI();
-                console.log('👋 Disconnected from Google Calendar');
             }
         } else {
             // User wants to connect
-            console.log('🔄 Connecting to Google Calendar...');
             const success = await window.googleCalendarSync.signInToGoogle();
             
             if (success) {
@@ -307,20 +305,12 @@ function createMaintenancePlan() {
         };
 
         // Use the new task generator instead of old generateTaskTemplates
-        console.log('🏠 DEBUG: taskGenerator exists:', !!window.taskGenerator);
-        console.log('🏠 DEBUG: createMaintenancePlan exists:', !!(window.taskGenerator && window.taskGenerator.createMaintenancePlan));
         
         if (window.taskGenerator && window.taskGenerator.createMaintenancePlan) {
-            console.log('🏠 DEBUG: Using new task generator');
             const result = window.taskGenerator.createMaintenancePlan();
-            console.log('🏠 DEBUG: Task generator result:', result);
-            console.log('🏠 DEBUG: homeData from generator:', result.homeData);
-            console.log('🏠 DEBUG: Purchase price:', result.homeData.purchasePrice);
-            console.log('🏠 DEBUG: Purchase year:', result.homeData.purchaseYear);
             window.homeData = result.homeData;
             window.tasks = result.tasks;
         } else {
-            console.log('🏠 DEBUG: Using old system fallback');
             // Fallback to old system
             generateTaskTemplates();
             
@@ -340,7 +330,6 @@ function createMaintenancePlan() {
         }
 
         setTimeout(showTaskSetup, 0);
-        console.log('✅ Successfully moved to task setup screen with expanded features');
     } catch (error) {
         console.error('❌ Error in createMaintenancePlan:', error);
         alert('❌ Error creating maintenance plan. Check console for details.');
@@ -1098,7 +1087,6 @@ function generateExpandedFeatureTasks(startingId = 1000) {
         });
     }
 
-    console.log(`✅ Generated ${expandedTasks.length} tasks for expanded features`);
     return expandedTasks;
 }
 
@@ -1576,20 +1564,17 @@ function goBackToHomeSetup() {
 
 // CLEAN SIMPLE VERSION: Complete task setup with smart due dates
 function finishTaskSetup() {
-    console.log('🚀 Starting clean simple task setup completion...');
     
     // Update user's display name if provided during setup
     const userNameInput = document.getElementById('user-name');
     if (userNameInput && userNameInput.value.trim() && window.currentUser) {
         const newName = userNameInput.value.trim();
-        console.log(`👤 Updating user display name to: ${newName}`);
         window.currentUser.displayName = newName;
         
         // Store the updated name for future use
         localStorage.setItem('userDisplayName', newName);
     }
     
-    console.log(`📊 Processing ${tasks.length} tasks...`);
     
     let successCount = 0;
     let errorCount = 0;
@@ -1598,7 +1583,6 @@ function finishTaskSetup() {
     tasks.forEach(task => {
         if (task.isTemplate) {
             try {
-                console.log(`⚙️ Processing task: ${task.title}`);
                 
                 // Use smart due date calculation
                 let dueDate;
@@ -1651,7 +1635,6 @@ function finishTaskSetup() {
                 task.isCompleted = false;
                 task.lastCompleted = null;
                 
-                console.log(`  ✅ FINAL: Task "${task.title}" due: ${task.dueDate.toLocaleDateString()}`);
                 successCount++;
                 
             } catch (error) {
@@ -1661,12 +1644,10 @@ function finishTaskSetup() {
         }
     });
     
-    console.log(`✅ Task processing complete: ${successCount} successful, ${errorCount} errors`);
     
     // Verify we have tasks with due dates
     const tasksWithDates = tasks.filter(t => t.dueDate);
     
-    console.log(`📊 Final verification: ${tasksWithDates.length} tasks have due dates`);
     
     if (tasksWithDates.length === 0) {
         console.error('❌ CRITICAL: No tasks have due dates after processing!');
@@ -1677,7 +1658,6 @@ function finishTaskSetup() {
     // Save data immediately
     try {
         saveData();
-        console.log('💾 Data saved successfully');
     } catch (error) {
         console.error('❌ Error saving data:', error);
         alert('❌ Error saving data. Please try again.');
@@ -1687,7 +1667,6 @@ function finishTaskSetup() {
     // Update global references BEFORE switching views
     window.homeData = homeData;
     window.tasks = tasks;
-    console.log('🌐 Global references updated');
     
   // Switch to main app
 const taskSetupEl = document.getElementById('task-setup');
@@ -1706,7 +1685,6 @@ document.getElementById('header-subtitle').textContent = homeData.fullAddress;
             `Welcome, ${window.currentUser.displayName.split(' ')[0]}` : 
             'Welcome back';
         dashboardSubtitle.textContent = `${userName} • ${homeData.fullAddress}`;
-        console.log(`👋 Updated dashboard welcome: ${userName}`);
     }
 
     // Show bottom navigation
@@ -1733,7 +1711,6 @@ document.body.classList.add('main-app-active');
     
     // Initialize dashboard with error handling
     try {
-        console.log('🏠 Initializing dashboard...');
         
         // CRITICAL FIX: Ensure main-app is visible
         const mainApp = document.getElementById('main-app');
@@ -1743,7 +1720,6 @@ document.body.classList.add('main-app-active');
         }
         
         showTab('dashboard');
-        console.log('✅ Dashboard initialized successfully');
         
         // Start welcome tour for new users
         setTimeout(() => {
@@ -1767,18 +1743,15 @@ document.body.classList.add('main-app-active');
     if (window.currentUser) {
         saveUserDataToFirebaseEnhanced(window.currentUser.uid, homeData, tasks)
             .then(() => {
-                console.log('💾 User data saved to Firebase');
             })
             .catch((error) => {
                 console.error('❌ Error saving to Firebase:', error);
             });
     }
-    console.log('🎉 CLEAN SIMPLE TASK SETUP COMPLETION SUCCESSFUL!');
 }
 
 // FIXED: Enhanced showTab function that respects All Tasks view
 function showTab(tabName) {
-    console.log(`🔄 Switching to tab: ${tabName}`);
 
     // UNIFIED: Always ensure header is visible on all main tabs
     if (['dashboard', 'calendar', 'appliances', 'documents', 'planning', 'vendors'].includes(tabName)) {
@@ -1787,7 +1760,6 @@ function showTab(tabName) {
         // Remove any conflicting header classes
         document.body.classList.remove('hide-header', 'show-header');
         
-        console.log('✅ Header made sticky for tab:', tabName);
     }
     
     // 🎯 CRITICAL FIX: Only hide back arrow if we're actually switching away from All Tasks
@@ -1795,12 +1767,10 @@ function showTab(tabName) {
     const isLeavingAllTasks = allTasksView && !allTasksView.classList.contains('hidden');
     
     if (isLeavingAllTasks) {
-        console.log('🔍 Leaving All Tasks view - hiding back arrow...');
         const backButton = document.getElementById('back-to-dashboard');
         if (backButton) {
             backButton.classList.add('hidden');
             backButton.style.display = 'none';
-            console.log('✅ Back arrow hidden when leaving All Tasks');
         }
     }
     
@@ -1834,11 +1804,9 @@ function showTab(tabName) {
         if (tabName === 'calendar' || tabName === 'planning' || tabName === 'vendors') {
             // Calendar, Planning, and Vendors are full-screen, hide main-app (and its footer)
             mainApp.classList.add('hidden');
-            console.log('✅ Main app container hidden for full-screen tab:', tabName);
         } else {
             // All other tabs need main-app visible
             mainApp.classList.remove('hidden');
-            console.log('✅ Main app container shown for regular tab:', tabName);
         }
     }
     
@@ -1877,7 +1845,6 @@ function showTab(tabName) {
             dashboardTab.classList.remove('opacity-70');
         }
         
-        console.log('🏠 Initializing enhanced dashboard...');
         
         // Update header subtitles with current address
         if (window.homeData?.fullAddress) {
@@ -1887,7 +1854,6 @@ function showTab(tabName) {
             
             if (headerSubtitle) headerSubtitle.textContent = subtitleText;
             if (dashboardSubtitle) dashboardSubtitle.textContent = subtitleText;
-            console.log('✅ Header address updated:', subtitleText);
         }
         
         // Enhanced dashboard initialization with robust retry mechanism
@@ -1895,13 +1861,10 @@ function showTab(tabName) {
             try {
                 if (typeof EnhancedDashboard !== 'undefined') {
                     if (!window.enhancedDashboard) {
-                        console.log('🆕 Creating new enhanced dashboard instance...');
                         window.enhancedDashboard = new EnhancedDashboard();
                     } else {
-                        console.log('🔄 Refreshing existing enhanced dashboard...');
                         window.enhancedDashboard.render();
                     }
-                    console.log('✅ Enhanced dashboard ready');
                     return true;
                 } else {
                     console.warn('⚠️ EnhancedDashboard class not available yet');
@@ -1915,7 +1878,6 @@ function showTab(tabName) {
 
         // Try to initialize immediately
         if (!initializeDashboard()) {
-            console.log('🔄 Enhanced dashboard not ready, waiting...');
             // Retry after a short delay to allow scripts to load
             setTimeout(() => {
                 if (!initializeDashboard()) {
@@ -1927,14 +1889,11 @@ function showTab(tabName) {
         
         // TIMING FIX: Additional refresh to catch any YouTube URL timing issues
         setTimeout(() => {
-            console.log('🎬 Safety refresh for video buttons...');
             try {
                 if (window.enhancedDashboard && window.enhancedDashboard.render) {
                     window.enhancedDashboard.render();
-                    console.log('✅ Safety refresh completed (enhanced)');
                 } else {
                     updateDashboard();
-                    console.log('✅ Safety refresh completed (basic)');
                 }
             } catch (error) {
                 console.error('❌ Error during safety refresh:', error);
@@ -1964,7 +1923,6 @@ function showTab(tabName) {
             calendarTab.classList.remove('opacity-70');
         }
         
-        console.log('📅 Initializing calendar...');
         
         // Initialize calendar
         try {
@@ -1990,15 +1948,12 @@ function showTab(tabName) {
             documentsTab.classList.remove('text-gray-600');
         }
         
-        console.log('📄 Initializing documents...');
         
         // Initialize documents module
         try {
             if (!window.casaCareDocuments && typeof CasaCareDocuments !== 'undefined') {
-                console.log('📄 Creating new documents instance...');
                 window.casaCareDocuments = new CasaCareDocuments();
             } else if (window.casaCareDocuments) {
-                console.log('📄 Refreshing documents...');
                 window.casaCareDocuments.render();
             }
         } catch (error) {
@@ -2012,13 +1967,11 @@ function showTab(tabName) {
             propertyFeaturesView.classList.remove('hidden');
         }
         
-        console.log('🏠 Initializing property features...');
         
         // Populate with current data
         try {
             populatePropertyFeaturesTab();
             populatePropertySummarySection();
-            console.log('✅ Property features populated');
         } catch (error) {
             console.error('❌ Error populating property features:', error);
         }
@@ -2036,16 +1989,13 @@ function showTab(tabName) {
             appliancesTab.classList.remove('opacity-70');
         }
         
-        console.log('⚙️ Switching to appliances tab...');
         
         // Initialize or refresh appliances module
         try {
             if (!window.applianceManager) {
-                console.log('⚙️ Appliance manager not found, initializing...');
                 if (typeof window.initializeApplianceManager === 'function') {
                     window.applianceManager = window.initializeApplianceManager();
                 } else if (typeof ApplianceManager !== 'undefined') {
-                    console.log('⚙️ Creating appliance manager directly...');
                     window.applianceManager = new ApplianceManager();
                 } else {
                     console.error('❌ ApplianceManager class not available');
@@ -2054,7 +2004,6 @@ function showTab(tabName) {
             }
             
             if (window.applianceManager && typeof window.applianceManager.render === 'function') {
-                console.log('⚙️ Rendering appliances view...');
                 window.applianceManager.render();
             } else {
                 console.error('❌ Appliance manager render method not available');
@@ -2076,7 +2025,6 @@ function showTab(tabName) {
             planningTab.classList.remove('opacity-70');
         }
         
-        console.log('📊 Initializing planning & budget...');
         
         // Initialize planning functionality
         try {
@@ -2096,7 +2044,6 @@ function showTab(tabName) {
             vendorsTab.classList.remove('opacity-70');
         }
         
-        console.log('📇 Initializing vendors directory...');
         
         // Initialize vendors functionality with mobile-specific handling
         try {
@@ -2105,7 +2052,6 @@ function showTab(tabName) {
             
             // MOBILE FIX: Ensure vendors are rendered after a short delay for mobile
             setTimeout(() => {
-                console.log('🔄 Mobile-specific vendors refresh...');
                 renderVendors();
             }, 100);
             
@@ -2114,12 +2060,10 @@ function showTab(tabName) {
         }
     }
     
-    console.log(`✅ Switched to ${tabName} tab`);
 }
 
 // 🎯 ENHANCED: showAllTasks function with better back arrow handling
 function showAllTasks() {
-    console.log('📋 Switching to All Tasks view...');
     
     // SIMPLIFIED: Just ensure main-app-active class (header will be sticky automatically)
     document.body.classList.add('main-app-active');
@@ -2149,7 +2093,6 @@ function showAllTasks() {
                 backButton.style.display = 'flex';
                 backButton.style.visibility = 'visible';
                 backButton.style.opacity = '1';
-                console.log('✅ Back arrow visible with automatically sticky header!');
             }
         }, 50);
         
@@ -2167,7 +2110,6 @@ function showAllTasks() {
     // Render the content
     renderAllTasksView();
     
-    console.log('✅ All Tasks view displayed with unified sticky header system');
 }
 
 function renderAllTasksView() {
@@ -2232,7 +2174,6 @@ window.tasks.forEach(task => {
         </div>
     `;
     
-    console.log('✅ All Tasks view rendered successfully');
 }
 
 function renderAllTaskCategories() {
@@ -2326,7 +2267,6 @@ function renderAllTasksTaskItem(task) {
             .replace(/\s+/g, '+') // Replace spaces with +
             .trim();
         task.youtubeUrl = `https://www.youtube.com/results?search_query=how+to+${searchQuery}+maintenance`;
-        console.log(`🎬 Generated missing YouTube URL for "${task.title}": ${task.youtubeUrl}`);
     }
     
     const now = new Date();
@@ -2343,7 +2283,6 @@ function renderAllTasksTaskItem(task) {
     
     // Debug log for Safety tasks
     if (isSafetyTask) {
-        console.log(`🟠 Safety task detected: "${task.title}" (category: ${task.category}, priority: ${task.priority})`);
     }
     
     // Enhanced status styling
@@ -2479,7 +2418,6 @@ function getStatusBadgeColor(urgencyDot) {
 
 // NEW FUNCTION: Edit task specifically from All Tasks view
 function editTaskFromAllTasks(taskId) {
-    console.log('✏️ Editing task from All Tasks view:', taskId);
     
     const task = window.tasks.find(t => t.id === taskId);
     if (!task) {
@@ -2509,11 +2447,9 @@ if (originalTaskManagerSave && window.TaskManager) {
         
         // If we were editing from All Tasks, refresh that view
         if (window.editingFromAllTasks) {
-            console.log('🔄 Refreshing All Tasks view after edit...');
             setTimeout(() => {
                 if (typeof renderAllTasksView === 'function') {
                     renderAllTasksView();
-                    console.log('✅ All Tasks view refreshed');
                 }
                 window.editingFromAllTasks = false; // Clear the flag
             }, 100);
@@ -2521,7 +2457,6 @@ if (originalTaskManagerSave && window.TaskManager) {
         
         // If we were editing appliance tasks, continue to next task
         if (window.editingApplianceTasks && window.applianceTaskEditor) {
-            console.log('🔄 Moving to next appliance task...');
             setTimeout(() => {
                 window.applianceTaskEditor.nextTask();
             }, 100);
@@ -2529,7 +2464,6 @@ if (originalTaskManagerSave && window.TaskManager) {
         
         // If we were editing from appliance view, restore the appliance modal
         if (window.editingFromApplianceView) {
-            console.log('🔄 Restoring appliance view after task edit...');
             setTimeout(() => {
                 // Restore the hidden appliance modal
                 const applianceModal = document.getElementById('appliance-tasks-modal');
@@ -2542,7 +2476,6 @@ if (originalTaskManagerSave && window.TaskManager) {
         
         // If we were editing from generated tasks view, restore the generated tasks modal
         if (window.editingFromGeneratedTasks) {
-            console.log('🔄 Restoring generated tasks view after task edit...');
             setTimeout(() => {
                 // Restore the hidden generated tasks modal
                 const generatedModal = document.getElementById('generated-tasks-modal');
@@ -2555,7 +2488,6 @@ if (originalTaskManagerSave && window.TaskManager) {
         
         return result;
     };
-    console.log('✅ TaskManager.save enhanced for All Tasks refresh');
 }
 
 // Also override TaskManager close to handle appliance modal restoration
@@ -2564,7 +2496,6 @@ if (originalTaskManagerClose && window.TaskManager) {
     window.TaskManager.close = function() {
         // If we were editing from appliance view and user cancels, restore the modal
         if (window.editingFromApplianceView) {
-            console.log('🔄 Restoring appliance view after task edit cancel...');
             setTimeout(() => {
                 const applianceModal = document.getElementById('appliance-tasks-modal');
                 if (applianceModal) {
@@ -2576,7 +2507,6 @@ if (originalTaskManagerClose && window.TaskManager) {
         
         // If we were editing from generated tasks view and user cancels, restore the modal
         if (window.editingFromGeneratedTasks) {
-            console.log('🔄 Restoring generated tasks view after task edit cancel...');
             setTimeout(() => {
                 const generatedModal = document.getElementById('generated-tasks-modal');
                 if (generatedModal) {
@@ -2589,7 +2519,6 @@ if (originalTaskManagerClose && window.TaskManager) {
         // Call the original close function
         return originalTaskManagerClose.apply(this, arguments);
     };
-    console.log('✅ TaskManager.close enhanced for appliance modal restoration');
 }
 
 // Make the function globally available
@@ -2600,7 +2529,6 @@ window.showAllTasks = showAllTasks;
 
 // UPDATE your updateDashboard function to call this setup:
 function updateDashboard() {
-    console.log('🔄 Running basic dashboard update...');
     
     if (!window.tasks || window.tasks.length === 0) {
         console.warn('⚠️ No tasks available for dashboard');
@@ -2672,7 +2600,6 @@ function updateDashboard() {
     // ADD THIS LINE: Set up click handlers for basic dashboard
     setupBasicDashboardClicks();
     
-    console.log(`📊 Basic dashboard updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total, annual cost: ${formatCurrency(totalCost)}, annual HOA: ${formatCurrency(hoaCost * 12)}`);
 }
 
 // Basic dashboard click handler for Total Tasks card
@@ -2685,14 +2612,12 @@ function setupBasicDashboardClicks() {
         
         if (newTotalCard) {
             newTotalCard.addEventListener('click', () => {
-                console.log('📋 Total Tasks clicked (basic dashboard) - navigating to All Tasks');
                 if (typeof showAllTasks === 'function') {
                     showAllTasks();
                 } else {
                     console.error('❌ showAllTasks function not found');
                 }
             });
-            console.log('✅ Basic dashboard Total Tasks click handler added');
         }
     }
 }
@@ -2700,7 +2625,6 @@ function setupBasicDashboardClicks() {
 
 // FIXED: Enhanced Add Task function for setup with better modal handling
 function addTaskFromSetup() {
-    console.log('➕ Adding custom task from setup...');
     
     // Verify modal is available
     const modal = document.getElementById('task-edit-modal');
@@ -2729,7 +2653,6 @@ function addTaskFromSetup() {
         isTemplate: true // Important: mark as template so it gets processed correctly
     };
     
-    console.log('📋 New task created:', newTask);
     
     // Open modal for new task
     openTaskEditModal(newTask, true);
@@ -2738,7 +2661,6 @@ function addTaskFromSetup() {
 // FIXED: Enhanced task completion with better calendar sync
 // Enhanced task completion - now opens modal instead of direct completion
 function completeTask(taskId) {
-    console.log(`✅ Opening completion modal for task ${taskId}...`);
     
     const task = window.tasks.find(t => t.id === taskId);
     if (!task) {
@@ -2749,17 +2671,14 @@ function completeTask(taskId) {
 
     // Store the task ID for the modal
     window.currentCompletingTask = task;
-    console.log('🎯 Task stored for completion:', task.title);
     
     // Always create a fresh modal (remove any existing one first)
     const existingModal = document.getElementById('task-completion-modal');
     if (existingModal && existingModal.parentNode) {
         existingModal.parentNode.removeChild(existingModal);
-        console.log('🗑️ Removed existing modal');
     }
     // Initialize photos array
     window.completionPhotos = [];
-    console.log('🧹 Initialized completion photos array');
     
     // Create new modal directly in body
     const newModal = document.createElement('div');
@@ -2831,33 +2750,22 @@ function completeTask(taskId) {
     
     // Add to body
     document.body.appendChild(newModal);
-    console.log('✅ New modal created and added to body');
-    console.log('✅ Modal should now be visible!');
     
     // Double-check visibility
     setTimeout(() => {
         const computedStyle = window.getComputedStyle(modal);
-        console.log('🔍 Modal computed display:', computedStyle.display);
-        console.log('🔍 Modal computed visibility:', computedStyle.visibility);
-        console.log('🔍 Modal computed opacity:', computedStyle.opacity);
     }, 100);
 }
 
 // Original task completion logic - now called from modal
 function processTaskCompletion(taskId, completionData = {}) {
-    console.log(`✅ Processing completion for task ${taskId}...`);
-    console.log('🔍 DEBUG: Completion data received:', completionData);
-    console.log('🔍 DEBUG: window.tasks exists:', !!window.tasks);
-    console.log('🔍 DEBUG: window.tasks length:', window.tasks?.length);
     
     const task = window.tasks.find(t => t.id === taskId);
     if (!task) {
         console.error('❌ Task not found:', taskId);
-        console.log('🔍 DEBUG: Available task IDs:', window.tasks?.map(t => t.id));
         return false;
     }
     
-    console.log('✅ DEBUG: Task found:', task.title);
 
     const oldDueDate = task.dueDate ? new Date(task.dueDate) : new Date();
     const completionDate = new Date();
@@ -2873,8 +2781,6 @@ function processTaskCompletion(taskId, completionData = {}) {
         nextDueDate: null // Will be set below as ISO string
     };
     
-    console.log('📷 DEBUG: completionRecord.photos:', completionRecord.photos);
-    console.log('📷 DEBUG: completionRecord.photos length:', completionRecord.photos?.length);
     
     // Initialize completionHistory if it doesn't exist
     if (!task.completionHistory) {
@@ -2896,15 +2802,10 @@ function processTaskCompletion(taskId, completionData = {}) {
     task.dueDate = nextDueDate;
     task.nextDue = nextDueDate;
     
-    console.log(`📅 Task "${task.title}" completed with enhanced data!`);
-    console.log(`  Old due date: ${oldDueDate.toLocaleDateString()}`);
-    console.log(`  Next due date: ${nextDueDate.toLocaleDateString()}`);
-    console.log(`  Completion record:`, completionRecord);
     
     // Save data immediately
     try {
         saveData();
-        console.log('💾 Data saved after task completion');
     } catch (error) {
         console.error('❌ Error saving data after completion:', error);
         alert('❌ Error saving task completion');
@@ -2915,29 +2816,23 @@ function processTaskCompletion(taskId, completionData = {}) {
     
     // Refresh enhanced dashboard
     if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
-        console.log('🔄 Refreshing enhanced dashboard...');
         window.enhancedDashboard.render();
     } else {
-        console.log('🔄 Refreshing basic dashboard...');
         updateDashboard();
     }
     
     // CRITICAL: Force calendar refresh with verification
     if (window.casaCareCalendar) {
-        console.log('📅 Forcing calendar refresh...');
         try {
             if (typeof window.casaCareCalendar.refresh === 'function') {
                 window.casaCareCalendar.refresh();
-                console.log('✅ Calendar refresh called successfully');
             } else if (typeof window.casaCareCalendar.render === 'function') {
                 window.casaCareCalendar.render();
-                console.log('✅ Calendar render called successfully');
             } else {
                 console.warn('⚠️ Calendar refresh method not found, trying to recreate...');
                 // Try to recreate calendar if refresh doesn't work
                 if (typeof CasaCareCalendar !== 'undefined') {
                     window.casaCareCalendar = new CasaCareCalendar();
-                    console.log('✅ Calendar recreated successfully');
                 }
             }
         } catch (error) {
@@ -2948,7 +2843,6 @@ function processTaskCompletion(taskId, completionData = {}) {
         if (typeof CasaCareCalendar !== 'undefined') {
             try {
                 window.casaCareCalendar = new CasaCareCalendar();
-                console.log('✅ Calendar created successfully after task completion');
             } catch (error) {
                 console.error('❌ Error creating calendar:', error);
             }
@@ -2961,7 +2855,6 @@ function processTaskCompletion(taskId, completionData = {}) {
 
 // FIXED: Enhanced Edit Task function for setup with better modal handling
 function editTaskFromSetup(taskId) {
-    console.log(`✏️ Editing task from setup: ${taskId}`);
     
     const task = tasks.find(t => t.id === taskId);
     if (!task) {
@@ -2970,7 +2863,6 @@ function editTaskFromSetup(taskId) {
         return;
     }
     
-    console.log('📋 Task found for editing:', task);
     
     // Verify modal is available
     const modal = document.getElementById('task-edit-modal');
@@ -2990,7 +2882,6 @@ function deleteTaskDirect(taskId) {
         const taskIndex = tasks.findIndex(t => t.id === taskId);
         if (taskIndex > -1) {
             const deletedTask = tasks.splice(taskIndex, 1)[0];
-            console.log(`🗑️ Deleted task: ${deletedTask.title}`);
             
             // Update global reference
             window.tasks = tasks;
@@ -3005,7 +2896,6 @@ function deleteTaskDirect(taskId) {
 
 // FIXED: Enhanced modal functions with better error checking
 function openTaskEditModal(task, isNewTask = false) {
-    console.log('Opening modal for:', task.title || 'New Task');
     
     const modal = document.getElementById('task-edit-modal');
     if (!modal) {
@@ -3036,12 +2926,10 @@ function closeTaskEditModal() {
     }
     currentEditingTask = null;
     window.currentEditingTask = null;
-    console.log('✅ Task edit modal closed');
 }
 
 // Save task from edit modal
 function saveTaskFromEdit() {
-    console.log('💾 Saving task from edit modal...');
     
     if (!currentEditingTask && !window.currentEditingTask) {
         console.error('❌ No task being edited');
@@ -3061,7 +2949,6 @@ function saveTaskFromEdit() {
     const priority = getAutoPriority(title, category); // NOW use it for priority
     const dueDateInput = document.getElementById('edit-task-due-date');
     
-    console.log('📝 Form values:', { title, description, cost, frequency, category, priority });
     
     // Validate inputs
     if (!title) {
@@ -3091,11 +2978,9 @@ function saveTaskFromEdit() {
         dueDate = new Date();
     }
     
-    console.log('📅 Due date:', dueDate.toLocaleDateString());
     
     // Check if this is a new task
     const isNewTask = !tasks.find(t => t.id === editingTask.id);
-    console.log('🆕 Is new task:', isNewTask);
     
     // Update task properties
     editingTask.title = title;
@@ -3111,11 +2996,9 @@ function saveTaskFromEdit() {
         // Add to tasks array
         tasks.push(editingTask);
         window.tasks = tasks; // Update global reference
-        console.log('✅ New task added to global array');
     } else {
         // Update global reference to ensure changes are reflected
         window.tasks = tasks;
-        console.log('✅ Existing task updated');
     }
     
     // Determine if we're in setup or main app by checking which screen is visible
@@ -3124,11 +3007,9 @@ function saveTaskFromEdit() {
     
     if (taskSetupVisible) {
         // We're in task setup, re-render categories
-        console.log('🔄 Refreshing task setup categories...');
         renderTaskCategories();
     } else if (mainAppVisible) {
         // We're in main app, save and refresh
-        console.log('🔄 Saving data and refreshing main app...');
         saveData();
         
         // Refresh dashboard
@@ -3144,7 +3025,6 @@ function saveTaskFromEdit() {
         }
     } else {
         // Default behavior - save everything
-        console.log('🔄 Default save and refresh...');
         saveData();
         if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
             window.enhancedDashboard.render();
@@ -3157,8 +3037,6 @@ function saveTaskFromEdit() {
     closeTaskEditModal();
     
     alert(`✅ Task "${title}" ${isNewTask ? 'added' : 'updated'} successfully!`);
-    console.log('✅ Task save completed successfully');
-    console.log('🔍 Starting refresh check...');
     
     // Simple refresh: Check which view is active and refresh it
     const allTasksView = document.getElementById('all-tasks-view');
@@ -3166,12 +3044,10 @@ function saveTaskFromEdit() {
     
     if (allTasksView && !allTasksView.classList.contains('hidden')) {
         // We're in All Tasks view - reload data then refresh
-        console.log('🔄 Refreshing All Tasks view after save...');
         if (window.loadTasksFromFirebase) {
             window.loadTasksFromFirebase().then(() => {
                 if (typeof renderAllTasksView === 'function') {
                     renderAllTasksView();
-                    console.log('✅ All Tasks view refreshed with fresh data');
                 }
             });
         } else if (typeof renderAllTasksView === 'function') {
@@ -3179,11 +3055,9 @@ function saveTaskFromEdit() {
         }
     } else if (dashboardView && !dashboardView.classList.contains('hidden')) {
         // We're in main dashboard - reload data then refresh  
-        console.log('🔄 Refreshing dashboard after save...');
         if (window.loadTasksFromFirebase) {
             window.loadTasksFromFirebase().then(() => {
                 showTab('dashboard');
-                console.log('✅ Dashboard refreshed with fresh data');
             });
         } else {
             showTab('dashboard');
@@ -3201,7 +3075,6 @@ function deleteTaskFromEdit() {
         const taskIndex = tasks.findIndex(t => t.id === currentEditingTask.id);
         if (taskIndex > -1) {
             const deletedTask = tasks.splice(taskIndex, 1)[0];
-            console.log(`🗑️ Deleted task: ${deletedTask.title}`);
             
             // Update global reference
             window.tasks = tasks;
@@ -3241,7 +3114,6 @@ function deleteTaskFromEdit() {
  * Open editable home info modal instead of simple alert
  */
 function showHomeInfo() {
-    console.log('🏠 Opening editable home info modal...');
     
     if (!homeData.fullAddress) {
         alert('🏠 No home information set yet. Complete the setup to add your home details.');
@@ -3263,7 +3135,6 @@ function showHomeInfo() {
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
     
-    console.log('✅ Home info modal opened');
 }
 
 /**
@@ -3289,7 +3160,6 @@ function populateHomeInfoForm() {
         }
     });
     
-    console.log('📝 Home info form populated with current data');
 }
 
 /**
@@ -3301,14 +3171,12 @@ function closeHomeInfoModal() {
         modal.classList.add('hidden');
         modal.style.display = 'none';
     }
-    console.log('✅ Home info modal closed');
 }
 
 /**
  * Save the updated home information
  */
 function saveHomeInfo() {
-    console.log('💾 Saving updated home information...');
     
     // Get form values
     const newAddress = document.getElementById('edit-home-address').value.trim();
@@ -3349,7 +3217,6 @@ function saveHomeInfo() {
     // Save to storage
     try {
         saveData();
-        console.log('💾 Home data saved successfully');
     } catch (error) {
         console.error('❌ Error saving home data:', error);
         alert('❌ Error saving changes. Please try again.');
@@ -3378,7 +3245,6 @@ function saveHomeInfo() {
         alert(`✅ Home information updated successfully!\n\nProperty details have been saved.`);
     }
     
-    console.log('✅ Home information updated:', homeData.fullAddress);
 }
 
 // Make functions globally available
@@ -3396,7 +3262,6 @@ function clearData() {
         if (window.currentUser) {
             saveUserDataToFirebaseEnhanced(window.currentUser.uid, {}, [])
                 .then(() => {
-                    console.log('✅ Data cleared from Firebase');
                 })
                 .catch((error) => {
                     console.error('❌ Error clearing Firebase data:', error);
@@ -3524,14 +3389,12 @@ function populatePropertyFeaturesTab() {
         };
     }, 100);
     
-    console.log('📝 Property features tab populated with current data');
 }
 
 /**
  * Save property features changes from the tab
  */
 function savePropertyFeaturesFromTab() {
-    console.log('💾 Saving property features changes...');
     
     if (!homeData.features) {
         homeData.features = {};
@@ -3596,7 +3459,6 @@ function savePropertyFeaturesFromTab() {
         showTab('dashboard');
     }
     
-    console.log('✅ Property features updated:', newFeatures);
 }
 
 /**
@@ -3702,7 +3564,6 @@ function saveFeatureChanges() {
         if (window.currentUser) {
             saveUserDataToFirebaseEnhanced(window.currentUser.uid, homeData, window.tasks || [])
                 .then(() => {
-                    console.log('✅ Property features saved to Firebase');
                 })
                 .catch((error) => {
                     console.error('❌ Error saving to Firebase:', error);
@@ -3720,7 +3581,6 @@ function saveFeatureChanges() {
  * Generate new tasks for newly added features
  */
 function generateTasksForNewFeatures(oldFeatures, newFeatures) {
-    console.log('🔄 Checking for new features to generate tasks...');
     
     const newlyAddedFeatures = [];
     
@@ -3733,11 +3593,9 @@ function generateTasksForNewFeatures(oldFeatures, newFeatures) {
     });
     
     if (newlyAddedFeatures.length === 0) {
-        console.log('📋 No new features added, no new tasks to generate');
         return;
     }
     
-    console.log('🆕 New features detected:', newlyAddedFeatures);
     
     // Use the task generator to create tasks for new features
     if (window.taskGenerator && homeData) {
@@ -3765,7 +3623,6 @@ function generateTasksForNewFeatures(oldFeatures, newFeatures) {
                 
                 // Add the new task
                 window.tasks.push(newTask);
-                console.log(`✅ Added new task: ${newTask.title}`);
             }
         });
     }
@@ -3848,7 +3705,6 @@ function exportTaskList() {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
     
-    console.log('📋 Task list exported from Settings');
     alert('📋 Task list exported successfully!');
 }
 
@@ -3868,13 +3724,11 @@ function saveData() {
         return;
     }
     
-    console.log('💾 Using enhanced save to preserve all data...');
     
     // FIXED: Use enhanced save that preserves ALL data types
     saveUserDataToFirebaseEnhanced(window.currentUser.uid, window.homeData || {}, window.tasks || [])
         .then((success) => {
             if (success) {
-                console.log('✅ Enhanced save completed - all data preserved');
             } else {
                 console.warn('⚠️ Enhanced save failed, trying fallback...');
                 // Fallback to original save
@@ -3882,21 +3736,17 @@ function saveData() {
             }
         })
         .then(() => {
-            console.log('✅ Data saved successfully');
             
             // REFRESH: Check which view is active and refresh it after enhanced save
-            console.log('🔍 Enhanced save complete - checking for view refresh...');
             const allTasksView = document.getElementById('all-tasks-view');
             const dashboardView = document.getElementById('dashboard-view');
             
             if (allTasksView && !allTasksView.classList.contains('hidden')) {
                 // We're in All Tasks view - reload data then refresh
-                console.log('🔄 Refreshing All Tasks view after enhanced save...');
                 if (window.loadTasksFromFirebase) {
                     window.loadTasksFromFirebase().then(() => {
                         if (typeof renderAllTasksView === 'function') {
                             renderAllTasksView();
-                            console.log('✅ All Tasks view refreshed with fresh data after enhanced save');
                         }
                     });
                 } else if (typeof renderAllTasksView === 'function') {
@@ -3904,11 +3754,9 @@ function saveData() {
                 }
             } else if (dashboardView && !dashboardView.classList.contains('hidden')) {
                 // We're in main dashboard - reload data then refresh  
-                console.log('🔄 Refreshing dashboard after enhanced save...');
                 if (window.loadTasksFromFirebase) {
                     window.loadTasksFromFirebase().then(() => {
                         showTab('dashboard');
-                        console.log('✅ Dashboard refreshed with fresh data after enhanced save');
                     });
                 } else {
                     showTab('dashboard');
@@ -3939,10 +3787,8 @@ async function loadData() {
                 // Load vendors if they exist
                 if (userData.vendors) {
                     vendors = userData.vendors;
-                    console.log(`✅ Loaded ${vendors.length} vendors from Firebase`);
                 } else {
                     vendors = [];
-                    console.log('📂 No vendors found, starting with empty list');
                 }
                 
                 // Restore dates - handle both old nextDue and new dueDate formats
@@ -3959,12 +3805,10 @@ async function loadData() {
                     if (task.lastCompleted) task.lastCompleted = new Date(task.lastCompleted);
                 });
                 
-                console.log('✅ Data loaded from Firebase with calendar compatibility');
                 return true;
             }
         }
         
-        console.log('ℹ️ No data found in Firebase for this user');
         return false;
     } catch (error) {
         console.error('❌ Failed to load data from Firebase:', error);
@@ -3979,7 +3823,6 @@ async function hasExistingData() {
 
 // Enhanced initialization
 async function initializeApp() {
-    console.log('🏠 The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initializing...');
     
     // Make well water function available globally ASAP
     window.toggleWellWaterOptions = toggleWellWaterOptions;
@@ -4019,7 +3862,6 @@ async function initializeApp() {
             updateCalendarSyncUI();
         }
         
-        console.log(`👋 Welcome back! Loaded ${tasks.length} tasks for ${homeData.fullAddress}`);
     } else {
         document.getElementById('setup-form').style.display = 'block';
         document.getElementById('task-setup').classList.add('hidden');
@@ -4028,7 +3870,6 @@ async function initializeApp() {
     
     initializeDateManagement();
     
-    console.log('✅ The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES initialized successfully!');
 }
 
 // Export functions to global scope
@@ -4287,21 +4128,14 @@ function updateConfirmationSummary() {
 }
 
 function proceedToTaskGeneration() {
-    console.log('🚀 Proceeding to task generation...');
     
     // Use the new task generator system to get tasks with proper YouTube URLs
-    console.log('🔍 DEBUG: window.taskGenerator exists:', !!window.taskGenerator);
-    console.log('🔍 DEBUG: window.taskGenerator.createMaintenancePlan exists:', !!(window.taskGenerator && window.taskGenerator.createMaintenancePlan));
     
     if (window.taskGenerator && window.taskGenerator.createMaintenancePlan) {
-        console.log('🚀 Using new task generator with YouTube URLs');
         const result = window.taskGenerator.createMaintenancePlan();
         window.homeData = result.homeData;
         window.tasks = result.tasks;
-        console.log(`🚀 Generated ${result.tasks.length} tasks with YouTube URLs`);
     } else {
-        console.log('🚀 Fallback to old system - task generator not available');
-        console.log('🔍 Available on window:', Object.keys(window).filter(k => k.includes('task') || k.includes('Task')));
         // Fallback to old system
         generateTaskTemplates();
         window.homeData = homeData;
@@ -4319,7 +4153,6 @@ function proceedToTaskGeneration() {
     // Run your existing task setup display
     setTimeout(showTaskSetup, 0);
     
-    console.log('✅ Moved to task setup page');
 }
 
 function goBackFromConfirmation() {
@@ -4356,7 +4189,6 @@ if (document.readyState !== 'loading') {
     initializeApp();
 }
 
-console.log('🏠 The Home Keeper CLEAN SIMPLE VERSION WITH ALL FIXES script loaded successfully!');
 
 // ========================================
 // STEP 4: ORGANIZED NAMESPACE SYSTEM
@@ -4440,7 +4272,6 @@ CasaCare.components = {
 
 CasaCare.debug = {
     listGlobalFunctions: function() {
-        console.log('🌍 GLOBAL FUNCTIONS (Calendar Critical):');
         const criticalGlobals = [
             'completeTask', 'saveData', 'loadData', 'tasks', 'homeData',
             'createMaintenancePlan', 'finishTaskSetup', 'showTab', 'toggleWellWaterOptions'
@@ -4449,25 +4280,20 @@ CasaCare.debug = {
         criticalGlobals.forEach(name => {
             const exists = typeof window[name] !== 'undefined';
             const type = typeof window[name];
-            console.log(`  ${name}: ${exists ? '✅' : '❌'} (${type})`);
         });
     },
     
     listNamespacedFunctions: function() {
-        console.log('🏗️ NAMESPACED FUNCTIONS:');
         Object.keys(CasaCare).forEach(namespace => {
             if (typeof CasaCare[namespace] === 'object' && namespace !== 'debug') {
-                console.log(`  CasaCare.${namespace}:`, Object.keys(CasaCare[namespace]));
             }
         });
     },
     
     testCalendarSync: function() {
-        console.log('📅 TESTING CALENDAR SYNC:');
         
         // Test tasks array
         const tasksExist = Array.isArray(window.tasks);
-        console.log(`  window.tasks: ${tasksExist ? '✅' : '❌'} (${tasksExist ? window.tasks.length : 0} tasks)`);
         
         // Test date consistency
         if (tasksExist && window.tasks.length > 0) {
@@ -4487,20 +4313,16 @@ CasaCare.debug = {
                 }
             });
             
-            console.log(`  Date sync status: ${syncedCount}/${totalWithDates} tasks synced (${syncedCount === totalWithDates ? '✅ PERFECT' : '⚠️ NEEDS ATTENTION'})`);
         }
         
         // Test calendar object
         const calendarExists = typeof window.casaCareCalendar === 'object' && window.casaCareCalendar !== null;
-        console.log(`  window.casaCareCalendar: ${calendarExists ? '✅' : '❌'}`);
         
         // Test complete task function
         const completeTaskExists = typeof window.completeTask === 'function';
-        console.log(`  window.completeTask: ${completeTaskExists ? '✅' : '❌'}`);
         
         // Test enhanced dashboard
         const dashboardExists = typeof window.enhancedDashboard === 'object' && window.enhancedDashboard !== null;
-        console.log(`  window.enhancedDashboard: ${dashboardExists ? '✅' : '❌'}`);
         
         return {
             tasksArray: tasksExist,
@@ -4513,10 +4335,8 @@ CasaCare.debug = {
     },
     
     fixDateSync: function() {
-        console.log('🔧 ATTEMPTING TO FIX DATE SYNC ISSUES...');
         
         if (!window.tasks || !Array.isArray(window.tasks)) {
-            console.log('❌ No tasks array found');
             return false;
         }
         
@@ -4525,7 +4345,6 @@ CasaCare.debug = {
         if (fixed > 0) {
             try {
                 saveData();
-                console.log(`✅ Fixed ${fixed} tasks and saved data`);
                 
                 // Refresh displays
                 if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
@@ -4541,7 +4360,6 @@ CasaCare.debug = {
                 return false;
             }
         } else {
-            console.log('✅ No sync issues found - all tasks are properly synchronized');
             return true;
         }
     }
@@ -4736,7 +4554,6 @@ class InstallationBanner {
             this.banner.classList.add('show');
         }, 100);
         
-        console.log('📱 Install banner shown');
     }
     
     hideBanner() {
@@ -4760,7 +4577,6 @@ class InstallationBanner {
         localStorage.setItem('install-banner-dismissed', 'true');
         localStorage.setItem('install-banner-dismiss-until', dismissUntil.toISOString());
         
-        console.log('📱 Install banner dismissed for 7 days');
     }
     
     // Public method to manually show the banner
@@ -4791,7 +4607,6 @@ if (document.readyState !== 'loading') {
     installBanner = new InstallationBanner();
 }
 
-console.log('📱 Smart installation banner system loaded');
 
 function toggleCategory(categoryId) {
     const tasksDiv = document.getElementById(`tasks-${categoryId}`);
@@ -5083,7 +4898,6 @@ function closeCompletionModal() {
 }
 
 function simpleTaskCompletion() {
-    console.log('✅ Simple task completion triggered');
     if (!window.currentCompletingTask) {
         console.error('❌ No task selected for completion');
         return;
@@ -5094,13 +4908,11 @@ function simpleTaskCompletion() {
     
     if (success !== false) {
         closeCompletionModal();
-        console.log(`✅ "${window.currentCompletingTask.title}" completed successfully!`);
         alert(`✅ "${window.currentCompletingTask.title}" completed successfully!`);
     }
 }
 
 function enhancedTaskCompletion() {
-    console.log('✅ Enhanced task completion triggered');
     if (!window.currentCompletingTask) {
         console.error('❌ No task selected for completion');
         return;
@@ -5116,14 +4928,12 @@ function enhancedTaskCompletion() {
         photos: [...(window.completionPhotos || [])] // Clone the array
     };
     
-    console.log('📝 Enhanced completion data:', completionData);
     
     // Process the completion using existing logic
     const success = processTaskCompletion(window.currentCompletingTask.id, completionData);
     
     if (success !== false) {
         closeCompletionModal();
-        console.log(`✅ "${window.currentCompletingTask.title}" completed successfully!`);
         
         // Show success message with details
         let message = `✅ "${window.currentCompletingTask.title}" completed successfully!`;
@@ -5144,15 +4954,10 @@ async function handlePhotoUpload(event) {
     
     const previewContainer = document.getElementById('photo-preview');
     
-    console.log(`📷 Uploading ${files.length} photos to Firebase Storage...`);
     
     // Check if Firebase Storage is available
     if (!window.storage) {
         console.error('❌ Firebase Storage not available');
-        console.log('🔍 DEBUG: window.storage:', window.storage);
-        console.log('🔍 DEBUG: window.auth:', window.auth);
-        console.log('🔍 DEBUG: window.db:', window.db);
-        console.log('🔍 DEBUG: firebase object:', typeof firebase !== 'undefined' ? firebase : 'undefined');
         alert('❌ Photo upload unavailable. Please refresh the page and try again.');
         return;
     }
@@ -5170,7 +4975,6 @@ async function handlePhotoUpload(event) {
                 continue;
             }
             
-            console.log(`📷 Uploading: ${file.name}`);
             
             // Create unique filename
             const timestamp = Date.now();
@@ -5194,7 +4998,6 @@ async function handlePhotoUpload(event) {
             };
             
             window.completionPhotos.push(photoData);
-            console.log(`✅ Photo uploaded: ${file.name}`);
             
             // Create preview element
             const previewDiv = document.createElement('div');
@@ -5288,15 +5091,10 @@ function confirmTaskCompletion() {
         photos: [...window.completionPhotos] // Clone the array
     };
     
-    console.log('📝 Completion data:', completionData);
-    console.log('📷 DEBUG: window.completionPhotos array:', window.completionPhotos);
-    console.log('📷 DEBUG: Number of photos:', window.completionPhotos.length);
     if (window.completionPhotos.length > 0) {
-        console.log('📷 DEBUG: First photo:', window.completionPhotos[0]);
     }
     
     // Process the completion using existing logic
-    console.log('🔍 DEBUG: About to call processTaskCompletion with data:', completionData);
     const success = processTaskCompletion(window.currentCompletingTask.id, completionData);
     
     if (success !== false) {
@@ -5305,7 +5103,6 @@ function confirmTaskCompletion() {
         
         // Show success message
         const message = `✅ "${window.currentCompletingTask.title}" completed successfully!`;
-        console.log(message);
         
         // You could add a toast notification here
         alert(message);
@@ -5322,7 +5119,6 @@ window.enhancedTaskCompletion = enhancedTaskCompletion;
 
 // Show task completion history
 function showTaskHistory(taskId) {
-    console.log(`📋 Opening history for task ${taskId}...`);
     
     const task = window.tasks.find(t => t.id === taskId);
     if (!task) {
@@ -5332,7 +5128,6 @@ function showTaskHistory(taskId) {
     }
     
     const completionHistory = task.completionHistory || [];
-    console.log(`📋 Found ${completionHistory.length} completion records for "${task.title}"`);
     
     // Remove any existing history modal
     const existingModal = document.getElementById('task-history-modal');
@@ -5358,37 +5153,27 @@ function showTaskHistory(taskId) {
             .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
             .map((record, index) => {
                 // Handle different date formats (Date object, string, timestamp, Firebase Timestamp)
-                console.log('🔍 Debug completion record:', record);
-                console.log('🔍 completedAt value:', record.completedAt);
-                console.log('🔍 completedAt type:', typeof record.completedAt);
                 
                 let date;
                 if (record.completedAt instanceof Date) {
                     date = record.completedAt;
-                    console.log('📅 Using Date object');
                 } else if (record.completedAt && typeof record.completedAt.toDate === 'function') {
                     // Firebase Timestamp
                     date = record.completedAt.toDate();
-                    console.log('📅 Converting Firebase Timestamp to date:', date);
                 } else if (typeof record.completedAt === 'string') {
                     date = new Date(record.completedAt);
-                    console.log('📅 Parsing string to date:', date);
                 } else if (typeof record.completedAt === 'number') {
                     date = new Date(record.completedAt);
-                    console.log('📅 Parsing timestamp to date:', date);
                 } else {
                     console.warn('⚠️ Unknown date format, using current date as fallback');
                     date = new Date(); // Fallback to current date
-                    console.log('📅 Using fallback current date');
                 }
                 
                 // Check if date is valid
                 if (isNaN(date.getTime())) {
                     console.warn('❌ Invalid date found in completion record:', record.completedAt);
                     date = new Date(); // Fallback to current date
-                    console.log('📅 Using fallback after invalid date');
                 } else {
-                    console.log('✅ Valid date:', date.toLocaleDateString());
                 }
                 
                 const photosHtml = record.photos && record.photos.length > 0 ? 
@@ -5459,7 +5244,6 @@ function showTaskHistory(taskId) {
     historyModal.style.padding = '16px';
     
     document.body.appendChild(historyModal);
-    console.log('✅ History modal created and displayed');
 }
 
 function closeHistoryModal() {
@@ -5519,7 +5303,6 @@ window.closePhotoModal = closePhotoModal;
 
 // DEBUG: Clear all modals and fix scrolling
 window.clearAllModals = function() {
-    console.log('🧹 Clearing all modals and fixing scrolling...');
     
     // Remove all possible modal elements
     const modalIds = [
@@ -5534,7 +5317,6 @@ window.clearAllModals = function() {
         const modal = document.getElementById(id);
         if (modal && modal.parentNode) {
             modal.parentNode.removeChild(modal);
-            console.log(`✅ Removed ${id}`);
         }
     });
     
@@ -5547,20 +5329,11 @@ window.clearAllModals = function() {
         const position = computed.position;
         
         if (zIndex > 1000 && (position === 'fixed' || position === 'absolute')) {
-            console.log(`🔍 Found high z-index element:`, {
-                tag: el.tagName,
-                id: el.id,
-                class: el.className,
-                zIndex: zIndex,
-                position: position,
-                display: computed.display
-            });
             
             // Remove it completely
             if (el.parentNode) {
                 el.parentNode.removeChild(el);
                 removedCount++;
-                console.log(`🗑️ Removed blocking element`);
             }
         }
     });
@@ -5581,19 +5354,15 @@ window.clearAllModals = function() {
     document.onscroll = null;
     document.ontouchmove = null;
     
-    console.log(`✅ Removed ${removedCount} blocking elements, scrolling should work now`);
-    console.log('🔄 Try scrolling now, or refresh page if still stuck');
 };
 
 // DEBUG: Test modal manually
 window.testModal = function() {
-    console.log('🧪 Testing modal manually...');
     const modal = document.getElementById('task-completion-modal');
     if (!modal) {
         console.error('❌ Modal not found!');
         return;
     }
-    console.log('✅ Modal found, showing...');
     modal.style.display = 'flex';
     modal.style.position = 'fixed';
     modal.style.top = '0';
@@ -5607,10 +5376,6 @@ window.testModal = function() {
     // Debug info
     const rect = modal.getBoundingClientRect();
     const computed = window.getComputedStyle(modal);
-    console.log('🔍 Modal bounding rect:', rect);
-    console.log('🔍 Modal parent:', modal.parentElement);
-    console.log('🔍 Modal computed z-index:', computed.zIndex);
-    console.log('🔍 Modal computed position:', computed.position);
     
     // Check if there are other elements with high z-index
     const allElements = document.querySelectorAll('*');
@@ -5621,20 +5386,13 @@ window.testModal = function() {
             highZIndexElements.push({element: el, zIndex: zIndex});
         }
     });
-    console.log('🔍 Elements with high z-index:', highZIndexElements);
     
-    console.log('🧪 Modal should now be visible with red background');
 };
 
 // DEBUG: Test reschedule system
 window.testReschedule = function() {
-    console.log('🧪 TESTING RESCHEDULE SYSTEM:');
-    console.log('  rescheduleTaskFromDashboard:', typeof window.rescheduleTaskFromDashboard);
-    console.log('  tasks available:', !!window.tasks);
-    console.log('  tasks count:', window.tasks?.length || 0);
     
     if (window.tasks && window.tasks.length > 0) {
-        console.log('  Testing with first task:', window.tasks[0].title);
         try {
             window.rescheduleTaskFromDashboard(window.tasks[0].id);
         } catch (error) {
@@ -5646,7 +5404,6 @@ window.testReschedule = function() {
 // ===== PLANNING & BUDGET FUNCTIONALITY =====
 
 function renderPlanningView() {
-    console.log('📊 Rendering planning view...');
     
     const planningItems = generatePlanningItems();
     
@@ -5891,7 +5648,6 @@ function generatePlanningItems() {
         );
     });
     
-    console.log(`📊 Generated ${items.length} planning items (${customItems.length} custom), ${filteredItems.length} after filtering hidden items`);
     
     return filteredItems;
 }
@@ -5991,7 +5747,6 @@ let currentSystemType = null;
 let currentSystemTitle = null;
 
 function updateSystemAge(systemType, systemTitle) {
-    console.log(`📝 Opening system age update for: ${systemType} - ${systemTitle}`);
     
     currentSystemType = systemType;
     currentSystemTitle = systemTitle;
@@ -6054,13 +5809,11 @@ function saveSystemAge() {
     // Save the system age
     window.homeData.systemAges[currentSystemType] = selectedAge;
     
-    console.log(`✅ Saved ${currentSystemType} age: ${selectedAge} years`);
     
     // Save to Firebase
     if (window.currentUser) {
         saveUserDataToFirebaseEnhanced(window.currentUser.uid, window.homeData, window.tasks || [])
             .then(() => {
-                console.log('✅ System age saved to Firebase');
                 
                 // Refresh planning view to show updated data
                 renderPlanningView();
@@ -6085,7 +5838,6 @@ function deletePlanningItem(itemType, itemTitle) {
         return;
     }
     
-    console.log('🗑️ Deleting planning item:', itemTitle, 'Type:', itemType);
     
     // Initialize hidden planning items if it doesn't exist
     if (!window.homeData.hiddenPlanningItems) {
@@ -6108,7 +5860,6 @@ function deletePlanningItem(itemType, itemTitle) {
             'features.hiddenPlanningItems': window.homeData.hiddenPlanningItems
         })
         .then(() => {
-            console.log('✅ Hidden planning item saved to Firebase');
             
             // Refresh planning view
             renderPlanningView();
@@ -6167,7 +5918,6 @@ function saveCustomPlanningItem() {
         return;
     }
     
-    console.log('💾 Saving custom planning item:', name);
     
     // Create custom planning item
     const customItem = {
@@ -6198,7 +5948,6 @@ function saveCustomPlanningItem() {
             'features.customPlanningItems': window.homeData.customPlanningItems
         })
         .then(() => {
-            console.log('✅ Custom planning item saved to Firebase');
             
             // Refresh planning view
             renderPlanningView();
@@ -6282,7 +6031,6 @@ function needsProfessionalService(taskTitle, taskCategory) {
 }
 
 function openTaskShop(taskTitle, taskCategory) {
-    console.log(`🛒 Opening shop for task: ${taskTitle} (${taskCategory})`);
     
     // Generate contextual search terms based on task title and category
     const searchTerms = generateShopSearchTerms(taskTitle, taskCategory);
@@ -6294,7 +6042,6 @@ function openTaskShop(taskTitle, taskCategory) {
 }
 
 function findProfessionalService(taskTitle, taskCategory) {
-    console.log(`👷 Finding professional for task: ${taskTitle} (${taskCategory})`);
     
     // Create search terms for professional services
     const cleanTitle = taskTitle.toLowerCase()
@@ -6416,7 +6163,6 @@ let vendors = [];
 // Load vendors from Firebase
 async function loadVendors() {
     if (!window.auth?.currentUser) {
-        console.log('⚠️ No authenticated user, skipping vendor load');
         // Still render empty state for testing
         renderVendors();
         return;
@@ -6426,11 +6172,9 @@ async function loadVendors() {
         const userDoc = await window.db.collection('users').doc(window.auth.currentUser.uid).get();
         if (userDoc.exists && userDoc.data().vendors) {
             vendors = userDoc.data().vendors;
-            console.log(`✅ Loaded ${vendors.length} vendors from Firebase`);
             renderVendors();
         } else {
             vendors = [];
-            console.log('📂 No vendors found, starting with empty list');
             renderVendors();
         }
     } catch (error) {
@@ -6451,7 +6195,6 @@ async function saveVendors() {
         await window.db.collection('users').doc(window.auth.currentUser.uid).update({
             vendors: vendors
         });
-        console.log('✅ Vendors saved to Firebase');
     } catch (error) {
         console.error('❌ Error saving vendors:', error);
         throw error;
@@ -6466,7 +6209,6 @@ function renderVendors() {
         return;
     }
     
-    console.log(`🔄 Rendering ${vendors.length} vendors`);
 
     if (vendors.length === 0) {
         vendorsList.innerHTML = `
@@ -6624,7 +6366,6 @@ async function addVendor() {
         // Show success message
         showToast(`✅ Added ${name} to vendor directory`);
 
-        console.log('✅ Vendor added successfully:', vendor);
 
     } catch (error) {
         console.error('❌ Error adding vendor:', error);
@@ -6656,7 +6397,6 @@ async function deleteVendor(vendorId) {
         // Show success message
         showToast(`✅ Deleted ${vendor.name} from vendor directory`);
 
-        console.log('✅ Vendor deleted successfully:', vendor.name);
 
     } catch (error) {
         console.error('❌ Error deleting vendor:', error);

@@ -154,11 +154,9 @@ function showLoginScreen() {
         taskSetup.style.display = 'none';
     }
     
-    console.log('🔐 Login screen shown, everything else hidden');
 }
 
 function showMainApp() {
-    console.log('🚀 showMainApp called');
     document.getElementById('login-screen').classList.add('hidden');
     
     const header = document.getElementById('app-header');
@@ -168,9 +166,6 @@ function showMainApp() {
     document.getElementById('main-app').classList.remove('hidden');
     document.body.classList.add('main-app-active');
     
-    console.log('✅ Header should now be visible, main-app-active class added');
-    console.log('Header element:', header);
-    console.log('Body classes:', document.body.className);
     
     if (typeof showTab === 'function') {
         showTab('dashboard');
@@ -2280,7 +2275,6 @@ function showMainApp() {
     
   <!-- Task System Override (Working Fix) -->
 <script>
-    console.log('🚨 Loading task system override...');
 
     // Complete override system
     window.openTaskEditModal = function(task, isNew) {
@@ -2300,7 +2294,6 @@ function showMainApp() {
         currentTask: null,
         
         openModal: function(task, isNew) {
-            console.log('📝 Opening modal for:', task.title || 'New Task');
             
             this.currentTask = {...task};
             window.currentEditingTask = this.currentTask;
@@ -2534,11 +2527,9 @@ function showMainApp() {
         // Check if video buttons are already visible
         const hasVideoButtons = document.querySelector('button[onclick*="openYouTubeVideo"]');
         if (hasVideoButtons) {
-            console.log('✅ Video buttons are visible, no refresh needed');
             return;
         }
 
-        console.log('📺 Showing refresh button for video buttons');
         
         // Create refresh notification
         const refreshNotification = document.createElement('div');
@@ -2607,7 +2598,6 @@ function showMainApp() {
             youtubeField.style.backgroundColor = '';
         }, 1000);
         
-        console.log('🔍 Generated YouTube search URL:', youtubeSearchUrl);
     };
 
     
@@ -2621,11 +2611,9 @@ function showMainApp() {
         window.open(searchUrl, '_blank', 'noopener,noreferrer');
     };
     
-    console.log('✅ Task system override loaded');
 </script>
 <!-- WORKING MODAL SOLUTION -->
 <script>
-    console.log('🔧 Creating NEW working reschedule modal...');
     
     // Create a completely new, simple modal that definitely works
     function createWorkingRescheduleModal() {
@@ -2758,7 +2746,6 @@ function showMainApp() {
             event.preventDefault();
         }
         
-        console.log('📅 Opening WORKING reschedule modal for task:', taskId);
         
         const task = window.tasks.find(t => t.id === taskId);
         if (!task) {
@@ -2797,7 +2784,6 @@ function showMainApp() {
         // Focus on date input
         setTimeout(() => {
             newDateEl.focus();
-            console.log('✅ Working modal should now be visible!');
         }, 100);
     };
     
@@ -2849,22 +2835,18 @@ function showMainApp() {
         window.currentRescheduleTask.dueDate = newDate;
         window.currentRescheduleTask.nextDue = newDate; // Calendar sync
         
-        console.log('✅ Task updated:', taskTitle, 'to', newDate.toLocaleDateString());
         
         // Save and refresh
         if (typeof saveData === 'function') {
             saveData();
-            console.log('💾 Data saved');
         }
         
         if (window.enhancedDashboard?.render) {
             window.enhancedDashboard.render();
-            console.log('🔄 Dashboard refreshed');
         }
         
         if (window.casaCareCalendar?.refresh) {
             window.casaCareCalendar.refresh();
-            console.log('📅 Calendar refreshed');
         }
         
         // Close modal and show success
@@ -2872,17 +2854,11 @@ function showMainApp() {
         alert(`✅ "${taskTitle}" rescheduled to ${newDate.toLocaleDateString()}`);
     };
     
-    console.log('✅ NEW working reschedule modal created and ready!');
 
     // DEBUG: Test reschedule system
     window.testReschedule = function() {
-        console.log('🧪 TESTING RESCHEDULE SYSTEM:');
-        console.log('  rescheduleTaskFromDashboard:', typeof window.rescheduleTaskFromDashboard);
-        console.log('  tasks available:', !!window.tasks);
-        console.log('  tasks count:', window.tasks?.length || 0);
         
         if (window.tasks && window.tasks.length > 0) {
-            console.log('  Testing with first task:', window.tasks[0].title);
             try {
                 window.rescheduleTaskFromDashboard(window.tasks[0].id);
             } catch (error) {
@@ -3245,7 +3221,6 @@ function showMainApp() {
     // Switch back to display mode
     cancelAddressEdit();
     
-    console.log('✅ Address updated:', newAddress);
   }
 
   function cancelAddressEdit() {
@@ -3431,36 +3406,30 @@ window.showEmailLogin = showEmailLogin;
         window.addEventListener('load', function() {
             navigator.serviceWorker.register('/sw.js')
                 .then(function(registration) {
-                    console.log('✅ Service worker registered for PWA compliance');
                     
                     // Listen for service worker updates
                     registration.addEventListener('updatefound', () => {
-                        console.log('[SW] Update found, installing new version...');
                         const newWorker = registration.installing;
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                console.log('[SW] New version available - refreshing...');
                                 window.location.reload();
                             }
                         });
                     });
                 })
                 .catch(function(error) {
-                    console.log('⚠️ Service worker registration failed (non-critical):', error);
                 });
         });
         
         // MOBILE CACHE FIX: Force cache refresh on mobile for vendor updates
         const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         if (isMobile) {
-            console.log('[PWA] Mobile detected - checking for vendor updates...');
             
             // Check if this is the first load after a potential update
             const lastCacheUpdate = localStorage.getItem('lastCacheUpdate');
             const currentVersion = '2025.10.06.01';
             
             if (lastCacheUpdate !== currentVersion) {
-                console.log('[PWA] New version detected on mobile - clearing cache...');
                 setTimeout(() => {
                     clearPWACache();
                     localStorage.setItem('lastCacheUpdate', currentVersion);
@@ -3479,7 +3448,6 @@ window.showEmailLogin = showEmailLogin;
             event.error.message.includes('fetch') ||
             event.error.message.includes('network')
         )) {
-            console.log('[PWA] Possible cache corruption detected, clearing caches...');
             clearPWACache();
         }
     });
@@ -3493,7 +3461,6 @@ window.showEmailLogin = showEmailLogin;
                     const messageChannel = new MessageChannel();
                     messageChannel.port1.onmessage = (event) => {
                         if (event.data && event.data.success) {
-                            console.log('[PWA] Cache cleared successfully');
                             setTimeout(() => window.location.reload(), 1000);
                         }
                     };
@@ -3558,11 +3525,9 @@ window.showEmailLogin = showEmailLogin;
 <!-- SIMPLE MODAL FIX - Add this before </body> -->
 <!-- FIXED MODAL SCRIPT - Replace the previous one with this -->
 <script>
-console.log('🔧 Loading FIXED modal script...');
 
 // 1. TASK EDIT MODAL FUNCTIONS (CORRECTED)
 window.openTaskEditModal = function(task, isNew = false) {
-    console.log('📝 Opening task modal:', task.title || 'New Task', 'isNew:', isNew);
     
     const modal = document.getElementById('task-edit-modal');
     if (!modal) return;
@@ -3628,7 +3593,6 @@ window.saveTaskFromEdit = function() {
             .replace(/\s+/g, '+') // Replace spaces with +
             .trim();
         youtubeUrl = `https://www.youtube.com/results?search_query=how+to+${searchQuery}+maintenance`;
-        console.log('🔍 Auto-generated YouTube URL:', youtubeUrl);
     }
     
     if (!title) { alert('❌ Name required'); return; }
@@ -3661,32 +3625,26 @@ window.saveTaskFromEdit = function() {
     if (window.googleCalendarSync && window.googleCalendarSync.isConnected()) {
         if (isNew) {
             // New task - create calendar event
-            console.log('📅 Syncing new task to Google Calendar...');
             window.googleCalendarSync.syncTaskToCalendar(task).then((eventId) => {
                 if (eventId) {
                     task.googleEventId = eventId;
                     if (typeof saveData === 'function') saveData();
-                    console.log('✅ New task synced to Google Calendar');
                 }
             }).catch(error => {
                 console.error('❌ Failed to sync new task to Google Calendar:', error);
             });
         } else if (task.googleEventId) {
             // Existing task with calendar event - update it
-            console.log('📅 Updating Google Calendar event for edited task...');
             window.googleCalendarSync.updateCalendarEvent(task).then(() => {
-                console.log('✅ Google Calendar event updated for edited task');
             }).catch(error => {
                 console.error('❌ Failed to update Google Calendar event:', error);
             });
         } else {
             // Existing task without calendar event - create one
-            console.log('📅 Creating Google Calendar event for edited task...');
             window.googleCalendarSync.syncTaskToCalendar(task).then((eventId) => {
                 if (eventId) {
                     task.googleEventId = eventId;
                     if (typeof saveData === 'function') saveData();
-                    console.log('✅ Google Calendar event created for edited task');
                 }
             }).catch(error => {
                 console.error('❌ Failed to create Google Calendar event:', error);
@@ -3732,7 +3690,6 @@ window.deleteTaskFromEdit = function() {
 
 // 2. ADD TASK FUNCTIONS (CORRECTED)
 window.addTaskFromDashboard = function() {
-    console.log('➕ Adding task from dashboard');
     const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
     const newTask = {
         id: maxId + 1, 
@@ -3747,7 +3704,6 @@ window.addTaskFromDashboard = function() {
 };
 
 window.addTaskFromSetup = function() {
-    console.log('➕ Adding task from setup');
     const maxId = Math.max(...(window.tasks?.map(t => t.id) || [0]));
     const newTask = {
         id: maxId + 1, 
@@ -3780,7 +3736,6 @@ window.rescheduleTaskFromDashboard = function(taskId, event) {
         event.preventDefault();
     }
     
-    console.log('📅 Rescheduling task:', taskId);
     
     const task = window.tasks?.find(t => t.id === taskId);
     if (!task) {
@@ -3847,49 +3802,35 @@ window.rescheduleTaskFromDashboard = function(taskId, event) {
     };
     
     window.confirmTaskReschedule = function(taskId) {
-        console.log('🚀 confirmTaskReschedule called for task:', taskId);
         
         const newDateStr = document.getElementById('new-task-date').value;
-        console.log('📅 New date selected:', newDateStr);
         
         if (!newDateStr) {
-            console.log('⚠️ No date selected, returning');
             return;
         }
         
         const newDate = new Date(newDateStr + 'T12:00:00');
         const task = window.tasks.find(t => t.id === taskId);
         
-        console.log('📋 Task found:', !!task, task?.title);
-        console.log('📅 New date object:', newDate);
         
         if (task) {
             task.dueDate = newDate;
             task.nextDue = newDate;
             
             // Sync reschedule to Google Calendar if connected
-            console.log('🔍 Google Calendar sync check:', {
-                googleCalendarSyncExists: !!window.googleCalendarSync,
-                isConnected: window.googleCalendarSync?.isConnected?.(),
-                taskHasGoogleEventId: !!task.googleEventId
-            });
             
             if (window.googleCalendarSync && window.googleCalendarSync.isConnected()) {
                 if (task.googleEventId) {
                     // Task already has calendar event - update it
-                    console.log('📅 Updating existing Google Calendar event for reschedule...');
                     window.googleCalendarSync.updateCalendarEvent(task).then(() => {
-                        console.log('✅ Google Calendar event updated for reschedule');
                     }).catch(error => {
                         console.error('❌ Failed to update Google Calendar event:', error);
                     });
                 } else {
                     // Task doesn't have calendar event yet - create one
-                    console.log('📅 Creating new Google Calendar event for reschedule...');
                     window.googleCalendarSync.syncTaskToCalendar(task).then((eventId) => {
                         if (eventId) {
                             task.googleEventId = eventId;
-                            console.log('✅ New Google Calendar event created for reschedule');
                         }
                     }).catch(error => {
                         console.error('❌ Failed to create Google Calendar event:', error);
@@ -3907,7 +3848,6 @@ window.rescheduleTaskFromDashboard = function(taskId, event) {
     };
 };
 
-console.log('✅ FIXED modal script loaded - all buttons should work now!');
 </script>
 
 
@@ -3931,7 +3871,6 @@ const storage = firebase.storage();
 
 // iOS-specific authentication fixes
 if (window.Capacitor && window.Capacitor.getPlatform() === 'ios') {
-    console.log('🍎 iOS detected - setting up iOS authentication fixes');
     
     // Set persistence to LOCAL for iOS
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
@@ -3950,7 +3889,6 @@ try {
     // Enable offline persistence
     db.enablePersistence({ synchronizeTabs: true })
         .then(() => {
-            console.log('🔥 Firebase offline persistence enabled');
         })
         .catch((err) => {
             if (err.code === 'failed-precondition') {
@@ -3963,7 +3901,6 @@ try {
     console.warn('⚠️ Firebase persistence setup failed:', error);
 }
 
-console.log('🔥 Firebase initialized');
 
 
 // ===== STEP 1: ADD THESE BACKUP FUNCTIONS TO index.html =====
@@ -3973,15 +3910,12 @@ console.log('🔥 Firebase initialized');
 async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
     try {
         if (!userId || !window.currentUser) {
-            console.log('🚫 Enhanced save skipped: No user logged in');
             return false;
         }
         if (window.currentUser?.isDemo || window.currentUser?.isDemoUser) {
-            console.log('🚫 Demo user detected, skipping Firebase save');
             return false;
         }
 
-        console.log('💾 Enhanced save: Starting comprehensive save...');
         
         // Convert Date objects to Firebase Timestamps for proper storage
         const firebaseTasks = (tasks || []).map(task => {
@@ -3999,8 +3933,6 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
             
             // CRITICAL FIX: Handle completion history dates and keep photos for Firebase compatibility
             if (firebaseTask.completionHistory && Array.isArray(firebaseTask.completionHistory)) {
-                console.log('🔍 DEBUG: Processing task with completion history:', firebaseTask.title);
-                console.log('🔍 DEBUG: Completion history length:', firebaseTask.completionHistory.length);
                 firebaseTask.completionHistory = firebaseTask.completionHistory.map(record => {
                     const firebaseRecord = { ...record };
                     
@@ -4028,7 +3960,6 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
                     // NEW: Keep photos for Firebase save (now using URLs from Firebase Storage)
                     // No need to remove photos anymore as they use URLs instead of base64
                     if (firebaseRecord.photos && Array.isArray(firebaseRecord.photos)) {
-                        console.log('📷 DEBUG: Processing photos for Firebase save:', firebaseRecord.photos);
                         
                         // Filter out photos that don't have URLs (invalid Firebase Storage photos)
                         // and ensure photos are properly formatted for Firebase
@@ -4046,7 +3977,6 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
                                     };
                                 } else {
                                     // Legacy base64 photo - convert to count for now (too large for Firestore)
-                                    console.log('⚠️ Found legacy base64 photo, converting to photo count');
                                     return null; // Will be filtered out
                                 }
                             })
@@ -4056,9 +3986,7 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
                         if (firebaseRecord.photos.length === 0 && record.photos && record.photos.length > 0) {
                             firebaseRecord.photoCount = record.photos.length;
                             delete firebaseRecord.photos;
-                            console.log('📷 No valid Firebase Storage photos, set photoCount:', firebaseRecord.photoCount);
                         } else {
-                            console.log('📷 Saved', firebaseRecord.photos.length, 'Firebase Storage photos');
                         }
                     }
                     
@@ -4090,13 +4018,9 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
             version: '2.1'
         };
 
-        console.log(`📄 Enhanced save: Saving ${userData.documents.length} documents`);
-        console.log(`📦 Enhanced save: Saving ${userData.appliances.length} appliances`);
-        console.log(`📋 Enhanced save: Saving ${userData.tasks.length} tasks`);
         
         // Use set with merge to avoid overwriting
         await db.collection('users').doc(userId).set(userData, { merge: true });
-        console.log('✅ Enhanced save: All data saved successfully');
         return true;
     } catch (error) {
         console.error('❌ Enhanced save error:', error);
@@ -4108,11 +4032,9 @@ async function saveUserDataToFirebaseEnhanced(userId, homeData, tasks) {
 async function loadUserDataEnhanced(userId) {
     try {
         if (!userId) {
-            console.log('🚫 Enhanced load skipped: No userId');
             return false;
         }
 
-        console.log('📥 Enhanced load: Loading comprehensive data...');
         
         const userDoc = await db.collection('users').doc(userId).get();
         if (userDoc.exists) {
@@ -4120,10 +4042,8 @@ async function loadUserDataEnhanced(userId) {
             
             // Load appliances and documents ALWAYS (not conditional)
             window.applianceData = Array.isArray(userData.appliances) ? userData.appliances : [];
-            console.log(`📦 Enhanced load: ${window.applianceData.length} appliances loaded`);
             
             window.documentsData = Array.isArray(userData.documents) ? userData.documents : [];
-            console.log(`📄 Enhanced load: ${window.documentsData.length} documents loaded`);
             
             // Load main data conditionally
             if (userData.homeData && userData.tasks) {
@@ -4177,15 +4097,12 @@ async function loadUserDataEnhanced(userId) {
                     }
                 });
   
-                console.log(`✅ Enhanced load: Success! ${window.tasks.length} tasks, ${window.applianceData.length} appliances, ${window.documentsData.length} documents`);
                 return true;
             } else {
-                console.log(`✅ Enhanced load: Partial success! ${window.applianceData.length} appliances, ${window.documentsData.length} documents (no main data)`);
                 return false;
             }
         }
         
-        console.log('📥 Enhanced load: No data found');
         return false;
     } catch (error) {
         console.error('❌ Enhanced load error:', error);
@@ -4194,7 +4111,6 @@ async function loadUserDataEnhanced(userId) {
 }
 // FIXED: Test function to verify data integrity with documents
 function testDataIntegrity() {
-    console.log('🧪 Testing data integrity...');
     
     const results = {
         homeData: !!window.homeData && !!window.homeData.fullAddress,
@@ -4205,19 +4121,13 @@ function testDataIntegrity() {
         timestamp: new Date().toISOString()
     };
     
-    console.log('🧪 Data integrity results:', results);
     return results;
 }
 
 // Debug function to check document status
 function debugDocumentStatus() {
-    console.log('🔍 DOCUMENT DEBUG STATUS:');
-    console.log('  window.documentsData:', Array.isArray(window.documentsData) ? window.documentsData.length : 'NOT FOUND');
-    console.log('  window.casaCareDocuments instance:', !!window.casaCareDocuments);
-    console.log('  instance.documents:', window.casaCareDocuments?.documents?.length || 'NOT FOUND');
     
     if (window.documentsData && window.documentsData.length > 0) {
-        console.log('  First document:', window.documentsData[0]);
     }
     
     return {
@@ -4233,12 +4143,10 @@ window.loadUserDataEnhanced = loadUserDataEnhanced;
 window.testDataIntegrity = testDataIntegrity;
 window.debugDocumentStatus = debugDocumentStatus;
 
-console.log('✅ FIXED: Enhanced Firebase functions updated for direct document reference');
 
 // NEW: Enhanced save that works alongside existing system
 async function saveDataEnhanced() {
     if (!window.currentUser) {
-        console.log('🚫 Enhanced save skipped: No user');
         return false;
     }
     
@@ -4257,7 +4165,6 @@ async function saveDataEnhanced() {
     );
     
     if (success) {
-        console.log('✅ Enhanced save completed successfully');
     } else {
         console.warn('⚠️ Enhanced save failed, existing save will still run');
     }
@@ -4266,13 +4173,8 @@ async function saveDataEnhanced() {
 }
 
 function debugDocumentStatus() {
-    console.log('🔍 DOCUMENT DEBUG STATUS:');
-    console.log('  window.documentsData:', Array.isArray(window.documentsData) ? window.documentsData.length : 'NOT FOUND');
-    console.log('  window.casaCareDocuments instance:', !!window.casaCareDocuments);
-    console.log('  instance.documents:', window.casaCareDocuments?.documents?.length || 'NOT FOUND');
     
     if (window.documentsData && window.documentsData.length > 0) {
-        console.log('  First document:', window.documentsData[0]);
     }
     
     return {
@@ -4289,7 +4191,6 @@ window.loadUserDataEnhanced = loadUserDataEnhanced;
 window.testDataIntegrity = testDataIntegrity;
 window.saveDataEnhanced = saveDataEnhanced;
 
-console.log('✅ Step 1: Enhanced backup functions loaded');
 
 // Authentication Functions
 function showLoginForm() {
@@ -4317,7 +4218,6 @@ function signInUser() {
     
     auth.signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
-            console.log('✅ User signed in:', userCredential.user.email);
             handleSuccessfulLogin(userCredential.user);
         })
         .catch((error) => {
@@ -4343,13 +4243,11 @@ function createUser() {
     
     auth.createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
-            console.log('✅ User created:', userCredential.user.email);
             
             // Update the user's profile with their name
             return userCredential.user.updateProfile({
                 displayName: name
             }).then(() => {
-                console.log('✅ User profile updated with name:', name);
                 handleNewUserSignup(userCredential.user);
             });
         })
@@ -4395,7 +4293,6 @@ function showDebugMessage(message) {
     debugDiv.scrollTop = debugDiv.scrollHeight;
     
     // Also log to console
-    console.log(message);
 }
 
 function signInWithGoogle() {
@@ -4404,7 +4301,6 @@ function signInWithGoogle() {
     // Check if we're running on iOS through Capacitor
     if (window.Capacitor && window.Capacitor.getPlatform() === 'ios') {
         // Use native iOS Google Sign-In
-        console.log('🍎 Using native iOS Google sign-in');
         window.nativeGoogleSignIn();
         return;
     }
@@ -4419,7 +4315,6 @@ function signInWithGoogle() {
     // Use popup for all devices (the original working method)
     auth.signInWithPopup(provider)
         .then(async (result) => {
-            console.log('✅ Google sign in success:', result.user.email);
             
             // Use enhanced account linking
             await signInWithGoogleLinked(result);
@@ -4447,10 +4342,8 @@ function signInWithGoogle() {
 }
 
 function signOutUser() {
-    console.log('👋 Signing out user...');
     
     auth.signOut().then(() => {
-        console.log('✅ User signed out successfully');
         
         // Clear local data
         window.currentUser = null;
@@ -4462,7 +4355,6 @@ function signOutUser() {
         localStorage.removeItem('user');
         localStorage.removeItem('userEmail');
         localStorage.removeItem('userDisplayName');
-        console.log('✅ LocalStorage cleared');
 
         // Show login screen and hide other screens
         document.getElementById('login-screen').classList.remove('hidden');
@@ -4502,7 +4394,6 @@ async function checkExistingAccount(email) {
         // First check Firebase Auth methods
         const methods = await auth.fetchSignInMethodsForEmail(email);
         if (methods && methods.length > 0) {
-            console.log('🔍 Found existing auth methods for', email, ':', methods);
             return { hasAuth: true, methods: methods };
         }
 
@@ -4514,7 +4405,6 @@ async function checkExistingAccount(email) {
         
         if (!usersSnapshot.empty) {
             const existingUserDoc = usersSnapshot.docs[0];
-            console.log('🔍 Found existing user data for email:', email);
             return { 
                 hasData: true, 
                 userId: existingUserDoc.id, 
@@ -4525,7 +4415,6 @@ async function checkExistingAccount(email) {
         // Also check localStorage for stored email
         const storedEmail = localStorage.getItem('userEmail');
         if (storedEmail === email) {
-            console.log('🔍 Found matching email in localStorage');
             return { hasLocalStorage: true };
         }
 
@@ -4539,10 +4428,8 @@ async function checkExistingAccount(email) {
 // Merge user data from existing account into current account
 async function linkAccountData(currentUserId, existingUserData, currentUserEmail) {
     try {
-        console.log('🔗 Linking account data for', currentUserEmail);
         
         if (!existingUserData) {
-            console.log('ℹ️ No existing data to merge');
             return true;
         }
 
@@ -4567,7 +4454,6 @@ async function linkAccountData(currentUserId, existingUserData, currentUserEmail
         delete mergeData.userId;
 
         await db.collection('users').doc(currentUserId).set(mergeData, { merge: true });
-        console.log('✅ Account data successfully linked and merged');
 
         return true;
     } catch (error) {
@@ -4648,7 +4534,6 @@ async function signInWithAppleLinked(authResult, userInfo) {
 
         // If account exists, offer to link
         if (existingAccount.hasAuth || existingAccount.hasData) {
-            console.log('🔗 Found existing account, offering to link');
             
             return new Promise((resolve) => {
                 showAccountLinkingDialog(
@@ -4656,7 +4541,6 @@ async function signInWithAppleLinked(authResult, userInfo) {
                     userEmail,
                     async () => {
                         // User chose to link
-                        console.log('✅ User chose to link accounts');
                         
                         if (existingAccount.userData) {
                             await linkAccountData(appleUser.uid, existingAccount.userData, userEmail);
@@ -4667,7 +4551,6 @@ async function signInWithAppleLinked(authResult, userInfo) {
                     },
                     () => {
                         // User chose separate account
-                        console.log('➡️ User chose separate account');
                         handleNewUserSignup(appleUser);
                         resolve(appleUser);
                     }
@@ -4675,7 +4558,6 @@ async function signInWithAppleLinked(authResult, userInfo) {
             });
         } else {
             // No existing account found
-            console.log('🆕 No existing account found, checking Apple user data');
             
             const hasAppleData = await loadUserDataEnhanced(appleUser.uid);
             if (hasAppleData) {
@@ -4703,7 +4585,6 @@ async function signInWithGoogleLinked(result) {
         const existingAccount = await checkExistingAccount(userEmail);
         
         if (existingAccount.hasData && !existingAccount.hasAuth) {
-            console.log('🔗 Found existing Apple account data, offering to link');
             
             return new Promise((resolve) => {
                 showAccountLinkingDialog(
@@ -4711,7 +4592,6 @@ async function signInWithGoogleLinked(result) {
                     userEmail,
                     async () => {
                         // User chose to link - load existing data
-                        console.log('✅ User chose to link with existing Apple account');
                         
                         // Load the existing Apple user data into current session
                         window.homeData = existingAccount.userData.homeData || {};
@@ -4725,7 +4605,6 @@ async function signInWithGoogleLinked(result) {
                     },
                     () => {
                         // User chose separate account - check normal Google data
-                        console.log('➡️ User chose separate Google account');
                         loadUserDataEnhanced(user.uid).then(hasData => {
                             if (hasData) {
                                 handleSuccessfulLogin(user);
@@ -4764,12 +4643,10 @@ async function signInWithGoogleLinked(result) {
     
 // Handle successful login (existing user)
 function handleSuccessfulLogin(user) {
-    console.log('🏠 User logged in, loading data first...');
     
     // Store user email for account linking
     if (user.email && !user.email.includes('homekeeper.app')) {
         localStorage.setItem('userEmail', user.email);
-        console.log('💾 Stored user email for account linking:', user.email);
     }
     
     // Hide login screen immediately
@@ -4778,27 +4655,20 @@ function handleSuccessfulLogin(user) {
     document.getElementById('setup-form').style.display = 'none';
     
     // Load data FIRST, then show dashboard - with mobile retry logic
-    console.log('📱 Starting data load for mobile/desktop...');
     
     loadUserDataEnhanced(user.uid).then(hasData => {
-        console.log('✅ Data load completed, hasData:', hasData);
         if (hasData) {
             // NOW show the app with data already loaded
             const header = document.getElementById('app-header');
-            console.log('🔍 Header element found:', !!header);
             if (header) {
-                console.log('🔍 Header current classes:', header.className);
-                console.log('🔍 Header current style:', header.style.cssText);
                 header.classList.remove('hidden');
                 header.style.display = 'block';
                 header.style.visibility = 'visible';
                 header.style.opacity = '1';
-                console.log('🔍 Header after changes:', header.style.cssText);
             }
             
             document.getElementById('main-app').classList.remove('hidden');
             document.body.classList.add('main-app-active');
-            console.log('🔍 Body classes after main-app-active:', document.body.className);
             const userName = user.displayName ? `Welcome, ${user.displayName.split(' ')[0]}` : 'Welcome back';
             
             // Update both header subtitles
@@ -4814,15 +4684,10 @@ function handleSuccessfulLogin(user) {
             if (window.enhancedDashboard && window.enhancedDashboard.render) {
                 window.enhancedDashboard.render();
             }
-            console.log('✅ Data loaded, dashboard ready');
             
             // Run YouTube integration immediately (no delay)
-            console.log('📺 DEBUG: Running YouTube integration');
-            console.log('📺 DEBUG: window.tasks exists:', !!window.tasks);
-            console.log('📺 DEBUG: tasks length:', window.tasks?.length || 0);
             
             if (typeof window.forceYouTubeIconsToShow === 'function') {
-                console.log('📺 DEBUG: Using forceYouTubeIconsToShow');
                 window.forceYouTubeIconsToShow();
             } else {
                 // Smart YouTube migration: Add search URLs to user-added tasks that don't have them
@@ -4837,18 +4702,15 @@ function handleSuccessfulLogin(user) {
                                 .trim();
                             task.youtubeUrl = `https://www.youtube.com/results?search_query=how+to+${searchQuery}+maintenance`;
                             migrated++;
-                            console.log(`📺 Added YouTube search URL for user task: "${task.title}"`);
                         }
                     });
                     
                     if (migrated > 0) {
-                        console.log(`📺 Added YouTube search URLs to ${migrated} user-added tasks`);
                         // Save the updated tasks
                         if (typeof saveData === 'function') {
                             saveData();
                         }
                         // CRITICAL FIX: Refresh dashboard after YouTube URL migration
-                        console.log('🔄 Refreshing dashboard after YouTube URL migration...');
                         
                         // Force immediate and complete refresh
                         if (window.enhancedDashboard) {
@@ -4859,7 +4721,6 @@ function handleSuccessfulLogin(user) {
                                 // Force re-render after DOM update
                                 setTimeout(() => {
                                     window.enhancedDashboard.render();
-                                    console.log('✅ Dashboard force-refreshed with YouTube URLs');
                                         
                                         // Show refresh button after a delay if video buttons still not visible
                                         setTimeout(() => {
@@ -4868,11 +4729,9 @@ function handleSuccessfulLogin(user) {
                                 }, 50);
                             } else {
                                 window.enhancedDashboard.render();
-                                console.log('✅ Dashboard refreshed with YouTube URLs');
                             }
                         } else if (typeof updateDashboard === 'function') {
                             updateDashboard();
-                            console.log('✅ Basic dashboard refreshed with YouTube URLs');
                         }
                     }
                 }
@@ -4880,14 +4739,11 @@ function handleSuccessfulLogin(user) {
             
             // ADDITIONAL FIX: Always refresh dashboard after all YouTube URL processing is complete
             // This ensures video buttons show up immediately even for existing tasks
-            console.log('🎬 Ensuring dashboard shows all video buttons...');
             setTimeout(() => {
                 if (window.enhancedDashboard && window.enhancedDashboard.render) {
                     window.enhancedDashboard.render();
-                    console.log('✅ Final dashboard refresh completed');
                 } else if (typeof updateDashboard === 'function') {
                     updateDashboard();
-                    console.log('✅ Final basic dashboard refresh completed');
                 }
             }, 100); // Small delay to ensure all processing is complete
             
@@ -4895,13 +4751,11 @@ function handleSuccessfulLogin(user) {
             // Update appliance manager with loaded data
             if (window.applianceManager && window.applianceData) {
                 window.applianceManager.setAppliances(window.applianceData);
-                console.log('✅ Appliance manager updated with loaded data');
              } 
             
             // Update documents manager with loaded data
             if (window.casaCareDocuments && window.documentsData) {
                 window.casaCareDocuments.documents = window.documentsData;
-                console.log('✅ Documents manager updated with loaded data');
             }
             
             
@@ -4910,13 +4764,11 @@ function handleSuccessfulLogin(user) {
         }
     }).catch(error => {
         console.error('❌ Error loading user data:', error);
-        console.log('🔄 Attempting retry for mobile compatibility...');
         
         // Mobile retry logic - try one more time after a short delay
         setTimeout(() => {
             loadUserDataEnhanced(user.uid).then(hasData => {
                 if (hasData) {
-                    console.log('✅ Retry successful - showing app');
                     document.getElementById('main-app').classList.remove('hidden');
                     document.body.classList.add('main-app-active');
                     showTab('dashboard');
@@ -4928,7 +4780,6 @@ function handleSuccessfulLogin(user) {
                         updateDashboard();
                     }
                 } else {
-                    console.log('🚫 Retry failed - showing setup');
                     handleNewUserSignup(user);
                 }
             }).catch(retryError => {
@@ -4942,15 +4793,8 @@ function handleSuccessfulLogin(user) {
 
 // In handleNewUserSignup function, make sure it sets up padding correctly:    
 function handleNewUserSignup(user) {
-    console.log('🆕 New user signed up, starting setup process...');
-    console.log('🔍 User details:', {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName
-    });
     
     // Hide ALL other screens first
-    console.log('👁️ Hiding all login screens and main app...');
     const loginScreen = document.getElementById('login-screen');
     const mainApp = document.getElementById('main-app');
     
@@ -4972,12 +4816,10 @@ function handleNewUserSignup(user) {
     document.body.style.paddingTop = '0';
     
     // Show setup form
-    console.log('📋 Showing setup form...');
     const setupForm = document.getElementById('setup-form');
     if (setupForm) {
         setupForm.classList.remove('hidden');
         setupForm.style.display = 'block';
-        console.log('✅ Setup form is now visible');
     } else {
         console.error('❌ Setup form element not found!');
     }
@@ -4988,40 +4830,32 @@ function handleNewUserSignup(user) {
     // Store user email for account linking  
     if (user.email && !user.email.includes('homekeeper.app')) {
         localStorage.setItem('userEmail', user.email);
-        console.log('💾 Stored user email for account linking:', user.email);
     }
     
     // Check if we need to show name field for Apple users
     if (!user.displayName || user.displayName === 'Apple User' || user.needsName) {
-        console.log('👤 Showing name field for user without proper name');
         const nameField = document.getElementById('name-field');
         if (nameField) {
             nameField.classList.remove('hidden');
         }
     } else {
         // User has a name from Google/profile, show welcome message
-        console.log(`👋 Setting welcome message for ${user.displayName.split(' ')[0]}`);
         const setupTitle = document.querySelector('#setup-form h2');
         if (setupTitle) {
             setupTitle.textContent = `Welcome, ${user.displayName.split(' ')[0]}!`;
         }
     }
     
-    console.log('✅ New user ready for setup');
 }
     
 // Check for redirect result from Google Sign In (for Safari iOS only)
-console.log('🔍 Checking for redirect result...');
 auth.getRedirectResult().then((result) => {
-    console.log('📊 Redirect result:', result);
     if (result.user) {
-        console.log('✅ Google redirect sign in success:', result.user.email);
         alert('✅ Redirect sign in success! Email: ' + result.user.email);
         
         // Handle the successful sign in with account linking
         signInWithGoogleLinked(result);
     } else {
-        console.log('ℹ️ No user in redirect result');
     }
 }).catch((error) => {
     console.error('❌ Redirect error:', error);
@@ -5042,30 +4876,23 @@ auth.onAuthStateChanged((user) => {
     // Prevent duplicate processing for same user
     const userKey = user ? user.uid : null;
     if (authProcessing || userKey === lastAuthUser) {
-        console.log('⚠️ Auth state change ignored - already processing or same user');
         return;
     }
     
     authProcessing = true;
     lastAuthUser = userKey;
-    console.log('🔄 Processing auth state change for:', user ? user.email : 'signed out');
     
     if (user) {
         // User is signed in
-        console.log('👤 Auth state changed - user logged in:', user.email);
-        console.log('🔍 Google sign-in in progress:', !!window.googleSignInInProgress);
         window.currentUser = user;
         
         // Only auto-load if we're not in the middle of a Google sign-in
         if (!window.googleSignInInProgress) {
-            console.log('🔄 Auto-loading user data via auth state change');
             handleSuccessfulLogin(user);
         } else {
-            console.log('⏸️ Skipping auto-load - Google sign-in handling routing');
         }
     } else {
         // User is signed out
-        console.log('👋 Auth state changed - no user, showing login screen');
         document.getElementById('login-screen').classList.remove('hidden');
         document.getElementById('setup-form').classList.add('hidden');
         document.getElementById('main-app').classList.add('hidden');
@@ -5094,11 +4921,9 @@ auth.onAuthStateChanged((user) => {
 // Check if an account with this email already exists (for account linking)
 async function checkForExistingAccountByEmail(email) {
     try {
-        console.log(`🔍 Checking Firebase for existing account with email: ${email}`);
         
         if (!email || email.includes('homekeeper.app') || email.includes('example.com')) {
             // Skip check for placeholder emails
-            console.log('🔍 Skipping placeholder email');
             return null;
         }
         
@@ -5108,7 +4933,6 @@ async function checkForExistingAccountByEmail(email) {
         // We need to search through all user documents to find one with this email
         // Since Firebase doesn't allow querying by email directly, we'll check common patterns
         
-        console.log('🔍 Searching Firebase users collection...');
         
         // Try to find user by email in their profile data
         const querySnapshot = await usersCollection.get();
@@ -5121,7 +4945,6 @@ async function checkForExistingAccountByEmail(email) {
                 userData.userEmail === email ||
                 (userData.homeData && userData.homeData.email === email)) {
                 
-                console.log(`🔗 Found existing account! User ID: ${doc.id}`);
                 
                 // Return the existing user's data
                 return {
@@ -5133,7 +4956,6 @@ async function checkForExistingAccountByEmail(email) {
             }
         }
         
-        console.log('🔍 No existing Firebase account found for this email');
         return null;
         
     } catch (error) {
@@ -5155,7 +4977,6 @@ function handleAppleSignInRedirect() {
             console.error('🍎 Apple Sign-In error:', appleError);
             alert('Apple Sign-In failed: ' + appleError);
         } else if (code) {
-            console.log('🍎 Apple Sign-In success with code:', code);
             
             // Parse user info if provided
             let userInfo = {};
@@ -5187,25 +5008,20 @@ function handleAppleSignInRedirect() {
             // Check if this email already has data (account linking)
             checkForExistingAccountByEmail(appleUser.email).then(existingData => {
                 if (existingData) {
-                    console.log('🔗 Found existing account with same email - linking accounts');
                     
                     // Use existing user data but update with Apple info
                     window.currentUser = appleUser;
                     window.homeData = existingData.homeData;
                     window.tasks = existingData.tasks || [];
                     
-                    console.log('➡️ Routing to main dashboard (linked Apple account)');
                     handleSuccessfulLogin(appleUser);
                 } else {
-                    console.log('🔍 No existing account found - checking Apple user data');
                     
                     // Check if this Apple user specifically has data
                     loadUserDataEnhanced(appleUser.uid).then(hasData => {
                         if (hasData) {
-                            console.log('➡️ Routing to main dashboard (existing Apple user)');
                             handleSuccessfulLogin(appleUser);
                         } else {
-                            console.log('➡️ Routing to setup flow (new Apple user)');
                             handleNewUserSignup(appleUser);
                         }
                     }).catch(error => {
@@ -5230,7 +5046,6 @@ function handleAppleSignInRedirect() {
 // Apple Sign-In Function (supports both iOS and web)
 async function signInWithApple() {
     try {
-        console.log('🍎 Starting Apple Sign-In...');
         
         // Check if running on iOS/native app
         if (window.Capacitor && window.Capacitor.getPlatform() !== 'web') {
@@ -5257,7 +5072,6 @@ async function signInWithApple_iOS() {
         requestedScopes: ['email', 'name']
     });
     
-    console.log('🍎 Apple Sign-In iOS result:', result);
     
     // Create user object for Firebase (keeping your existing flow)
     const appleUser = {
@@ -5304,7 +5118,6 @@ async function signInWithApple_Web() {
             
             // Create and store event handlers to prevent duplicates
             window.appleSuccessHandler = async (event) => {
-                console.log('🍎 Apple Sign-In Web success:', event.detail);
                 
                 const { authorization, user } = event.detail;
                 
@@ -5328,9 +5141,7 @@ async function signInWithApple_Web() {
             document.addEventListener('AppleIDSignInOnFailure', window.appleFailureHandler);
             
             // Trigger Apple Sign-In
-            console.log('🍎 About to trigger AppleID.auth.signIn()...');
             AppleID.auth.signIn();
-            console.log('🍎 AppleID.auth.signIn() called successfully');
             
         } catch (error) {
             console.error('🍎 Apple Sign-In Web initialization error:', error);
@@ -5355,7 +5166,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // No more automatic selections based on property type
-        console.log(`Property type selected: ${propertyType} - form remains blank for user choice`);
     }
     
     // Set initial selection (no automatic feature selection)
@@ -5391,7 +5201,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <script>
 function celebrateStepCompletion(currentStep, nextStep) {
-    console.log(`✅ Completing step ${currentStep}, moving to step ${nextStep}`);
     
     
     
@@ -5420,7 +5229,6 @@ function celebrateStepCompletion(currentStep, nextStep) {
 // REPLACE showSuccessMessage with this simple version:
 function showSuccessMessage(message) {
     // No more green floating bubbles - just log
-    console.log('Step completed:', message);
 }
 function getStepMessage(step) {
     const messages = {
@@ -5460,7 +5268,6 @@ function showSuccessMessage(message) {
 </script>
 <script>
 function startDemo() {
-    console.log('🚀 Starting demo mode...');
     
     // Set demo mode flag
     window.isDemoMode = true;
@@ -5526,7 +5333,6 @@ function showDemoBanner() {
 const originalSaveData = window.saveData;
 window.saveData = function() {
     if (window.isDemoMode) {
-        console.log('📝 Demo mode: Data saved locally only');
         // Store in localStorage for demo
         localStorage.setItem('demoData', JSON.stringify({
             homeData: window.homeData,
@@ -5577,7 +5383,6 @@ function toggleAdvancedFeatures() {
 
 // Skip to step function
 function skipToStep(stepNumber) {
-    console.log(`⏭️ Skipping to step ${stepNumber}`);
     
     // Hide all steps
     document.querySelectorAll('.onboarding-step').forEach(step => {

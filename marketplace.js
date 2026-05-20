@@ -1,14 +1,12 @@
 // Marketplace Integration Module
 // Handles product recommendations and affiliate links
 
-console.log('🛍️ Loading Marketplace module...');
 
 class MarketplaceManager {
     constructor() {
         // Amazon Associate ID - Ready to earn revenue!
         this.amazonAssociateId = 'thehomekeeper-20';
         this.productDatabase = this.initializeProductDatabase();
-        console.log('🛒 Marketplace manager initialized');
     }
 
     /* 
@@ -909,7 +907,6 @@ class MarketplaceManager {
 
     // Render the main marketplace tab
     renderMarketplace() {
-        console.log('🛍️ Rendering marketplace...');
         
         // Populate HVAC products - show all HVAC related items
         this.populateCategory('hvac-products', ['hvac filter', 'filter', 'mini split', 'wall ac', 'baseboard']);
@@ -932,7 +929,6 @@ class MarketplaceManager {
         // Populate Seasonal products
         this.populateSeasonalProducts();
         
-        console.log('✅ Marketplace populated');
     }
     
     // Populate a specific category container
@@ -1130,7 +1126,6 @@ class MarketplaceManager {
 
     // Filter shop categories based on dropdown selection
     filterByCategory(selectedCategory) {
-        console.log('🔍 Filtering shop by category:', selectedCategory);
         
         // Get all category sections
         const categories = [
@@ -1154,7 +1149,6 @@ class MarketplaceManager {
             }
         });
 
-        console.log(`✅ Shop filtered to show: ${selectedCategory === 'all' ? 'all categories' : selectedCategory}`);
     }
 }
 
@@ -1169,4 +1163,3 @@ function filterShopCategory() {
     }
 }
 
-console.log('✅ Marketplace module loaded successfully');

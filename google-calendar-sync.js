@@ -1,7 +1,6 @@
 // Google Calendar Integration Module - Modern Google Identity Services
 // Syncs maintenance tasks with user's Google Calendar
 
-console.log('📅 Loading Google Calendar Sync module...');
 
 class GoogleCalendarSync {
     constructor() {
@@ -15,7 +14,6 @@ class GoogleCalendarSync {
         this.accessToken = null;
         this.maintenanceCalendarId = null;
         
-        console.log('📅 Google Calendar Sync initialized');
         
         // Initialize when page loads
         this.initializeWhenReady();
@@ -33,10 +31,8 @@ class GoogleCalendarSync {
         return new Promise((resolve) => {
             const checkAPIs = () => {
                 if (window.gapi && window.google && window.google.accounts) {
-                    console.log('✅ Google APIs ready');
                     resolve();
                 } else {
-                    console.log('⏳ Waiting for Google APIs...');
                     setTimeout(checkAPIs, 100);
                 }
             };
@@ -47,7 +43,6 @@ class GoogleCalendarSync {
     // Initialize Google API
     async initializeGoogleAPI() {
         try {
-            console.log('🔄 Initializing Google Calendar API...');
             
             if (!window.gapi) {
                 throw new Error('Google API library (gapi) not loaded');
@@ -73,7 +68,6 @@ class GoogleCalendarSync {
                 discoveryDocs: [this.DISCOVERY_DOC]
             });
 
-            console.log('✅ Google Calendar API initialized');
             return true;
         } catch (error) {
             console.error('❌ Error initializing Google Calendar API:', error);
@@ -85,14 +79,12 @@ class GoogleCalendarSync {
     async signInToGoogle() {
         try {
             if (!this.gapi || !this.gapi.client) {
-                console.log('🔄 Google API not ready, re-initializing...');
                 const initSuccess = await this.initializeGoogleAPI();
                 if (!initSuccess) {
                     throw new Error('Failed to initialize Google API');
                 }
             }
 
-            console.log('🔐 Signing in to Google Calendar...');
 
             // Use Google Identity Services for OAuth
             return new Promise((resolve, reject) => {
@@ -107,7 +99,6 @@ class GoogleCalendarSync {
                             return;
                         }
 
-                        console.log('✅ OAuth token received');
                         this.accessToken = response.access_token;
                         this.isSignedIn = true;
 
@@ -152,7 +143,6 @@ class GoogleCalendarSync {
             this.maintenanceCalendarId = null;
             this.gapi.client.setToken(null);
             
-            console.log('👋 Signed out from Google Calendar');
             this.showUserMessage('Disconnected from Google Calendar');
         } catch (error) {
             console.error('❌ Error signing out:', error);
@@ -162,7 +152,6 @@ class GoogleCalendarSync {
     // Set up dedicated "Home Maintenance" calendar
     async setupMaintenanceCalendar() {
         try {
-            console.log('🏠 Setting up Home Maintenance calendar...');
 
             // First, check if calendar already exists
             const calendarList = await this.gapi.client.calendar.calendarList.list();
@@ -172,7 +161,6 @@ class GoogleCalendarSync {
 
             if (existingCalendar) {
                 this.maintenanceCalendarId = existingCalendar.id;
-                console.log('✅ Found existing Home Maintenance calendar:', existingCalendar.id);
                 return existingCalendar.id;
             }
 
@@ -186,7 +174,6 @@ class GoogleCalendarSync {
             });
 
             this.maintenanceCalendarId = calendar.result.id;
-            console.log('✅ Created new Home Maintenance calendar:', calendar.result.id);
 
             return calendar.result.id;
         } catch (error) {
@@ -201,12 +188,9 @@ class GoogleCalendarSync {
     async syncTaskToCalendar(task) {
         try {
             if (!this.isSignedIn) {
-                console.log('⚠️ Not signed in to Google Calendar, skipping sync for:', task.title);
                 return null;
             }
 
-            console.log('📅 Syncing task to Google Calendar:', task.title);
-            console.log('📅 Task due date:', task.dueDate);
 
             // Ensure proper date format (YYYY-MM-DD for all-day events)
             let dueDate = task.dueDate;
@@ -238,7 +222,6 @@ class GoogleCalendarSync {
                 colorId: this.getCategoryColor(task.category)
             };
 
-            console.log('📅 Event data:', eventData);
 
             // Create the event
             const event = await this.gapi.client.calendar.events.insert({
@@ -246,7 +229,6 @@ class GoogleCalendarSync {
                 resource: eventData
             });
 
-            console.log('✅ Task synced to Google Calendar:', event.result.id);
 
             // Store the Google event ID in the task for future updates
             if (window.tasks) {
@@ -318,7 +300,6 @@ class GoogleCalendarSync {
                 return null;
             }
 
-            console.log('🔄 Updating Google Calendar event for:', task.title);
 
             // Ensure proper date format
             let dueDate = task.dueDate;
@@ -355,7 +336,6 @@ class GoogleCalendarSync {
                 resource: eventData
             });
 
-            console.log('✅ Google Calendar event updated');
             return event.result.id;
         } catch (error) {
             console.error('❌ Error updating Google Calendar event:', error);
@@ -370,14 +350,12 @@ class GoogleCalendarSync {
                 return;
             }
 
-            console.log('🗑️ Deleting Google Calendar event for:', task.title);
 
             await this.gapi.client.calendar.events.delete({
                 calendarId: this.maintenanceCalendarId,
                 eventId: task.googleEventId
             });
 
-            console.log('✅ Google Calendar event deleted');
         } catch (error) {
             console.error('❌ Error deleting Google Calendar event:', error);
         }
@@ -386,48 +364,28 @@ class GoogleCalendarSync {
     // Sync all existing tasks to Google Calendar
     async syncAllTasks() {
         if (!window.tasks || !this.isSignedIn) {
-            console.log('⚠️ No tasks to sync or not signed in');
-            console.log('📊 Debug info:', {
-                tasksExist: !!window.tasks,
-                tasksCount: window.tasks?.length,
-                isSignedIn: this.isSignedIn
-            });
             return;
         }
 
-        console.log('🔄 Syncing all tasks to Google Calendar...');
-        console.log('📊 Total tasks available:', window.tasks.length);
         
         let syncCount = 0;
         let skipCount = 0;
         for (const task of window.tasks) {
-            console.log('📋 Checking task:', task.title, {
-                isCompleted: task.isCompleted,
-                hasGoogleEventId: !!task.googleEventId,
-                dueDate: task.dueDate
-            });
             
             // Only sync incomplete tasks without existing Google event
             if (!task.isCompleted && !task.googleEventId) {
-                console.log('✅ Task eligible for sync:', task.title);
                 const eventId = await this.syncTaskToCalendar(task);
                 if (eventId) {
                     syncCount++;
-                    console.log('🎉 Task synced successfully:', task.title, 'Event ID:', eventId);
                 } else {
-                    console.log('❌ Task sync failed:', task.title);
                 }
                 // Small delay to avoid rate limiting
                 await this.delay(100);
             } else {
                 skipCount++;
-                console.log('⏭️ Skipping task:', task.title, {
-                    reason: task.isCompleted ? 'completed' : 'already has google event'
-                });
             }
         }
 
-        console.log(`✅ Synced ${syncCount} tasks to Google Calendar`);
         this.showUserMessage(`✅ Synced ${syncCount} tasks to your Google Calendar!`);
     }
 
@@ -438,7 +396,6 @@ class GoogleCalendarSync {
 
     // Show user-friendly messages
     showUserMessage(message) {
-        console.log('📢', message);
         // Could integrate with your existing toast/notification system
     }
 
@@ -465,4 +422,3 @@ class GoogleCalendarSync {
 // Initialize the Google Calendar sync
 window.googleCalendarSync = new GoogleCalendarSync();
 
-console.log('✅ Google Calendar Sync module loaded successfully');

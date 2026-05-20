@@ -14,7 +14,6 @@ class EnhancedDashboard {
         'General': { icon: '🔧', color: 'gray' }
     };
     
-    console.log('🎯 Enhanced Dashboard initializing with shared categoryConfig');
     this.init();
 }
 
@@ -29,7 +28,6 @@ class EnhancedDashboard {
         const overdueCard = document.getElementById('overdue-card');
         if (overdueCard) {
             overdueCard.addEventListener('click', () => {
-                console.log('📊 Overdue card clicked');
                 this.setFilter('overdue');
             });
         }
@@ -37,7 +35,6 @@ class EnhancedDashboard {
         const weekCard = document.getElementById('week-card');
         if (weekCard) {
             weekCard.addEventListener('click', () => {
-                console.log('📊 Week card clicked');
                 this.setFilter('week');
             });
         }
@@ -46,7 +43,6 @@ class EnhancedDashboard {
         const totalCard = document.getElementById('total-card');
         if (totalCard) {
             totalCard.addEventListener('click', () => {
-                console.log('📋 Total Tasks clicked - navigating to All Tasks view');
                 if (typeof showAllTasks === 'function') {
                     showAllTasks();
                 } else {
@@ -55,16 +51,13 @@ class EnhancedDashboard {
             });
         }
 
-        console.log('✅ Enhanced dashboard events bound successfully');
     }
 
     setFilter(filterType) {
         // 🎯 NEW: Toggle functionality - if clicking the same filter, return to 'all'
         if (this.currentFilter === filterType) {
-            console.log(`🔄 Toggling ${filterType} filter back to 'all'`);
             this.currentFilter = 'all';
         } else {
-            console.log(`🔄 Setting filter to: ${filterType}`);
             this.currentFilter = filterType;
         }
         
@@ -196,12 +189,10 @@ class EnhancedDashboard {
 
         // Add safety check for tasks loading
         if (!window.tasks || !Array.isArray(window.tasks)) {
-            console.log('⚠️ Tasks not yet loaded, showing loading message');
             tasksList.innerHTML = `<div class="p-6 text-center text-gray-500">Loading tasks...</div>`;
             // Retry after a short delay
             setTimeout(() => {
                 if (window.tasks && Array.isArray(window.tasks)) {
-                    console.log('✅ Tasks loaded, re-rendering');
                     this.renderFilteredTasks();
                 }
             }, 500);
@@ -224,14 +215,11 @@ class EnhancedDashboard {
         }
 
         // Debug logging before rendering
-        console.log('🎬 DEBUG: Task YouTube URL status for new accounts:');
         filteredTasks.slice(0, 5).forEach(task => {
             const hasValidUrl = task.youtubeUrl && task.youtubeUrl.includes('youtube.com');
-            console.log(`  - "${task.title}": ${task.youtubeUrl ? '✅ HAS URL' : '❌ NO URL'} | Valid: ${hasValidUrl ? '✅' : '❌'} | URL: ${task.youtubeUrl || 'undefined'}`);
         });
         
         tasksList.innerHTML = filteredTasks.map(task => this.renderEnhancedTaskCard(task)).join('');
-        console.log(`✅ Rendered ${filteredTasks.length} tasks, ${filteredTasks.filter(t => t.youtubeUrl).length} have video URLs, ${filteredTasks.filter(t => t.youtubeUrl && t.youtubeUrl.includes('youtube.com')).length} have valid YouTube URLs`);
     }
 
 renderEnhancedTaskCard(task) {
@@ -247,7 +235,6 @@ renderEnhancedTaskCard(task) {
             .replace(/\s+/g, '+') // Replace spaces with +
             .trim();
         task.youtubeUrl = `https://www.youtube.com/results?search_query=how+to+${searchQuery}+maintenance`;
-        console.log(`🎬 Generated missing YouTube URL for "${task.title}": ${task.youtubeUrl}`);
     }
     
     // Enhanced Safety task detection
@@ -424,7 +411,6 @@ renderEnhancedTaskCard(task) {
         homeAddressElement.innerHTML = `🏠 ${window.homeData.fullAddress} <span class="text-blue-600">(click to search on Zillow)</span>`;
     }
     
-    console.log(`📊 Stats updated: ${overdueCount} overdue, ${weekCount} this week, ${totalTasks} total, annual cost: ${window.formatCurrency(totalCost)}, annual HOA: ${window.formatCurrency(hoaCost * 12)}`);
 }
 }
 
@@ -432,7 +418,6 @@ renderEnhancedTaskCard(task) {
 
 // UPDATED: Function to add task (replaces show all tasks)
 function addTaskFromDashboard() {
-    console.log('➕ Adding new task from dashboard...');
     
     const title = prompt('Task Title:');
     if (!title) return;
@@ -502,7 +487,6 @@ function addTaskFromDashboard() {
         window.casaCareCalendar.refresh();
     }
     
-    console.log('✅ New task added:', newTask);
     alert(`✅ Task "${title}" added successfully!`);
 }
 
@@ -513,7 +497,6 @@ function closeTaskEditModal() {
         modal.classList.add('hidden');
     }
     window.currentEditingTask = null;
-    console.log('✅ Task edit modal closed');
 }
 
 // Delete task from edit modal
@@ -527,7 +510,6 @@ function deleteTaskFromEdit() {
         const taskIndex = window.tasks.findIndex(t => t.id === window.currentEditingTask.id);
         if (taskIndex > -1) {
             const deletedTask = window.tasks.splice(taskIndex, 1)[0];
-            console.log(`🗑️ Deleted task: ${deletedTask.title}`);
             
             // Save data
             if (typeof window.saveData === 'function') {
@@ -564,7 +546,6 @@ function deleteTaskFromEdit() {
 
 // ENHANCED: Save task from edit modal (works in both setup and dashboard)
 function saveTaskFromEdit() {
-    console.log('💾 Saving task from edit modal (enhanced dashboard version)...');
     
     if (!window.currentEditingTask) {
         console.error('❌ No task being edited');
@@ -581,7 +562,6 @@ function saveTaskFromEdit() {
     const category = document.getElementById('edit-task-category')?.value || 'General';
     const dueDateInput = document.getElementById('edit-task-due-date');
     
-    console.log('📝 Form values:', { title, description, cost, frequency, priority, category });
     
     // Validate inputs
     if (!title) {
@@ -620,11 +600,9 @@ function saveTaskFromEdit() {
         dueDate = new Date();
     }
     
-    console.log('📅 Due date:', dueDate.toLocaleDateString());
     
     // Check if this is a new task
     const isNewTask = !window.tasks.find(t => t.id === window.currentEditingTask.id);
-    console.log('🆕 Is new task:', isNewTask);
     
     // Update task properties
     window.currentEditingTask.title = title;
@@ -639,9 +617,7 @@ function saveTaskFromEdit() {
     if (isNewTask) {
         // Add to tasks array
         window.tasks.push(window.currentEditingTask);
-        console.log('✅ New task added to global array');
     } else {
-        console.log('✅ Existing task updated');
     }
     
     // Always save data and refresh
@@ -652,21 +628,17 @@ function saveTaskFromEdit() {
         } else if (typeof saveData === 'function') {
             saveData();
         }
-        console.log('💾 Data saved');
         
         // Refresh dashboard
         if (window.enhancedDashboard && typeof window.enhancedDashboard.render === 'function') {
             window.enhancedDashboard.render();
-            console.log('🔄 Enhanced dashboard refreshed');
         } else if (typeof updateDashboard === 'function') {
             updateDashboard();
-            console.log('🔄 Basic dashboard updated');
         }
         
         // Refresh calendar if available
         if (window.casaCareCalendar && typeof window.casaCareCalendar.refresh === 'function') {
             window.casaCareCalendar.refresh();
-            console.log('📅 Calendar refreshed');
         }
         
         // Also try to refresh task categories if in setup
@@ -674,7 +646,6 @@ function saveTaskFromEdit() {
             const taskSetup = document.getElementById('task-setup');
             if (taskSetup && !taskSetup.classList.contains('hidden')) {
                 renderTaskCategories();
-                console.log('📋 Task categories re-rendered');
             }
         }
         
@@ -695,7 +666,6 @@ function closeDatePickerModal() {
         modal.classList.add('hidden');
     }
     window.currentRescheduleTask = null;
-    console.log('📅 Date picker modal closed');
 }
 
 function setQuickDate(daysFromNow) {
@@ -713,7 +683,6 @@ function setQuickDate(daysFromNow) {
         newDueDateInput.style.backgroundColor = '';
     }, 300);
     
-    console.log(`📅 Quick date set to ${daysFromNow} days from now`);
 }
 
 function confirmReschedule() {
@@ -773,28 +742,18 @@ function confirmReschedule() {
     // ADDED: Google Calendar sync for reschedules
     if (window.googleCalendarSync && window.googleCalendarSync.isConnected()) {
         const task = window.currentRescheduleTask;
-        console.log('🔍 Google Calendar sync check for reschedule:', {
-            googleCalendarSyncExists: !!window.googleCalendarSync,
-            isConnected: window.googleCalendarSync.isConnected(),
-            taskHasGoogleEventId: !!task.googleEventId,
-            taskTitle: task.title
-        });
         
         if (task.googleEventId) {
             // Task already has calendar event - update it
-            console.log('📅 Updating existing Google Calendar event for reschedule...');
             window.googleCalendarSync.updateCalendarEvent(task).then(() => {
-                console.log('✅ Google Calendar event updated for reschedule');
             }).catch(error => {
                 console.error('❌ Failed to update Google Calendar event:', error);
             });
         } else {
             // Task doesn't have calendar event yet - create one
-            console.log('📅 Creating new Google Calendar event for reschedule...');
             window.googleCalendarSync.syncTaskToCalendar(task).then((eventId) => {
                 if (eventId) {
                     task.googleEventId = eventId;
-                    console.log('✅ New Google Calendar event created for reschedule');
                     // Save again to persist the googleEventId
                     if (typeof window.saveData === 'function') {
                         window.saveData();
@@ -805,7 +764,6 @@ function confirmReschedule() {
             });
         }
     } else {
-        console.log('⚠️ Google Calendar sync not available or not connected');
     }
     
     // Close modal
@@ -813,7 +771,6 @@ function confirmReschedule() {
     
     // Show success message
     const message = `✅ "${window.currentRescheduleTask.title}" rescheduled from ${oldDate.toLocaleDateString()} to ${newDate.toLocaleDateString()}`;
-    console.log(message);
     
     // Show a nice success notification
     showSuccessNotification(`Task rescheduled to ${newDate.toLocaleDateString()}`);
@@ -847,4 +804,3 @@ function showSuccessNotification(message) {
 window.EnhancedDashboard = EnhancedDashboard;
 
 
-console.log('📋 Enhanced Dashboard script loaded with simplified date system');
