@@ -437,6 +437,15 @@ function showMainApp() {
 </div> <!-- Closes: bg-white shadow-sm border-b sticky -->
 </div> <!-- Closes: login-screen -->
 
+<!-- Loading Screen (shown while data loads after login) -->
+<div id="loading-screen" class="hidden fixed inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 flex items-center justify-center z-50" style="display:none;">
+    <div class="text-center">
+        <div class="inline-block w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
+        <p class="text-indigo-700 font-semibold text-lg">Loading your home...</p>
+        <p class="text-indigo-400 text-sm mt-2">Just a moment</p>
+    </div>
+</div>
+
 <!-- Native Setup Form -->
 <div id="setup-form" class="hidden bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex flex-col">
     <div class="flex-1 flex flex-col justify-start px-6 py-6">
@@ -4664,10 +4673,36 @@ function handleSuccessfulLogin(user) {
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('setup-form').classList.add('hidden');
     document.getElementById('setup-form').style.display = 'none';
-    
+
+    // Show loading screen while data loads
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        loadingScreen.classList.remove('hidden');
+        loadingScreen.style.display = 'flex';
+    }
+
+    // Safety timeout — if data takes >10s, proceed anyway (avoids stuck spinner)
+    const loadingTimeout = setTimeout(() => {
+        if (loadingScreen) {
+            loadingScreen.classList.add('hidden');
+            loadingScreen.style.display = 'none';
+        }
+        document.getElementById('main-app').classList.remove('hidden');
+        document.body.classList.add('main-app-active');
+        showTab('dashboard');
+        if (window.enhancedDashboard && window.enhancedDashboard.render) {
+            window.enhancedDashboard.render();
+        }
+    }, 10000);
+
     // Load data FIRST, then show dashboard - with mobile retry logic
-    
+
     loadUserDataEnhanced(user.uid).then(hasData => {
+        clearTimeout(loadingTimeout);
+        if (loadingScreen) {
+            loadingScreen.classList.add('hidden');
+            loadingScreen.style.display = 'none';
+        }
         if (hasData) {
             // NOW show the app with data already loaded
             const header = document.getElementById('app-header');
@@ -4775,10 +4810,15 @@ function handleSuccessfulLogin(user) {
         }
     }).catch(error => {
         console.error('❌ Error loading user data:', error);
-        
+        clearTimeout(loadingTimeout);
+
         // Mobile retry logic - try one more time after a short delay
         setTimeout(() => {
             loadUserDataEnhanced(user.uid).then(hasData => {
+                if (loadingScreen) {
+                    loadingScreen.classList.add('hidden');
+                    loadingScreen.style.display = 'none';
+                }
                 if (hasData) {
                     document.getElementById('main-app').classList.remove('hidden');
                     document.body.classList.add('main-app-active');
@@ -4795,6 +4835,10 @@ function handleSuccessfulLogin(user) {
                 }
             }).catch(retryError => {
                 console.error('❌ Retry also failed:', retryError);
+                if (loadingScreen) {
+                    loadingScreen.classList.add('hidden');
+                    loadingScreen.style.display = 'none';
+                }
                 // Final fallback to setup
                 handleNewUserSignup(user);
             });

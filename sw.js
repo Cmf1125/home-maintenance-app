@@ -1,6 +1,6 @@
 // Robust Service Worker with automatic error recovery and cache management
 // Updated: 2026-05-12c - CSS fix for setup form hidden/flex conflict
-const CACHE_VERSION = '2026-05-12c-css-fix';
+const CACHE_VERSION = '2026-05-21-loading-spinner';
 const CACHE_NAME = `home-keeper-v${CACHE_VERSION}`;
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `dynamic-${CACHE_VERSION}`;

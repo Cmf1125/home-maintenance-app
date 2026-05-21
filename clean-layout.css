@@ -6,7 +6,8 @@
    ======================================== */
 #setup-form.hidden,
 #property-confirmation.hidden,
-#task-setup.hidden {
+#task-setup.hidden,
+#loading-screen.hidden {
     display: none !important;
 }
 
