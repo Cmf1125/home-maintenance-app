@@ -1527,40 +1527,7 @@ function renderSimpleTaskItem(task) {
 }
 
 // Navigation functions
-function goBackToHomeSetup() {
-    document.getElementById('task-setup').classList.add('hidden');
-    document.getElementById('setup-form').style.display = 'block';
-    
-    // Pre-populate form with current data
-    if (homeData.address) document.getElementById('address').value = homeData.address;
-    if (homeData.city) document.getElementById('city').value = homeData.city;
-    if (homeData.state) document.getElementById('state').value = homeData.state;
-    if (homeData.zipcode) document.getElementById('zipcode').value = homeData.zipcode;
-    if (homeData.propertyType) document.getElementById('property-type').value = homeData.propertyType;
-    if (homeData.yearBuilt) document.getElementById('year-built').value = homeData.yearBuilt;
-    if (homeData.sqft) document.getElementById('sqft').value = homeData.sqft;
-    if (homeData.hoaCost) document.getElementById('hoa-cost').value = homeData.hoaCost;
-    
-    // Set all checkboxes and options
-    if (homeData.features) {
-        Object.entries(homeData.features).forEach(([key, value]) => {
-            const element = document.getElementById(key.replace(/([A-Z])/g, '-$1').toLowerCase());
-            if (element && element.type === 'checkbox') {
-                element.checked = value;
-            }
-        });
-        
-        // Handle text inputs
-        if (homeData.features.otherFeatures) {
-            document.getElementById('other-features').value = homeData.features.otherFeatures;
-        }
-        
-        // Show well water options if needed
-        if (typeof toggleWellWaterOptions === 'function') {
-            toggleWellWaterOptions();
-        }
-    }
-}
+// Defined below (line ~4697) — duplicate removed
 
 // CLEAN SIMPLE VERSION: Complete task setup with smart due dates
 function finishTaskSetup() {
@@ -4723,6 +4690,29 @@ function goBackToHomeSetup() {
     document.getElementById('progress-label').textContent = `Step ${step} of ${totalSteps}`;
     document.getElementById('progress-percent').textContent = `${percent}%`;
     document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+
+    // Pre-populate form with existing home data
+    if (window.homeData) {
+        if (homeData.address) document.getElementById('address').value = homeData.address;
+        if (homeData.city) document.getElementById('city').value = homeData.city;
+        if (homeData.state) document.getElementById('state').value = homeData.state;
+        if (homeData.zipcode) document.getElementById('zipcode').value = homeData.zipcode;
+        if (homeData.yearBuilt) document.getElementById('year-built').value = homeData.yearBuilt;
+        if (homeData.sqft) document.getElementById('sqft').value = homeData.sqft;
+        if (homeData.hoaCost) document.getElementById('hoa-cost').value = homeData.hoaCost;
+
+        if (homeData.features) {
+            Object.entries(homeData.features).forEach(([key, value]) => {
+                const el = document.getElementById(key.replace(/([A-Z])/g, '-$1').toLowerCase());
+                if (el && el.type === 'checkbox') el.checked = value;
+            });
+            if (homeData.features.otherFeatures) {
+                const otherEl = document.getElementById('other-features');
+                if (otherEl) otherEl.value = homeData.features.otherFeatures;
+            }
+            if (typeof toggleWellWaterOptions === 'function') toggleWellWaterOptions();
+        }
+    }
 }
 // Real-time task preview functionality
 function updateTaskPreview() {
