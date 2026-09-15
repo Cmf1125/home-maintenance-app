@@ -5468,57 +5468,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-
-// Add notification permission banner if needed
-function addNotificationBanner() {
-    if (!window.nativeFeatures || !('Notification' in window)) return;
-    
-    if (Notification.permission === 'default') {
-        const banner = document.createElement('div');
-        banner.className = 'notification-banner';
-        banner.innerHTML = `
-            <h4>🔔 Enable Reminders</h4>
-            <p>Get notified about upcoming maintenance tasks</p>
-            <button onclick="requestNotificationPermission(this.parentElement)">
-                Enable Notifications
-            </button>
-        `;
-        
-        // Insert after header
-        const header = document.querySelector('.header, h1');
-        if (header) {
-            header.parentNode.insertBefore(banner, header.nextSibling);
-        }
-    }
-}
-
-// Request notification permission
-async function requestNotificationPermission(banner) {
-    if (!window.nativeFeatures) return;
-    
-    const granted = await window.nativeFeatures.requestNotificationPermissions();
-    
-    if (granted) {
-        banner.innerHTML = `
-            <h4>✅ Notifications Enabled</h4>
-            <p>You'll receive reminders for your maintenance tasks</p>
-        `;
-        setTimeout(() => banner.remove(), 3000);
-    } else {
-        banner.innerHTML = `
-            <h4>❌ Notifications Disabled</h4>
-            <p>You can enable them later in Settings</p>
-        `;
-    }
-}
-
-// Initialize notification banner on page load
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(addNotificationBanner, 2000);
-});
-
-</script>
-
 </body>
 </html>
 <!-- Trigger deployment Fri Sep 26 10:13:17 EDT 2025 -->
