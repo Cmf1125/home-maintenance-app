@@ -7,7 +7,10 @@
 #setup-form.hidden,
 #property-confirmation.hidden,
 #task-setup.hidden,
-#loading-screen.hidden {
+#loading-screen.hidden,
+#task-edit-modal.hidden,
+#date-picker-modal.hidden,
+#home-info-modal.hidden {
     display: none !important;
 }
 
