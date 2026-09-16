@@ -56,15 +56,6 @@ body.setup-active #setup-form {
 </style>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Capacitor Core -->
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@capacitor/core@8/dist/capacitor.js"></script>
-    
-    <!-- Capacitor iOS Bundle (only loads on iOS) -->
-    <script type="module">
-        if (window.Capacitor?.getPlatform() === 'ios') {
-            import('https://cdn.jsdelivr.net/npm/@capacitor/ios@8/dist/plugin.js');
-        }
-    </script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="calendar.css"> 
     <link rel="stylesheet" href="enhanced-styles.css">
@@ -1778,7 +1769,7 @@ function showMainApp() {
 </div>
 
 <!-- System Age Update Modal -->
-<div id="system-age-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+<div id="system-age-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4" style="display:none;">
     <div class="bg-white rounded-xl w-full max-w-md p-6">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-xl font-bold text-gray-900">Update System Age</h3>
@@ -1844,7 +1835,7 @@ function showMainApp() {
 </div>
 
 <!-- Add Planning Item Modal -->
-<div id="add-planning-item-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+<div id="add-planning-item-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4" style="display:none;">
     <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-xl font-bold text-gray-900">Add Custom Planning Item</h3>
@@ -1916,7 +1907,7 @@ function showMainApp() {
 </div>
 
 <!-- Add Vendor Modal -->
-<div id="add-vendor-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+<div id="add-vendor-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4" style="display:none;">
     <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-xl font-bold text-gray-900">Add Vendor</h3>
@@ -2125,7 +2116,7 @@ function showMainApp() {
         </div>
 
        <!-- Date Picker Modal -->
-<div id="date-picker-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+<div id="date-picker-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4" style="display:none;">
   <div class="bg-white rounded-xl w-full max-w-sm p-6 shadow-2xl">
     <div class="text-center mb-6">
       <h3 class="text-xl font-bold text-gray-900 mb-2">📅 Reschedule Task</h3>
@@ -2199,7 +2190,7 @@ function showMainApp() {
 
 
             <!-- Editable Home Info Modal -->
-<div id="home-info-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+<div id="home-info-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4" style="display:none;">
     <div class="bg-white rounded-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-xl font-bold">🏠 Edit Home Information</h3>
@@ -3876,15 +3867,6 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-// iOS-specific authentication fixes
-if (window.Capacitor && window.Capacitor.getPlatform() === 'ios') {
-    
-    // Set persistence to LOCAL for iOS
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-    
-    // Override popup blocking detection for iOS
-    window.isIOSApp = true;
-}
 
 // Make Firebase instances globally available
 window.auth = auth;
@@ -4304,13 +4286,6 @@ function showDebugMessage(message) {
 
 function signInWithGoogle() {
     window.googleSignInInProgress = true; // Flag to prevent auto-login
-    
-    // Check if we're running on iOS through Capacitor
-    if (window.Capacitor && window.Capacitor.getPlatform() === 'ios') {
-        // Use native iOS Google Sign-In
-        window.nativeGoogleSignIn();
-        return;
-    }
     
     const provider = new firebase.auth.GoogleAuthProvider();
     

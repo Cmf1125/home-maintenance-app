@@ -10,7 +10,10 @@
 #loading-screen.hidden,
 #task-edit-modal.hidden,
 #date-picker-modal.hidden,
-#home-info-modal.hidden {
+#home-info-modal.hidden,
+#system-age-modal.hidden,
+#add-planning-item-modal.hidden,
+#add-vendor-modal.hidden {
     display: none !important;
 }
 
